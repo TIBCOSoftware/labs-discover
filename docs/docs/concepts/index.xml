@@ -1,0 +1,60 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – Concepts</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/</link>
+    <description>Recent content in Concepts on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/concepts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Architecture</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</link>
+      <pubDate>Sun, 05 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;high-level-view&#34;&gt;High Level view&lt;/h2&gt;
+&lt;p&gt;The current Architecture of Project Discover, from an high-level perspective&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;we are working on an update Image!
+&lt;img src=&#34;Architecture.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;tibco-product-list&#34;&gt;TIBCO Product List&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO Cloud™ Integration	1.34.0	Current&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Live Apps	1.27.0	Current&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Spotfire®	10.8.0	Current&lt;/li&gt;
+&lt;li&gt;TIBCO® Data Science - Team Studio	6.5.0	Current&lt;/li&gt;
+&lt;li&gt;TIBCO® Data Virtualization	8.3.0	Current&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Algorithm</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</link>
+      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;high-level-view&#34;&gt;High Level view&lt;/h2&gt;
+&lt;p&gt;The current Algorithm pipeline of Project Discover, from an high-level perspective&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;processMining.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
