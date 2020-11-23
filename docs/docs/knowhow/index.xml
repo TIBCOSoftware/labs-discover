@@ -1,0 +1,170 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – KnowHow</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/</link>
+    <description>Recent content in KnowHow on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Thu, 19 Nov 2020 00:00:00 +0000</lastBuildDate>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/knowhow/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Data</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/data/</link>
+      <pubDate>Fri, 16 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/data/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;data-types&#34;&gt;Data Types&lt;/h2&gt;
+&lt;p&gt;Discover support to upload and manage CSV Files.
+For other types of data sources, you can use the New Process Analysis wizard to connect to any TIBCO Data Virtualization views. e.g. Databases, Big Data Clusters, or ready to use Application Connectors.&lt;/p&gt;
+&lt;h2 id=&#34;csv-files&#34;&gt;CSV Files&lt;/h2&gt;
+&lt;h4 id=&#34;file-size&#34;&gt;File Size&lt;/h4&gt;
+&lt;p&gt;You can upload files up to 500MB,
+for bigger data sets, please use TIBCO Data Virtualization.&lt;/p&gt;
+&lt;h4 id=&#34;file-formats&#34;&gt;File Formats&lt;/h4&gt;
+&lt;p&gt;Upload your files in &lt;strong&gt;CSV Format&lt;/strong&gt; only.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Please note that zip files are not supported.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Cases</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/cases/</link>
+      <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/cases/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-are-investigations&#34;&gt;What are Investigations&lt;/h2&gt;
+&lt;p&gt;An &lt;strong&gt;investigation&lt;/strong&gt; is a result of a negative finding in the process mining analysis.
+Ir represents an issue, or a potential area of improvement, that cannot be ignored and needs to be reported to case resolvers.
+A typical investigation follows a process that start from initial verification, investigation of the root cause, qualification of the issue (confirmed or false positive)
+and finally a resolution in the form of counter measures that will take effect and be checked again in the next round of procss mining.&lt;/p&gt;
+&lt;h3 id=&#34;what-are-the-investigation-types&#34;&gt;What are the Investigation Types&lt;/h3&gt;
+  &lt;p&gt;Two investigation types are possible: &lt;/p&gt;
+  &lt;li&gt; &lt;strong&gt;Compliance&lt;/strong&gt; &lt;/li&gt;
+  &lt;li&gt; &lt;strong&gt;Improvements&lt;/strong&gt; &lt;/li&gt;
+&lt;h2 id=&#34;what-is-compliance&#34;&gt;What is Compliance&lt;/h2&gt;
+&lt;p&gt;A &lt;strong&gt;Compliance&lt;/strong&gt; investigation is an issue discovered during the process mining analysis that needs to be reported and tracked until resolution.&lt;/p&gt;
+&lt;h2 id=&#34;what-is-improvement&#34;&gt;What is Improvement&lt;/h2&gt;
+&lt;p&gt;An &lt;strong&gt;Improvement&lt;/strong&gt; investigation is proposal made by the process stakeholder to improve a certain area of the process, following inefficiencies discovered during the process mining analysis.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Lifecycle</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/lifecycle/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/lifecycle/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-is-the-process-analysis-lifecycle&#34;&gt;What is the Process Analysis Lifecycle&lt;/h2&gt;
+&lt;p&gt;Once created using the wizard, Process analysis may follow the list of statuses below.&lt;/p&gt;
+    &lt;li&gt; &lt;strong&gt;Added&lt;/strong&gt;: Initial status after creation from the wizard. Once Added, the analysis goes directly to the Process Mining status.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Process Mining&lt;/strong&gt;: Once here, the computation of the process mining algorithm(s) is sent to the backend.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Ready&lt;/strong&gt;: Process Mining has been successfully completed and analysis is ready to view analytics.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Not Ready&lt;/strong&gt;: Process Mining has terminated with errors. Those errors should be reviewed and the analysis should be edited and re-run. &lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Archived&lt;/strong&gt;: This is like a read only mode. the analysis can see be viewed but not modified. &lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Purged&lt;/strong&gt;: Analysis is marked for removal and should be removed automatically from the list.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Completed&lt;/strong&gt;: This terminate status means the analysis can be permanently deleted from the system.&lt;/li&gt;
+&lt;br&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Note: in State &amp;lsquo;Process Mining&amp;rsquo;, a progress bar is visible on the status to track the overall progress. Once completed, the analysis goes automatically either in Ready ot Not Ready status.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Online Help</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/onlinehelp/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/onlinehelp/</guid>
+      <description>
+        
+        
+        &lt;p&gt;The Discover UI provides a contextual Online Help, based on current visible screen.&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../OnlineHelp.png&#34; alt=&#34;Online Help&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Try it out!&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 3rd Party</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/3rd-party/</link>
+      <pubDate>Tue, 14 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/3rd-party/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;used-3rd-party-libraries&#34;&gt;used 3rd Party Libraries&lt;/h2&gt;
+&lt;p&gt;Used within Spotfire JSViz 3.5.1.0 with TIBCO Component Exchange License, all just referenced and not included.&lt;/p&gt;
+&lt;h3 id=&#34;angular-js&#34;&gt;Angular JS&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;angularjs	1.7.9	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-animate	1.7.9	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-animate.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-animate.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-aria	1.7.9	MIT	
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-aria.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-aria.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-messages	1.7.9	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-messages.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-messages.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-material	1.1.20	MIT	
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-material	1.1.20	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.css&#34;&gt;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.css&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;material-icons	3.0.1	Apache 2.0		
+&lt;a href=&#34;https://fonts.googleapis.com/icon?family=Material+Icons&#34;&gt;https://fonts.googleapis.com/icon?family=Material+Icons&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;fontawesome	5.12.0	SIL OFL		
+&lt;a href=&#34;https://use.fontawesome.com/releases/v5.12.0/css/all.css&#34;&gt;https://use.fontawesome.com/releases/v5.12.0/css/all.css&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;cytoscape&#34;&gt;Cytoscape&lt;/h3&gt;
+&lt;p&gt;from &lt;a href=&#34;https://js.cytoscape.org&#34;&gt;https://js.cytoscape.org&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;cytoscape.js	3.13.0	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape@3.13.0/dist/cytoscape.min.js&#34;&gt;https://unpkg.com/cytoscape@3.13.0/dist/cytoscape.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-dagre	2.2.2	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape-dagre@2.2.2/cytoscape-dagre.js&#34;&gt;https://unpkg.com/cytoscape-dagre@2.2.2/cytoscape-dagre.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-panzoom	2.5.3	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape-panzoom.js&#34;&gt;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape-panzoom.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-panzoom	2.5.3	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape.js-panzoom.css&#34;&gt;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape.js-panzoom.css&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-popper	1.0.6	MIT	No	
+&lt;a href=&#34;https://unpkg.com/cytoscape-popper@1.0.6/cytoscape-popper.js&#34;&gt;https://unpkg.com/cytoscape-popper@1.0.6/cytoscape-popper.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;others&#34;&gt;others&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;dagrejs	0.8.5	MIT		
+&lt;a href=&#34;https://unpkg.com/dagre@0.8.5/dist/dagre.min.js&#34;&gt;https://unpkg.com/dagre@0.8.5/dist/dagre.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;popperjs	1.16.0	MIT		
+&lt;a href=&#34;https://unpkg.com/popper.js@1.16.0/dist/umd/popper.js&#34;&gt;https://unpkg.com/popper.js@1.16.0/dist/umd/popper.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;tippy.js	4.3.5	MIT		
+&lt;a href=&#34;https://unpkg.com/tippy.js@4.3.5/umd/index.all.js&#34;&gt;https://unpkg.com/tippy.js@4.3.5/umd/index.all.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;jQuery	3.4.1	MIT		
+&lt;a href=&#34;https://code.jquery.com/jquery-3.4.1.min.js&#34;&gt;https://code.jquery.com/jquery-3.4.1.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

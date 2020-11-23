@@ -3,23 +3,63 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-branding/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/prerequisites/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-general/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/importwizard/</loc>
+    <lastmod>2020-11-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-overview/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step1/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-an-event-log/</loc>
+    <lastmod>2020-11-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/knowhow/data/</loc>
+    <lastmod>2020-10-16T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://tibcosoftware.github.io/labs-discover/docs/overview/</loc>
-    <lastmod>2020-10-05T09:59:25+02:00</lastmod>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step2/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-variants/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-process-mining/</loc>
+    <lastmod>2020-11-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/knowhow/cases/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
@@ -28,33 +68,113 @@
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/customize/custom-processminer-algo/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/knowhow/lifecycle/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-map/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/customize/data-tables/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/getting-started/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step3/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/tasks/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-the-business-value/</loc>
+    <lastmod>2020-11-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-activities/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step4/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-a-process-analysis/</loc>
+    <lastmod>2020-11-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-analytics/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/knowhow/onlinehelp/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-resource-graph/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step5/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-database/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-reference-model/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step6/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-orchestration/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-compliance/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-process-mining/</loc>
+    <lastmod>2020-11-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-cases/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-filters/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://tibcosoftware.github.io/labs-discover/docs/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
@@ -63,28 +183,68 @@
   </url>
   
   <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/3rd-party/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/getting-started/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-add-ons/</loc>
+    <lastmod>2020-11-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/analytics/howtos/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</loc>
+    <lastmod>2020-11-20T11:32:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/knowhow/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/docs/knowhow/3rd-party/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://tibcosoftware.github.io/labs-discover/blog/2020/11/06/nov.-2020-release/</loc>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://tibcosoftware.github.io/labs-discover/blog/2020/09/23/tibco-now-update/</loc>
-    <lastmod>2020-10-05T12:25:24+02:00</lastmod>
+    <lastmod>2020-11-19T18:41:30+01:00</lastmod>
   </url>
   
   <url>
     <loc>https://tibcosoftware.github.io/labs-discover/blog/2020/05/03/project-updates/</loc>
-    <lastmod>2020-10-05T12:25:24+02:00</lastmod>
+    <lastmod>2020-10-05T12:37:44+02:00</lastmod>
   </url>
   
   <url>
     <loc>https://tibcosoftware.github.io/labs-discover/blog/2020/01/09/initial-release/</loc>
     <lastmod>2020-10-05T12:25:24+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://tibcosoftware.github.io/labs-discover/docs/installation/customize/</loc>
-    <lastmod>2020-06-17T08:53:37+02:00</lastmod>
   </url>
   
   <url>

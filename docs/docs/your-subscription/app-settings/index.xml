@@ -1,0 +1,182 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – Settings</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/</link>
+    <description>Recent content in Settings on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Thu, 19 Nov 2020 00:00:00 +0000</lastBuildDate>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Branding</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-branding/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-branding/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../Branding.png&#34; alt=&#34;Branding&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;can-i-adjust-the-application-branding&#34;&gt;Can I adjust the Application Branding&lt;/h4&gt;
+&lt;p&gt;Yes. In the General section you can change the application title.
+&lt;/p&gt;
+&lt;h4 id=&#34;can-i-adjust-the-welcome-screen&#34;&gt;Can I adjust the Welcome Screen&lt;/h4&gt;
+&lt;p&gt;Yes. The Welcome screen has the following structure:
+    &lt;li&gt;A title&lt;/li&gt;
+    &lt;li&gt;A sub-title&lt;/li&gt;
+    &lt;li&gt;3 sections describing the application capabilities. Each of them has an icon associated, and is made of a title and a description&lt;/li&gt;
+    &lt;li&gt;A background image&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;
+   You can change all text, upload new image and icons, to brand your own landing page.
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: General</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-general/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-general/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-General.png&#34; alt=&#34;General&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Here you can configure the necessary &lt;strong&gt;TIBCO Cloud components&lt;/strong&gt;  used to manage the lifecycle of Process analysis.
+&lt;/p&gt;
+&lt;h4 id=&#34;messaging&#34;&gt;Messaging&lt;/h4&gt;
+&lt;p&gt;The following &lt;strong&gt;TIBCO Cloud Messaging&lt;/strong&gt;  configurations are required
+    &lt;li&gt;Messaging endpoint&lt;/li&gt;
+    &lt;li&gt;Messaging API Key&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;Those elements can be found in your TIBCO Cloud Messaging subscription&lt;/p&gt;
+&lt;h4 id=&#34;integration&#34;&gt;Integration&lt;/h4&gt;
+&lt;p&gt;The following &lt;strong&gt;TIBCO Cloud Integration&lt;/strong&gt;  configurations are required
+    &lt;li&gt;Integration endpoint&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;Those elements can be found in your TIBCO Cloud Integration subscription&lt;/p&gt;
+&lt;h4 id=&#34;live-apps&#34;&gt;Live Apps&lt;/h4&gt;
+&lt;p&gt;The following &lt;strong&gt;TIBCO Cloud Live Apps&lt;/strong&gt; configurations are required
+    &lt;li&gt;Application used to manage the Process Analysis lifecycle&lt;/li&gt;
+    &lt;li&gt;Creator used to create cases of the above&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;Those elements can be found in your TIBCO Cloud Live Apps subscription&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Analytics</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-analytics/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-analytics/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../Analytics.png&#34; alt=&#34;Analytics&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;enable-web-authoring&#34;&gt;Enable Web Authoring&lt;/h4&gt;
+&lt;p&gt;Spotfire Web Authoring can get toggled on or off&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Note: this capability requires the web authoring role on Spotfire.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;spotfire-server-configuration&#34;&gt;Spotfire Server Configuration&lt;/h4&gt;
+&lt;p&gt;The default Spotfire server is TIBCO Cloud Spotfire. &lt;br&gt;
+However you can toggle that settings off and enter the URL of your own managed server.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Database</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-database/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-database/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-Database.png&#34; alt=&#34;Database&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;You can specify the details of the Database used to store the output of the process mining.
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Orchestration</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-orchestration/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-orchestration/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-Orchestration.png&#34; alt=&#34;Orchestration&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;You can specify the details of the spark orchestrator responsible for running process mining on the backend.
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Process Mining</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-process-mining/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-platform-process-mining/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-ProcessMining.png&#34; alt=&#34;ProcessMining&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;You can specify the details of the spark orchestrator responsible for running process mining on the backend.
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Add-On&#39;s</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-add-ons/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-subscription/app-settings/settings-add-ons/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../Addons.png&#34; alt=&#34;Discover Addons&#34;&gt;&lt;/p&gt;
+&lt;p&gt;The following add-ons are available
+    &lt;li&gt;TIBCO Data Virtualization (TDV)&lt;/li&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;why-to-use-tdv&#34;&gt;Why to use TDV&lt;/h4&gt;
+&lt;p&gt;TIBCO Data Virtualization helps you access, combine and provision your event logs data from your supporting systems. 
+&lt;p&gt;TIBCO DV allows you to:&lt;/p&gt;
+&lt;li&gt;&lt;strong&gt;Connect to your operational systems&lt;/strong&gt; using of our 200+ connectors&lt;/li&gt;
+&lt;li&gt;Create &lt;strong&gt;virtual views&lt;/strong&gt; of your data ready to be consumed by analytics and process mining. 
+No more complex ETL needed, your data doesn&#39;t need to move!&lt;/li&gt; 
+&lt;li&gt;&lt;strong&gt;Federate multiple sources&lt;/strong&gt; as your business processes touch multiple operational systems. &lt;/li&gt;
+&lt;li&gt;Deliver&lt;strong&gt; High performance&lt;/strong&gt; access to your data. &lt;/li&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;how-to-configure-tdv&#34;&gt;How to configure TDV&lt;/h4&gt;
+&lt;p&gt;You can use your own managed TIBCO Data Virtualization and bring your data to the solution. 
+&lt;p&gt;Use this setting screen to configure:&lt;/p&gt;
+&lt;li&gt;The URL and port of the Business Directory Server. Note that a proxy is needed to allow the Web Application to access Business Directory APIs 
+    hosted on a different domain. Configure that proxy to allow CORS headers.
+&lt;/li&gt;
+&lt;li&gt;The  port of your TDV Server. Please remember to white list the IP address of your TDV server so that it can be reached from the backend. 
+    The hostname of your TDV server is not needed here because it is provided dynamically by the Business Directory Server as you pick views. 
+&lt;/li&gt; 
+&lt;li&gt;Username and password to access the above.&lt;/li&gt;
+&lt;/p&gt;
+      </description>
+    </item>
+    
+  </channel>
+</rss>

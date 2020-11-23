@@ -1,0 +1,282 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – Discover Analytics</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/</link>
+    <description>Recent content in Discover Analytics on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/analytics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Overview</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-overview/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-overview/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visOverview.png&#34; alt=&#34;Overview Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A set of KPIs allow you to quickly visualize &lt;/p&gt;
+    &lt;li&gt;Nb of Events&lt;/li&gt;
+    &lt;li&gt;Nb of Cases&lt;/li&gt;
+    &lt;li&gt;Nb of Variants&lt;/li&gt;
+    &lt;li&gt;Nb of Activities&lt;/li&gt;
+    &lt;li&gt;Median and average case duration&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;
+  Open cases are also visualized on a timeline, allowing you to filter start and end times using the zoom slider and the filter panel.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Variants</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-variants/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-variants/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visVariants.png&#34; alt=&#34;Variants Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+  Variants can be explored, focusing on:
+  &lt;li&gt;Distribution by frequency or performance&lt;/li&gt;
+  &lt;li&gt;Top frequency: discover the most frequent paths corresponding to your 80% cases.&lt;/li&gt;
+  &lt;li&gt;Bottom performance: discover the worst cases in terms of duration and identify the outliers.&lt;/li&gt;
+&lt;/p&gt;  
+&lt;p&gt;
+  Select one or more variants from the table and visualize the corresponding process map.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Process Map</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-map/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-map/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visProcessMap.png&#34; alt=&#34;Process Map Visualization&#34;&gt;&lt;/p&gt;
+ &lt;p&gt;
+   Typical features include:
+   &lt;li&gt;Node color represent a metric (frequency or performance)&lt;/li&gt;
+   &lt;li&gt;Zoom in and out to explore the process&lt;/li&gt;
+   &lt;li&gt;Support of multiple layouts&lt;/li&gt;
+   &lt;li&gt;Ability to select nodes and edges for filtering purpose&lt;/li&gt;
+   &lt;li&gt;Configurable labels on edges (including Nb events &amp; duration)&lt;/li&gt;
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Activities</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-activities/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-activities/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visActivities.png&#34; alt=&#34;Activities Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+  Two main categorizations are proposed:
+&lt;li&gt;by frequency&lt;/li&gt;
+&lt;li&gt;by performance&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;
+  Each set of visualizations include a time distribution, and a tree map representing resources performing the activities. 
+&lt;/p&gt;
+&lt;p&gt;Select one or more activities to drill down into details.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Resource Graph</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-resource-graph/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-resource-graph/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visResourceGraph.png&#34; alt=&#34;Resource Graph Visualization&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;
+    The purpose is to help discover some patterns related to how resources are involved and interact with each other in processes.
+ &lt;/p&gt;
+ &lt;p&gt;
+   A table lists resources ranked by number of activities performed. 
+   &lt;li&gt;select one or more resources to see details, including the list of activities performed by the selection.  &lt;/li&gt;
+ &lt;/p&gt;
+ &lt;p&gt;
+   The graph represent &lt;strong&gt;resources&lt;/strong&gt; as nodes and &lt;strong&gt;connections&lt;/strong&gt; as edges. 
+   A connection between two resources represents two consecutive activities in the same case. 
+   Of course, an edge can represent more than one occurrences of such connection, for one or more cases.
+ &lt;/p&gt;
+ &lt;p&gt;
+   A filter panel allows 
+   &lt;li&gt;setting a minimum number of activities, as a way to filter resources&lt;/li&gt;
+   &lt;li&gt;setting a minimum number of activities, as a way to filter resources and connections&lt;/li&gt;
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Reference Model</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-reference-model/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-reference-model/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visReferenceModel.png&#34; alt=&#34;Reference Model Visualization&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;Here&#39;s how it works:
+    &lt;li&gt;Initially the reference model is empty.&lt;/li&gt;
+    &lt;li&gt;As you discover variants, you can Add one or more to the reference model.&lt;/li&gt;
+    &lt;li&gt;The reference model is then persisted in the backend, therefore next time you open the analysis it will appear.&lt;/li&gt;
+    &lt;li&gt;Once set, you can check compliance of the cases against that reference set.&lt;/li&gt;
+    &lt;li&gt;At any time, you can add/remove variants from the reference model.&lt;/li&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+  Setting the reference model does not require any modeling. 
+  Instead, it follows a discovery approach, expecting the data and cases to contain at least one occurrence of them.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Compliance</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-compliance/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-compliance/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visCompliance.png&#34; alt=&#34;Compliance Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A variant is qualified as non compliant if it doesn&#39;t follow any of the variants that constitute the reference model. 
+    Only the paths are considered for compliance checking.&lt;/p&gt;
+&lt;p&gt;What you can see at a glance is:&lt;/p&gt;
+&lt;li&gt;The level of non compliance in the form of the number of variants, and % of cases that aren&#39;t compliant with the reference set. &lt;/li&gt;
+&lt;li&gt;A table showing all non compliant variants
+&lt;li&gt;A visual representation of the differences between the reference model and a selected non compliant variant&lt;/li&gt; 
+&lt;/p&gt;
+&lt;p&gt;
+   The table of non compliant variants can be sorted by any of these columns:
+   &lt;li&gt;Degree of non compliance, expressed as the number of difference between the variant (row) and the reference model&lt;/li&gt;
+   &lt;li&gt;Number of cases&lt;/li&gt;
+   &lt;li&gt;Duration metrics&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;
+   You can select a variant in the table and perform the following actions:
+   &lt;li&gt;Visualize the process compared to the reference model.   &lt;/li&gt;
+   &lt;li&gt;Mark the variant as checked so that next time you open the analysis you won&#39;t need to inspect it again. &lt;/li&gt;
+   &lt;li&gt;Raise an investigation so that the non compliance can be escalated, validated and the root cause problem resolved so that it doesn&#39;t occur again in the future &lt;/li&gt;
+  &lt;li&gt;Track the status of the investigation&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;Graph Color Codes&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../compare-colors.png&#34; alt=&#34;Compliance Visualization&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Cases</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-cases/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-cases/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visCases.png&#34; alt=&#34;Cases Visualization&#34;&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;usually cases get selected from a variant selection&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;
+    It allows to drill down into the details of each case and view their event history.
+    Cases are listed and can be compared visually by selecting them.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Filters</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-filters/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-filters/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;..//visFilters.png&#34; alt=&#34;Filters Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This template is a starting point. It is designed as &lt;strong&gt;generic&lt;/strong&gt;, so that you can use it against any data source.  
+    ou will find default visualizations for Process Maps, Variants, Cases, Resources and many more.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: How To&#39;s</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/howtos/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/howtos/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;can-i-customize-visualizations&#34;&gt;Can I customize Visualizations&lt;/h3&gt;
+&lt;p&gt;
+Absolutely. This is even recommended to fulfill your Business use case! &lt;br&gt;You can use TIBCO Cloud Spotfire Analyst to edit the DXP.
+&lt;p&gt;For example you can:&lt;/p&gt;
+  &lt;li&gt;Change visualizations (eg. from bar chart to line chart)&lt;/li&gt;
+  &lt;li&gt;Add or remove visualizations, for example to best represent custom attributes such as a regional attribute best represented on a map chart.  &lt;/li&gt;
+  &lt;li&gt;Add more data sources, correlated with the business processes, such as CRM data. You can then define relations between the data tables&lt;/li&gt;
+  &lt;li&gt;add more data preparation, data science, AI/ML&lt;/li&gt;
+  &lt;li&gt;Add or remove tabs&lt;/li&gt;
+  &lt;li&gt;and much more !&lt;/li&gt;
+&lt;/p&gt;
+  &lt;p&gt;The template is stored in the TIBCO Spotfire Library.  
+    The link can be found and configured under the Settings configuration tab, in the analytics section.
+ &lt;/p&gt;
+&lt;h3 id=&#34;can-i-maximize-visualizations&#34;&gt;Can I maximize Visualizations&lt;/h3&gt;
+&lt;p&gt;Yes. Every single visualization can be maximized by clicking on the corresponding symbol on the top right corner of the visualization header.&lt;/p&gt;
+&lt;h3 id=&#34;can-i-raise-investigations&#34;&gt;Can I raise Investigations&lt;/h3&gt;
+&lt;p&gt;Yes. In the Compliance tab, you can select a variant from the non compliant variants table, and then click on the &lt;strong&gt;+Investigation&lt;/strong&gt; button.
+Fill a short and detailed description and a new case will be created.&lt;/p&gt;
+&lt;h3 id=&#34;can-i-track-the-status&#34;&gt;Can I track the Status&lt;/h3&gt;
+&lt;p&gt;Yes. The variants table in the Compliance tab contains a &lt;strong&gt;Status&lt;/strong&gt; column allowing you to track the status of that variant inspection.&lt;/p&gt;
+&lt;p&gt;The status is one of:&lt;/p&gt;
+&lt;li&gt;unchecked (default) Enabled by clicking on the &#34;Uncheck&#34; button&lt;/li&gt; 
+&lt;li&gt;checked: means inspected. Enabled by clicking on the &#34;Check&#34; button.&lt;/li&gt; 
+&lt;li&gt;Compliance or Improvement: Means an investigation has been raised.&lt;/li&gt;
+&lt;br&gt;
+In case an investigation is created, you can find tracking information in the next two columns:
+&lt;br&gt;&lt;br&gt;
+&lt;li&gt;Case Type: subject of the case (eg. Variant) &lt;/li&gt;
+&lt;li&gt;Case Status: status of the case in the case management component. &lt;/li&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

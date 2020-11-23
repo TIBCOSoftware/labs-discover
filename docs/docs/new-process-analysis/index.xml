@@ -1,0 +1,172 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – New Process Analysis</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/</link>
+    <description>Recent content in New Process Analysis on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Import Wizard</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/importwizard/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/importwizard/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+The purpose of this wizard is to drive you through the creation of a new process analysis
+First, you will be able to bring your data in the form of a virtualized data view or a file.
+Once done, a new entry will appear in the process analysis table and the process mining algorithm will start automatically.
+Finally, after some minutes, the entry will move to a &lt;strong&gt;Ready&lt;/strong&gt; state and you will be able to view analytics.
+&lt;/p&gt;
+&lt;h3 id=&#34;can-i-edit-an-import-wizard-later-&#34;&gt;can I edit an Import Wizard later ?&lt;/h3&gt;
+&lt;p&gt;
+Yes. Listed process analysis can be edited using the &lt;strong&gt;Edit&lt;/strong&gt; action available on each line. 
+This action is only available in &lt;strong&gt;Ready&lt;/strong&gt; and &lt;strong&gt;Not ready&lt;/strong&gt; status.
+&lt;/p&gt;
+&lt;h3 id=&#34;whats-next-&#34;&gt;whats next ?&lt;/h3&gt;
+&lt;p&gt;
+Once created, a new entry will be added in the Process Analysis table.
+The execution of process mining algorithm will start automatically.
+After a few minutes, the entry will enter a &lt;strong&gt;Ready&lt;/strong&gt; state which means you can start visual analytics by clicking on &lt;Strong&gt;view Analytics&lt;/Strong&gt;
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 1 name &amp; description</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step1/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step1/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep1.png&#34; alt=&#34;new Analysis Step 1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;These Name will then appear in the process analysis table.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 2 data source type</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step2/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step2/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep2.png&#34; alt=&#34;new Analysis Step 2&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Select the type of data source you want to connect data from. Choose one of:&lt;/p&gt;
+  &lt;ol&gt;
+    &lt;li&gt;TIBCO Data Virtualization&lt;/li&gt;
+    &lt;li&gt;CSV Files&lt;/li&gt;
+  &lt;/ol&gt;
+  &lt;p&gt;When selecting &lt;strong&gt;CSF Files&lt;/strong&gt; you will then need to choose a file from a drop down. 
+    If you need to upload a new CSF file, please use the Data tab from the top menu bar.
+  Once the file is selected, you are presented a preview of the content, so you can double check it.
+  &lt;/p&gt;
+  &lt;p&gt;When selecting &lt;strong&gt;TIBCO Data Virtualization&lt;/strong&gt; you will then need to choose a combination of site, database and table.
+    Those are introspected from your Data Virtualization server. 
+  Once the table is selected, you are presented a preview of the content, so you can double check it.
+  &lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 3 parsing options</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step3/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step3/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep3.png&#34; alt=&#34;new Analysis Step 3&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Parsing options depend on the type of data source&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;For CSV Files&lt;/strong&gt;&lt;/p&gt;
+    &lt;li&gt;Specify the column separator. While CSV stands for Comma Separated Values, some files may use a different separator.&lt;/li&gt;
+    &lt;li&gt;Specify the special characters used for quote, escape and comment in values. &lt;/li&gt;
+    &lt;li&gt;Specify the encoding of the file such as UTF-8 &lt;/li&gt;
+    &lt;li&gt;Specify additional parsing options such as skip comments or empty lines&lt;/li&gt;
+    &lt;li&gt;Specify the number of lines you want to preview from the File &lt;/li&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;For Data Virtualization views&lt;/strong&gt;&lt;/p&gt;
+    &lt;li&gt;Specify the encoding of the data such as UTF-8 &lt;/li&gt;
+    &lt;li&gt;Specify the number of lines you want to preview from the data &lt;/li&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 4 data source columns</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step4/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step4/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep4.png&#34; alt=&#34;new Analysis Step 4&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;In this step you will tell us what columns from the source data correspond to the expected data needed to run process mining.&lt;/p&gt;
+  &lt;p&gt;mandatory mappings are:&lt;/p&gt;  
+  &lt;li&gt;&lt;strong&gt;CaseId&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Activity name&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Activity start timestamp&lt;/strong&gt;&lt;/li&gt;
+  &lt;p&gt;&lt;/p&gt; 
+  &lt;p&gt;optional mappings are:&lt;/p&gt;  
+  &lt;li&gt;Resource&lt;/li&gt;
+  &lt;li&gt;Activity end timestamp&lt;/li&gt;
+  &lt;li&gt;Extra attributes. &lt;i&gt;Note this one allows multiple selection&lt;/i&gt;&lt;/li&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 5 datetime format</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step5/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step5/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep5.png&#34; alt=&#34;new Analysis Step 5&#34;&gt;&lt;/p&gt;
+&lt;p&gt;In this step, you need to tell us the &lt;strong&gt;format of the datetime&lt;/strong&gt; column, so that we can parse it.
+    We try to guess the format and give you the final word to confirm it.
+  &lt;/p&gt;
+  &lt;p&gt; In case of &lt;strong&gt;ambiguity&lt;/strong&gt;, we propose you the list of possible matching formats, 
+    and we suggest you browse more rows in the data source in order to remove the ambiguity.
+    An example of such ambiguity is: 1/2/2020: you cannot tell which number is the month and which number is the day.
+    But if you read more lines you may find 1/25/2020 which indicates the the month is first. 
+  &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 6 review</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step6/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step6/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep6.png&#34; alt=&#34;new Analysis Step 6&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This is the final step. Please review the summary of previous selections and finalize the creation of the new analysis by clicking on &lt;strong&gt;Finish&lt;/strong&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
