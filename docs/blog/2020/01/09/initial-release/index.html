@@ -3,10 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.62.2" />
-
-<META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
-
+<meta name="generator" content="Hugo 0.79.0" /><META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
 
 
 <link rel="shortcut icon" href="/favicons/favicon.ico" >
@@ -26,17 +23,18 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://tibcosoftware.github.io/labs-discover/blog/2020/01/09/initial-release/" />
 <meta property="article:published_time" content="2020-01-09T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-10-05T12:25:24+02:00" /><meta property="og:site_name" content="Project Discover™" />
+<meta property="article:modified_time" content="2020-11-25T19:38:18+01:00" /><meta property="og:site_name" content="Project Discover™" />
 <meta itemprop="name" content="Initial Release">
 <meta itemprop="description" content="First **public** Release.
 ">
-<meta itemprop="datePublished" content="2020-01-09T00:00:00&#43;00:00" />
-<meta itemprop="dateModified" content="2020-10-05T12:25:24&#43;02:00" />
+<meta itemprop="datePublished" content="2020-01-09T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-25T19:38:18+01:00" />
 <meta itemprop="wordCount" content="33">
 
 
 
-<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" />
+<meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Initial Release"/>
 <meta name="twitter:description" content="First **public** Release.
 "/>
@@ -58,22 +56,23 @@ if (!doNotTrack) {
 
 
 
-<link rel="preload" href="/labs-discover/scss/main.min.b89b80d9419406daa7c0ed2e35270fa100fe03d637a5bcde4d4b7df1f4cd87f1.css" as="style">
-<link href="/labs-discover/scss/main.min.b89b80d9419406daa7c0ed2e35270fa100fe03d637a5bcde4d4b7df1f4cd87f1.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/labs-discover/scss/main.min.b3777d1de130b743f48c5273591e22abddef8c1ed6a1a9c82e69b87a180a7bb6.css" as="style">
+<link href="/labs-discover/scss/main.min.b3777d1de130b743f48c5273591e22abddef8c1ed6a1a9c82e69b87a180a7bb6.css" rel="stylesheet" integrity="">
 
-
-<link href="/css/offline-search.css" rel="stylesheet">
 
 <script
-  src="https://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  src="https://code.jquery.com/jquery-3.5.1.min.js"
+  integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
   crossorigin="anonymous"></script>
 
-<script src="https://unpkg.com/lunr@2.1.6/lunr.js"></script>
-<script src="/js/offline-search.js"></script>
+<script
+  src="https://unpkg.com/lunr@2.3.8/lunr.min.js"
+  integrity="sha384-vRQ9bDyE0Wnu+lMfm57BlYLO0/XauFuKpVsZPs7KEDwYKktWi5+Kz3MP8++DFlRY"
+  crossorigin="anonymous"></script>
 
 
-    <title>Initial Release | Project Discover™</title>
+
+
   </head>
   <body class="td-page td-blog">
     <header>
@@ -131,10 +130,21 @@ if (!doNotTrack) {
 		</ul>
 	</div>
 	<div class="navbar-nav d-none d-lg-block">
-<div id="search-nav-container">
-<input type="search" id="search-input" autocomplete="off" class="form-control td-search-input" placeholder="&#xf002 Search this site…" autocomplete="on">
-<div id="search-results" class="container"></div>
-</div>
+
+
+
+<input
+  type="search"
+  class="form-control td-search-input"
+  placeholder="&#xf002; Search this site…"
+  aria-label="Search this site…"
+  autocomplete="off"
+  
+  data-offline-search-index-json-src="/labs-discover/offline-search-index.625272e0475381c3dc76b236d249094f.json"
+  data-offline-search-base-href="/"
+  data-offline-search-max-results="10"
+>
+
 </div>
 </nav>
 
@@ -150,18 +160,30 @@ if (!doNotTrack) {
 
 <div id="td-sidebar-menu" class="td-sidebar__inner">
   
-  <form class="td-sidebar__search d-flex align-items-center">
+  <form class="td-sidebar__search d-flex align-items-center d-lg-none">
     
-<div id="search-nav-container">
-<input type="search" id="search-input" autocomplete="off" class="form-control td-search-input" placeholder="&#xf002 Search this site…" autocomplete="on">
-<div id="search-results" class="container"></div>
-</div>
+
+
+
+<input
+  type="search"
+  class="form-control td-search-input"
+  placeholder="&#xf002; Search this site…"
+  aria-label="Search this site…"
+  autocomplete="off"
+  
+  data-offline-search-index-json-src="/labs-discover/offline-search-index.625272e0475381c3dc76b236d249094f.json"
+  data-offline-search-base-href="/"
+  data-offline-search-max-results="10"
+>
+
 
     <button class="btn btn-link td-sidebar__toggle d-md-none p-0 ml-3 fas fa-bars" type="button" data-toggle="collapse" data-target="#td-section-nav" aria-controls="td-docs-nav" aria-expanded="false" aria-label="Toggle section navigation">
     </button>
   </form>
   
-  <nav class="collapse td-sidebar-nav pt-2 pl-4" id="td-section-nav">
+  <nav class="collapse td-sidebar-nav" id="td-section-nav">
+    
     
     
 
@@ -180,7 +202,8 @@ if (!doNotTrack) {
       
       
       
-      
+        
+          
 
 
 
@@ -197,33 +220,42 @@ if (!doNotTrack) {
       
       
       
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-labs-discoverblog20201106nov-2020-release" href="/labs-discover/blog/2020/11/06/nov.-2020-release/">Nov. 2020 release</a>
-      
-      
-      
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-labs-discoverblog20200923tibco-now-update" href="/labs-discover/blog/2020/09/23/tibco-now-update/">TIBCO NOW update</a>
+        
+          
+          
+          <a class="td-sidebar-link td-sidebar-link__page " id="m-labs-discoverblog20201106nov-2020-release" href="/labs-discover/blog/2020/11/06/nov.-2020-release/">Nov. 2020 release</a>
+        
       
       
       
+        
+          
+          
+          <a class="td-sidebar-link td-sidebar-link__page " id="m-labs-discoverblog20200923tibco-now-update" href="/labs-discover/blog/2020/09/23/tibco-now-update/">TIBCO NOW update</a>
+        
       
       
-      <a class="td-sidebar-link td-sidebar-link__page " id="m-labs-discoverblog20200503project-updates" href="/labs-discover/blog/2020/05/03/project-updates/">project Updates</a>
+      
+        
+          
+          
+          <a class="td-sidebar-link td-sidebar-link__page " id="m-labs-discoverblog20200503project-updates" href="/labs-discover/blog/2020/05/03/project-updates/">project Updates</a>
+        
       
       
       
-      
-      
-      <a class="td-sidebar-link td-sidebar-link__page  active" id="m-labs-discoverblog20200109initial-release" href="/labs-discover/blog/2020/01/09/initial-release/">first public Release</a>
+        
+          
+          
+          <a class="td-sidebar-link td-sidebar-link__page  active" id="m-labs-discoverblog20200109initial-release" href="/labs-discover/blog/2020/01/09/initial-release/">first public Release</a>
+        
       
       
     </li>
   </ul>
 </ul>
 
+        
       
       
     </li>
@@ -243,6 +275,8 @@ if (!doNotTrack) {
 
 
 
+
+
 <div class="td-page-meta ml-2 pb-1 pt-2 mb-0">
 
 
@@ -250,10 +284,21 @@ if (!doNotTrack) {
 
 
 
+
+
+
+
+
+<a href="https://github.com/TIBCOSoftware/labs-discover//edit/master/docs-src/content/en/blog/releases/first-release.md" target="_blank"><i class="fa fa-edit fa-fw"></i> Edit this page</a>
+<a href="https://github.com/TIBCOSoftware/labs-discover//new/master/docs-src/content/en/blog/releases/first-release.md?filename=change-me.md&amp;value=---%0D%0Atitle%3A&#43;%22Long&#43;Page&#43;Title%22%0D%0AlinkTitle%3A&#43;%22Short&#43;Nav&#43;Title%22%0D%0Aweight%3A&#43;100%0D%0Adescription%3A&#43;%3E-%0D%0A&#43;&#43;&#43;&#43;&#43;Page&#43;description&#43;for&#43;heading&#43;and&#43;indexes.%0D%0A---%0D%0A%0D%0A%23%23&#43;Heading%0D%0A%0D%0AEdit&#43;this&#43;template&#43;to&#43;create&#43;your&#43;new&#43;page.%0D%0A%0D%0A%2A&#43;Give&#43;it&#43;a&#43;good&#43;name%2C&#43;ending&#43;in&#43;%60.md%60&#43;-&#43;e.g.&#43;%60getting-started.md%60%0D%0A%2A&#43;Edit&#43;the&#43;%22front&#43;matter%22&#43;section&#43;at&#43;the&#43;top&#43;of&#43;the&#43;page&#43;%28weight&#43;controls&#43;how&#43;its&#43;ordered&#43;amongst&#43;other&#43;pages&#43;in&#43;the&#43;same&#43;directory%3B&#43;lowest&#43;number&#43;first%29.%0D%0A%2A&#43;Add&#43;a&#43;good&#43;commit&#43;message&#43;at&#43;the&#43;bottom&#43;of&#43;the&#43;page&#43;%28%3C80&#43;characters%3B&#43;use&#43;the&#43;extended&#43;description&#43;field&#43;for&#43;more&#43;detail%29.%0D%0A%2A&#43;Create&#43;a&#43;new&#43;branch&#43;so&#43;you&#43;can&#43;preview&#43;your&#43;new&#43;file&#43;and&#43;request&#43;a&#43;review&#43;via&#43;Pull&#43;Request.%0D%0A" target="_blank"><i class="fa fa-edit fa-fw"></i> Create child page</a>
 <a href="https://github.com/TIBCOSoftware/labs-discover//issues/new?title=Initial%20Release" target="_blank"><i class="fab fa-github fa-fw"></i> Create documentation issue</a>
 
 
 <a href="https://github.com/TIBCOSoftware/labs-discover/issues/new" target="_blank"><i class="fas fa-tasks fa-fw"></i> Create project issue</a>
+
+
+
+
 
 </div>
 
@@ -277,6 +322,7 @@ if (!doNotTrack) {
 		
 		<time datetime="2020-01-09" class="text-muted">Thursday, January 09, 2020</time>
 	</div>
+	
 	<p>We are in the process of releasing the first public Implementation of the TIBCO LABS™ Process-Mining Solution, you can expect a lot unique features from it.</p>
 <blockquote>
 <p>please have a look back soon here.</p>
@@ -309,19 +355,19 @@ if (!doNotTrack) {
 <ul class="list-inline mb-0">
   
   <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="Facebook" aria-label="Facebook">
-    <a class="text-white" target="_blank" href="https://www.facebook.com/TIBCO">
+    <a class="text-white" target="_blank" rel="noopener noreferrer" href="https://www.facebook.com/TIBCO">
       <i class="fab fa-facebook"></i>
     </a>
   </li>
   
   <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="Twitter" aria-label="Twitter">
-    <a class="text-white" target="_blank" href="https://twitter.com/tibco">
+    <a class="text-white" target="_blank" rel="noopener noreferrer" href="https://twitter.com/tibco">
       <i class="fab fa-twitter"></i>
     </a>
   </li>
   
   <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="Linkedin" aria-label="Linkedin">
-    <a class="text-white" target="_blank" href="https://www.linkedin.com/company/tibco/">
+    <a class="text-white" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/company/tibco/">
       <i class="fab fa-linkedin"></i>
     </a>
   </li>
@@ -338,19 +384,19 @@ if (!doNotTrack) {
 <ul class="list-inline mb-0">
   
   <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="GitHub" aria-label="GitHub">
-    <a class="text-white" target="_blank" href="https://github.com/TIBCOSoftware/labs-discover">
+    <a class="text-white" target="_blank" rel="noopener noreferrer" href="https://github.com/TIBCOSoftware/labs-discover">
       <i class="fab fa-github"></i>
     </a>
   </li>
   
   <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="TIBCO Community" aria-label="TIBCO Community">
-    <a class="text-white" target="_blank" href="https://community.tibco.com/modules/project-discover">
+    <a class="text-white" target="_blank" rel="noopener noreferrer" href="https://community.tibco.com/modules/project-discover">
       <i class="fa fa-comment-alt"></i>
     </a>
   </li>
   
   <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="TIBCO LABS Email" aria-label="TIBCO LABS Email">
-    <a class="text-white" target="_blank" href="mailto:tibcolabs@tibco.com">
+    <a class="text-white" target="_blank" rel="noopener noreferrer" href="mailto:tibcolabs@tibco.com">
       <i class="fa fa-envelope"></i>
     </a>
   </li>
@@ -362,7 +408,7 @@ if (!doNotTrack) {
       </div>
       <div class="col-12 col-sm-4 text-center py-2 order-sm-2">
         <small class="text-white">&copy; 2020 TIBCO Software Inc. All Rights Reserved</small>
-        <small class="ml-1"><a href="https://www.tibco.com/company/terms-of-use" target="_blank">Terms of Use</a></small>
+        <small class="ml-1"><a href="https://www.tibco.com/company/terms-of-use" target="_blank">Privacy Policy</a></small>
 	
 		<p class="mt-2"><a href="/labs-discover/about/">About Project Discover™</a></p>
 	
@@ -382,7 +428,15 @@ if (!doNotTrack) {
 
 
 
-<script src="/labs-discover/js/main.min.d61e2a14a18826e825de9a5710bb3fddcc0b9a253f9a502c470cf01c053abb9e.js" integrity="sha256-1h4qFKGIJugl3ppXELs/3cwLmiU/mlAsRwzwHAU6u54=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+<script src="/labs-discover/js/main.min.460c8ae21829f9b330823a08f34ac961d7d0daa8874c8c9eba7ea0484bb42a79.js" integrity="sha256-RgyK4hgp&#43;bMwgjoI80rJYdfQ2qiHTIyeun6gSEu0Knk=" crossorigin="anonymous"></script>
+
 
 
 
