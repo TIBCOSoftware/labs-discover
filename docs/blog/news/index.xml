@@ -1,39 +1,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Project Discover™ – Project Discovery</title>
-    <link>https://tibcosoftware.github.io/labs-discover/</link>
-    <description>Recent content in Project Discovery on Project Discover™</description>
+    <title>Project Discover™ – News</title>
+    <link>https://tibcosoftware.github.io/labs-discover/blog/news/</link>
+    <description>Recent content in News on Project Discover™</description>
     <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Wed, 23 Sep 2020 00:00:00 +0000</lastBuildDate>
     
-	  <atom:link href="https://tibcosoftware.github.io/labs-discover/index.xml" rel="self" type="application/rss+xml" />
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/blog/news/index.xml" rel="self" type="application/rss+xml" />
     
     
       
-      
-    
-    
-    <item>
-      <title>Blog: Nov. 2020 release</title>
-      <link>https://tibcosoftware.github.io/labs-discover/blog/2020/11/06/nov.-2020-release/</link>
-      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://tibcosoftware.github.io/labs-discover/blog/2020/11/06/nov.-2020-release/</guid>
-      <description>
         
-        
-        &lt;p&gt;new Features added:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Added progress bar to Process Analysis allowing to track the progress of process mining computation&lt;/li&gt;
-&lt;li&gt;Added automatic guessing of date formats when creating new analysis&lt;/li&gt;
-&lt;li&gt;new contextual Online Help&lt;/li&gt;
-&lt;li&gt;updated Documentation&lt;/li&gt;
-&lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;more soon.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-      </description>
-    </item>
+      
+    
     
     <item>
       <title>Blog: TIBCO NOW update</title>
@@ -51,31 +30,6 @@ Join our Demo Booth &amp;hellip;&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;https://2020.now.tibco.com/sessions/increased-business-value-with-augmented-operational-insight&#34;&gt;TIBCO NOW 2020&lt;/a&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Next, we announced that our Source will be available soon.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Blog: July 2020 release</title>
-      <link>https://tibcosoftware.github.io/labs-discover/blog/2020/07/14/july-2020-release/</link>
-      <pubDate>Tue, 14 Jul 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://tibcosoftware.github.io/labs-discover/blog/2020/07/14/july-2020-release/</guid>
-      <description>
-        
-        
-        &lt;p&gt;new Features added:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;reworked Analytics Dashboards&lt;/li&gt;
-&lt;li&gt;new File Importer&lt;/li&gt;
-&lt;li&gt;new Configuration and Settings Dialogs&lt;/li&gt;
-&lt;li&gt;new Investigation Case Types: Compliance &amp;amp; Improvements&lt;/li&gt;
-&lt;li&gt;updated Process Analysis Lifecycle&lt;/li&gt;
-&lt;li&gt;reworked UX Designs&lt;/li&gt;
-&lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;more soon.&lt;/p&gt;
 &lt;/blockquote&gt;
 
       </description>
@@ -107,24 +61,6 @@ Join our Demo Booth &amp;hellip;&lt;/p&gt;
 &lt;/ul&gt;
 &lt;blockquote&gt;
 &lt;p&gt;looking forward having more great updates soon&lt;/p&gt;
-&lt;/blockquote&gt;
-
-      </description>
-    </item>
-    
-    <item>
-      <title>Blog: Initial Release</title>
-      <link>https://tibcosoftware.github.io/labs-discover/blog/2020/01/09/initial-release/</link>
-      <pubDate>Thu, 09 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://tibcosoftware.github.io/labs-discover/blog/2020/01/09/initial-release/</guid>
-      <description>
-        
-        
-        &lt;p&gt;We started the process of releasing the first public Implementation of the TIBCO LABS™ Process-Mining Solution.&lt;/p&gt;
-&lt;p&gt;The LABS Project is working closly with early customers to explore their needs and requirements.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;expect a lot unique features from the release.&lt;/p&gt;
 &lt;/blockquote&gt;
 
       </description>
