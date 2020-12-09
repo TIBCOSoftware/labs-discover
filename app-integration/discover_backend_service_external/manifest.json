@@ -72,7 +72,7 @@
         {
             "name": "Auth.token",
             "datatype": "password",
-            "default": "SECRET:<your secret/pass here>"
+            "default": "SECRET:<your secret here>"
         },
         {
             "name": "Auth.sandboxid",

@@ -67,7 +67,7 @@ export class DataComponent implements OnInit {
   public handleUpload = (files: File[]): void => {
     if (files.length > 0) {
       const file = files[0];
-      const fileExist = this.documents.filter(element => element.name === file.name).length > 0;
+      const fileExist = this.documents?.filter(element => element.name === file.name).length > 0;
       this.fileUploadService.uploadFile('orgFolders', this.configService.config.discover.csv.folder, file, file.name, 'description', fileExist);
       this.fileInput.nativeElement.value = '';
     }

@@ -1,3 +1,8 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
 CREATE TABLE IF NOT EXISTS public.variants_status
 (
     analysis_id text COLLATE pg_catalog."default" NOT NULL,

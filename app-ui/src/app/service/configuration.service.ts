@@ -29,6 +29,10 @@ export class ConfigurationService {
     return this.configuration;
   }
 
+  get groups() {
+    return this.appDefinitionService.usersGroups;
+  }
+
   public async readConfig(): Promise<Configuration> {
     if (!this.configuration) {
       this.configuration = {} as Configuration;

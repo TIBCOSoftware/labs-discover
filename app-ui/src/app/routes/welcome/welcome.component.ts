@@ -34,7 +34,7 @@ export class WelcomeComponent implements OnInit {
   }
 
   getStarted(){
-    this.router.navigate(['/discover/process-analysis']);
+    this.router.navigate(['/discover']);
   }
 
 }

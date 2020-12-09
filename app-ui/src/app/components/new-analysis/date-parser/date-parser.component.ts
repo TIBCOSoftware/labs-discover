@@ -9,6 +9,7 @@ import { TDVService } from 'src/app/service/tdv.service';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 import { DateParseRecord, DateParsingResult } from 'src/app/models/parsing';
 import { Table } from 'primeng/table';
+import { SelectOption } from '@tibco-tcstk/tc-web-components/dist/types/models/selectInputConfig';
 
 @Component({
   selector: 'date-parser',
@@ -189,6 +190,13 @@ export class DateParserComponent implements OnChanges, OnInit {
           } else {
             // this.parse.dateTimeFormat = undefined;
           }
+          if (this.parse.dateTimeFormat) {
+            const stepStatus = {
+              step: 'dates',
+              completed: this.parse.dateTimeFormat && this.parse.dateTimeFormat !== ''
+            } as NewAnalysisStepStatus;
+            this.status.emit(stepStatus);
+          }
         }
       }
     )
@@ -287,6 +295,34 @@ export class DateParserComponent implements OnChanges, OnInit {
       this.parse.dateTimeFormat = possMatches[0];
     }
     return possMatches;
+  }
+
+  public get options() {
+    let options: SelectOption[] = [];
+    if (this.possFormats && this.possFormats.length > 0) {
+      this.possFormats.forEach((fmt: string) => {
+        options.push(
+          {
+            label: fmt,
+            value: fmt,
+            disabled: false
+          }
+        );
+      })
+    } else {
+      this.partialFormats.forEach((fmt: string) => {
+        options.push(
+          {
+            label: fmt,
+            value: fmt,
+            disabled: false
+          }
+        );
+      })
+    }
+
+
+    return options;
   }
 
   public dateClass(date: string, col: string): string {

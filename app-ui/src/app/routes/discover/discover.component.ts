@@ -5,6 +5,7 @@ import { DatasourceService } from "../../service/datasource.service";
 import { FullSpotfireConfig } from "../../models/discover";
 import { CaseCacheService } from "../../service/custom-case-cache.service";
 import { ConfigurationService } from 'src/app/service/configuration.service';
+import { unionBy } from 'lodash-es';
 
 @Component({
   selector: 'app-discover',
@@ -27,13 +28,8 @@ export class DiscoverComponent implements AfterViewInit {
     this.fullSpotfireConfig = {
       hasAnalytics: false
     }
-    this.tabs = [
-      { id: 'process-analysis', label: 'Process Analysis' },
-      { id: 'analytics', label: 'Analytics' },
-      { id: 'cases', label: 'Investigations' },
-      { id: 'data', label: 'Data' },
-      { id: 'settings', label: 'Settings' }
-    ];
+
+    this.tabs = this.generateMenu();
 
     router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
@@ -60,7 +56,29 @@ export class DiscoverComponent implements AfterViewInit {
           this.hideAnalytics = true;
         }
       }
-  });
+    });
+    if (this.router.url === '/discover'){
+      this.router.navigate(['/discover/' + this.tabs[0].id]);
+    }
+  }
+
+  public generateMenu = (): any[] => {
+    let tabs = [];
+    if (this.configService.groups.filter(element => element.name === 'Discover Analysts').length > 0){
+      tabs = [
+        { id: 'process-analysis', label: 'Process Analysis' },
+        { id: 'analytics', label: 'Analytics' },
+        { id: 'cases', label: 'Investigations' },
+        { id: 'data', label: 'Data' }
+      ];
+    }
+    if (this.configService.groups.filter(element => element.name === 'Discover Case Resolvers').length > 0){
+      tabs = unionBy(tabs, [{ id: 'cases', label: 'Investigations' }], 'id');
+    }
+    if (this.configService.groups.filter(element => element.name === 'Discover Administrators').length > 0){
+      tabs.push({ id: 'settings', label: 'Settings' });
+    }
+    return tabs;
   }
 
   ngAfterViewInit() {

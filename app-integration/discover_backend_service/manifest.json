@@ -192,7 +192,7 @@
         {
             "name": "Auth.oauth",
             "datatype": "password",
-            "default": "SECRET:<your secret/pass here>"
+            "default": "SECRET:<your secret here>"
         },
         {
             "name": "Auth.region",
@@ -222,7 +222,7 @@
         {
             "name": "PostgreSQL.discodevDB.Host",
             "datatype": "string",
-            "default": "discover.cluster-<your endpoint here>.eu-west-1.rds.amazonaws.com"
+            "default": "discover.cluster-<your secret here>.eu-west-1.rds.amazonaws.com"
         },
         {
             "name": "PostgreSQL.discodevDB.Port",
@@ -242,7 +242,7 @@
         {
             "name": "PostgreSQL.discodevDB.Password",
             "datatype": "password",
-            "default": "SECRET:<your secret/pass here>"
+            "default": "SECRET:<your secret here>"
         },
         {
             "name": "PostgreSQL.discodevDB.Maximum_Open_Connections",
@@ -297,12 +297,12 @@
         {
             "name": "Messaging.tcm_discover.Connection_URL",
             "datatype": "string",
-            "default": "wss://<your endpoint here>-apps.eu.messaging.cloud.tibco.com/channel"
+            "default": "wss://<your secret here>-apps.eu.messaging.cloud.tibco.com/channel"
         },
         {
             "name": "Messaging.tcm_discover.Authentication_Key",
             "datatype": "string",
-            "default": "<your secret/pass here>"
+            "default": "<your secret here>"
         },
         {
             "name": "Messaging.tcm_discover.Timeout",

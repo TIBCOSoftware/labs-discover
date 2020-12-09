@@ -18,15 +18,15 @@
 }
 
 .valid {
-  background-color: rgb(225, 247, 235);
+  background-color: #E1F7EB;
 }
 
 .invalid {
-  background-color: rgb(249, 225, 228);
+  background-color: #F9E1E3;
 }
 
 .notdate {
-  background-color: #edf0f3;
+  background-color: #FFFFFF;
 }
 
 .loading-indicator {
@@ -38,7 +38,26 @@
 .date-format-entry {
   display: flex;
   flex-direction: row;
-  max-width: 350px;
+  /*max-width: 350px;*/
+  width: 100%;
+}
+
+.good-date-label {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.good-date-label-text {
+  line-height: 21px;
+  font-size: 14px;
+  align-self: flex-end;
+}
+
+.good-date-label-icon {
+  max-height: 20px;
+  align-self: flex-end;
+  margin-right: 6px;
 }
 
 .options-header {
@@ -58,6 +77,9 @@
 
 .parse-options-csv-date-element-format {
   flex: 1;
+  width: 340px;
+  max-width: 340px;
+  min-width: 340px;
 }
 
 ::ng-deep .custom-table-css.p-datatable .p-datatable-scrollable-header, .custom-table-css.p-datatable .p-datatable-scrollable-footer {
@@ -85,4 +107,8 @@
 
 .warning-triangle {
   padding-right: 5px;
+}
+
+::ng-deep .datasource-csv-preview .p-component {
+  font-size: 14px;
 }

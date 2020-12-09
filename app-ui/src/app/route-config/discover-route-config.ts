@@ -4,40 +4,44 @@ import { SettingsComponent } from '../routes/settings/settings.component';
 import { CasesComponent } from '../routes/cases/cases.component';
 import { DataComponent } from '../routes/data/data.component';
 import { CONFIGURATION_ROUTE_CONFIG, CONFIGURATION_PROVIDERS } from './configuration-route-config';
+import { AccessGuard } from '../guards/access.guard';
 
 export const DISCOVER_ROUTE_CONFIG = [
   {
     path: "process-analysis",
-    component: ProcessAnalysisComponent
-    // canActivate: [SelectedRoleGuard],
+    component: ProcessAnalysisComponent,
+    canActivate: [
+      AccessGuard
+    ]
   },
   {
     path: "analytics",
-    component: AnalyticsComponent
-    // canActivate: [SelectedRoleGuard],
+    component: AnalyticsComponent,
+    canActivate: [
+      AccessGuard
+    ]
   },
   {
     path: "cases",
-    component: CasesComponent
-    // canActivate: [SelectedRoleGuard],
+    component: CasesComponent,
+    canActivate: [
+      AccessGuard
+    ]
   },
   {
     path: "data",
-    component: DataComponent
-    // canActivate: [SelectedRoleGuard],
+    component: DataComponent,
+    canActivate: [
+      AccessGuard
+    ]
   },
   {
     path: 'settings',
     component: SettingsComponent,
-    // canActivate: [
-    //   AuthGuard
-    //   // RoleGuard
-    // ],
+    canActivate: [
+      AccessGuard
+    ],
     children: CONFIGURATION_ROUTE_CONFIG
-  },
-  {
-    path: '**',
-    redirectTo: '/discover/process-analysis'
   }
 ];
 

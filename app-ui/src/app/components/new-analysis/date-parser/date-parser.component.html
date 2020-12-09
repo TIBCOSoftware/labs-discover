@@ -5,9 +5,9 @@
       Parsing data in batches of&nbsp;<uxpl-form-field style="margin-bottom: 5px; max-width: 70px;" consise type="number" valid required="true" value="{{rows}}" (uxplChanged)="rowsUpdate($event)"></uxpl-form-field>&nbsp;rows
     </div-->
     <br>
-    <div *ngIf="possFormats?.length === 1 && !dateOptions" class="valid" style="display: inline-block">
+    <!--div *ngIf="possFormats?.length === 1 && !dateOptions" class="valid" style="display: inline-block">
       Date format has been detected as: {{possFormats}}&nbsp;<span *ngIf="this.loadedData[loadedData.length - 1] === undefined">- validated OK against {{loadedData?.length - 1}} rows</span><span *ngIf="this.loadedData[loadedData.length - 1] !== undefined">- validated OK against ALL rows</span>
-    </div>
+    </div-->
     <div *ngIf="possFormats?.length === 1 && dateOptions" class="valid" style="display: inline-block">
       <span *ngIf="this.loadedData[loadedData.length - 1] !== undefined ; else moreToLoad">Date format validated OK against ALL rows</span>
       <ng-template #moreToLoad>
@@ -40,9 +40,21 @@
 
     <div class="options-header">
       <div class="date-format-entry">
-        <uxpl-form-field class="parse-options-csv-date-element-format" [options]="possFormats && possFormats.length > 0 ? possFormats : partialFormats" label="Date format: " type="text" valid required="true"  [value]="parse?.dateTimeFormat" (uxplChanged)="handleDateFormatUpdate($event)"></uxpl-form-field>
-        <uxpl-button [disabled]="!isNewFormat(parse.dateTimeFormat)" (clicked)="validate()">Validate</uxpl-button>
-        <uxpl-button *ngIf="validating" type="secondary" (clicked)="reset()">Reset</uxpl-button>
+        <uxpl-select-input class="parse-options-csv-date-element-format" label="Date format: "  type="text" allow-input [value]="parse?.dateTimeFormat" [options]="options" [value]="parse?.dateTimeFormat" (uxplChanged)="handleDateFormatUpdate($event)"></uxpl-select-input>
+        <!--uxpl-form-field class="parse-options-csv-date-element-format" [options]="possFormats && possFormats.length > 0 ? possFormats : partialFormats" label="Date format: " type="text" valid required="true"  [value]="parse?.dateTimeFormat" (uxplChanged)="handleDateFormatUpdate($event)"></uxpl-form-field-->
+        <uxpl-button type="secondary" [disabled]="!isNewFormat(parse.dateTimeFormat)" (clicked)="validate()">Validate</uxpl-button>
+        <uxpl-button *ngIf="validating" type="no-border" (clicked)="reset()">Reset</uxpl-button>
+        <div *ngIf="possFormats?.length === 1 && !dateOptions" class="good-date-label">
+          <uxpl-icon class="good-date-label-icon" icon="pl-icon-success" width="20px" height="20px" color="#039145"></uxpl-icon>
+          <div *ngIf="possFormats && possFormats.length === 1; else multiFormats" class="good-date-label-text">
+            <span>
+            Date format detected and validated against {{loadedData?.length - 1}} rows. Scroll down to validate more.
+            </span>
+          </div>
+          <ng-template #multiFormats>
+            <div class="good-date-label-text">Date format has been detected as: {{possFormats}}&nbsp;<span *ngIf="this.loadedData[loadedData.length - 1] === undefined">- validated OK against {{loadedData?.length - 1}} rows</span><span *ngIf="this.loadedData[loadedData.length - 1] !== undefined">- validated OK against ALL rows</span></div>
+          </ng-template>
+        </div>
       </div>
     </div>
   <br>

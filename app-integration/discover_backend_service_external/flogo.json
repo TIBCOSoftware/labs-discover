@@ -492,7 +492,7 @@
         {
             "name": "Auth.token",
             "type": "string",
-            "value": "SECRET:<your secret/pass here>"
+            "value": "SECRET:<your secret here>"
         },
         {
             "name": "Auth.sandboxid",
