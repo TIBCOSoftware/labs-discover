@@ -1,0 +1,63 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Settings ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is settings about?",
+            "label": "What is settings about?",
+            "title": "What is settings about?",
+            "url": "assets/help/application/Settings-About.html",
+            "content": "",
+            "default": "true"
+          }
+
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Platform / Process Mining ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "About this section?",
+            "label": "About this section",
+            "title": "About this section",
+            "url": "assets/help/application/Settings-Platform-General-Process-Mining.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

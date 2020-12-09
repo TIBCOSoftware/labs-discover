@@ -1,0 +1,18 @@
+<style>
+  .inline   {
+    vertical-align: middle;
+    height: 20px;
+    width: 20px;
+  }
+</style>
+
+  <p>Once created using the wizard, Process analysis may follow the list of statuses below.</p>
+    <li> <strong>Added</strong>: Initial status after creation from the wizard. Once Added, the analysis goes directly to the Process Mining status.</li>
+    <li> <strong>Process Mining</strong>: Once here, the computation of the process mining algorithm(s) is sent to the backend. 
+      A progress bar is visible on the status to track the overall progress. Once completed, the analysis goes automatically either in Ready ot Not Ready status. </li>
+    <li> <strong>Ready</strong>: Process Mining has been successfully completed and analysis is ready to view analytics.</li>
+    <li> <strong>Not Ready</strong>: Process Mining has terminated with errors. Those errors should be reviewed and the analysis should be edited and re-run. </li>
+    <li> <strong>Archived</strong>: This is like a read only mode. the analysis can see be viewed but not modified. </li>
+    <li> <strong>Purged</strong>: Analysis is marked for removal and should be removed automatically from the list.</li>
+    <li> <strong>Completed</strong>: This terminate status means the analysis can be permanently deleted from the system.</li>
+

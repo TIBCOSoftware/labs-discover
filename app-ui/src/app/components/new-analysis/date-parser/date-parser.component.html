@@ -1,0 +1,102 @@
+<!--div> {{dates.columns}}</div-->
+<div style="display: inline-block; margin-top: 20px; width: 100%;">
+  <div *ngIf="loadedData ; else loadingData">
+    <!-- div class="paging-row">
+      Parsing data in batches of&nbsp;<uxpl-form-field style="margin-bottom: 5px; max-width: 70px;" consise type="number" valid required="true" value="{{rows}}" (uxplChanged)="rowsUpdate($event)"></uxpl-form-field>&nbsp;rows
+    </div-->
+    <br>
+    <div *ngIf="possFormats?.length === 1 && !dateOptions" class="valid" style="display: inline-block">
+      Date format has been detected as: {{possFormats}}&nbsp;<span *ngIf="this.loadedData[loadedData.length - 1] === undefined">- validated OK against {{loadedData?.length - 1}} rows</span><span *ngIf="this.loadedData[loadedData.length - 1] !== undefined">- validated OK against ALL rows</span>
+    </div>
+    <div *ngIf="possFormats?.length === 1 && dateOptions" class="valid" style="display: inline-block">
+      <span *ngIf="this.loadedData[loadedData.length - 1] !== undefined ; else moreToLoad">Date format validated OK against ALL rows</span>
+      <ng-template #moreToLoad>
+        <span>Date format validated OK against {{loadedData?.length - 1}} rows - scroll down to check more</span>
+      </ng-template>
+    </div>
+    <div *ngIf="possFormats?.length > 1">
+      <div style="display: flex; flex-direction: row">
+        <uxpl-icon class="upload-icon warning-triangle" icon="pl-icon-warning-triangle" width="20px" height="20px" style="max-height: 20px;" color="#FAB632"></uxpl-icon>
+        <span>Multiple possible date formats detected. You can scroll through the data to try and detect dates later in the dataset or select a date format and click validate.</span>
+      </div>
+      <br>
+      <div style="display: inline-block">Possible formats: <span [ngClass]="{'indeterminate': possFormats?.length > 1}">{{possFormats}}</span></div>
+      <br>
+    </div>
+    <div *ngIf="possFormats?.length < 1 && !dateOptions && (!bestPartialMatches || bestPartialMatches.length <= 0)">
+      No possible date formats detected. You can manually enter a date format.
+    </div>
+    <div *ngIf="bestPartialMatches && bestPartialMatches.length > 0">
+      <div style="display: flex; flex-direction: row">
+        <uxpl-icon class="upload-icon warning-triangle" icon="pl-icon-warning-triangle" width="20px" height="20px" style="max-height: 20px;" color="#FAB632"></uxpl-icon>
+        <span>Some rows do not match date formats:</span>
+      </div>
+      <div *ngFor="let res of bestPartialMatches | slice:0:5">
+        <div *ngIf="res?.matches > 0">
+          <div class="partialMatchRec" [ngClass]="{'best-match-selected': isSelectedBestMatch(res)}" (click)="selectBestMatch(res)">{{res?.format}} : {{res?.matches}} matched rows : {{res?.badRows.length}} non matching rows</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="options-header">
+      <div class="date-format-entry">
+        <uxpl-form-field class="parse-options-csv-date-element-format" [options]="possFormats && possFormats.length > 0 ? possFormats : partialFormats" label="Date format: " type="text" valid required="true"  [value]="parse?.dateTimeFormat" (uxplChanged)="handleDateFormatUpdate($event)"></uxpl-form-field>
+        <uxpl-button [disabled]="!isNewFormat(parse.dateTimeFormat)" (clicked)="validate()">Validate</uxpl-button>
+        <uxpl-button *ngIf="validating" type="secondary" (clicked)="reset()">Reset</uxpl-button>
+      </div>
+    </div>
+  <br>
+
+  </div>
+  <ng-template #loadingData>
+    <div class="loading-indicator">
+      <uxpl-spinner style="height: 150px; min-width: 150px; max-width: 150px;" appearance="light"
+                    message="Loading cases..."></uxpl-spinner>
+    </div>
+  </ng-template>
+</div>
+
+<br>
+<div class="datasource-csv-preview">
+  <p-table #dt *ngIf="loadedData && dataSource" [columns]="columns" autoLayout="true" [resizableColumns]="false" scrollHeight="flex" showCurrentPageReport="false" [value]="loadedData" [scrollable]="true" [rows]="rows" scrollHeight="300px" styleClass="custom-table-css"
+      [virtualScroll]="true" [virtualRowHeight]="30" [lazy]="true" (onLazyLoad)="dataSource?.loadMore($event)">
+      <ng-template pTemplate="header" let-columns>
+          <tr>
+              <th style="width: 30px" class="top-row">
+                  <div style="width: 30px; overflow: hidden">Row</div>
+              </th>
+              <th style="width: 200px" *ngFor="let col of columns" class="top-row">
+                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                  <uxpl-icon *ngIf="isBadColumn(col)" class="upload-icon warning-triangle" icon="pl-icon-warning-triangle" width="20px" height="20px" style="max-height: 20px;" color="#FAB632"></uxpl-icon>
+                  <div style="width: 175px; overflow: hidden; flex-grow: 1">{{col}}</div>
+                </div>
+              </th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns" let-idx="rowIndex">
+          <tr style="height:30px">
+            <td style="width: 30px" class="notdate">
+              <div style="width: 30px; overflow: hidden">{{idx + 1}}</div>
+            </td>
+            <td style="width: 200px" *ngFor="let col of columns" [ngClass]="dateClass(rowData[col], col)">
+              <div style="width: 175px; overflow: hidden">{{rowData[col]}}</div>
+            </td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="loadingbody" let-columns="columns">
+          <tr style="height:30px">
+              <td *ngFor="let col of columns">
+                  <div class="loading-text"></div>
+              </td>
+          </tr>
+      </ng-template>
+  </p-table>
+  <div class="table-footer-row">
+    <div class="footer-end" *ngIf="this.loadedData && this.loadedData.length > 0">
+      <div *ngIf="this.loadedData[loadedData?.length - 1] !== undefined ; else loadingRowsCounter">ALL rows loaded</div>
+      <ng-template #loadingRowsCounter>
+        <div>{{loadedData?.length - 1}} rows loaded</div>
+      </ng-template>
+    </div>
+  </div>
+</div>

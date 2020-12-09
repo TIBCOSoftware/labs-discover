@@ -1,0 +1,65 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Branding</h1>
+    <div class="settings-buttons">
+      <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+      <uxpl-button type="secondary" (clicked)="handlePreview()">Preview</uxpl-button>
+      <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>
+  </div>
+  <div class="settings-container">
+    <div>
+      <h2>General</h2>
+      <div class="settings-subcategory">
+        <h3>Application</h3>
+        <uxpl-form-field id="#appTitle" fieldId="appTitle" style="margin-top: 5px; margin-bottom: 5px;" label="Application title" type="text" valid required="true" [value]="discover.general.applicationTitle" (uxplChanged)="handleUpdate($event, 'general')"></uxpl-form-field>
+      </div>
+    </div>
+    <div>
+      <h2>Welcome screen</h2>
+      <div>
+        <div  class="settings-subcategory">
+            <h3>Introduction</h3>
+            <uxpl-form-field id="#welcomeScreenTitle" fieldId="welcomeScreenTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Title" type="text" valid required="true" [value]="discover.landingPage.title" (uxplChanged)="handleUpdate($event, 'landingPage', 'title')"></uxpl-form-field>
+            <uxpl-form-field id="#appTitle" fieldId="appTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Subtitle" type="text" valid required="true" [value]="discover.landingPage.subtitle" (uxplChanged)="handleUpdate($event, 'landingPage', 'subtitle')"></uxpl-form-field>
+        </div>
+        <div class="settings-subcategory">
+          <h3>Capabilities description</h3>
+          <div>
+            <p-table [value]="discover.landingPage.highlights" styleClass="custom-table-css">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="top-row" style="width: 15%">Icon</th>
+                  <th class="top-row" style="width: 25%">Title</th>
+                  <th class="top-row" style="width: 60%">Description</th>
+                  <th class="top-row-empty" style="width: 50px">
+                  </th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-highlight let-rowIndex="rowIndex">
+                <tr class="rowhover" >
+                <td class="no-padding data-row hovereffect">
+                  {{highlight.iconURL}}
+                </td>
+                <td class="no-padding data-row hovereffect">{{highlight.title}}</td>
+                <td class="no-padding data-row hovereffect">{{highlight.content}}</td>
+                <td class="no-padding">
+                  <uxpl-icon icon="pl-icon-edit" width="24px" height="24px" (click)="handleHighlighEdit(rowIndex)"></uxpl-icon>
+                </td>
+              </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+        <div class="settings-subcategory">
+          <h3>Background image</h3>
+          <div class="settings-line">
+            <input type="file" #file style="display:none" (change)="handleUpload($event.target.files[0])">
+            <uxpl-form-field class="setting-background-image" label="Background image" type="text" valid required="true" [value]="discover.landingPage.backgroundURL" (uxplChanged)="handleUpdate($event, 'landingPage', 'backgroundURL')"></uxpl-form-field>
+            <uxpl-icon style="margin-bottom: -5px;" icon="pl-icon-upload" width="24px" height="24px" (click)="file.click()"></uxpl-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

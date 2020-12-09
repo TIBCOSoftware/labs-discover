@@ -1,0 +1,31 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Platform</h1>
+    <div class="settings-buttons">
+      <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+      <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>      
+  </div>
+  <div class="settings-container">    
+    <div>
+      <h2>Database</h2>
+      <div>
+        <h3>General</h3>
+        <div class="platform-line">
+          <uxpl-form-field class="flex-field flex-margin" label="Backend type" type="text" valid required="true" [value]="discover.storage.type" (uxplChanged)="handleUpdateStorage($event, 'type')"></uxpl-form-field>
+          <uxpl-form-field class="flex-field flex-margin" label="Batch size" type="number" valid required="true" [value]="discover.storage.batchSize" (uxplChanged)="handleUpdateStorage($event, 'batchSize')"></uxpl-form-field>
+          <uxpl-form-field class="flex-field" label="Partitions" type="number" valid required="true" [value]="discover.storage.partitions" (uxplChanged)="handleUpdateStorage($event, 'partitions')"></uxpl-form-field>    
+        </div>
+        <div class="platform-line">
+          <uxpl-form-field class="flex-field flex-margin" label="Database URL (jdbc)" type="text" valid required="true" [value]="discover.storage.url" (uxplChanged)="handleUpdateStorage($event, 'url')"></uxpl-form-field>
+          <uxpl-form-field class="flex-field" label="Driver" type="text" valid required="true" [value]="discover.storage.driver" (uxplChanged)="handleUpdateStorage($event, 'driver')"></uxpl-form-field>
+        </div>
+        <h3>Security</h3>
+        <div class="platform-line">
+          <uxpl-form-field class="flex-field flex-margin" label="Username" type="text" valid required="true" [value]="discover.storage.username" (uxplChanged)="handleUpdateStorage($event, 'username')"></uxpl-form-field>
+          <uxpl-form-field class="flex-field" label="Password" type="password" valid required="true" [value]="discover.storage.password" (uxplChanged)="handleUpdateStorage($event, 'password')"></uxpl-form-field>
+        </div>
+        </div>
+    </div>
+  </div>
+</div>

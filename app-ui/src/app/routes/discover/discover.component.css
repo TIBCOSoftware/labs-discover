@@ -1,0 +1,34 @@
+.discover-container {
+  background-color: white;
+  overflow: auto;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.box .rowC {
+  background-color: white;
+}
+
+.box .rowC.header {
+  flex: 1 1 auto;
+}
+
+.box .rowC.content {
+  flex: 1 1 auto;
+}
+
+.analytics-container{
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.analytics-dashboard{
+  flex: 1 1 auto;
+}

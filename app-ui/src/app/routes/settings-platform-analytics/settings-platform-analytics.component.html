@@ -1,0 +1,29 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Platform</h1>
+    <div class="settings-buttons">
+      <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+      <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>
+  </div>
+  <div class="settings-container">
+    <div>
+      <h2>Analytics</h2>
+      <div>
+        <div style='margin: 10px 2px 10px 3px'>
+          <uxpl-switch-input style="padding: 3px" [checked]="!discover.analytics.useCustomServer"
+                             (uxplChange)="updateSpotfireCloud($event);">Use TIBCO Cloud Spotfire
+          </uxpl-switch-input>
+        </div>
+        <div style='margin: 30px 2px 10px 0px'>
+          <uxpl-form-field [disabled]="disabledCustomAnalyticsServer()" label="Custom TIBCO Spotfire server" type="text"
+                           valid required="true" [value]="discover.analytics.customServer"
+                           (uxplChanged)="handleCustomeSpotfireServer($event);"></uxpl-form-field>
+        </div>
+        <div style='margin: 20px 2px 10px 3px'>
+          <uxpl-switch-input style="padding: 3px" [checked]="discover.analytics.edit" (uxplChange)="updateSpotfireEdit($event);">Enable Web Authoring          </uxpl-switch-input>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

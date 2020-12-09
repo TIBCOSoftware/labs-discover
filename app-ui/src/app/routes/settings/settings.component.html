@@ -1,0 +1,10 @@
+<div class="settings-container">
+    <div class="settings-left-nav">
+        <uxpl-left-nav-multi #leftNav [tabs]="leftNavTabs" width="300px" (selected)="handleClick($event)"></uxpl-left-nav-multi>
+    </div>
+    <div class="settings-main">
+        <div class="tcs-settings-router-pane" fxFlex>
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

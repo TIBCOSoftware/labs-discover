@@ -1,0 +1,39 @@
+<div>
+  <div class="map-row">
+    <uxpl-select-input class="map-field" label="Which field represents the case Id?" allow-input [value]="data.caseId" [options]="calculateOption('caseId')" (uxplSelection)="handleSelection($event, 'caseId')"></uxpl-select-input>
+    <uxpl-select-input class="map-field map-field-margin" label="Which field represents the activity?" allow-input [value]="data.activity" [options]="calculateOption('activity')" (uxplSelection)="handleSelection($event, 'activity')"></uxpl-select-input>
+    <uxpl-select-input class="map-field map-field-margin" label="Which field represents the resource?" allow-input [value]="data.resource" [options]="calculateOption('resource')" (uxplSelection)="handleSelection($event, 'resource')"></uxpl-select-input>
+  </div>
+  <div class="map-row">
+    <uxpl-select-input class="map-field" label="Which field represents the start time?" allow-input [value]="data.start" [options]="calculateOption('start')" (uxplSelection)="handleSelection($event, 'start')"></uxpl-select-input>
+    <uxpl-select-input class="map-field map-field-margin" label="Which field represents the end time?" allow-input [value]="data.end" [options]="calculateOption('end')" (uxplSelection)="handleSelection($event, 'end')"></uxpl-select-input>
+    <uxpl-select-input class="map-field map-field-margin" label="Include other fields in the analysis?" allow-input [values]="data.other" [options]="calculateOption('other')" multiple (uxplSelection)="handleSelection($event, 'other')"></uxpl-select-input>
+  </div>
+  <!--div class="parse-options-csv-date-format">
+    <uxpl-form-field class="parse-options-csv-date-element-format" [options]="dateOptions" label="Date and time format: " type="text" valid required="true"  [value]="parse.dateTimeFormat" (uxplChanged)="handleUpdate($event, 'dateTimeFormat')"></uxpl-form-field>
+  </div-->
+
+  <div *ngIf="previewColumns?.length > 0" class="map-preview-container">
+    <div class="tcs-data-preview-button-text">Data Preview</div>
+    <div class="datasource-csv-preview">
+        <p-table #dt [columns]="previewColumns" [value]="previewData" styleClass="custom-table-css"
+        autoLayout="false" dataKey="name" [resizableColumns]="false" scrollHeight="flex"
+        rows="15" showCurrentPageReport="false">
+          <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="top-row">
+              {{col.headerName}}
+            </th>
+          </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-previewData let-expanded="expanded" let-columns="columns" let-rowIndex="rowIndex">
+            <tr>
+              <td *ngFor="let col of columns" [ngStyle]="{'text-align': col.align != undefined ? col.align : 'left' }" class="table-element">
+                {{ getObjectValue(previewData, col) }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+    </div>
+  </div>
+</div>

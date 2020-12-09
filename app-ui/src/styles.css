@@ -1,0 +1,184 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+/* @import "~primeicons/primeicons.css";
+@import "~primeng/resources/primeng.min.css";
+@import "~primeng/resources/themes/nova-light/theme.css"; */
+
+/* @import '~ag-grid-community/dist/styles/ag-theme-material.css'; */
+/* @import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-balham.css"; */
+/* You can add global styles to this file, and also import other style files */
+@font-face {
+  font-family: Source Sans Pro;
+  src: url("assets/fonts/SourceSansPro-Regular.ttf");
+}
+
+@font-face {
+  font-family: Source Sans Pro Light;
+  src: url("assets/fonts/SourceSansPro-Light.ttf");
+}
+
+@font-face {
+  font-family: Source Sans Pro ExtraLight;
+  src: url("assets/fonts/SourceSansPro-ExtraLight.ttf");
+}
+
+@font-face {
+  font-family: Source Sans Pro Semibold;
+  src: url("assets/fonts/SourceSansPro-SemiBold.ttf");
+}
+
+body * {
+  font-family: var(--app-font-family, Source Sans Pro);
+}
+
+html, body {
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  background-color: #f4f4f4;
+  overflow: hidden;
+}
+
+.tcs-style-dialog .mat-dialog-container {
+  padding: 0px;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px 0 #dedede;
+  background-color: #ffffff;
+}
+
+/* required live apps form overrides */
+body .md-select-menu-container {
+  z-index: 1090;
+}
+
+body md-autocomplete md-autocomplete-wrap.md-menu-showing {
+  z-index: 1051;
+}
+
+body .md-scroll-mask {
+  z-index: 1050;
+}
+
+body .md-scroll-mask > .md-scroll-mask-bar {
+  z-index: 1065;
+}
+
+body .md-datepicker-is-showing .md-scroll-mask {
+  z-index: 1099
+}
+
+body .md-datepicker-calendar-pane {
+  z-index: 1001;
+}
+
+/* end required live apps form overrides */
+
+
+.page-title {
+  font-family: Source Sans Pro;
+  color: #212121;
+  font-size: 30px;
+  letter-spacing: 0;
+  line-height: 38px;
+  margin-right: 20px;
+  margin-left: 10px;
+}
+
+.page-container {
+  margin: 20px;
+  background-color: white;
+}
+
+.tcs-pointer {
+  cursor: pointer;
+}
+
+/* TODO: Move to UXPL */
+.secondary-button {
+  box-sizing: border-box;
+  margin: 10px;
+  padding-top: 2px;
+  border: 1px solid #1774E5;
+  border-radius: 3px;
+  z-index: 10;
+  background-color: #FFFFFF;
+  min-height: 25px;
+  /*min-width: 130px;*/
+  text-align: center;
+  color: #1774E5;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.secondary-button:hover {
+  color: #2ca7ff;
+  background-color: #def3fffc;
+  cursor: pointer;
+}
+
+.hover-icon:hover{
+  cursor: pointer;
+}
+
+h1 {
+  height: 36px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 36px;
+}
+
+h2 {
+  height: 27px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 27px;
+}
+
+h3 {
+  height: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.settings-title {
+  display: flex;
+  flex-direction: row;
+}
+
+.settings-container {
+  overflow: auto;
+  height: 100vh;
+}
+
+.settings-buttons {
+  display: flex;
+  flex: 1 1 0%;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ace_editor.ace-sqlserver * {
+  font-family: monospace;
+}
+
+.tc-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.search-highlight {
+  background-color: yellow !important;
+}

@@ -1,0 +1,27 @@
+<div fxLayout="row" fxLayoutAlign="end center" style="z-index: 200;">
+    <div (click)="buttonClicked($event, button)" *ngFor="let button of primaryButtons"
+         class="action-button">{{button.label}}{{button.addition}}</div>
+    <!--<div class="action-button" (click)="buttonClicked($event, 'New Employee')">New Employee</div> -->
+    <div [hidden]="!showAdditionalButtons" > <!-- (click)="openMenu()" class="action-button" >More Actions...</div> -->
+        <!--<button [hidden]="hideMatButton" mat-button [matMenuTriggerFor]="appMenu">More Actions...</button>
+        <div (click)="openMenu()" [matMenuTriggerFor]="appMenu" class="action-button">More Actions...</div>-->
+        <icon-button (click)="openMenu()" [matMenuTriggerFor]="appMenu"  [text]="'More'"
+                     [iconLocation]="'assets/images/svg/down.svg'"></icon-button>
+        <mat-menu #appMenu="matMenu" xPosition="before">
+            <!--
+            <button *ngFor="let aButton of additionalButtons" mat-menu-item class="action-button"
+                    (click)="buttonClicked($event, aButton)">{{aButton.label}}</button> -->
+            <div (click)="buttonClicked($event, aButton)" *ngFor="let aButton of additionalButtons"
+                 class="action-button-menu">{{aButton.label}}{{aButton.addition}}</div>
+        </mat-menu>
+    </div>
+    <div [hidden]="!showAdminButtons" >
+        <icon-button [matMenuTriggerFor]="appAdminMenu"  [text]="'Admin'"
+                     [iconLocation]="'assets/images/svg/down.svg'"></icon-button>
+        <mat-menu #appAdminMenu="matMenu" xPosition="before">
+            <div (click)="buttonClicked($event, aButton)" *ngFor="let aButton of adminButtons"
+                 class="action-button-menu">{{aButton.label}}{{aButton.addition}}</div>
+        </mat-menu>
+    </div>
+</div>
+

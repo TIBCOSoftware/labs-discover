@@ -1,0 +1,33 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Date and time formats</h1>
+    <div class="settings-buttons">
+        <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+        <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>      
+  </div>
+  <div class="settings-container">
+    <div>
+      <h2>Supported date and time formats to parse</h2> 
+        <div style="display: flex; flex-direction: row;">
+          <div id="formats" onfocusout="myScript()"
+            ace-editor
+            [text]="dateTimeFormats"
+            [options]="aceEditorOptions"
+            [readOnly]="false"
+            [autoUpdateContent]="false"
+            (textChanged)="handleUpdateDateTimeFormats($event)"     
+            style="margin-top: 20px; min-height: 500px; max-height: 500px; width:90%;">
+          </div>
+          <div id="preview"
+            ace-editor
+            [text]="previewValues"
+            [options]="aceEditorOptions"
+            [readOnly]="true"
+            [autoUpdateContent]="false"
+            style="margin-top: 20px; min-height: 500px; max-height: 500px; width:90%;">
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

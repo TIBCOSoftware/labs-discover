@@ -1,0 +1,22 @@
+<div class="caseview-top-level">
+  <div class="caseview-wrapper" *ngIf="hasCaseConfig">
+    <div class="caseview-left-nav" >
+      <uxpl-left-nav-multi #leftNav (selected)="handleClick($event)" [tabs]="leftNavTabs"></uxpl-left-nav-multi>
+    </div>
+    <div class="caseview-table" *ngIf="casesConfig.caseconfigs && casesConfig.caseconfigs.length > 0">
+      <custom-case-list *ngFor="let cCon of casesConfig.caseconfigs; let i = index" [cConfig]="cCon" [hidden]="hideTable[i]"></custom-case-list>
+    </div>
+  </div>
+  <div [hidden]="hasCaseConfig" class="center">
+    <div class="img-center">
+      <img width="204" src="{{noDataIconLocation}}">
+    </div>
+    <div class="no-data-available"><br></div>
+    <div class="no-data-available" style="font-weight: bold">No cases configured.<br></div>
+    <div class="no-data-available"><br></div>
+    <!--
+    <div class="no-data-available"> Select <span class="no-data-available-click" (click)="selectAnalytic()">a process analysis</span>
+      to get started.
+    </div>-->
+  </div>
+</div>

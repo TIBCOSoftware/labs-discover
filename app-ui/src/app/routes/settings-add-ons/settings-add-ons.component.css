@@ -1,0 +1,16 @@
+.settings-main {
+  margin-right: 24px;
+}
+
+.addons-line {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-field {
+  flex: 1 1 0%;
+}
+
+.flex-margin {
+  margin-right: 15px;
+}

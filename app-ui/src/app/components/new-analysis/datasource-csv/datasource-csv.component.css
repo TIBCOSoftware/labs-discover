@@ -1,0 +1,21 @@
+.datasource-csv-filelist-text {
+    color: #727272;
+    font-family: "Source Sans Pro";
+    font-size: 13px;
+    letter-spacing: 0;
+    line-height: 21px;
+    margin-bottom: 23px;
+}
+
+.datasource-csv-preview-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.datasource-csv-filelist-container {
+    width: 293px;
+    border-radius: 0 0 3px 3px;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.35);
+    padding: 16px 20px 16px 16px;
+}

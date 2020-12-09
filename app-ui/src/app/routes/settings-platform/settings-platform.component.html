@@ -1,0 +1,33 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Platform</h1>
+    <div class="settings-buttons">
+      <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+      <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>      
+  </div>
+  <div class="settings-container">    
+    <div>
+      The following TIBCO Cloud components used to manage the lifecycle of Process analysis.
+      <h2>Messaging</h2>
+      <div>
+        <uxpl-form-field label="TIBCO Cloud Messaging endpoint" type="text" valid required="true" [value]="discover.messaging.endpoint" (uxplChanged)="handleUpdateMessaging($event, 'endpoint')"></uxpl-form-field>
+        <br>
+        <uxpl-form-field label="TIBCO Cloud Messaging key" type="password" valid required="true" [value]="discover.messaging.key" (uxplChanged)="handleUpdateMessaging($event, 'key')"></uxpl-form-field>
+      </div>
+    </div>
+    <div>
+      <h2>Integration endpoint</h2>
+      <div>
+        <uxpl-form-field label="Endpoint" type="text" valid required="true" [value]="discover.messaging.configURL" (uxplChanged)="handleUpdateMessaging($event, 'configURL')"></uxpl-form-field>
+      </div>
+    </div>
+    <div>
+      <h2>Live Apps application </h2>
+      <div class="platform-line">
+        <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Analysis Lifecyle Application" [value]="discover.analysis.applicationId" [options]="availableApps" (uxplSelection)="handleAnalysisLifecycleSelection($event, 'applicationId')"></uxpl-select-input>
+        <uxpl-select-input class="flex-field" select-caption="" label="Creator" [value]="discover.analysis.creatorId" [options]="availableCreators" (uxplSelection)="handleAnalysisLifecycleSelection($event, 'creatorId')"></uxpl-select-input>
+      </div>
+    </div>
+  </div>
+</div>

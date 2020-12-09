@@ -1,0 +1,42 @@
+.tcla-components-pane {
+  margin-top: 20px;
+}
+
+.padded-widget {
+  padding: 20px;
+}
+
+:host ::ng-deep .mat-tab-body-wrapper {
+  height: 100%;
+}
+
+/* This sets the sibling of router-outlet - ie) the routed component to full width */
+/* note: this outer component must have encapsulation: ViewEncapsulation.None */
+router-outlet + * {
+  width: 100%;
+}
+
+.tcs-starter-app-router-pane {
+  overflow: hidden;
+  margin-bottom: auto;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.box .rowC {
+  background-color: white;
+}
+
+.box .rowC.header {
+  flex: 1 1 auto;
+}
+
+.box .rowC.content {
+  flex: 1 1 auto;
+}

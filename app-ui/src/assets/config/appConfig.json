@@ -1,0 +1,237 @@
+{
+  "config": {
+    "customConfig1": {
+      "configAttribute1": "sampleValue"
+    },
+    "discover": {
+      "investigations": {
+        "numberApplications": 2,
+        "applications": [
+          {
+            "applicationId": "",
+            "creatorId": ""
+          },
+          {
+            "applicationId": "",
+            "creatorId": ""
+          }
+        ]
+      },
+      "analysis": {
+        "applicationId": "",
+        "creatorId": ""
+      },
+      "csv": {
+        "folder": "datasources"
+      },
+      "tdv": {
+        "enable": false,
+        "bdsServer": "",
+        "bdsPort": 443,
+        "username": "",
+        "password": "",
+        "jdbcPort": 9400,
+        "workers": 5,
+        "k8sEnable": false,
+        "k8sNamespace": "",
+        "k8sPodName": ""
+      },
+      "messaging": {
+        "endpoint": "endpoint",
+        "key": "key",
+        "configURL": "configURL"
+      },
+      "storage": {
+        "type": "aurora",
+        "batchSize": 100000,
+        "partitions": 60,
+        "url": "url",
+        "driver": "driver",
+        "username": "username",
+        "password": "password"
+      },
+      "analytics": {
+        "server": "https://labs.spotfire-cloud.com",
+        "template": "/TIBCO - Office of the CTO/Discodev/processmining_discodev_final",
+        "menuConfig": [
+          {
+            "id": "Overview",
+            "label": "Overview",
+            "icon": "assets/images/analytics/ic_home.svg",
+            "child": []
+          },
+          {
+            "id": "Variants Overview",
+            "label": "Variants",
+            "icon": "assets/images/analytics/ic_explore.svg",
+            "child": [
+              {
+                "id": "Top Frequents Variants",
+                "label": "Top Frequency",
+                "icon": ""
+              },
+              {
+                "id": "Bottom Performance Variants",
+                "label": "Bottom Performance",
+                "icon": ""
+              }
+            ]
+          },
+          {
+            "id": "Variants Map",
+            "label": "Process Map",
+            "icon": "assets/images/analytics/ic-process_map.svg",
+            "child": []
+          },
+          {
+            "id": "Activities Frequency",
+            "label": "Activities",
+            "icon": "assets/images/analytics/ic-activities.svg",
+            "child": [
+              {
+                "id": "Activities Performance",
+                "label": "Performance",
+                "icon": ""
+              }
+            ]
+          },
+          {
+            "id": "Resources",
+            "label": "Resources Graph",
+            "icon": "assets/images/analytics/ic-community.svg",
+            "child": []
+          },
+          {
+            "id": "Reference Model",
+            "label": "Reference Model",
+            "icon": "assets/images/analytics/ic-model.svg"
+          },
+          {
+            "id": "Compliance",
+            "label": "Compliance",
+            "icon": "assets/images/analytics/ic-compliance.svg"
+          },
+          {
+            "id": "Case Context",
+            "label": "Cases",
+            "icon": "assets/images/analytics/ic-cases.svg",
+            "child": [
+              {
+                "id": "Case Attributes",
+                "label": "Attributes",
+                "icon": ""
+              }
+            ]
+          },
+          {
+            "id": "Filters",
+            "label": "Filters",
+            "icon": "assets/images/analytics/ic_filter.svg",
+            "child": [
+              {
+                "id": "Filters Activities",
+                "label": "Activities",
+                "icon": ""
+              }
+            ]
+          },
+          {
+            "id": "Config",
+            "label": "DevTools",
+            "icon": "assets/images/analytics/ic_maintenance.svg",
+            "child": []
+          }
+        ],
+        "marking": [
+          {
+            "type": "Compliance",
+            "table": "Cases",
+            "marking": "Case"
+          },
+          {
+            "type": "Compliance",
+            "table": "Variants",
+            "marking": "Variant"
+          },
+          {
+            "type": "Improvement",
+            "table": "Cases",
+            "marking": "Case"
+          },
+          {
+            "type": "Compliance",
+            "table": "Variants",
+            "marking": "Variant"
+          }
+        ]
+      },
+      "landingPage": {
+        "key": "",
+        "description": "",
+        "title": "Welcome to your Discover App",
+        "subtitle": "Discover, understand and Improve Your Business Processes from Operation Systems event logs data.",
+        "highlights": [
+          {
+            "title": "Learn from your data",
+            "iconURL": "ic-graph.svg",
+            "content": "Objectively visualize, identify, and quantify bottlenecks and inefficiencies in your business processes."
+          },
+          {
+            "title": "Prioritize improvements",
+            "iconURL": "ic-community.svg",
+            "content": "Raise out of compliance issues and process improvement requests. Collaborate with other teams to swiftly improve processes."
+          },
+          {
+            "title": "Predict with confidence",
+            "iconURL": "ic-documentation.svg",
+            "content": "Anticipate process outcomes such as future path, duration and cost with predictive analytics and apply it to your in-flight cases."
+          }
+        ],
+        "backgroundURL": "ProcessMiningsmall.jpg",
+        "actionButtons": [
+          {
+            "text": "Get started",
+            "route": "/starterApp/pd/datasource-administration"
+          }
+        ],
+        "verticalPadding": 0,
+        "roles": [],
+        "priority": 0
+      },
+      "general": {
+        "browserTitle": "TIBCO Cloud™ Discover App",
+        "applicationTitle": "Discover App",
+        "welcomeMessage": "My Cases Dashboard",
+        "roles": [],
+        "documentationUrl": "assets/help.html"
+      },
+      "dateTimeFormats": [
+        "d/M/yy H:mm", 
+        "d/M/yyyy H:m:ss"
+      ]
+    },
+    "settingsMenu": [
+      {
+          "entry": "Branding",
+          "icon": "assets/images/settings/tcs-starters-icon.svg"
+      },
+      {
+          "entry": "Analytics",
+          "icon": "assets/images/settings/tcs-liveapps-sm-icon.svg"
+      },
+      {
+          "entry": "Investigations",
+          "icon": "assets/images/settings/tcs-liveapps-sm-icon.svg"
+      },
+      {
+          "entry": "Platform",
+          "icon": "assets/images/settings/tcs-spotfire-icon.svg",
+          "options": ["General", "Analytics", "Orchestration", "Process mining", "Database", "Dates and times"]
+      },
+      {
+          "entry": "Add-ons",
+          "icon": "assets/images/settings/tcs-starters-icon.svg"
+      }
+    ]
+  }
+}

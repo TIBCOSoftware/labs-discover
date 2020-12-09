@@ -1,0 +1,246 @@
+.case-table-wrapper{
+  /*border: 1px solid red;*/
+}
+
+.button-container{
+  display: flex;
+  flex-flow: row;
+  height: 40px;
+}
+.badge{
+  border-radius: 2px;
+  padding: .25em .5rem;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+.good {
+  background-color: #E1F7EB !important;
+  color: #256029;
+
+  /*color: #ffffff !important;*/
+}
+.bad {
+  background-color: #F9E1E3 !important;
+  /*color: #ffffff !important;*/
+}
+.neutral {
+  background-color: #FEF7EA !important;
+  /*color: #ffffff !important;*/
+}
+.archived {
+  background-color: #f4f4f4 !important;
+  /*color: #ffffff !important;*/
+}
+
+.analysis-button{
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  align-items: center;
+}
+
+
+
+
+.rowhover:hover > .hovereffect {
+  background: #F3F4FB;
+  color: #495057;
+  cursor: pointer;
+}
+
+:host ::ng-deep .custom-table-css {
+
+  .top-row{
+    background-color: transparent;
+    border-width:0px;
+    font-size: 14px;
+    font-family: "Source Sans Pro";
+    color: #727272;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .top-row-small{
+    width: 150px;
+  }
+
+  .top-row-left {
+    background-color: transparent;
+    border-width:0px;
+    align-content: center;
+  }
+
+  .top-row:after {
+    content: ""; /* This is necessary for the pseudo element to work. */
+    display: block; /* This will put the pseudo element on its own line. */
+    margin: 0 auto; /* This will center the border. */
+    width: 100%; /* Change this to whatever width you want. */
+    border-bottom: 2px solid #1774E5;
+  }
+
+  .top-row-empty{
+    background: white;
+    border-bottom: none;
+  }
+
+  .sort-icon{
+    float: right;
+  }
+
+  .filter-row{
+    background-color: transparent;
+    border-width:0px;
+  }
+
+  .ui-table-tbody > tr:nth-child(even) {
+    background-color: transparent;
+  }
+
+  .ui-table-tbody > tr :hover {
+    background-color: #f6f6f6;
+  }
+
+  .data-row{
+    font-size: 14px;
+    font-family: Source Sans Pro;
+    color: #727272;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .ui-dropdown{
+    min-width: 50px;
+  }
+
+  .ui-paginator {
+    .ui-dropdown {
+      float: left;
+    }
+
+    .ui-paginator-current {
+      float: right;
+    }
+  }
+
+  .ui-progressbar {
+    height: 8px;
+    background-color: #D8DADC;
+
+    .ui-progressbar-value {
+      background-color: #00ACAD;
+    }
+  }
+
+  .ui-column-filter {
+    display: block;
+    input {
+      width: 100%;
+    }
+  }
+
+  .ui-table-globalfilter-container {
+    float: right;
+    input {
+      width: 200px;
+    }
+  }
+
+  .ui-datepicker {
+    min-width: 25em;
+
+    td {
+      font-weight: 400;
+    }
+  }
+
+  .ui-table-caption {
+    border: 0 none;
+    padding: 12px;
+    text-align: left;
+    font-size: 20px;
+  }
+
+  .ui-paginator {
+    border: 0 none;
+    padding: 1em;
+  }
+
+  .ui-table-thead > tr > th {
+    /*border: 0 none;*/
+    text-align: left;
+
+    &.ui-filter-column {
+      border-top: 1px solid #c8c8c8;
+    }
+
+    &:first-child {
+      // width: 5em;
+      text-align: left;
+    }
+
+    &:last-child {
+      text-align: left;
+    }
+  }
+
+  .ui-table-tbody > tr > td {
+    border: 0 none;
+    cursor: auto;
+
+    &:first-child {
+      // width: 3em;
+      text-align: left;
+    }
+
+    &:last-child {
+      text-align: left;
+    }
+  }
+
+  .ui-dropdown-label:not(.ui-placeholder) {
+    text-transform: uppercase;
+  }
+
+  .ui-table-tbody > tr > td .ui-column-title {
+    display: none;
+  }
+
+  .ui-paginator-bottom{
+    background-color: transparent;
+  }
+}
+
+/* Responsive */
+@media screen and (max-width: 64em) {
+  :host ::ng-deep .ui-table {
+    &.custom-table-css {
+      .ui-table-thead > tr > th,
+      .ui-table-tfoot > tr > td {
+        display: none !important;
+      }
+      .ui-table-tbody > tr > td {
+        text-align: left;
+        display: block;
+        border: 0 none !important;
+        width: 100% !important;
+        float: left;
+        clear: left;
+        border: 0 none;
+
+        .ui-column-title {
+          padding: .4em;
+          min-width: 30%;
+          display: inline-block;
+          margin: -.4em 1em -.4em -.4em;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}
+
+

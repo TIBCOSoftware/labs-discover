@@ -1,0 +1,7 @@
+.parse-preview-container {
+  margin-top: 30px;
+}
+
+::ng-deep .parse-preview-container .custom-table-css.p-datatable.p-component.p-datatable-auto-layout {
+  font-size: 12px;
+}

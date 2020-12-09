@@ -1,0 +1,39 @@
+<div class="case-table-wrapper">
+  <div class="case-list-toolbar-container">
+    <div class="case-list-search">
+      <uxpl-form-field style="margin-bottom:15px;" type="text" valid value=""
+                       (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+      <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
+    </div>
+    <tool-bar [notificationText]="toolBarNotification" [createNewText]="NEW_CASE"
+              (toolBarButtonClicked)="handleTBut($event)" [actionButtons]="actionButtons"></tool-bar>
+  </div>
+  <div class="case-list-table-container">
+    <!--div [hidden]="tableLoading"-->
+    <div [hidden]="tableLoading">
+      <custom-case-table style="background-color: #f4f4f4;" *ngIf="caseRefs && caseRefs.length > 0"
+                         [cConfig]="cConfig"
+                         [caseRefs]="caseRefs"
+                         [sandboxId]="sandboxId"
+                         [loading]="tableLoading"
+                         [searchTerm]="searchTerm"
+                         (selection)="selectTableCaseRefs($event)"
+                         (selectionCases)="selectCaseInfo($event)"
+                         (caseEvent)="caseEventClicked($event)">
+      </custom-case-table>
+      <div *ngIf="caseRefs && caseRefs.length === 0" class="center">
+        <div class="img-center">
+          <img width="204" [src]="noDataIconLocation">
+        </div>
+        <div class="no-data-available"><br></div>
+        <div class="no-data-available" style="font-weight: bold">No cases available.<br></div>
+        <div class="no-data-available"><br></div>
+      </div>
+
+    </div>
+    <div *ngIf="tableLoading" class="loading-indicator">
+      <uxpl-spinner style="height: 150px; min-width: 150px; max-width: 150px;" appearance="light"
+                    message="Loading cases..."></uxpl-spinner>
+    </div>
+  </div>
+</div>

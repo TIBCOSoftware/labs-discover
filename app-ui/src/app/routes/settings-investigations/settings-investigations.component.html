@@ -1,0 +1,23 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Investigations</h1>
+    <div class="settings-buttons">
+        <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+        <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>      
+  </div>
+  <div *ngIf="availableApps && availableApps.length > 0" class="settings-container">
+    <div>
+      <h2>Compliance</h2>
+      <div class="platform-line">
+        <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Select TIBCO LiveApps application to be used for compliance" [value]="getApplication(0)" [options]="availableApps" (uxplSelection)="handleApplicationSelection($event, 0)"></uxpl-select-input>
+        <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Select TIBCO LiveApps creator to be used for compliance" [value]="getCreator(0)" [options]="getCreators(0)" (uxplSelection)="handleCreatorSelection($event, 0)"></uxpl-select-input>  
+      </div>
+      <h2>Improvement</h2>
+      <div class="platform-line">
+        <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Select TIBCO LiveApps application to be used for improvement" [value]="getApplication(1)" [options]="availableApps" (uxplSelection)="handleApplicationSelection($event, 1)"></uxpl-select-input>
+        <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Select TIBCO LiveApps creator to be used for improvement" [value]="getCreator(1)" [options]="getCreators(1)" (uxplSelection)="handleCreatorSelection($event, 1)"></uxpl-select-input>  
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Settings ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is settings about?",
+            "label": "What is settings about?",
+            "title": "What is settings about?",
+            "url": "assets/help/application/Settings-About.html",
+            "content": "",
+            "default": "true"
+          }
+
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell me about Add-ons",
+        "label": "Tell me more about Add-ons ...",
+        "title": "Tell me about Add-ons...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What are the available add-ons?",
+            "label": "What are the available add-ons?",
+            "title": "What are the available add-ons?",
+            "url": "assets/help/application/Settings-Add-Ons.html",
+            "content": "",
+            "default": "true"
+          }
+
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell me more about Data Virtualization",
+        "label": "Tell me more about Data Virtualization ...",
+        "title": "Tell me more about Data Virtualization ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "Why use TIBCO Data Virtualization?",
+            "label": "Why use TIBCO Data Virtualization?",
+            "title": "Why use TIBCO Data Virtualization?",
+            "url": "assets/help/application/Settings-Add-Ons-Why-Use-TDV.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "How do I configure my own TIBCO DV?",
+            "label": "How do I configure my own TIBCO DV?",
+            "title": "How do I configure my own TIBCO DV?",
+            "url": "assets/help/application/Settings-Add-Ons-How-Do-I-Configure-TDV.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "external",
+            "name": "Learn more avout TIBCO DV",
+            "label": "Learn more avout TIBCO DV",
+            "title": "Learn more avout TIBCO DV",
+            "icon": "assets/help/images/ic-docs-icon.svg",
+            "url": "https://www.tibco.com/data-virtualization",
+            "content": "",
+            "default": "true"
+          }        ]
+      },
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

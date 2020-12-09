@@ -1,0 +1,14 @@
+<tcsf-spotfire-wrapper    [url]="sfServer"
+                          [path]="sfAnalysis"
+                          [customization]="sfProps"
+                          [markingOn]="sfMarkingOn"
+                          (markingEvent)="marking($event);"
+                          [maxRows]="sfMarkingMaxRows"
+                          [version]="10.10"
+                          [parameters]="parameters"
+                          [page]="page"
+                          (document)="SFDocument = $event"
+                          id="TCSTKSPOTFIRETEMPLATE-id1"
+                          (handleErrorMessage)="handleError($event)">
+</tcsf-spotfire-wrapper>
+

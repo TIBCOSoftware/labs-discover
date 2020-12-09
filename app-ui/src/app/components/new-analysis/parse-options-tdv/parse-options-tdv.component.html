@@ -1,0 +1,7 @@
+<div class="parse-options-tdv-container">
+  <div class="parse-options-tdv-row">
+    <uxpl-select-input class="parse-options-tdv-margin parse-option-tdv-grow1" label="Encoding" [value]="data.encoding" [options]="encodingOptions" (uxplSelection)="handleEncodingSelection($event)"></uxpl-select-input>
+    <uxpl-form-field class="parse-options-tdv-margin parse-option-tdv-grow1" label="Number of rows to preview" type="number" valid required="true" value="{{data.numberRowsForPreview}}" (uxplChanged)="handleUpdate($event, 'numberRowsForPreview')"></uxpl-form-field>
+    <uxpl-button class="parse-options-tdv-margin" (clicked)="clickedRefresh();">Refresh</uxpl-button>
+  </div>
+</div>

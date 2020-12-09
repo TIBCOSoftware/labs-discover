@@ -1,0 +1,25 @@
+.banner{
+    font-weight: bold;
+    color: #055DAB;
+}
+
+
+#fadeout {
+    opacity: 1;
+    transition: 1s opacity;
+    font-size: 18px;
+    color: #055DAB;
+}
+
+.banner-float{
+    position: fixed;
+    left: 50%;
+    z-index: 1000;
+    margin-top: -45px;
+    margin-left: 50px;
+    height: 30px;
+}
+
+.banner-float, .banner-float > * {
+    z-index: 1500;
+}

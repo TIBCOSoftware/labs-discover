@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Foundations/system icon/ic_pagination_next</title>
+    <defs>
+        <path d="M16.8601,11.9877 L11.0239,17.8245 C10.7899,18.0585 10.4101,18.0585 10.1755,17.8245 C9.9415,17.5899 9.9415,17.2101 10.1755,16.9755 L15.1633,11.9877 L10.1995,7.0245 C9.9655,6.7899 9.9655,6.4101 10.1995,6.1755 C10.4341,5.9415 10.8139,5.9415 11.0479,6.1755 L16.8601,11.9877 Z" id="path-1"></path>
+    </defs>
+    <g id="Foundations/system-icon/ic_pagination_next" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <use id="ic-dropdown" fill="#1774E5" xlink:href="#path-1"></use>
+    </g>
+</svg>

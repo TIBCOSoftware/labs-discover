@@ -1,0 +1,18 @@
+<div class="box">
+  <div class="rowC header">
+    <uxpl-primary-nav #primaryNav [tabs]="tabs" (selected)="handleClick($event)"></uxpl-primary-nav>
+    <news-banner></news-banner>
+  </div>
+  <div class="rowC content discover-container">
+    <div [hidden]="hideAnalytics" style="height: 100%">
+      <div class="analytics-container">
+        <analytics-dashboard [fullSpotfireConfig]="fullSpotfireConfig"
+                             class="analytics-dashboard"></analytics-dashboard>
+      </div>
+    </div>
+    <div [hidden]="!hideAnalytics" style="height: 100%">
+        <router-outlet></router-outlet>
+    </div>
+    <upload-status></upload-status>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+<p-table #dt [columns]="cols" [value]="processAnalyses" [(selection)]="selectedPAs"
+         dataKey="ID" id="pTable" styleClass="custom-table-css"
+         [rowHover]="false"
+         [rows]="NUMBER_OF_ITEMS_BEFORE_PAGINATION" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [loading]="loading"
+         [paginator]="showPagination" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         [filterDelay]="0">
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <!--
+            <th style="width: 50px" class="top-row-left">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th> -->
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field"  class="top-row" [ngClass]="{'top-row-small': col.field == 'state' }">
+        {{col.header}}
+        <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
+                    ariaLabelDesc="Activate to sort in descending order"
+                    ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+      </th>
+
+      <th style="width: 250px" class="top-row-empty">
+
+      </th>
+      <th style="width: 50px" class="top-row-empty">
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-expanded="expanded" let-columns="columns">
+    <tr class="rowhover" id="toHightlight">
+      <td *ngFor="let col of columns" class="no-padding data-row hovereffect" (click)="dt.toggleRow(rowData, $event)"
+          (dblclick)="openAnalysisClicked(rowData)">
+        <div *ngIf="col.field != 'state'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div>
+        <div *ngIf="col.field == 'state'">
+          <uxpl-tag matTooltip="{{getToolTip(col.field, rowData)}}" matTooltipClass="tTip" progress="{{getProgress(col.field, rowData)}}" icon="{{'assets/images/states/' + rowData[col.field] + '.svg'}}" class="uxpl-tag"
+                    color="{{getNgClass(col.field, rowData)}}">{{ obtainData(rowData, col.field)}}</uxpl-tag>
+          <!-- <span class="badge" [ngClass]="getNgClass(col.field, rowData)"><img src="{{'assets/images/' + rowData[col.field] + '.svg' }}">{{obtainData(rowData, col.field)}}</span> -->
+        </div>
+      </td>
+      <td class="no-padding">
+        <div class="button-container " >
+          <uxpl-options-menu style="margin-top: 5px" x-position="before" y-position="after" icon-height="15px" icon-width="15px" [config]="getAction(rowData)" (selected)="handleCaseActionSelect($event)"></uxpl-options-menu>
+          <uxpl-button *ngIf="rowData.state == 'Ready' || rowData.state == 'Archived' " id="#openAnalysis" type="secondary"  (clicked)="openAnalysisClicked(rowData)" [height]="'28px'">
+            <div class="analysis-button">View analytics  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
+          </uxpl-button>
+        </div>
+      </td>
+      <td class="no-padding" style="width: 30px !important;">
+        <a href="#" [pRowToggler]="rowData">
+          <img *ngIf="!expanded" src="assets/images/svg/ic_caretdown.svg" class="hover-icon">
+          <img *ngIf="expanded" src="assets/images/svg/ic_caretup.svg" class="hover-icon">
+        </a>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="rowexpansion" let-rowData let-columns="columns">
+    <tr style="background-color: #FFFFFF">
+      <td [attr.colspan]="columns.length + 2">
+        <div class="ui-g ui-fluid" style="font-size:16px;padding:20px; ">
+          <process-analysis-details [processAnalysis]="rowData"></process-analysis-details>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

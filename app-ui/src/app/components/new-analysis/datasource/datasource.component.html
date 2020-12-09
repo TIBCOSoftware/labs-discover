@@ -1,0 +1,27 @@
+<div>
+  <div *ngIf="multipleDataTypes()" style="width:340px;">
+    <uxpl-select-input label="Data source type" [value]="data.inputType" [options]="options" (uxplSelection)="handleSelection($event)"></uxpl-select-input>
+  </div>
+  <div class="datasource-preview">
+    <datasource-tdv *ngIf="showDatasource('tdv')" [data]="data.tdv"  [parse]="parse" (handlePreviewData)="previewTDVData($event)" (handleStatus)="updateStatus($event)" (handleError)="handleError($event)"></datasource-tdv>
+    <datasource-csv *ngIf="showDatasource('csv')" [data]="data.file" [parse]="parse" (handlePreviewData)="previewCSVData($event)" (handleStatus)="updateStatus($event)"></datasource-csv>
+    <div class="datasource-preview-table" *ngIf="!isError && previewColumns?.length > 0 ">
+      <tcpmg-generic-table  [columnDefs]="previewColumns" [rowData]="previewData.slice(0,5)" 
+        [autoLayout]="false" [showSortIcon]="false"
+        [showExpandButton]="false" [paginator]="false"
+        [showCurrentPageReport]="false" [showFilterRow]="false">
+      </tcpmg-generic-table>
+    </div>
+    <div *ngIf="isError" class="datasource-error">
+      <uxpl-empty-state-system type="system error" [message]="errorMessage" [description]="errorDescription"></uxpl-empty-state-system>
+    </div>
+    <div *ngIf="!isError && (previewColumns === undefined || previewColumns?.length === 0)" class="center">
+      <div class="img-center">
+        <img width="204" [src]="noDataIconLocation">
+      </div>
+      <div class="no-data-available"><br></div>
+      <div class="no-data-available" style="font-weight: bold">No preview data available.<br></div>
+      <div class="no-data-available"><br></div>
+    </div>
+    </div>
+</div>

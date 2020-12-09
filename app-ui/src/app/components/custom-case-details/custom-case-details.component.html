@@ -1,0 +1,34 @@
+<mat-card class="cont-card" *ngIf="caseDetail">
+  <mat-card-header>
+    <div class="header-sections">
+      <div>
+        <!--<mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}} ({{caseDetail.untaggedCasedataObj.state}})</mat-card-title>-->
+        <mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}}</mat-card-title>
+        <mat-card-subtitle>{{cConfig.customTitle}}</mat-card-subtitle>
+      </div>
+      <div *ngIf="cConfig.showMilestones">
+        <tcla-live-apps-case-states [small]="true" [hideTitle]="true"
+                                    [sandboxId]="appDefinitionService?.claims?.primaryProductionSandbox?.id"
+                                    [caseRef]="caseDetail?.caseReference"
+                                    [appId]="caseDetail?.metadata?.applicationId"></tcla-live-apps-case-states>
+      </div>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <table style="width:100%;">
+      <tr class="cell-row" *ngFor="let row of cConfig.detailFields">
+        <td *ngFor="let field of row" class="case-details-cell">
+          <div class="case-details-cell-wrappr">
+            <div class="cell-header-main">{{field.label}}</div>
+            <div *ngIf="field.format == 'EVENT-LINK'" class="cont-detail-link cont-detail" matTooltip="{{getToolTip(field.field, field.format)}}" matTooltipClass="tTip"
+                 [innerHTML]="getFieldValue(field.field, field.format)" (click)="eventClicked(field)"></div>
+            <div *ngIf="field.format != 'EVENT-LINK'" class="cont-detail" matTooltip="{{getToolTip(field.field, field.format)}}" matTooltipClass="tTip"
+                 [innerHTML]="getFieldValue(field.field, field.format)"></div>
+
+          </div>
+
+        </td>
+      </tr>
+    </table>
+  </mat-card-content>
+</mat-card>

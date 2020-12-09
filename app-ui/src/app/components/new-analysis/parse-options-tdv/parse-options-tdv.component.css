@@ -1,0 +1,23 @@
+.parse-options-tdv-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.parse-options-tdv-row {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0%;
+}
+
+.parse-options-tdv-margin {
+  margin-left: 10px;
+}
+
+.parse-option-tdv-grow5 {
+  flex-grow: 5;
+}
+
+.parse-option-tdv-grow1 {
+  flex-grow: 1;
+}
+  

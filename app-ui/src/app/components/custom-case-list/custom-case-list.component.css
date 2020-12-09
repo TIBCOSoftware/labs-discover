@@ -1,0 +1,123 @@
+:host {
+  flex: 1;
+}
+
+.case-table-wrapper{
+  /*border: 1px solid red;*/
+  display: flex;
+  flex-direction: column;
+}
+
+
+.case-list-toolbar-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #FFFFFF;
+}
+
+.case-list-table-container {
+  height: 100%;
+  background-color: #FFFFFF;
+  padding: 15px;
+  overflow: auto;
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.text-normal{
+  color: #686767;
+  font-family: "Source Sans Pro";
+  align-content: center;
+  font-size: 18px;
+  letter-spacing: 0;
+  line-height: 27px;
+  display: inline;
+  margin-right: 8px;
+}
+
+
+@keyframes shake {
+  0% {
+    transform: translate(1px, 1px) rotate(0deg);
+  }
+  10% {
+    transform: translate(-1px, -2px) rotate(-1deg);
+  }
+  20% {
+    transform: translate(-3px, 0px) rotate(1deg);
+  }
+  30% {
+    transform: translate(3px, 2px) rotate(0deg);
+  }
+  40% {
+    transform: translate(1px, -1px) rotate(1deg);
+  }
+  50% {
+    transform: translate(-1px, 2px) rotate(-1deg);
+  }
+  60% {
+    transform: translate(-3px, 1px) rotate(0deg);
+  }
+  70% {
+    transform: translate(3px, 1px) rotate(-1deg);
+  }
+  80% {
+    transform: translate(-1px, -1px) rotate(1deg);
+  }
+  90% {
+    transform: translate(1px, 2px) rotate(0deg);
+  }
+  100% {
+    transform: translate(1px, -2px) rotate(-1deg);
+  }
+}
+
+/**** For spinner */
+:host ::ng-deep .mat-progress-spinner circle, .mat-spinner circle {
+  stroke: #1774E5;
+}
+
+.center {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+}
+
+
+.no-data-available {
+  color: #4A4A4A;
+  font-family: Source Sans Pro;
+  font-size: 18px;
+  letter-spacing: 0.96px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.no-data-available-click {
+  color: #3873DD;
+  /*font-family: "Open Sans Bold";*/
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 0.96px;
+  line-height: 22px;
+  text-align: center;
+  letter: normal;
+  cursor: pointer;
+}
+
+
+.img-center{
+  margin: auto;
+  width: 204px;
+}
+
+.case-list-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

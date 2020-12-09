@@ -1,0 +1,59 @@
+.process-analysis-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-icon {
+  display: flex;
+}
+
+.process-analysis-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.process-analysis-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.process-analysis-button {
+  display: flex;
+  flex-direction: row;
+}
+
+.sshow {
+  display: block;
+}
+
+.hhidden {
+  display: none;
+}
+
+.mmodal {
+  z-index: 1000;
+  position: fixed;
+  top: 30px;
+  bottom: 0;
+  left: 300px;
+  width: 500px;
+}
+
+.process-analysis-wrapper{
+  background-color: #FFFFFF;
+}
+
+.process-analysis-container{
+  height: 100%;
+  background-color: #FFFFFF;
+  margin-top: 15px;
+}
+
+.icon-position {
+  margin-bottom: -15px;
+}
+
+

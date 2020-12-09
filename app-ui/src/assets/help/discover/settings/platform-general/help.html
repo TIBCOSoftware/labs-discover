@@ -1,0 +1,112 @@
+<html>
+<head>
+  <link href='../../../help.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <h1>Help Settings for  <b>Platform</b></h1>
+    <div class="row">
+        <div class="col">
+            <h2>Storage</h2>
+            <p>This is where database settings are expected. The process miner job will store all the output there</p>
+            <div class="tabs">
+            <div class="tab">
+                <input type="checkbox" id="chck1">
+                <label class="tab-label" for="chck1">General</label>
+                <div class="tab-content">
+                <p><strong><span style="text-decoration: underline;">Backend Type</span> </strong>:&nbsp; Storage type to be use as an ouput of the process mining job&nbsp;</p>
+        <p><span style="text-decoration: underline;">Values</span> :</p>
+        <ul>
+        <li><em><strong>aurora</strong></em> (Postgresql Database)</li>
+        <li><em><strong>sbdf&nbsp;</strong></em>(file format for TIBCO Spotfire)</li>
+        </ul>
+        <p><strong><span style="text-decoration: underline;">Batch Size</span>&nbsp;</strong>:&nbsp;The JDBC batch size, which determines how many rows to insert per round trip. This can help performance on JDBC drivers. This option applies only to writing. It defaults to&nbsp;<em><code>1000</code></em>.</p>
+        <p><span style="text-decoration: underline;">Values</span> : 1000 - 100000</p>
+        <hr />
+        <p><span style="text-decoration: underline;"><strong>Partitions&nbsp;</strong></span>:&nbsp; The maximum number of partitions that can be used for parallelism in table reading and writing. This also determines the maximum number of concurrent JDBC connections. If the number of partitions to write exceeds this limit, we decrease it to this limit by calling&nbsp;<code>coalesce(numPartitions)</code>&nbsp;before writing.</p>
+        <p><span style="text-decoration: underline;">Values</span> : 20-200</p>
+        <p><span style="text-decoration: underline;"><strong>Database URL</strong></span> :&nbsp;The JDBC URL to connect to. The source-specific connection properties may be specified in the URL. e.g.,&nbsp;<code>jdbc:postgresql://localhost/test?user=fred&amp;password=secret</code></p>
+        <p><span style="text-decoration: underline;"><strong>Driver</strong></span> :&nbsp;The class name of the JDBC driver to use to connect to this URL.</p>
+                </div>
+            </div>
+            <div class="tab">
+                <input type="checkbox" id="chck2">
+                <label class="tab-label" for="chck2">Security</label>
+                <div class="tab-content">
+                <p><span style="text-decoration: underline;"><strong>Username</strong></span> :&nbsp; Username used to get access to the database, needs dbo level</p>
+                <p><span style="text-decoration: underline;"><strong>Password</strong></span> :&nbsp; Password for the sql user set above</p>
+                </div>
+            </div>
+            </div>
+            <hr />
+        <div class="col">
+            <h2>Communication</h2>
+            <p>This is where messaging settings are expected. The process miner job will slisten to requests from there</p>
+            <div class="tabs">
+               <div class="tab">
+                  <input type="checkbox" id="chck3">
+                  <label class="tab-label" for="chck3">Messaging</label>
+                  <div class="tab-content">
+                     <p><strong><span style="text-decoration: underline;">Endpoint</span> </strong>:&nbsp; eFTL endpoint URL as shown inn the endpoint section of TIBCO Cloud Messaging&nbsp;</p>
+                  </div>
+               </div>
+               <div class="tab">
+                  <input type="checkbox" id="chck4">
+                  <label class="tab-label" for="chck4">Security</label>
+                  <div class="tab-content">
+                     <p><strong><span style="text-decoration: underline;">Messaging Key</span> </strong>: Access KEY to authentify against TIBCO Cloud Messaging</p>
+                  </div>
+               </div>
+               <div class="tab">
+                <input type="checkbox" id="chck5">
+                <label class="tab-label" for="chck5">Analysis</label>
+                <div class="tab-content">
+                   <p><span style="text-decoration: underline;"><strong>Config URL</strong></span> :&nbsp; https endpoint for accessing the analysis configuration (public service for discovery in Flogo)</p>
+                </div>
+             </div>
+            </div>
+         </div>
+         <hr />
+         <div class="col">
+         <h2>Analytics</h2>
+         <p>This is where spotfire settings are expected.</p>
+         <div class="tabs">
+            <div class="tab">
+               <input type="checkbox" id="chck6">
+               <label class="tab-label" for="chck6">Use TIBCO Cloud Spotfire</label>
+               <div class="tab-content">
+                  <p><strong><span style="text-decoration: underline;">Boolean</span> </strong>:&nbsp; enable this button if you wanna use the SaaS version of spotfire as part of your subscription&nbsp;</p>
+               </div>
+            </div>
+            <div class="tab">
+               <input type="checkbox" id="chck7">
+               <label class="tab-label" for="chck7">Custom Spotfire Server</label>
+               <div class="tab-content">
+                  <p><strong><span style="text-decoration: underline;">Spotfire server URL</span> </strong>: Spotfire url (https) to use for this application </p>
+               </div>
+            </div>
+         </div>
+      </div>
+      <hr />
+      <h2>Analysis lifecycle application</h2>
+      <p>This is where LiveApps settings are expected.</p>
+      <div class="tabs">
+         <div class="tab">
+            <input type="checkbox" id="chck8">
+            <label class="tab-label" for="chck8">Application</label>
+            <div class="tab-content">
+               <p><strong><span style="text-decoration: underline;">App Name</span> </strong>:&nbsp; Live Apps application to be use for storing the metadata of analysis.&nbsp;</p>
+            </div>
+         </div>
+         <div class="tab">
+            <input type="checkbox" id="chck9">
+            <label class="tab-label" for="chck9">Creator</label>
+            <div class="tab-content">
+               <p><strong><span style="text-decoration: underline;">Create Name</span> </strong>: LiveApps creator to be used for creating a new entry.</p>
+            </div>
+         </div>
+      </div>
+    </div>
+</div>
+
+    </body>
+    </html>

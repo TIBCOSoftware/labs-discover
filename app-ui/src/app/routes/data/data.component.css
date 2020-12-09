@@ -1,0 +1,22 @@
+.data-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.data-title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.data-wrapper{
+  background-color: #FFFFFF;
+}
+

@@ -1,0 +1,21 @@
+<div>
+  <uxpl-form-field id="#analysisName" readonly [value]="data.basicInfo.analysisName" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Analysis name" type="text" valid required="true"></uxpl-form-field>
+  <uxpl-form-field id="#analysisDescription" readonly [value]="data.basicInfo.analysisDescription" fieldId="analysisDescription" style="margin-top: 5px; margin-bottom: 5px;" label="Analysis description" type="text" valid required="true"></uxpl-form-field>
+  <uxpl-form-field *ngIf="data.datasource.file" id="#analysisName" readonly [value]="data.datasource.file.filename" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="File name" type="text" valid required="true"></uxpl-form-field>
+
+  <div>
+    <div class="map-row">
+      <uxpl-form-field class="map-field" id="#analysisName" [value]="data.mapping.caseId" readonly fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the case Id?" type="text" valid required="true"></uxpl-form-field>
+      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.activity" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the activity?" type="text" valid required="true"></uxpl-form-field>
+      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.resource" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the resource?" type="text" valid required="true"></uxpl-form-field>
+    </div>
+    <div class="map-row">
+      <uxpl-form-field class="map-field" id="#analysisName" readonly [value]="data.mapping.start" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the start time?" type="text" valid required="true"></uxpl-form-field>
+      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.end" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the end time?" type="text" valid required="true"></uxpl-form-field>
+      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.other" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Include other fields in the analysis?" type="text" valid required="true"></uxpl-form-field>
+    </div>
+    <div class="map-row">
+      <uxpl-form-field class="map-field" id="#analysisName" readonly [value]="data.parse.dateTimeFormat" fieldId="dateTimeFormat" style="margin-top: 5px; margin-bottom: 5px;" label="Datetime format" type="text" valid required="true"></uxpl-form-field>
+    </div>
+  </div>
+</div>

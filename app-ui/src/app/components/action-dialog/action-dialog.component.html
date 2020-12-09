@@ -1,0 +1,13 @@
+<div class="tcs-dialog-outer-div">
+    <mat-toolbar class="tcs-case-creation-dialog-toolbar">
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex>
+            <span class="tcs-case-creation-dialog-toolbar-text">{{ data.label }}</span>
+        </div>
+        <mat-icon fxLayout="column" fxLayoutAlign="start end" class="tcs-case-creation-dialog-icons"
+                  [svgIcon]="'tcs-close-icon'" (click)="closeDialog(false)"></mat-icon>
+    </mat-toolbar>
+    <div mat-dialog-content class="tcs-case-creation-dialog" fxLayout="column">
+        <tcla-live-apps-action-standalone [legacyActions]="false" [applicationId]="appId" typeId="1" [sandboxId]="sandboxId" [processName]="data.label" [caseRef]="caseRef" (caseCreated)="handleActionCompleted(true)"></tcla-live-apps-action-standalone>
+    </div>
+</div>
+

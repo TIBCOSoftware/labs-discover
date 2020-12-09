@@ -1,0 +1,70 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Process Analysis...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is a Process Analysis ...",
+            "label": "What is a Process Analysis?",
+            "title": "What is a Process Analysis",
+            "url": "assets/help/concepts/What-Is-A-Process-Analysis.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "How do I create a Process analysis??",
+            "label": "How do I create a Process analysis?",
+            "title": "How do I create a Process analysis",
+            "url": "assets/help/application/How-to-Create-A-Process-Analysis.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What do the different statuses mean?",
+            "label": "What do the different statuses mean?",
+            "title": "What do the different statuses mean?",
+            "url": "assets/help/application/What-Is-The-Process-Analysis-Lifecycle.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What actions can I run on Process analysis?",
+            "label": "What actions can I run on Process analysis?",
+            "title": "What actions can I run on Process analysis?",
+            "url": "assets/help/application/Process-Analysis-What-Actions-I-Can-Run.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

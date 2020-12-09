@@ -1,0 +1,29 @@
+<div class="page-container process-analysis-container">
+  <div class="process-analysis-title-container">
+    <div class="process-analysis-title">
+      <div class="page-title">Process Analysis</div>
+      <uxpl-form-field style="margin-bottom:15px;" type="text" valid required="true" value=""
+                       (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+      <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
+    </div>
+    <div class="process-analysis-button">
+      <uxpl-button id="#newAnalysis" icon="assets/images/svg/plus.svg" (clicked)="newAnalysisDialog();" [width]="'121px'">
+        Analysis
+      </uxpl-button>
+      <uxpl-button class="icon-position" id="#refresh" type="secondary" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refresh()" type="no-border">
+        Refresh
+      </uxpl-button>
+    </div>
+  </div>
+  <div class="process-analysis-wrapper" *ngIf="showTable">
+    <div class="process-analysis-container">
+      <process-analysis-table [processAnalyses]="cases" [actions]="caseActions" [searchTerm]="search" (openAnalysis)="handleClick($event)" (caseActionSelect)="handleActionSelected($event)" (forceRefresh)="refresh()"></process-analysis-table>
+    </div>
+  </div>
+  <div *ngIf="!showTable">
+    <mat-icon [svgIcon]="'ic-no-docs-icon'" style="height: 48px; width: 48px;"></mat-icon>
+    <div style="height: 100%" fxLayoutAlign="start center">
+      <span class="tcs-no-item-text">No documents found</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+.parse-options-csv-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.parse-options-csv-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+}
+
+.parse-options-csv-margin {
+  margin-left: 10px;
+}
+
+.parse-options-csv-align {
+  flex: 1 1 0%;
+}
+

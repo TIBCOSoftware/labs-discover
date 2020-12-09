@@ -1,0 +1,11 @@
+.datasource-tdv-select-margin {
+    margin-right: 10px;
+}
+
+.datasource-tdv-select-grow {
+    flex-grow: 1;
+}
+
+.datasource-tdv-select-container {
+    display:flex;
+}

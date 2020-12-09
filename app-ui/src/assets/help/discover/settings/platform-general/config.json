@@ -1,0 +1,90 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Settings ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is settings about?",
+            "label": "What is settings about?",
+            "title": "What is settings about?",
+            "url": "assets/help/application/Settings-About.html",
+            "content": "",
+            "default": "true"
+          }
+
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Platform / General ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "About this section?",
+            "label": "About this section",
+            "title": "About this section",
+            "url": "assets/help/application/Settings-Platform-General.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Messaging settings",
+            "label": "Messaging settings",
+            "title": "Messaging settings",
+            "url": "assets/help/application/Settings-Platform-General-Messaging.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Integration settings",
+            "label": "Integration settings",
+            "title": "Integration settings",
+            "url": "assets/help/application/Settings-Platform-General-Integration.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Live Apps settings",
+            "label": "Live Apps settings",
+            "title": "Live Apps settings",
+            "url": "assets/help/application/Settings-Platform-General-LiveApps.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

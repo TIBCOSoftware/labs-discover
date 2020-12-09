@@ -1,0 +1,88 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Investigations ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is an investigation ...",
+            "label": "What is an investigation?",
+            "title": "What is an investigation?",
+            "url": "assets/help/application/Cases-What-Are-Investigations.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What types of investigation are possible ...",
+            "label": "What types of investigation are possible?",
+            "title": "What types of investigation are possible?",
+            "url": "assets/help/application/Cases-What-Are-Investigations-Types.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell me more about Compliance",
+        "label": "Tell me more about Compliance ...",
+        "title": "Tell me more about Compliance ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is a Compliance investigation ...",
+            "label": "What is a Compliance investigation?",
+            "title": "What is a Compliance investigation",
+            "url": "assets/help/application/Cases-What-Is-Compliance.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },     
+      {
+        "type": "inline",
+        "name": "Tell me more about Improvement",
+        "label": "Tell me more about Improvement ...",
+        "title": "Tell me more about Improvement ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is an Improvement investigation ...",
+            "label": "What is an Improvement investigation?",
+            "title": "What is an Improvement investigation",
+            "url": "assets/help/application/Cases-What-Is-Improvement.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },     
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

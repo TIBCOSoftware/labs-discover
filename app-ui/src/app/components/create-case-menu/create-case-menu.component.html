@@ -1,0 +1,12 @@
+<div class="create-case-container" id="my-popup-content">
+  <uxpl-select-input #selectInput id="caseTypeInput" label="Case type" hint="Which kind of an issue is this case exhibiting?" (uxplChanged)="invInfo.type = $event.detail.value;"></uxpl-select-input>
+  <uxpl-form-field (uxplChanged)="invInfo.summary = $event.detail.value;"   id="#test124" fieldId="teete" style="margin-top: 5px; margin-bottom: 5px;" label="Summary of Investigation"
+                   type="text"
+                   hint="Briefly describe the Investigation"
+                   valid required="true"></uxpl-form-field>
+  <uxpl-textarea (uxplChanged)="invInfo.additionalDetails = $event.detail.value;" style="margin-top: 5px;" placeholder="Tell us more about this Investigation...">Additional details (Optional)</uxpl-textarea>
+  <div class="create-case-bottom-button-bar">
+    <uxpl-button (clicked)="createInvestigation.emit(null)" id="#cancelButton" type="no-border">Cancel</uxpl-button>
+    <uxpl-button (clicked)="createInvestiagation()">Create</uxpl-button>
+  </div>
+</div>
