@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigurationMenuEntry, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { Location } from '@angular/common';
@@ -10,7 +10,7 @@ import { TcAppDefinitionService } from '@tibco-tcstk/tc-liveapps-lib';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, AfterViewInit  {
 
   @ViewChild('leftNav', { static: false }) nav: ElementRef<UxplLeftNavMulti>;
   leftNavTabs = [];
@@ -37,7 +37,7 @@ export class SettingsComponent implements OnInit {
         });
         newEntry.child = newChildren;
       }
-      
+
       return newEntry;
     });
 

@@ -1,8 +1,8 @@
 {
   "cloudstarter": {
     "name": "project-discover",
-    "version": "1.1.01607480453410",
-    "build_date": "2020-12-09T02:20:53.410Z",
+    "version": "1.1.01611541376605",
+    "build_date": "2021-01-25T02:22:56.605Z",
     "description": "The TIBCO Cloud UI for Process Mining"
   }
 }

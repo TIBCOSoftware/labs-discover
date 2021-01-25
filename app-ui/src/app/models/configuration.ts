@@ -29,7 +29,48 @@ export interface DiscoverConfiguration {
   landingPage: LandingPageConfig;
   general: GeneralConfig;
   dateTimeFormats: string[];
+  ssConfig: SSConfig;
 }
+
+export interface SSConfig {
+  caseIdWords: string[];
+  resourceWords: string[];
+  activityWords: string[];
+  startWords: string[];
+  endWords: string[];
+  doAddAdditional: boolean;
+  threshold: number;
+  debug: boolean;
+}
+
+export interface SSResult {
+  ratings?: Rating[];
+  bestMatch?: Rating;
+  bestMatchIndex?: number;
+  [k: string]: unknown;
+}
+
+export interface HeadersSSResult {
+  caseIdColumn: string;
+  caseIdRating?: number;
+  resourceColumn: string;
+  resourceRating?: number;
+  activityColumn: string;
+  activityRating?: number;
+  startColumn: string;
+  startRating?: number;
+  endColumn: string;
+  endRating?: number;
+  otherFields?: string[];
+}
+
+
+export interface Rating {
+  target?: string;
+  rating?: number;
+  [k: string]: unknown;
+}
+
 
 export interface InvestigationConfig {
   numberApplications: number;

@@ -69,7 +69,7 @@ export interface NewAnalysisMapping {
     start?: string,
     end?: string,
     resource?: string,
-    other?: string
+    other?: string[]
 }
 
 export interface NewAnalysisStepStatus {

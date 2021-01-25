@@ -22,6 +22,8 @@ export class WizardComponent implements OnInit {
   public previewColumns: any[];
 
   public config: any;
+  public autoMapped: boolean;
+
 
   private creatorSchema: any;
   private statuses: NewAnalysisStepStatus[];
@@ -34,7 +36,9 @@ export class WizardComponent implements OnInit {
     protected tdvService: TDVService,
     protected messageService: MessageTopicService,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+    this.autoMapped = false;
+  }
 
   ngOnInit(): void {
     this.messageService.sendMessage('integratedHelp', 'discover/process-analysis/wizard');
@@ -398,5 +402,8 @@ export class WizardComponent implements OnInit {
     return returnData;
   }
 
+  hasAutoMapped(event){
+    this.autoMapped = event;
+  }
 
 }

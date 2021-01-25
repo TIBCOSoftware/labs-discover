@@ -9,6 +9,7 @@ import { SettingsPlatformProcessMinerComponent } from '../routes/settings-platfo
 import { SettingsPlatformDatabaseComponent } from '../routes/settings-platform-database/settings-platform-database.component';
 import { ResetComponent } from '../routes/reset/reset.component';
 import { SettingsPlatformDatetimeFormatComponent } from '../routes/settings-platform-datetime-format/settings-platform-datetime-format.component';
+import {SettingsPlatformAutomapComponent} from '../routes/settings-platform-automap/settings-platform-automap.component';
 
 export const CONFIGURATION_ROUTE_CONFIG = [
   {
@@ -42,6 +43,10 @@ export const CONFIGURATION_ROUTE_CONFIG = [
   {
     path: 'platform-dates-and-times',
     component: SettingsPlatformDatetimeFormatComponent
+  },
+  {
+    path: 'platform-auto-map',
+    component: SettingsPlatformAutomapComponent
   },
   {
     path: 'platform-database',

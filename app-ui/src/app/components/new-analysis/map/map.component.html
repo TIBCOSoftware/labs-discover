@@ -9,6 +9,9 @@
     <uxpl-select-input class="map-field map-field-margin" label="Which field represents the end time?" allow-input [value]="data.end" [options]="calculateOption('end')" (uxplSelection)="handleSelection($event, 'end')"></uxpl-select-input>
     <uxpl-select-input class="map-field map-field-margin" label="Include other fields in the analysis?" allow-input [values]="data.other" [options]="calculateOption('other')" multiple (uxplSelection)="handleSelection($event, 'other')"></uxpl-select-input>
   </div>
+  <div class="auto-map-row">
+    <uxpl-button class="parse-options-tdv-margin" height="30px" (clicked)="autoMap();" >Auto Map</uxpl-button>
+  </div>
   <!--div class="parse-options-csv-date-format">
     <uxpl-form-field class="parse-options-csv-date-element-format" [options]="dateOptions" label="Date and time format: " type="text" valid required="true"  [value]="parse.dateTimeFormat" (uxplChanged)="handleUpdate($event, 'dateTimeFormat')"></uxpl-form-field>
   </div-->
@@ -27,7 +30,7 @@
           </tr>
           </ng-template>
           <ng-template pTemplate="body" let-previewData let-expanded="expanded" let-columns="columns" let-rowIndex="rowIndex">
-            <tr>
+            <tr [ngClass]="{'auto-map-details': firstRowAdded }">
               <td *ngFor="let col of columns" [ngStyle]="{'text-align': col.align != undefined ? col.align : 'left' }" class="table-element">
                 {{ getObjectValue(previewData, col) }}
               </td>

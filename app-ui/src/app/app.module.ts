@@ -89,6 +89,8 @@ import { SettingsPlatformDatabaseComponent } from './routes/settings-platform-da
 import { Router } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SettingsPlatformDatetimeFormatComponent } from './routes/settings-platform-datetime-format/settings-platform-datetime-format.component';
+import {StringSimilarityService} from './service/string-similarity.service';
+import { SettingsPlatformAutomapComponent } from './routes/settings-platform-automap/settings-platform-automap.component';
 
 /** This is the tc core configuration object
  * To use oauth you must also add the OAuthInterceptor to providers
@@ -117,7 +119,7 @@ export function servicesOnRun(config: ConfigurationService, appDefinitionService
           const appIds = config.config.discover.investigations.applications.map(
             el => {
               return el.applicationId;
-            });
+            }).concat(config.config.discover.analysis.applicationId);
           if (appIds){
             cCache.init(config.config.sandboxId, appIds);
           }
@@ -178,7 +180,8 @@ export function servicesOnRun(config: ConfigurationService, appDefinitionService
     ResetComponent,
     SettingsPlatformAnalyticsComponent,
     SettingsPlatformDatabaseComponent,
-    SettingsPlatformDatetimeFormatComponent
+    SettingsPlatformDatetimeFormatComponent,
+    SettingsPlatformAutomapComponent
   ],
     imports: [
         AppRoutingModule,
@@ -214,7 +217,8 @@ export function servicesOnRun(config: ConfigurationService, appDefinitionService
       deps: [ConfigurationService, TcAppDefinitionService, CaseCacheService]
     },
     AccessGuard,
-    OfflineGuard
+    OfflineGuard,
+    StringSimilarityService
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

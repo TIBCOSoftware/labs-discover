@@ -13,7 +13,7 @@
         <parse [data]="newAnalysis.parse" [datasource]="newAnalysis.datasource" [previewColumns]="previewColumns" [previewData]="previewData" (status)="handleStatus($event)" (handlePreviewData)="handlePreviewData($event)"></parse>
       </div>
       <div *ngIf="display('map')" style="display: flex; flex-direction: column" slot="map">
-        <map [data]="newAnalysis.mapping" [datasource]="newAnalysis.datasource" [parse]="newAnalysis.parse" [columns]="newAnalysis.columns" [previewColumns]="previewColumns" [previewData]="previewData" (status)="handleStatus($event)"></map>
+        <map [data]="newAnalysis.mapping" [datasource]="newAnalysis.datasource" [parse]="newAnalysis.parse" [columns]="newAnalysis.columns" [previewColumns]="previewColumns" [previewData]="previewData" [firstRowAdded]="autoMapped" (status)="handleStatus($event)" (hasAutoMapped)="hasAutoMapped($event)"></map>
       </div>
       <div *ngIf="display('dates')" style="display: flex; flex-direction: column;" slot="dates">
           <date-parser [data]="newAnalysis?.mapping" [csvConfig]="newAnalysis?.datasource?.inputType === 'csv' ? newAnalysis?.datasource?.file : undefined" [parse]="newAnalysis?.parse" [tdvConfig]="newAnalysis?.datasource?.inputType === 'tdv' ? newAnalysis?.datasource?.tdv : undefined" (status)="handleStatus($event)"></date-parser>

@@ -340,6 +340,20 @@ const PROXY_CONFIG = {
       "Origin": "https://eu.liveapps.cloud.tibco.com"
     },
     "onProxyReq": addOauthHeader
+  },
+  "/tsc-ws/": {
+    "target": {
+      "host": "eu.liveapps.cloud.tibco.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://eu.liveapps.cloud.tibco.com"
+    },
+    "onProxyReq": addOauthHeader
   }
 }
 
@@ -371,8 +385,9 @@ function addOauthHeader(proxyReq, req) {
 
 // Function for logging
 const debug = false;
-function log(level, message){
-  if((debug && level == 'DEBUG') || level != 'DEBUG') {
+
+function log(level, message) {
+  if ((debug && level == 'DEBUG') || level != 'DEBUG') {
     console.log('[PROXY INTERCEPTOR] (' + level + '): ' + message);
   }
 }

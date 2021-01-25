@@ -72,8 +72,8 @@ After a few minutes, the entry will enter a &lt;strong&gt;Ready&lt;/strong&gt; s
     &lt;li&gt;TIBCO Data Virtualization&lt;/li&gt;
     &lt;li&gt;CSV Files&lt;/li&gt;
   &lt;/ol&gt;
-  &lt;p&gt;When selecting &lt;strong&gt;CSF Files&lt;/strong&gt; you will then need to choose a file from a drop down. 
-    If you need to upload a new CSF file, please use the Data tab from the top menu bar.
+  &lt;p&gt;When selecting &lt;strong&gt;CSV Files&lt;/strong&gt; you will then need to choose a file from a drop down. 
+    If you need to upload a new CSV file, please use the Data tab from the top menu bar.
   Once the file is selected, you are presented a preview of the content, so you can double check it.
   &lt;/p&gt;
   &lt;p&gt;When selecting &lt;strong&gt;TIBCO Data Virtualization&lt;/strong&gt; you will then need to choose a combination of site, database and table.
