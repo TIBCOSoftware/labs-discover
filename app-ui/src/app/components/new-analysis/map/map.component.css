@@ -78,6 +78,10 @@
   font-size: 12px;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
 .auto-map-row {
   display: flex;
   flex-direction: row;
@@ -90,6 +94,7 @@
   font-size: 14px;
 }
 
+<<<<<<< HEAD
 .mapping-section {
   display: flex;
   flex-direction: row;
@@ -107,3 +112,5 @@
   flex-direction: column;
   justify-content: flex-start;
 }
+=======
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771

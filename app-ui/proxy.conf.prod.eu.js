@@ -389,6 +389,7 @@ const PROXY_CONFIG = {
       "Origin": "https://eu.liveapps.cloud.tibco.com"
     },
     "onProxyReq": addOauthHeader
+<<<<<<< HEAD
   },
   "/s/": {
     "target": {
@@ -450,6 +451,8 @@ const PROXY_CONFIG = {
       "Origin": "https://discover.labs.tibcocloud.com"
     },
     "onProxyReq": addOauthHeader
+=======
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
   }
 
   // Spotfire Wrapper API Endpoint
@@ -518,9 +521,15 @@ function addOauthHeader(proxyReq, req) {
 // Function for logging
 const debug = false;
 
+<<<<<<< HEAD
 function log(level, ...message) {
   if ((debug && level == 'DEBUG') || level != 'DEBUG') {
     console.log('[PROXY INTERCEPTOR] (' + level + '): ', ...message);
+=======
+function log(level, message) {
+  if ((debug && level == 'DEBUG') || level != 'DEBUG') {
+    console.log('[PROXY INTERCEPTOR] (' + level + '): ' + message);
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
   }
 }
 

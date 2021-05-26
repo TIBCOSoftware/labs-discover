@@ -62,9 +62,14 @@ export const CORE_ROUTES = [
 
 export const CORE_PROVIDERS = [
   [
+<<<<<<< HEAD
     LoginPrefillResolver
     /*DiscSpotfireAuthResolver*/
     // DiscSpotfireAuthResolver,
+=======
+    LoginPrefillResolver,
+    /*DiscSpotfireAuthResolver*/
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
   ],
   DISCOVER_PROVIDERS
 ];

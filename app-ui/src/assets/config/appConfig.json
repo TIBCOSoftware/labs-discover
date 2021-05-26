@@ -206,7 +206,11 @@
       {
           "entry": "Platform",
           "icon": "assets/images/settings/tcs-spotfire-icon.svg",
+<<<<<<< HEAD
           "options": ["General", "Orchestration", "Process mining", "Database", "Dates and times" , "Auto map"]
+=======
+          "options": ["General", "Analytics", "Orchestration", "Process mining", "Database", "Dates and times" , "Auto map"]
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
       },
       {
           "entry": "Add-ons",

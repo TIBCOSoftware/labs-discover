@@ -31,6 +31,7 @@ export interface DiscoverConfiguration {
   general: GeneralConfig;
   dateTimeFormats: string[];
   ssConfig: SSConfig;
+<<<<<<< HEAD
   analyticTemplates: AnalyticTemplateUI[];
   navBarMessages?: NavBarMessage[];
 }
@@ -52,6 +53,19 @@ export interface SSConfig {
   Scheduledstart: string[];
   Scheduledend: string[];
   threshold: number;
+=======
+}
+
+export interface SSConfig {
+  caseIdWords: string[];
+  resourceWords: string[];
+  activityWords: string[];
+  startWords: string[];
+  endWords: string[];
+  doAddAdditional: boolean;
+  threshold: number;
+  debug: boolean;
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
 }
 
 export interface SSResult {

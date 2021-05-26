@@ -90,6 +90,7 @@ import { SettingsPlatformDatabaseComponent } from './routes/settings-platform-da
 import { Router } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { SettingsPlatformDatetimeFormatComponent } from './routes/settings-platform-datetime-format/settings-platform-datetime-format.component';
+<<<<<<< HEAD
 import { NewDatasetWizardComponent } from './components/new-dataset/wizard/wizard.component';
 import { NewDatasetBasicInfoComponent } from './components/new-dataset/basic-info/basic-info.component';
 import { NewDatasetDatasourceComponent } from './components/new-dataset/datasource/datasource.component';
@@ -142,6 +143,10 @@ import { CsvListComponent } from './components/new-dataset/csv-list/csv-list.com
 import { CsvFilesizePipe } from './components/new-dataset/csv-list/csvfilesize.pipe';
 import { CsvFiletimePipe } from './components/new-dataset/csv-list/csvfiletime.pipe';
 import { DragDropFieldsListComponent } from './routes/settings-investigations/drag-drop-fields-list/drag-drop-fields-list.component';
+=======
+import {StringSimilarityService} from './service/string-similarity.service';
+import { SettingsPlatformAutomapComponent } from './routes/settings-platform-automap/settings-platform-automap.component';
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
 
 /** This is the tc core configuration object
  * To use oauth you must also add the OAuthInterceptor to providers
@@ -161,6 +166,7 @@ const tcCoreConfig: TcCoreConfig = {
   enable_tce: false
 }
 
+<<<<<<< HEAD
 
 // can be used to defer initialization of TcAppDefService
 const tcLiveappsConfig: TcLiveappsConfig = {
@@ -171,6 +177,23 @@ export function servicesOnRun(oauthService: OauthService, config: ConfigurationS
   return () => oauthService.initialize().then(
     () => appDefinitionService.refresh().toPromise().then(
       () => config.refresh()
+=======
+export function servicesOnRun(config: ConfigurationService, appDefinitionService: TcAppDefinitionService, cCache: CaseCacheService) {
+  return () => appDefinitionService.refresh().toPromise().then(
+    () => config.refresh()
+      .then(
+      () => {
+        if (config.config.discover){
+          const appIds = config.config.discover.investigations.applications.map(
+            el => {
+              return el.applicationId;
+            }).concat(config.config.discover.analysis.applicationId);
+          if (appIds){
+            cCache.init(config.config.sandboxId, appIds);
+          }
+        }
+      }
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
     )
   );
 }
@@ -235,6 +258,7 @@ const configurationProvider = () => {
     ResetComponent,
     SettingsPlatformDatabaseComponent,
     SettingsPlatformDatetimeFormatComponent,
+<<<<<<< HEAD
     SettingsPlatformAutomapComponent,
     AnalyticsTemplatesComponent,
     AnalyticCardComponent,
@@ -270,6 +294,9 @@ const configurationProvider = () => {
     CsvFilesizePipe,
     CsvFiletimePipe,
     DragDropFieldsListComponent
+=======
+    SettingsPlatformAutomapComponent
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
   ],
     imports: [
         AppRoutingModule,
@@ -306,6 +333,7 @@ const configurationProvider = () => {
     },
     AccessGuard,
     OfflineGuard,
+<<<<<<< HEAD
     StringSimilarityService,
     {
       provide: APP_BASE_HREF,
@@ -313,6 +341,9 @@ const configurationProvider = () => {
       deps: [PlatformLocation]
     },
     { provide: Configuration, useFactory: configurationProvider, deps: [] },
+=======
+    StringSimilarityService
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

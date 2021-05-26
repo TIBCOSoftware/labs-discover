@@ -9,7 +9,10 @@ import { SettingsPlatformDatabaseComponent } from '../routes/settings-platform-d
 import { ResetComponent } from '../routes/reset/reset.component';
 import { SettingsPlatformDatetimeFormatComponent } from '../routes/settings-platform-datetime-format/settings-platform-datetime-format.component';
 import {SettingsPlatformAutomapComponent} from '../routes/settings-platform-automap/settings-platform-automap.component';
+<<<<<<< HEAD
 import {SettingsAnalyticTemplatesComponent} from '../routes/settings-analytic-templates/settings-analytic-templates.component';
+=======
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
 
 export const CONFIGURATION_ROUTE_CONFIG = [
   {

@@ -14,6 +14,7 @@
           <div class="ss-inner">
             <uxpl-button class="right-button" height="60px" (clicked)="getWords();">Get Words from<br> Previous Mappings
             </uxpl-button>
+<<<<<<< HEAD
             <uxpl-form-field style="width: 80%" label="Words to find the Case id" type="text" valid required="true"
                              [value]="discover?.ssConfig?.CaseID" (uxplChanged)="handleUpdate($event, 'CaseID')">
             </uxpl-form-field>
@@ -53,6 +54,46 @@
             <uxpl-form-field style="width: 80%" label="Threshold (all found mappings under this value will be ignored)" type="text" valid
                              required="true" [value]="discover?.ssConfig?.threshold" (uxplChanged)="handleUpdatethreshold($event)">
             </uxpl-form-field>
+=======
+            <uxpl-form-field style="width: 80%" label="Words to find the Case ID" type="text" valid required="true"
+                             [value]="discover.ssConfig.caseIdWords"
+                             (uxplChanged)="handleUpdate($event, 'caseId')"></uxpl-form-field>
+            <br>
+            <uxpl-form-field style="width: 80%" label="Words to find the Resource" type="text" valid required="true"
+                             [value]="discover.ssConfig.resourceWords"
+                             (uxplChanged)="handleUpdate($event, 'resource')"></uxpl-form-field>
+            <br>
+            <uxpl-form-field style="width: 80%" label="Words to find the Activity Name" type="text" valid
+                             required="true"
+                             [value]="discover.ssConfig.activityWords"
+                             (uxplChanged)="handleUpdate($event, 'activity')"></uxpl-form-field>
+            <br>
+            <uxpl-form-field style="width: 80%" label="Words to find the Start Time of the Activity" type="text" valid
+                             required="true"
+                             [value]="discover.ssConfig.startWords"
+                             (uxplChanged)="handleUpdate($event, 'start')"></uxpl-form-field>
+            <br>
+            <uxpl-form-field style="width: 80%" label="Words to find the End Time of the Activity" type="text" valid
+                             required="true"
+                             [value]="discover.ssConfig.endWords"
+                             (uxplChanged)="handleUpdate($event, 'end')"></uxpl-form-field>
+            <br>
+            <uxpl-form-field style="width: 80%" label="Threshold (all found mappings under this value will be ignored)" type="text" valid
+                             required="true"
+                             [value]="discover.ssConfig.threshold"
+                             (uxplChanged)="handleUpdate($event, 'threshold')"></uxpl-form-field>
+            <br>
+            <div style='margin: 10px 2px 10px 3px'>
+              <uxpl-switch-input style="padding: 3px" [checked]="discover.ssConfig.doAddAdditional"
+                                 (uxplChange)="handleUpdate($event, 'doAddAdditional');">Select Additional Values (if selected all the other fields are automatically included in the analysis)
+              </uxpl-switch-input>
+            </div>
+            <div style='margin: 10px 2px 10px 3px'>
+              <uxpl-switch-input style="padding: 3px" [checked]="discover.ssConfig.debug"
+                                 (uxplChange)="handleUpdate($event, 'debug');">Debug
+              </uxpl-switch-input>
+            </div>
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
           </div>
         </div>
         <br>

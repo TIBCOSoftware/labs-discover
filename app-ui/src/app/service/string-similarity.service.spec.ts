@@ -50,6 +50,7 @@ describe('StringSimilarityService', () => {
   it('Find Best Match Similar', () => {
     expect(SSService.findBestMatch('twoS', ['one', 'two', 'three'])).toEqual(jasmine.objectContaining({bestMatch: {target: 'two', rating: 0.8}}));
   });
+<<<<<<< HEAD
   /* TODO: fix these testcases
 
     it('Auto Map Basic', () => {
@@ -102,6 +103,59 @@ describe('StringSimilarityService', () => {
         }));
     });
   */
+=======
+
+  it('Auto Map Basic', () => {
+    expect(SSService.autoMap(['case', 'activity', 'user', 'start', 'end'])).toEqual(jasmine.objectContaining(
+      {
+        activityColumn: 'activity',
+        activityRating: 1,
+        caseIdColumn: 'case',
+        caseIdRating: 1,
+        endColumn: 'end',
+        endRating: 1,
+        resourceColumn: 'user',
+        resourceRating: 1,
+        startColumn: 'start',
+        startRating: 1
+      }));
+  });
+
+  it('Auto Map Similar', () => {
+    expect(SSService.autoMap(['caseS', 'activityS', 'userS', 'startS', 'endS'])).toEqual(jasmine.objectContaining(
+      {
+        activityColumn: 'activityS',
+        caseIdColumn: 'caseS',
+        endColumn: 'endS',
+        resourceColumn: 'userS',
+        startColumn: 'startS'
+      }));
+  });
+
+  it('Auto Map One Missing', () => {
+    expect(SSService.autoMap(['caseS', 'weird', 'userS', 'startS', 'endS'])).toEqual(jasmine.objectContaining(
+      {
+        activityColumn: 'none',
+        caseIdColumn: 'caseS',
+        endColumn: 'endS',
+        resourceColumn: 'userS',
+        startColumn: 'startS'
+      }));
+  });
+
+  it('Auto Map Add Additional', () => {
+    expect(SSService.autoMap(['caseS', 'activityS', 'userS', 'startS', 'endS', 'add1', 'add2'])).toEqual(jasmine.objectContaining(
+      {
+        activityColumn: 'activityS',
+        caseIdColumn: 'caseS',
+        endColumn: 'endS',
+        resourceColumn: 'userS',
+        startColumn: 'startS',
+        otherFields: ['add1', 'add2']
+      }));
+  });
+
+>>>>>>> 6258e5103bef12a5116d59672d50ed2824e6f771
   // TODO: Add a test where you change the config to say don't add additional fields
 
 });

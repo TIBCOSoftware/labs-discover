@@ -207,8 +207,8 @@ for bigger data sets, please use TIBCO Data Virtualization.&lt;/p&gt;
     &lt;li&gt;TIBCO Data Virtualization&lt;/li&gt;
     &lt;li&gt;CSV Files&lt;/li&gt;
   &lt;/ol&gt;
-  &lt;p&gt;When selecting &lt;strong&gt;CSF Files&lt;/strong&gt; you will then need to choose a file from a drop down. 
-    If you need to upload a new CSF file, please use the Data tab from the top menu bar.
+  &lt;p&gt;When selecting &lt;strong&gt;CSV Files&lt;/strong&gt; you will then need to choose a file from a drop down. 
+    If you need to upload a new CSV file, please use the Data tab from the top menu bar.
   Once the file is selected, you are presented a preview of the content, so you can double check it.
   &lt;/p&gt;
   &lt;p&gt;When selecting &lt;strong&gt;TIBCO Data Virtualization&lt;/strong&gt; you will then need to choose a combination of site, database and table.
@@ -715,7 +715,7 @@ However you can toggle that settings off and enter the URL of your own managed s
         
         &lt;p&gt;&lt;img src=&#34;..//visFilters.png&#34; alt=&#34;Filters Visualization&#34;&gt;&lt;/p&gt;
 &lt;p&gt;This template is a starting point. It is designed as &lt;strong&gt;generic&lt;/strong&gt;, so that you can use it against any data source.  
-    ou will find default visualizations for Process Maps, Variants, Cases, Resources and many more.
+   You will find default visualizations for Process Maps, Variants, Cases, Resources and many more.
 &lt;/p&gt;
 
       </description>
