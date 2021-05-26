@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ConfigurationMenuEntry, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { Location } from '@angular/common';
@@ -10,7 +10,7 @@ import { TcAppDefinitionService } from '@tibco-tcstk/tc-liveapps-lib';
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
-export class SettingsComponent implements OnInit {
+export class SettingsComponent implements OnInit, AfterViewInit  {
 
   @ViewChild('leftNav', { static: false }) nav: ElementRef<UxplLeftNavMulti>;
   leftNavTabs = [];
@@ -20,7 +20,7 @@ export class SettingsComponent implements OnInit {
   ngOnInit() {
     const settingsMenu = this.configService.appConfig.config.settingsMenu;
     this.leftNavTabs = settingsMenu.map((element: ConfigurationMenuEntry) => {
-      let newEntry = {
+      const newEntry = {
         id: element.entry.toLowerCase().split(' ').join('-'),
         label: element.entry,
         icon: TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, element.icon),
@@ -28,8 +28,8 @@ export class SettingsComponent implements OnInit {
       };
 
       if (element.options){
-        let newChildren = element.options.map((child: string) => {
-          let newChild = {
+        const newChildren = element.options.map((child: string) => {
+          const newChild = {
             id: newEntry.id + '-' + child.toLowerCase().split(' ').join('-'),
             label: child,
           };
@@ -37,12 +37,12 @@ export class SettingsComponent implements OnInit {
         });
         newEntry.child = newChildren;
       }
-      
+
       return newEntry;
     });
 
     if (this.configService.isAdmin) {
-      let newEntry = {
+      const newEntry = {
         id: 'reset',
         label: 'Reset',
         icon: TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, '/assets/images/settings/tcs-starters-icon.svg'),
@@ -57,7 +57,12 @@ export class SettingsComponent implements OnInit {
     const tab = this.nav.nativeElement.tabs.filter((entry) => {
       return entry.id === entryId;
     })[0];
-    this.nav.nativeElement.setTab(tab, true);
+    if(tab){
+      this.nav.nativeElement.setTab(tab, true);
+    } else {
+      this.nav.nativeElement.setTab(this.nav.nativeElement.tabs[0], true);
+    }
+
   }
 
   public handleClick(event) {

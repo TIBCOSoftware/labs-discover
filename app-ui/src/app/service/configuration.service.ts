@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Configuration, DiscoverConfiguration, ResetAction } from '../models/configuration';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 import { ApiResponseText, Group, TcAppDefinitionService, TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
 import { async, from, Observable, of } from 'rxjs';
 import { StateRole, TcSharedStateService, SharedStateList, SharedStateContent, TcCoreCommonFunctions, SharedStateEntry, TcGeneralLandingPageConfigService, TcGeneralConfigService } from '@tibco-tcstk/tc-core-lib';
@@ -17,7 +17,6 @@ export class ConfigurationService {
   private configuration: Configuration;
 
   constructor(
-    protected http: HttpClient,
     protected appDefinitionService: TcAppDefinitionService,
     protected sharedStateService: TcSharedStateService,
     protected landingPageConfig: TcGeneralLandingPageConfigService,
@@ -54,7 +53,7 @@ export class ConfigurationService {
       } else {
         return Promise.resolve(this.configuration);
       }
-      let discoverConfig = await this.getDiscoverConfig(this.config.uiAppId, true, true).toPromise();
+      const discoverConfig = await this.getDiscoverConfig(this.config.uiAppId, true, true).toPromise();
       if (discoverConfig) {
         this.configuration.discover = discoverConfig;
         return Promise.resolve(this.configuration);
@@ -82,7 +81,7 @@ export class ConfigurationService {
   }
 
   private initDiscoverConfig =  (): Observable<DiscoverConfiguration> => {
-    const ssName = this.config.uiAppId + this.DEFAULT_PREFIX;
+    const ssName = this.getSharedStateName(this.config.uiAppId, this.DEFAULT_PREFIX);;
     this.config.discover = this.appDefinitionService.appConfig.config.discover;
     this.config.discover.csv.folder = this.config.uiAppId + '_' + this.config.discover.csv.folder;
 
@@ -91,7 +90,7 @@ export class ConfigurationService {
         this.config.discover.id = ssId;
         return this.updateDiscoverConfig(this.config.sandboxId, this.config.uiAppId, this.config.discover, ssId).pipe(
           map((value: DiscoverConfiguration) =>  {
-            return <DiscoverConfiguration> value;
+            return value as DiscoverConfiguration;
           })
         );
       })
@@ -99,7 +98,7 @@ export class ConfigurationService {
   }
 
   private createDiscoverConfig(sandboxId: number, uiAppId: string, discoveryConfig: DiscoverConfiguration): Observable<string> {
-    const ssName = uiAppId + this.DEFAULT_PREFIX;
+    const ssName = this.getSharedStateName(uiAppId, this.DEFAULT_PREFIX);;
     const content: SharedStateContent = new SharedStateContent();
     const group = this.appDefinitionService.groups.find(grp => {
       return grp.name === this.SHARED_STATE_GROUP_NAME;
@@ -121,7 +120,7 @@ export class ConfigurationService {
   }
 
   private getDiscoverConfig = (uiAppId: string, useCache: boolean, flushCache: boolean): Observable<DiscoverConfiguration> => {
-    const ssName = uiAppId + this.DEFAULT_PREFIX;
+    const ssName = this.getSharedStateName(uiAppId, this.DEFAULT_PREFIX);;
 
     return this.sharedStateService.getSharedState(ssName, 'SHARED', useCache, flushCache).pipe(
       map((value: SharedStateList) => {
@@ -137,7 +136,7 @@ export class ConfigurationService {
   }
 
   public updateDiscoverConfig = (sandboxId: number, uiAppId: string, discoverConfig: DiscoverConfiguration, id: string): Observable<DiscoverConfiguration> => {
-    const ssName = uiAppId + this.DEFAULT_PREFIX;
+    const ssName = this.getSharedStateName(uiAppId, this.DEFAULT_PREFIX);;
     const content: SharedStateContent = new SharedStateContent();
     content.json = TcCoreCommonFunctions.escapeString(JSON.stringify(discoverConfig));
     const entry: SharedStateEntry = new SharedStateEntry();
@@ -159,19 +158,23 @@ export class ConfigurationService {
     );
   }
 
+  private getSharedStateName(uiAppId: string, suffix: string): string {
+    return uiAppId + suffix;
+  }
+
   private deleteDiscoverConfig = (): Observable<string> => {
     return this.sharedStateService.deleteSharedState(+this.config.discover.id);
   }
 
   public calculateResetActions = async (reset: boolean): Promise<ResetAction[]> => {
-    let actions = [];
+    const actions = [];
     if (reset) {
       actions.push({ label: 'Delete discover config SS entry', done: false, action: this.deleteDiscoverConfig() });
       actions.push({ label: 'Delete datasource org folder', done: false, action: this.documentService.deleteOrgFolder(this.appDefinitionService.uiAppId + '_' + this.config.discover.csv.folder) });
       actions.push({ label: 'Delete assets org folder', done: false, action: this.documentService.deleteOrgFolder(this.appDefinitionService.uiAppId + '_assets') });
     }
 
-    let [background, icon1, icon2, icon3, environment, simple, scheduled] = await Promise.all([
+    const [background, icon1, icon2, icon3, environment, simple, scheduled] = await Promise.all([
       this.createFile('/assets/init/images/ProcessMiningsmall.jpg', 'ProcessMiningsmall.jpg', 'image/jpg'),
       this.createFile('/assets/init/images/ic-community.svg', 'ic-community.svg', 'image/svg'),
       this.createFile('/assets/init/images/ic-documentation.svg', 'ic-documentation.svg', 'image/svg'),
@@ -196,7 +199,7 @@ export class ConfigurationService {
   }
 
   public execute = (actions: ResetAction[]): Observable<any> => {
-    let idx: number = 0;
+    const idx = 0;
     return from(actions)
     .pipe(
       mergeMap(
@@ -209,12 +212,12 @@ export class ConfigurationService {
   }
 
   private async createFile(path: string, name: string, type: string): Promise<File> {
-    let response = await fetch(path);
-    let data = await response.blob();
-    let metadata = {
-      type: type
+    const response = await fetch(path);
+    const data = await response.blob();
+    const metadata = {
+      type
     };
-    let file = new File([data], name, metadata);
+    const file = new File([data], name, metadata);
     return file
   }
 }

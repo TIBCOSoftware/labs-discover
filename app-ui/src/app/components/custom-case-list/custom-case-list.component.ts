@@ -14,12 +14,13 @@ import {MatDialog} from "@angular/material/dialog";
 import {ActivatedRoute, Router} from "@angular/router";
 import {MessageTopicService, TcCoreCommonFunctions} from "@tibco-tcstk/tc-core-lib";
 import {LaWrapperService} from "../../service/la-wrapper.service";
-import {CaseCacheService} from "../../service/custom-case-cache.service";
+import {CaseService} from "../../service/custom-case.service";
 import {CustomFormDefs} from "@tibco-tcstk/tc-forms-lib";
 import {delay, retryWhen, take} from "rxjs/operators";
 import {ActionDialogComponent} from "../action-dialog/action-dialog.component";
 import {Location} from '@angular/common';
 import {ConfigurationService} from 'src/app/service/configuration.service';
+import {notifyUser} from '../../functions/message';
 
 @Component({
   selector: 'custom-case-list',
@@ -60,14 +61,10 @@ export class CustomCaseListComponent implements OnInit {
               protected router: Router,
               protected route: ActivatedRoute,
               protected messageService: MessageTopicService,
-              protected caseProcessesService: TcCaseProcessesService,
               protected caseDataService: TcCaseDataService,
-              protected caseCache: CaseCacheService,
+              protected caseService: CaseService,
               protected lawService: LaWrapperService,
               protected configService: ConfigurationService) {
-
-
-
   }
 
   public firstLoad = false;
@@ -77,7 +74,7 @@ export class CustomCaseListComponent implements OnInit {
     this.messageService.getMessage('case.cache.loaded.' + this.cConfig.appId).subscribe(
       async (message) => {
         if (message.text === 'OK') {
-          this.caseRefs = [...await this.caseCache.getCaseRefsP(this.cConfig.appId)];
+          this.caseRefs = [...await this.caseService.loadCaseRefsAsync(this.cConfig.appId)];
         }
       }
     );
@@ -99,7 +96,7 @@ export class CustomCaseListComponent implements OnInit {
     (async () => {
       if (!this.firstLoad) {
         this.tableLoading = true;
-        this.caseRefs = await this.caseCache.getCaseRefsP(this.cConfig.appId);
+        this.caseRefs = await this.caseService.loadCaseRefsAsync(this.cConfig.appId);
         this.caseRefs = [...this.caseRefs];
         this.tableLoading = false;
         this.firstLoad = true;
@@ -241,7 +238,7 @@ export class CustomCaseListComponent implements OnInit {
           if (data.result == 'OK') {
             if (data.action.label) {
               this.messageService.sendMessage('news-banner.topic.message', data.action.label + ' Successful...');
-              resolve();
+              resolve(undefined);
             }
           }
         }
@@ -305,22 +302,22 @@ export class CustomCaseListComponent implements OnInit {
     (async () => {
       if (!this.tableLoading) {
         this.tableLoading = true;
-        const caseRefs = await this.caseCache.loadCaseRefsAsync(this.cConfig.appId);
+        const caseRefs = await this.caseService.loadCaseRefsAsync(this.cConfig.appId);
         if (caseRefs && caseRefs.length > 0) {
-          await this.caseCache.loadCasesAsync(this.cConfig.appId, caseRefs);
+          await this.caseService.loadCasesAsync(this.cConfig.appId, caseRefs);
         }
         this.caseRefs = [...caseRefs];
         // Check if the selected caserefs are still part of the new table
         this.checkSelectionValid();
-        this.selectedCases = await this.caseCache.getCasesPbyCaseRefs(this.cConfig.appId, this.selectedCaseRefs);
+        if (this.selectedCaseRefs && this.selectedCaseRefs.length > 0) {
+          this.selectedCases = await this.caseService.loadCasesAsync(this.cConfig.appId, this.selectedCaseRefs);
+        } else {
+          this.selectedCases = [];
+        }
         this.tableLoading = false;
         await this.setActionButtons();
       } else {
-        const mes = {
-          type: 'WARNING',
-          message: 'Still refreshing...'
-        };
-        this.messageService.sendMessage('news-banner.topic.message', 'MESSAGE:' + JSON.stringify(mes));
+        notifyUser('WARNING', 'Still refreshing...', this.messageService);
       }
     })();
   }
@@ -335,33 +332,7 @@ export class CustomCaseListComponent implements OnInit {
   }
 
   refreshCasesAfterSubmit(caseRef?: string) {
-    if (caseRef) {
-      setTimeout(async () => {
-        await this.caseCache.updateCasesInCache(this.cConfig.appId, [caseRef]);
-        this.caseRefs = [...await this.caseCache.getCaseRefsP(this.cConfig.appId)];
-        this.selectedCases = [...await this.caseCache.getCasesPbyCaseRefs(this.cConfig.appId, this.selectedCaseRefs)];
-        await this.setActionButtons();
-      });
-      setTimeout(async () => {
-        await this.caseCache.updateCasesInCache(this.cConfig.appId, [caseRef]);
-        this.caseRefs = [...await this.caseCache.getCaseRefsP(this.cConfig.appId)];
-        this.selectedCases = [...await this.caseCache.getCasesPbyCaseRefs(this.cConfig.appId, this.selectedCaseRefs)];
-        await this.setActionButtons();
-      }, this.REFRESH_DELAY);
-    } else {
-      setTimeout(async () => {
-        await this.caseCache.updateCasesInCache(this.cConfig.appId, this.selectedCaseRefs);
-        this.caseRefs = [...await this.caseCache.getCaseRefsP(this.cConfig.appId)];
-        this.selectedCases = [...await this.caseCache.getCasesPbyCaseRefs(this.cConfig.appId, this.selectedCaseRefs)];
-        await this.setActionButtons();
-      });
-      setTimeout(async () => {
-        await this.caseCache.updateCasesInCache(this.cConfig.appId, this.selectedCaseRefs);
-        this.caseRefs = [...await this.caseCache.getCaseRefsP(this.cConfig.appId)];
-        this.selectedCases = [...await this.caseCache.getCasesPbyCaseRefs(this.cConfig.appId, this.selectedCaseRefs)];
-        await this.setActionButtons();
-      }, this.REFRESH_DELAY);
-    }
+    this.setActionButtons();
   }
 
   caseEventClicked(data: CaseEvent) {

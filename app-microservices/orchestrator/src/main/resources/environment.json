@@ -1,0 +1,42 @@
+{
+  "k8s": {
+    "K8S_NAMESPACE": "spark-operator",
+    "K8S_DOCKER_DOMAIN": "tibcosoftware",
+    "K8S_DOCKER_IMAGE": "labs-discover-spark-pm",
+    "K8S_JOB_TEMPLATE": "/opt/orchestrator/templates/labs-discover-spark.template.json",
+    "K8S_SCHEDULED_JOB_TEMPLATE": "/opt/orchestrator/templates/labs-discover-spark.schedule.template.json",
+    "K8S_DOCKER_VERSION": "3.15.0",
+    "K8S_CLUSTER_NAME": "k8s",
+    "K8S_PERSISTANT_CLAIM": "efs-claim"
+  },
+  "preview": {
+    "K8S_NAMESPACE": "spark-operator",
+    "K8S_DOCKER_DOMAIN": "tibcosoftware",
+    "K8S_DOCKER_IMAGE": "labs-discover-spark-preview",
+    "K8S_JOB_TEMPLATE": "/opt/orchestrator/templates/labs-discover-spark.template.json",
+    "K8S_SCHEDULED_JOB_TEMPLATE": "/opt/orchestrator/templates/labs-discover-spark.schedule.template.json",
+    "K8S_DOCKER_VERSION": "0.0.1",
+    "K8S_CLUSTER_NAME": "k8s",
+    "K8S_PERSISTANT_CLAIM": "efs-claim"
+  },
+  "processMiner": {
+    "PROCESS_MINER_DRIVERS": 1,
+    "PROCESS_MINER_DRIVERS_CPU": 4,
+    "PROCESS_MINER_DRIVERS_MEMORY": "32768m",
+    "PROCESS_MINER_WORKERS": 2,
+    "PROCESS_MINER_WORKERS_CPU": 8,
+    "PROCESS_MINER_WORKERS_MEMORY": "32768m"
+  },
+  "docker": {
+    "DOCKER_LOGIN": "user",
+    "DOCKER_EMAIL": "user2@toto.org",
+    "DOCKER_PASSWORD": "blahblahblah",
+    "DOCKER_REGISTRY": "https://index.docker.io/v1/"
+  },
+  "aws": {
+    "AWS_ROLE_ARN": "arn:aws:iam::404217825284:role/AdministratorKeys",
+    "CLOUD_PROVIDER_REGION": "eu-west-1",
+    "CLOUD_PROVIDER": "aws"
+  },
+  "env":"common"
+}

@@ -1,0 +1,22 @@
+<div *ngIf="availableColumns" class="map-panel-container">
+  <div class="map-section">
+    Required fields
+  </div>
+  <div class="map-column">
+    <uxpl-select-input class="map-field" allow-clear="true" label="Case Id" allow-input [value]="data.caseId" [options]="calculateOption('caseId')" (uxplSelection)="handleSelection($event, 'caseId')" required></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Activity" allow-input [value]="data.activity" [options]="calculateOption('activity')" (uxplSelection)="handleSelection($event, 'activity')" required></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Start time" allow-input [value]="data.startTime" [options]="calculateTimeOption('startTime')" (uxplSelection)="handleSelection($event, 'startTime')" required></uxpl-select-input>
+  </div>
+  <div class="map-section margintop">
+    Optional fields
+  </div>
+  <div class="map-column">
+    <uxpl-select-input class="map-field" allow-clear="true" label="End time" allow-input [value]="data.endTime" [options]="calculateTimeOption('endTime')" (uxplSelection)="handleSelection($event, 'endTime')"></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Scheduled start time" allow-input [value]="data.scheduledStart" [options]="calculateTimeOption('scheduledStart')" (uxplSelection)="handleSelection($event, 'scheduledStart')"></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Scheduled end time" allow-input [value]="data.scheduledEnd" [options]="calculateTimeOption('scheduledEnd')" (uxplSelection)="handleSelection($event, 'scheduledEnd')"></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Requester" allow-input [value]="data.requester" [options]="calculateOption('requester')" (uxplSelection)="handleSelection($event, 'requester')"></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Organization" allow-input [value]="data.resourceGroup" [options]="calculateOption('resourceGroup')" (uxplSelection)="handleSelection($event, 'resourceGroup')"></uxpl-select-input>
+    <uxpl-select-input class="map-field" allow-clear="true" label="Resource" allow-input [value]="data.resource" [options]="calculateOption('resource')" (uxplSelection)="handleSelection($event, 'resource')"></uxpl-select-input>
+    <uxpl-switch-input class="map-field" style='margin-top: 5px' [checked]="data.otherAttributes" (uxplChange)="handleOtherAttributes($event)">Include all attributes</uxpl-switch-input>
+  </div>
+</div>

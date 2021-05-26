@@ -12,6 +12,11 @@
   /*border: 2px solid blueviolet;*/
 }
 
+.template-selector-wrapper{
+  height: calc(100vh - 179px);
+  overflow: auto;
+  /*border: 2px solid blueviolet;*/
+}
 
 .analytics-dashboard-wrapper {
   display: flex;
@@ -20,9 +25,15 @@
   /*border: 2px solid blueviolet;*/
 }
 
+.really-hidden {
+  display: none !important;
+}
+
 .analytics-dashboard-left-nav{
   /*border: 2px solid aqua;*/
   background-color: #f4f4f4;
+  /*height: calc(100vh - 179px);*/
+  height: 100%;
 }
 
 .analytics-dashboard-analytics{
@@ -30,9 +41,10 @@
   flex-direction: row;
   flex: 2 1 auto;
   /*box-sizing: border-box;*/
-  padding: 10px;
+  padding: 0px;
   width: 100%;
-  /*border: 2px solid chartreuse;*/
+  /*border: 1px solid red;*/
+  margin-bottom: 17px;
 }
 
 :host ::ng-deep .analytics-dashboard-top-level {
@@ -42,12 +54,13 @@
 }
 
 .center {
+  position: relative;
   /*border: 2px solid chartreuse;*/
   margin: auto;
   width: 60%;
   height: 200px;
   padding: 10px;
-  margin-bottom: 30%;
+  /*margin-bottom: 30%;*/
 }
 
 .no-data-available {

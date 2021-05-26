@@ -1,0 +1,20 @@
+.template-editor-wrapper {
+  height: 100%;
+}
+
+.stepper {
+  margin: 24px 32px 24px 32px;
+  height: calc(100vh - 220px);
+  overflow: auto;
+}
+
+.analytic-preview {
+  position: fixed;
+  top: 257px;
+  left: 540px;
+  bottom: 20px;
+  right: 20px;
+  width: calc(100vw - 572px);
+  height: calc(100vh - 293px);
+  /*border: 1px solid #73AD21;*/
+}

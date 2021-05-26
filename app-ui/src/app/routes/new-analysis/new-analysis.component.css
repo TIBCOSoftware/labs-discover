@@ -1,0 +1,38 @@
+.new-analysis-container {
+  height: 100%;
+  /*overflow: hidden;*/
+  overflow: auto;
+}
+
+.new-analysis-tab-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.data-preview {
+  position: fixed;
+  top: 257px;
+  left: 30px;
+  bottom: 20px;
+  right: 20px;
+  width: calc(100vw - 60px);
+  height: calc(100vh - 293px);
+  /*border: 1px solid #73AD21;*/
+}
+
+.modal-backdrop {
+  position: absolute;
+  width: 100%;
+  top: 256px;
+  left: 0;
+  height: 100%;
+  background: #FFFFFF;
+}
+
+.overlay-container {
+  position: relative;
+  top: calc(40% - 213px);
+  text-align: center;
+  margin: auto;
+}

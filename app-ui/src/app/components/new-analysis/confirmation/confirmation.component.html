@@ -1,21 +1,163 @@
-<div>
-  <uxpl-form-field id="#analysisName" readonly [value]="data.basicInfo.analysisName" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Analysis name" type="text" valid required="true"></uxpl-form-field>
-  <uxpl-form-field id="#analysisDescription" readonly [value]="data.basicInfo.analysisDescription" fieldId="analysisDescription" style="margin-top: 5px; margin-bottom: 5px;" label="Analysis description" type="text" valid required="true"></uxpl-form-field>
-  <uxpl-form-field *ngIf="data.datasource.file" id="#analysisName" readonly [value]="data.datasource.file.filename" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="File name" type="text" valid required="true"></uxpl-form-field>
-
-  <div>
-    <div class="map-row">
-      <uxpl-form-field class="map-field" id="#analysisName" [value]="data.mapping.caseId" readonly fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the case Id?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.activity" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the activity?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.resource" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the resource?" type="text" valid required="true"></uxpl-form-field>
-    </div>
-    <div class="map-row">
-      <uxpl-form-field class="map-field" id="#analysisName" readonly [value]="data.mapping.start" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the start time?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.end" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the end time?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#analysisName" readonly [value]="data.mapping.other" fieldId="analysisName" style="margin-top: 5px; margin-bottom: 5px;" label="Include other fields in the analysis?" type="text" valid required="true"></uxpl-form-field>
-    </div>
-    <div class="map-row">
-      <uxpl-form-field class="map-field" id="#analysisName" readonly [value]="data.parse.dateTimeFormat" fieldId="dateTimeFormat" style="margin-top: 5px; margin-bottom: 5px;" label="Datetime format" type="text" valid required="true"></uxpl-form-field>
-    </div>
+<div class="analysis-confirmation-container">
+  <div class="analysis-left">
+    <div class="spec-title">Analysis info</div>
+    <table class="detail-table">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Name</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.name}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Description</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.description}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="(dataSet$ | async) as dataset">
+        <td class="header-location">
+          <div class="item-header">Dataset</div>
+        </td>
+        <td>
+          <div class="item-detail">{{dataset.Dataset_Name}}</div>
+        </td>
+      </tr>
+    </table>
+    <!-- TODO: Add Scheduling
+    <div class="spec-title">Scheduling</div>
+    <div class="item-detail">???</div>   -->
+    <div class="spec-title" *ngIf="hasStart || hasStop">Start & Stop activities</div>
+    <table class="detail-table">
+      <tr class="detail-row" *ngIf="hasStart">
+        <td class="header-location">
+          <div class="item-header">Start activities</div>
+        </td>
+        <td>
+          <ul>
+            <li class="menu-item" *ngFor="let act of startActivities">{{act}}
+            </li>
+          </ul>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="hasStop">
+        <td class="header-location">
+          <div class="item-header">Stop activities</div>
+        </td>
+        <td>
+          <ul>
+            <li class="menu-item" *ngFor="let act of stopActivities">{{act}}
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="middle-divider"></div>
+  <div class="analysis-right">
+    <div class="spec-title" *ngIf="data.mappings" (dblclick)="showSource = !showSource;">Mappings</div>
+    <table class="detail-table" *ngIf="data.mappings">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">CaseID</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.caseId}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Start time</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.startTime}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Activity</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.activity}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="data.mappings.endTime">
+        <td class="header-location">
+          <div class="item-header">Activity end time</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.endTime}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="data.mappings.requester">
+        <td class="header-location">
+          <div class="item-header">Requester</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.requester}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="data.mappings.resource">
+        <td class="header-location">
+          <div class="item-header">Resource</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.resource}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="data.mappings.resourceGroup">
+        <td class="header-location">
+          <div class="item-header">Resource group</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.resourceGroup}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="data.mappings.scheduledStart">
+        <td class="header-location">
+          <div class="item-header">Scheduled start</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.scheduledStart}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" *ngIf="data.mappings.scheduledEnd">
+        <td class="header-location">
+          <div class="item-header">Scheduled end</div>
+        </td>
+        <td>
+          <div class="item-detail">{{data.mappings.scheduledEnd}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row" >
+        <td class="header-location">
+          <!--<pre>{{newAnalysis|json}}</pre> -->
+          <div class="item-header">Other Attributes</div>
+        </td>
+        <td>
+          <!--<div class="item-detail" *ngIf="data.Mapping.Otherattributes">All other attributes are also taken into account...</div>-->
+          <div class="item-detail" *ngIf="!data.mappings.otherAttributes">None...</div>
+          <ul *ngIf="data.mappings.otherAttributes">
+            <li class="menu-item" *ngFor="let oField of otherFields">{{oField}}
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <div class="spec-title" *ngIf="hasFilter">Filters</div>
+    <table class="detail-table">
+      <tr class="detail-row" *ngFor="let filter of data.filters | activities:':'">
+        <td class="header-location">
+          <div class="item-header">{{filter.Name}}</div>
+        </td>
+        <td>
+          <div class="item-detail">{{
+            createReadableArrayString(filter.Value, 50)}}</div>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>

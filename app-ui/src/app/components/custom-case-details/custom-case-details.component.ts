@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CaseConfig, CaseEvent, CaseField} from "../../models/configuration";
-import {CaseInfo, TcAppDefinitionService} from "@tibco-tcstk/tc-liveapps-lib";
+import {CaseConfig, CaseEvent, CaseField} from '../../models/configuration';
+import {CaseInfo, TcAppDefinitionService} from '@tibco-tcstk/tc-liveapps-lib';
 import _ from 'lodash';
 
 @Component({
@@ -10,20 +10,20 @@ import _ from 'lodash';
 })
 export class CustomCaseDetailsComponent implements OnInit {
 
+  constructor(protected appDefinitionService: TcAppDefinitionService) {
+  }
+
   @Input() cConfig: CaseConfig;
   @Input() caseDetail: CaseInfo;
   @Output() caseEvent: EventEmitter<CaseEvent> = new EventEmitter<CaseEvent>();
 
-  constructor(protected appDefinitionService: TcAppDefinitionService) {
-  }
+  protected MAX_FIELD_LENGTH = 35;
 
   ngOnInit(): void {
   }
 
-  protected MAX_FIELD_LENGTH = 35;
-
   private getField(fieldV) {
-    let cas = this.caseDetail;
+    const cas = this.caseDetail;
     if (cas.untaggedCasedataObj) {
       let field = 'untaggedCasedataObj.' + fieldV;
       if (fieldV.startsWith('META:')) {
@@ -41,7 +41,7 @@ export class CustomCaseDetailsComponent implements OnInit {
     if (format == 'ARRAY') {
       let newRe = '';
       if (Symbol.iterator in Object(re)) {
-        for (let val of re) {
+        for (const val of re) {
           newRe += val + '<br>';
         }
       }
@@ -54,8 +54,8 @@ export class CustomCaseDetailsComponent implements OnInit {
     return re;
   }
 
-  eventClicked(data:CaseField) {
-    const caseEvent:CaseEvent = {
+  eventClicked(data: CaseField) {
+    const caseEvent: CaseEvent = {
       caseInfo: this.caseDetail,
       caseFieldEvent: data
     }
@@ -67,7 +67,7 @@ export class CustomCaseDetailsComponent implements OnInit {
     if (format == 'ARRAY') {
       let newRe = '';
       if (Symbol.iterator in Object(re)) {
-        for (let val of re) {
+        for (const val of re) {
           newRe += val + '\n';
         }
       }
@@ -81,5 +81,11 @@ export class CustomCaseDetailsComponent implements OnInit {
       }
     }
     return re;
+  }
+
+
+  // Process updates from the souce pane
+  updateConfigJSON(newJson) {
+    console.log('Update JSON ', newJson);
   }
 }

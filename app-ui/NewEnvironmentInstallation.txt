@@ -1,0 +1,83 @@
+REQ 1: Don't Use Global
+REQ 2: Install and run from scratch
+REQ 3: Provide warnings if something is done already, but make it re-runnable
+
+
+
+STEP 1: Create new cloud properties file
+tcli
+
+STEP 2: Change to the right organization
+tcli change-cloud-organization
+
+STEP 3: Create Org folder and Upload Assets
+tcli create-org-folder -a discoverapp_assets
+tcli create-org-folder -a discoverapp_datasources
+tcli show-org-folders
+tcli upload-file-to-org-folder -a discoverapp_datasources:test/CallcenterExample.csv:SAME
+tcli upload-file-to-org-folder -a discoverapp_assets:src/assets/init/images/ProcessMiningsmall.jpg:SAME
+tcli upload-file-to-org-folder -a discoverapp_assets:src/assets/init/images/ic-documentation.svg:SAME
+tcli upload-file-to-org-folder -a discoverapp_assets:src/assets/init/images/ic-community.svg:ic-community.svg:SAME
+tcli upload-file-to-org-folder -a discoverapp_assets:src/assets/init/images/ic-graph.svg:ic-graph.svg:SAME
+tcli show-org-folders
+
+STEP 4: Create LiveApps Groups
+
+tcli create-live-apps-group -a "Discover Administrators:Discover Administrators"
+tcli create-live-apps-group -a "Discover Analysts:Group for Analysts; provides access to the dashboards"
+tcli create-live-apps-group -a "Discover Case Resolvers:Discover Case Resolvers"
+tcli create-live-apps-group -a "Discover Users:Discover Process Mining Users"
+
+STEP 4,5 Add Users to the groups (MANUAL);
+tcli add-user-to-group
+
+STEP 5: Create Shared State
+
+tcli create-shared-state-entry -a discoverapp.discover.config.client.context
+
+STEP 5: Configure Shared state
+
+Get the Group ID from
+tcli show-groups
+
+Set right shared state rights, run
+tcli watch-shared-state
+
+And update this file:
+
+With: discoverapp.discover.config.client.context.SHARED.json
+  "roles": [
+    {
+      "entityId": "6376",
+      "role": "OWNER",
+      "entityName": "Discover Users",
+      "entityType": "SubscriptionDefined"
+    }
+  ],
+  "
+
+    "roles": [{"entityId": "<EntityID>","role": "OWNER","entityName": "Discover Users","entityType": "SubscriptionDefined"}],
+
+
+Now update the Shared State file: discoverapp.discover.config.client.context.SHARED.CONTENT.json
+
+With the contents
+
+STEP 5,5:
+tcli create-spotfire-library-folder -a "/Teams/Discover MVP Customer X:Discover2:Folder for discover assets"
+
+STEP 6: Copy the Spotfire Reports
+tcli copy-spotfire-library-item  -a "Spotfire Reports:/Teams/Discover MVP DEV/Discover/main/project_discover_latest:/Teams/Discover MVP Customer X/Discover"
+tcli copy-spotfire-library-item  -a "Spotfire Reports:/Teams/Discover MVP DEV/Discover/main/project_discover_latest:/Teams/Discover MVP Customer X/Discover"
+
+STEP 7: Build and Deploy the UI
+tcli build-deploy
+
+STEP 8: Copy the LiveApps Applications
+tcli change-cloud-organization  -a "Discover MVP DEV"
+tcli copy-live-apps-between-organizations  -a "Discover improvement:Discover MVP Customer X"
+tcli copy-live-apps-between-organizations  -a "Discover Review:Discover MVP Customer X"
+
+
+tcli -p create-discover-environment-tibco-cloud.properties
+tcli --createCP -p create-discover-environment-tibco-cloud.properties

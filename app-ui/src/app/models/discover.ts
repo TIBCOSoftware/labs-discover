@@ -12,13 +12,12 @@ export interface Datasource {
     analysisDescription?: string;
     analysisCreatedBy?: string;
     analysisCreatedOn?: string;
+    selectNewTemplate?: boolean;
 }
 
 export interface NewAnalysis {
     basicInfo: NewAnalysisBasicInfo,
-    datasource: NewAnalysisDatasource,
     columns: string[],
-    parse: NewAnalysisParse,
     mapping: NewAnalysisMapping
 }
 
@@ -26,50 +25,13 @@ export interface NewAnalysisBasicInfo {
     analysisName: string,
     analysisDescription: string
 }
-
-export interface NewAnalysisDatasource {
-    inputType: string,
-    file?: NewAnalysisDatasourceFile,
-    tdv?: NewAnalysisDatasourceTDV
-}
-
-export interface NewAnalysisDatasourceFile {
-    filename: string,
-    location: string
-}
-
-export interface NewAnalysisDatasourceTDV {
-    username: string,
-    password: string,
-    site: string,
-    domain: string,
-    database: string,
-    table: string,
-    query: string,
-    numPartition: string,
-    primaryKey: string,
-    tdvTable: DataVirtualizationTable
-}
-
-export interface NewAnalysisParse {
-    skipComments?: boolean,
-    comments?: string,
-    columnSeparator?: string,
-    numberRowsForPreview?: number,
-    skipEmptyLines?: boolean,
-    encoding?: string,
-    dateTimeFormat?: string,
-    quoteChar?: string,
-    escapeChar?: string
-}
-
 export interface NewAnalysisMapping {
     caseId?: string,
     activity?: string,
     start?: string,
     end?: string,
     resource?: string,
-    other?: string
+    other?: string[]
 }
 
 export interface NewAnalysisStepStatus {
@@ -85,12 +47,18 @@ export interface FullSpotfireConfig {
   /*parameters?: string*/
 }
 
-export type InvestigationType = 'Compliance' | 'Improvement';
+// export type InvestigationType = 'Compliance' | 'Improvement';
+
+export type ContextType = 'Case' | 'Variants';
 
 export interface NewInvestigation {
-  type: InvestigationType,
-  summary: string,
-  additionalDetails?: string
+  type: string;
+  contextType: ContextType;
+  contextIds: string[];
+  summary: string;
+  additionalDetails?: string;
+  templateName?: string;
+  analysisId?: string;
 }
 
 export interface TCM_Message_discover_actions {
@@ -102,4 +70,16 @@ export interface TCM_Message_discover_actions {
   LAcase_ref: string;
   timestamp: string;
   isReference: number;
+}
+
+
+export interface Cloudstarter {
+  name: string;
+  version: string;
+  build_date: string;
+  description: string;
+}
+
+export interface CSDescriptor {
+  cloudstarter: Cloudstarter;
 }

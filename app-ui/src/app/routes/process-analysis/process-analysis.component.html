@@ -7,23 +7,28 @@
       <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
     </div>
     <div class="process-analysis-button">
-      <uxpl-button id="#newAnalysis" icon="assets/images/svg/plus.svg" (clicked)="newAnalysisDialog();" [width]="'121px'">
-        Analysis
-      </uxpl-button>
-      <uxpl-button class="icon-position" id="#refresh" type="secondary" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refresh()" type="no-border">
+      <uxpl-button class="icon-position" id="#refresh" type="no-border" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refresh()">
         Refresh
       </uxpl-button>
+      <uxpl-button class="icon-position" id="#refresh" type="secondary" (clicked)="showTemplates()">
+        Templates
+      </uxpl-button>
+      <uxpl-button id="#newAnalysis" icon="assets/images/svg/plus.svg" (clicked)="showNewAnalysis()" [width]="'121px'">
+        Analysis
+      </uxpl-button>
     </div>
   </div>
-  <div class="process-analysis-wrapper" *ngIf="showTable">
+  <div class="process-analysis-wrapper" *ngIf="loading || cases.length>0">
     <div class="process-analysis-container">
-      <process-analysis-table [processAnalyses]="cases" [actions]="caseActions" [searchTerm]="search" (openAnalysis)="handleClick($event)" (caseActionSelect)="handleActionSelected($event)" (forceRefresh)="refresh()"></process-analysis-table>
+      <process-analysis-table [processAnalyses]="cases" [searchTerm]="search" [statusMap]="statusMap" [loading]="loading" (openAnalysis)="openAnalytics($event)" (caseActionSelect)="handleActionSelected($event)" (forceRefresh)="refresh()"></process-analysis-table>
     </div>
   </div>
-  <div *ngIf="!showTable">
-    <mat-icon [svgIcon]="'ic-no-docs-icon'" style="height: 48px; width: 48px;"></mat-icon>
-    <div style="height: 100%" fxLayoutAlign="start center">
-      <span class="tcs-no-item-text">No documents found</span>
+  <div *ngIf="!loading && cases.length==0">
+    <div class="center">
+      <div class="img-center">
+        <img width="204" [src]="noDataIconLocation">
+      </div>
+      <div class="nodata-msg">No analysis. Please click Create button to get started.</div>
     </div>
   </div>
 </div>

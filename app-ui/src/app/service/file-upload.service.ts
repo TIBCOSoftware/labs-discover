@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import {Upload} from '../models/fileUpload';
 import {TcAppDefinitionService, TcDocumentService} from '@tibco-tcstk/tc-liveapps-lib';
 import {HttpEventType} from '@angular/common/http';
+import { concatMap, map, mapTo } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FileUploadService {
+
+  readonly ORG_FOLDERS: string = 'orgFolders';
 
   private _Uploads: Upload[] = [];
 
@@ -30,7 +34,7 @@ export class FileUploadService {
       timeStamp: Date.now()
     };
     this._Uploads = [...this._Uploads, newUpload];
-    this.documentService.uploadDocument(type, folderName, Number(this.appDefinitionService.claims.primaryProductionSandbox.id), file, name, description).subscribe(
+    this.doUploadFile(type, folderName, file, name, description).subscribe(
       (response: any) => {
         // console.log(response);
         if (response.type === HttpEventType.UploadProgress) {
@@ -49,14 +53,14 @@ export class FileUploadService {
         }
       },
       error => {
-        newUpload.status = 'failed'
+        newUpload.status = 'failed';
       }
-    )
+    );
   }
 
   public uploadFile(type: string , folderName: string, file: File, name: string, description: string, replace: boolean): boolean {
     if (replace){
-      this.documentService.deleteDocument('orgFolders', folderName, name, Number(this.appDefinitionService.claims.primaryProductionSandbox.id)).subscribe(
+      this.doUploadFile(type, folderName, file, name, description).subscribe(
         _ => {
           this.uploadFile(type, folderName, file, name, description, false);
         }
@@ -65,6 +69,37 @@ export class FileUploadService {
       this.addUpload(type, folderName, file, name, description);
     }
     return true;
+  }
+
+  public deleteFile(folderName: string, name: string): Observable<any> {
+    return this.documentService.deleteDocument(this.ORG_FOLDERS, folderName, name, Number(this.appDefinitionService.claims.primaryProductionSandbox.id));
+  }
+
+  public doUploadFile(type: string , folderName: string, file: File, name: string, description: string): Observable<any> {
+    return this.documentService.uploadDocument(type, folderName, Number(this.appDefinitionService.claims.primaryProductionSandbox.id), file, name, description);
+  }
+
+  /**
+   * Upload file synchrously without adding the it to uploads status array.
+   * @param type 
+   * @param folderName 
+   * @param file 
+   * @param name 
+   * @param description 
+   * @param replace 
+   */
+  public syncUploadFile(type: string , folderName: string, file: File, name: string, description: string, replace: boolean): Observable<any> {
+    if (replace){
+      return this.deleteFile(folderName, name)
+        .pipe(
+          map((result) => {
+            console.log(result);
+            return this.doUploadFile(type, folderName, file, name, description);
+          })
+        );
+    } else {
+      return this.doUploadFile(type, folderName, file, name, description);
+    }
   }
 
   public cancelUpload(upload: Upload) {

@@ -17,10 +17,11 @@
 }
 
 .case-list-table-container {
-  height: 100%;
+  /*border: 1px solid purple;*/
   background-color: #FFFFFF;
   padding: 15px;
   overflow: auto;
+  height: calc(100vh - 179px);
 }
 
 .loading-indicator {

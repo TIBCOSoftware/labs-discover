@@ -1,0 +1,8 @@
+.basic-info-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.error {
+    color: #db0000;
+}

@@ -1,0 +1,45 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Create Template...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "Basic info ...",
+            "label": "Basic Info",
+            "title": "Basic Info",
+            "url": "assets/help/application/Templates-Create-Basic-Infos.html",
+            "content": "",
+            "default": "true"
+          }
+          
+
+        ]
+      },      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

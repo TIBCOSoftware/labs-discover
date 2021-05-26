@@ -1,0 +1,97 @@
+.templates-wrapper{
+  background-color: #FFFFFF;
+  margin-left: 32px;
+  height: 100%;
+}
+
+.filter-header {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.filter-sub-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.filter-type {
+  display: flex;
+  flex-direction: row;
+  /*justify-content: flex-start;*/
+  align-items: flex-start;
+  align-content: flex-start;
+  margin-top: 24px;
+}
+
+.filter-type-label {
+  height: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-right: 13px;
+}
+
+.filter-item{
+  box-sizing: border-box;
+  height: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+  border: 1px solid #DEDEDE;
+  border-radius: 3px;
+  padding: 2px 8px 1px 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.filter-item:hover{
+  color: #1774E5;
+}
+
+.filter-enabled {
+  color: #FFFFFF;
+  background-color: #1774E5;
+  font-weight: 600;
+}
+.filter-enabled:hover {
+  color: #d5e7ff;
+  background-color: #1774E5;
+  font-weight: 600;
+}
+
+.search-container {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: row;
+  /*border: 2px solid blue;*/
+  margin-right: 64px;
+}
+
+.search-icon{
+  align-self: flex-end;
+}
+
+.icon-position {
+  margin-bottom: -15px;
+}
+
+.templates-container {
+  height: calc(100vh - 290px);
+  overflow: auto;
+  background-color: #FFFFFF;
+  margin-top: 22px;
+  padding-top: 10px
+}
+
+uxpl-card-grid::part(grid-container) {
+  overflow-y: hidden;
+}

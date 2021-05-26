@@ -61,5 +61,13 @@
         </div>
       </div>
     </div>
+    <div>
+      <h2>Advanced <span class="advanced" (click)="showAdvanced = true">>></span></h2>
+      <div *ngIf="showAdvanced" class="settings-subcategory">
+        <h3>Spotfire</h3>
+        <uxpl-form-field id="#appTitle" fieldId="appTitle" style="margin-top: 5px; margin-bottom: 5px;" label="Alternative Spotfire Server (leave blank to use TIBCO Cloud Spotfire)" type="text" valid [value]="discover.analyticsSF?.customServer" (uxplChanged)="handleUpdate($event, 'advanced', 'customServer')"></uxpl-form-field>
+        <uxpl-form-field id="#appTitle" fieldId="appTitle" style="margin-top: 25px; margin-bottom: 5px;" label="Spofire Preview DXP Location" type="text" valid [value]="discover.analyticsSF?.previewDXPLocation" (uxplChanged)="handleUpdate($event, 'advanced', 'previewDXPLocation')"></uxpl-form-field>
+      </div>
+    </div>
   </div>
 </div>

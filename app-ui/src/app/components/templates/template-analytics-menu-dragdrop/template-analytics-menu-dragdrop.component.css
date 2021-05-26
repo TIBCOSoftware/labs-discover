@@ -1,0 +1,132 @@
+.cdk-drag-placeholder {
+  /*display: none;*/
+  background-color: #FAFAFA;
+  box-shadow: inset 0 0 2px 0 #DEDEDE;
+  color: #B6B6B6;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2),
+  0 8px 10px 1px rgba(0, 0, 0, 0.14),
+  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  background: #AECFF6;
+  padding-bottom: 50px;
+  opacity: 0.9;
+}
+
+
+.drop-inside {
+  /*border: 1px solid #00f;*/
+  border: 2px dashed #1774E5;
+  background-color: #F4FAFD;
+}
+
+.drop-before {
+  border-top: 2px solid #1774E5;
+}
+
+.drop-after {
+  border-bottom: 2px solid #1774E5;
+}
+
+.node-title {
+  padding: 15px;
+  margin: 5px;
+  background: #eee;
+  cursor: grab;
+}
+
+.node-children {
+  position: relative;
+  transition: height 0.2s;
+  margin-left: 40px;
+}
+
+.item-notes {
+  margin-left: 20px;
+  color: #aaa;
+}
+
+.menu-item-drag {
+  height: 40px;
+  width: calc(100% - 10);
+  margin: 5px;
+  border: 1px solid #DEDEDE;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+.menu-item-drag:hover {
+  cursor: grab;
+  background-color: #F3F4FB;
+}
+.menu-item-drag:hover .right-drag-button {
+  color: #1774E5;
+}
+
+.right-drag-button{
+  margin: 0px 8px;
+  color: #B6B6B6;
+}
+.defIcon {
+  color: #1774E5;
+}
+
+.right-drag-button:hover {
+  cursor: pointer;
+}
+
+.menu-item-drag:active {
+  cursor: grabbing;
+  background-color: white;
+}
+
+.left-drag-section {
+  display: flex;
+  flex-direction: row;
+}
+
+.drag-label {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.hide-drag-label{
+  color: #B6B6B6 !important;
+}
+
+.default-label {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.drag-icon {
+
+}
+
+.right-drag-section{
+  display: flex;
+  flex-direction: row;
+
+}
+
+.popup-wrapper{
+  position: fixed;
+  width: 300px;
+  z-index: 100;
+}
+
+.menu-icon {
+  color: #AECFF6;
+  margin-left: 6px;
+  margin-right: 10px;
+}

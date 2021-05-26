@@ -1,0 +1,64 @@
+<!--
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Start and Stop activities</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" type="text/css" media="all" href="uxpl.min.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="main.css" />
+        
+        <script id="spotfire-loader">var Spotfire=function(e){"use strict";return e.initialize=function(e){var t="sfTemp"+1e4*Math.random()+"Cb",r=window;r[t]=e;var a={subject:"GetUrl",callbackId:-1,options:{cbId:t}};r.addEventListener("message",(function e(t){if(t.source!==r.parent||!t.data.src)return;r.removeEventListener("message",e);var a=document,n=a.createElement("script");n.src=t.data.src,(a.head||a.body).appendChild(n)})),r.parent.postMessage(a,"*")},e}({});</script>
+        <script src="uxpl.umd.min.js"></script>
+        <script src="main.js"></script>
+    </head>
+    <body>
+        <div id="btn-grid">
+
+            <button id="addToStartBtn" type="button" class="pl-button pl-button--primary">
+                <svg class="pl-button__icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M12 4c-4.416 0-8 3.584-8 8s3.584 8 8 8 8-3.584 8-8-3.584-8-8-8m3.2 8.801h-2.4V15.2a.8.8 0 1 1-1.6 0v-2.399H8.8a.8.8 0 0 1 0-1.601h2.4V8.801a.8.8 0 1 1 1.6 0V11.2h2.4a.8.8 0 0 1 0 1.601">
+                    </path>
+                </svg>
+                <span class="pl-button__label">Add to Start</span>
+            </button>
+    
+            <button id="addToStopBtn" type="button" class="pl-button pl-button--primary">
+                <svg class="pl-button__icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M12 4c-4.416 0-8 3.584-8 8s3.584 8 8 8 8-3.584 8-8-3.584-8-8-8m3.2 8.801h-2.4V15.2a.8.8 0 1 1-1.6 0v-2.399H8.8a.8.8 0 0 1 0-1.601h2.4V8.801a.8.8 0 1 1 1.6 0V11.2h2.4a.8.8 0 0 1 0 1.601">
+                    </path>
+                </svg>
+                <span class="pl-button__label">Add to Stop</span>
+            </button>
+    
+            <button id="removeStartBtn" type="button" class="pl-button pl-button--secondary">
+                <svg class="pl-button__icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M12 4c4.416 0 8 3.584 8 8s-3.584 8-8 8-8-3.584-8-8 3.584-8 8-8zm3.99 7H8.01A1 1 0 0 0 7 12l.007.117c.058.5.485.883 1.002.883h7.982a1 1 0 1 0 0-2z">
+                    </path>
+                </svg>
+                <span class="pl-button__label">Remove from Start</span>
+            </button>
+    
+            <button id="removeStopBtn" type="button" class="pl-button pl-button--secondary">
+                <svg class="pl-button__icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M12 4c4.416 0 8 3.584 8 8s-3.584 8-8 8-8-3.584-8-8 3.584-8 8-8zm3.99 7H8.01A1 1 0 0 0 7 12l.007.117c.058.5.485.883 1.002.883h7.982a1 1 0 1 0 0-2z">
+                    </path>
+                </svg>
+                <span class="pl-button__label">Remove from Stop</span>
+            </button>
+    
+        </div>
+    </body>
+</html>

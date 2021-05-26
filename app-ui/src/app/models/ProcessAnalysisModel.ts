@@ -55,6 +55,8 @@ export type Status = string;
 export type Progress = number;
 export type Message = string;
 export type Timestamp = string;
+export type SkipDirectMining = "Yes" | "No";
+export type AnalyticTemplate = string;
 
 export interface ProcessAnalysis {
   state?: State;
@@ -70,6 +72,8 @@ export interface ProcessAnalysis {
   Endpoints?: Endpoints;
   Schedule_1?: Schedule;
   ProcessMining?: ProcessMining;
+  SkipDirectMining?: SkipDirectMining;
+  AnalyticTemplate?: AnalyticTemplate;
   /* NOTE: THESE ARE ADDED UI FIELDS TODO: DON'T REPLACE ON NEW MODEL GENERATION*/
   /* ------------------------------- */
   CreatedBy?: string;

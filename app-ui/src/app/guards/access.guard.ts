@@ -24,8 +24,7 @@ export class AccessGuard implements CanActivate {
         const isAnalyst = this.appDefinitionService.usersGroups.findIndex(element => element.name === 'Discover Analysts') > 0;
         const isResolver = this.appDefinitionService.usersGroups.findIndex(element => element.name === 'Discover Case Resolvers') > 0;
         const isAdmin = this.appDefinitionService.usersGroups.findIndex(element => element.name === 'Discover Administrators') > 0;
-
-        console.log("***** ActivatedRoute: ", state.url);
+        console.log('***** ActivatedRoute: ', state.url);
         let requiredGroup: string;
         let output: boolean;
         switch (state.url.split('/')[2]){
@@ -42,6 +41,10 @@ export class AccessGuard implements CanActivate {
             requiredGroup = 'Discover Analysts';
             output = isAnalyst
             break;
+          case 'dataset':
+            requiredGroup = 'Discover Analysts';
+            output = isAnalyst
+            break;
           case 'settings':
             requiredGroup = 'Discover Admins';
             output = isAdmin;
@@ -54,7 +57,7 @@ export class AccessGuard implements CanActivate {
           console.error('Logged in user is NOT a member of the required Live Apps group ', requiredGroup);
           const errCode = 'NO_ACCESS';
           const errMessage = 'You must be a member of ' + requiredGroup + ' to access this application';
-          this.router.navigate(['/errorHandler/' + errCode + '/' + errMessage]);  
+          this.router.navigate(['/errorHandler/' + errCode + '/' + errMessage]);
         }
 
         return output;

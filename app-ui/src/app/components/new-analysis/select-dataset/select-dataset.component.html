@@ -1,0 +1,31 @@
+<div>
+  <div class="datasource-preview">
+    <uxpl-select-input label="Available datasets" [value]="dataset" [options]="datasets" (uxplSelection)="handleSelection($event)"></uxpl-select-input>
+    Don’t see the data set you’re looking for? Go to Datasets to create a new data set
+
+    <div class="datasource-preview-table" *ngIf="previewColumns"> <!-- *ngIf="!isError && previewColumns?.length > 0" -->
+      <tcpmg-generic-table  [columnDefs]="previewColumns" [rowData]="previewData.slice(0,5)" 
+        [autoLayout]="false" [showSortIcon]="false"
+        [showExpandButton]="false" [paginator]="false"
+        [showCurrentPageReport]="false" [showFilterRow]="false">
+      </tcpmg-generic-table>
+    </div>
+    <div *ngIf="!isError && previewColumns === undefined" class="center"> <!-- *ngIf=" (previewColumns === undefined || previewColumns?.length === 0)" class="center"> -->
+      <div class="img-center">
+        <img width="204" [src]="'assets/images/png/no-data.png'">
+      </div>
+      <div class="no-data-available"><br></div>
+      <div class="no-data-available" style="font-weight: bold">No preview data available.<br></div>
+      <div class="no-data-available"><br></div>
+    </div>
+    <div *ngIf="isError" class="center"> <!-- *ngIf="!isError && (previewColumns === undefined || previewColumns?.length === 0)" class="center"> -->
+      <div class="img-center">
+        <img width="204" [src]="'assets/images/png/no-data.png'">
+      </div>
+      <div class="no-data-available"><br></div>
+      <div class="no-data-available" style="font-weight: bold">The preview data service is not online.<br></div>
+      <div class="no-data-available" style="font-weight: bold">Please, contact your administrator.<br></div>
+      <div class="no-data-available"><br></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+{
+    "apiVersion": "1.0",
+    "version": "0.2",
+    "name": "Filter Panel",
+    "id": "filter-panel-mod",
+    "externalResources": [],
+    "icon": "icon.svg",
+    "properties": [
+        {
+            "name": "config",
+            "type": "string",
+            "defaultValue": "{}"
+        }
+    ],
+    "dataViewDefinition": {
+        "axes": [
+            {
+                "name": "Values",
+                "mode": "continuous",
+                "placement": "none",
+                "allowMultipleMeasures": true,
+                "automaticConfiguration": {"expressionHeuristics": "none"},
+                "dataTypes": {
+                    "allowBoolean": true,
+                    "allowNumeric": true,
+                    "allowDateTime": true,
+                    "allowString": true,
+                    "allowTimeSpan": true
+                }
+            },
+            {
+                "name": "Marking Axis",
+                "mode": "continuous",
+                "allowMultipleMeasures": false,
+                "dataTypes": {
+                    "allowBoolean": false,
+                    "allowNumeric": true,
+                    "allowDateTime": false,
+                    "allowString": true,
+                    "allowTimeSpan": false
+                },
+                "placement": "none",
+                "legendItem": {
+                    "defaultVisibility": "hidden"
+                },
+                "propertyControl": {
+                    "visibility": "hidden"
+                },
+                "automaticConfiguration": {
+                    "expressionHeuristics": "none"
+                }
+            },
+            {
+                "name": "Datasets",
+                "mode": "categorical",
+                "placement": "none",
+                "legendItem": {
+                    "defaultVisibility": "hidden"
+                },
+                "propertyControl": {
+                    "visibility": "hidden"
+                },
+                "automaticConfiguration": {
+                    "expressionHeuristics": "none"
+                }
+            }
+        ]
+    },
+    "files": []
+}

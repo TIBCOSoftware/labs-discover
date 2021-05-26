@@ -1,0 +1,54 @@
+<div class="analytic-card-outer">
+  <div class="analytic-card" [ngClass]="glowCSS">
+    <div class="top-header" [ngClass]="typeCSS"></div>
+    <div class="middle-content">
+      <div class="heading-container">
+        <div class="icon-container" *ngIf="cardConfig?.icon && !cardConfig.icon.startsWith('CUSTOM-ICON-CODE:')"><img height=52 width=52 src="{{cardConfig?.icon}}"></div>
+        <div class="icon-container" *ngIf="cardConfig?.icon && cardConfig.icon.startsWith('CUSTOM-ICON-CODE:')"><div class="icon-outer"><uxpl-icon class="card-icon" icon="{{cardConfig?.icon.substring(17)}}" width="30px" height="30px"></uxpl-icon></div></div>
+        <div class="heading" [innerHTML]="cardConfig?.name | highlight: highLight : 'Multi-Match'"></div>
+      </div>
+      <div class="splash" *ngIf="cardConfig?.splash">
+        <img class="splash-pic" src="{{cardConfig?.splash}}">
+      </div>
+      <div class="description-text" [innerHTML]="cardConfig?.description | highlight: highLight : 'Multi-Match'"></div>
+    </div>
+    <div class="bottom-header">
+      <div class="t-type-label">
+        {{cardConfig?.type}} TEMPLATE
+      </div>
+      <div class="button-bar">
+        <div *ngIf="isSelected" class="is-selected">
+          <div class="is-selected-label">
+            Selected
+          </div>
+        </div>
+        <div *ngIf="showSelect()" class="select-button" (click)="optionClicked('select', $event)">
+          <div class="select-label">
+            Select
+          </div>
+          <div>
+            <img src="assets/images/svg/Open.svg">
+          </div>
+        </div>
+        <div *ngIf="canEditOrDelete()" class="select-button" (click)="optionClicked('delete', $event)" matTooltip="delete"
+             matTooltipClass="tTip">
+          <div>
+            <uxpl-icon class="lower-icon" width="18px" height="18px" icon="pl-icon-delete"></uxpl-icon>
+          </div>
+        </div>
+        <div *ngIf="showCopy()" class="select-button" (click)="optionClicked('copy', $event)" matTooltip="copy template"
+             matTooltipClass="tTip">
+          <div>
+            <uxpl-icon class="lower-icon" width="18px" height="18px" icon="pl-icon-copy"></uxpl-icon>
+          </div>
+        </div>
+        <div *ngIf="canEditOrDelete()" class="select-button" (click)="optionClicked('edit', $event)" matTooltip="edit"
+             matTooltipClass="tTip">
+          <div>
+            <uxpl-icon class="lower-icon" width="18px" height="18px" icon="pl-icon-edit"></uxpl-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

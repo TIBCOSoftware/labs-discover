@@ -1,0 +1,36 @@
+{
+    "apiVersion": "1.1",
+    "version": "1.0",
+    "name": "Reference Model Selector",
+    "id": "ref-model-selector",
+    "icon": "icon.svg",
+    "properties": [
+    ],
+    "dataViewDefinition": {
+       
+        "axes": [
+            {
+                "name": "Variant IDs",
+                "mode": "continuous",
+                "placement": "none",
+                "dataTypes": {
+                    "allowBoolean": false,
+                    "allowNumeric": false,
+                    "allowDateTime": false,
+                    "allowString": true,
+                    "allowTimeSpan": false
+                },
+                "automaticConfiguration": {
+                    "expressionHeuristics": "none"
+                }
+            }
+        ]
+    },
+    "files": [
+        "index.html",
+        "main.css",
+        "main.js",
+        "uxpl.min.css",
+        "uxpl.umd.min.js"
+    ]
+}

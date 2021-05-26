@@ -1,0 +1,145 @@
+.analytic-card-outer {
+  padding-left: 28px;
+  padding-right: 28px;
+  padding-bottom: 32px;
+}
+
+.analytic-card {
+  /*height: 432px;*/
+  width: 400px;
+  border-radius: 3px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 6px 0 rgba(114,114,114,0.33);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.glow_general{
+  box-shadow: 0 0 25px #0E4F9E !important;
+}
+.glow_vertical{
+  box-shadow: 0 0 25px #039145 !important;
+}
+.glow_user_defined{
+  box-shadow: 0 0 25px #f17529 !important;
+}
+
+.top-header {
+  height: 4px;
+  border-radius: 3px 3px 0 0;
+}
+.top_general{
+  background-color: #0E4F9E;
+}
+.top_vertical{
+  background-color: #039145;
+}
+.top_user_defined{
+  background-color: #727272;
+}
+
+.middle-content {
+  margin-left: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.description-text {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+
+.splash {
+  margin-top: 24px;
+}
+
+.splash-pic {
+  max-width: 350px;
+}
+
+.heading-container{
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.heading {
+  margin-top: 12px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 27px;
+}
+
+.icon-container {
+  margin-right: 8px;
+}
+
+.bottom-header {
+  height: 32px;
+  width: 400px;
+  border-radius: 0 0 3px 3px;
+  background-color: #FAFAFA;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.t-type-label {
+  color: #727272;
+  font-family: "Source Sans Pro";
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 13px;
+  text-transform: uppercase;
+  margin: 10px 0 9px 24px;
+}
+
+.select-button {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+  margin: 4px 14px 4px 0;
+  padding: 0 10px 0 10px;
+  cursor: pointer;
+}
+
+.select-button:hover {
+  background-color: #1774e54d;
+  border-radius: 3px 3px 3px 3px;
+}
+
+.select-label {;
+  color: #1774E5;
+  font-family: "Source Sans Pro";
+  font-size: 12px;
+  letter-spacing: 0;
+  line-height: 18px;
+  text-align: right;
+  margin: 3px 0 3px 0;
+}
+
+.is-selected {
+  margin: 4px 14px 4px 0;
+  padding: 0 10px 0 10px;
+  cursor: default;
+}
+
+.is-selected-label {
+  color: #727272;
+  font-family: "Source Sans Pro";
+  font-size: 12px;
+  letter-spacing: 0;
+  line-height: 18px;
+  text-align: right;
+}

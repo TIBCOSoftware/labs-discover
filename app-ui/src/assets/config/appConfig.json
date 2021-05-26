@@ -6,15 +6,7 @@
     "discover": {
       "investigations": {
         "numberApplications": 2,
-        "applications": [
-          {
-            "applicationId": "",
-            "creatorId": ""
-          },
-          {
-            "applicationId": "",
-            "creatorId": ""
-          }
+        "caseConfig": [
         ]
       },
       "analysis": {
@@ -206,32 +198,31 @@
         "documentationUrl": "assets/help.html"
       },
       "dateTimeFormats": [
-        "d/M/yy H:mm", 
+        "d/M/yy H:mm",
         "d/M/yyyy H:m:ss"
       ]
     },
     "settingsMenu": [
       {
-          "entry": "Branding",
-          "icon": "assets/images/settings/tcs-starters-icon.svg"
-      },
-      {
-          "entry": "Analytics",
-          "icon": "assets/images/settings/tcs-liveapps-sm-icon.svg"
-      },
-      {
-          "entry": "Investigations",
-          "icon": "assets/images/settings/tcs-liveapps-sm-icon.svg"
-      },
-      {
           "entry": "Platform",
           "icon": "assets/images/settings/tcs-spotfire-icon.svg",
-          "options": ["General", "Analytics", "Orchestration", "Process mining", "Database", "Dates and times"]
+          "options": ["General", "Orchestration", "Process mining", "Database", "Dates and times" , "Auto map"]
       },
       {
           "entry": "Add-ons",
           "icon": "assets/images/settings/tcs-starters-icon.svg"
       }
+    ],
+    "adminMenu": [
+      {
+          "entry": "Branding",
+          "icon": "assets/images/settings/tcs-starters-icon.svg"
+      },
+      {
+          "entry": "Investigations",
+          "icon": "assets/images/settings/tcs-liveapps-sm-icon.svg"
+      }
     ]
+
   }
 }

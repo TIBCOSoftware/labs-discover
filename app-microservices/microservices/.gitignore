@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+npm-debug.log
+dist/
+coverage/
+container_data/*
+redis-lib/lib
+liveapps-lib/lib
+
+templates/HugoNotes.txt
+templates/Shared_State*/
+
+out/

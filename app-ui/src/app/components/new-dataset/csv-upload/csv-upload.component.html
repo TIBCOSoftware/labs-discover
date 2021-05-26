@@ -1,0 +1,33 @@
+<div class="file-upload-container" [ngClass]="{'big': size == 'big'}">
+  <div class="file-upload" [ngClass]="{fileover: fileover, fileselected: filename!=null, error: error!=null}" (drop)="onFileDrop($event)" (dragover)="onDragover($event)" (dragleave)="onDragleave($event)">
+    <div>
+      <svg width="55" height="64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M37.881 0c.38 0 .744.157 1.008.435l15.477 16.3c.25.26.39.61.392.974l.236 44.728A1.411 1.411 0 0153.6 64H1.4C.628 64 0 63.363 0 62.578V1.422C0 .637.628 0 1.4 0H37.88zm-2.082 2.844h-33v58.312h49.383l-.215-42.133H37.195a1.404 1.404 0 01-1.396-1.413V2.844zm9.01 42.715a1.739 1.739 0 010 3.478H10.232a1.739 1.739 0 010-3.478h34.577zm0-10.432a1.739 1.739 0 010 3.477H10.232a1.739 1.739 0 110-3.477h34.577zm-15.82-10.433a1.739 1.739 0 110 3.478H10.231a1.739 1.739 0 110-3.478h18.756zm9.6-19.87v11.372h11.23L38.588 4.825z" fill-rule="evenodd"/>
+      </svg>
+    </div>
+    <div class="upload-content">
+      <input type="file" #fileDropRef id="fileDropRef" (change)="fileBrowseHandler($event.target.files)" />
+  
+      <div *ngIf="filename==null">
+        <div *ngIf="size=='big'" class="">You don’t have any available files yet</div>
+        <div class="desc">Drag and drop your .csv file here, or </div>
+        <label for="fileDropRef" class="file-input-label">browse to upload</label>
+      </div>
+      <div *ngIf="filename">
+        <div class="filename" matTooltip="{{filename}}" matTooltipClass="filenameTooltip">{{filename}}</div>
+        <label for="fileDropRef" class="changefile">change</label>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="error" class="error-msg">
+    <div class="error-icon">
+      <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13.913 0c.147 0 .289.059.393.163l5.531 5.532a.556.556 0 01.163.393v7.824a.556.556 0 01-.163.393l-5.532 5.532a.556.556 0 01-.393.163H6.088a.556.556 0 01-.393-.163L.163 14.305A.556.556 0 010 13.912V6.088c0-.148.059-.29.163-.393L5.694.163A.556.556 0 016.087 0zm-.253 5.556a.783.783 0 00-.554.23L10 8.89 6.894 5.785a.784.784 0 00-1.11 1.109h.001L8.891 10l-3.106 3.106a.785.785 0 001.11 1.109L10 11.108l3.106 3.105a.785.785 0 001.11-1.109h-.001L11.109 10l3.106-3.106a.784.784 0 00-.555-1.339z" fill="#DB0000" fill-rule="evenodd"/>
+      </svg>
+    </div>
+    <div class="error-text">
+      <span class="error-title">Error. </span>
+      <span>{{error}}</span>
+    </div>
+  </div>
+</div>

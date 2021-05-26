@@ -1,0 +1,55 @@
+.discover-progress {
+
+  width: 80%;
+  margin: auto;
+
+  .message {
+
+    height: 23px;
+    color: #727272;
+    font-family: "Source Sans Pro";
+    font-size: 18px;
+    letter-spacing: 0;
+    line-height: 23px;
+    text-align: center;
+
+  }
+
+  .message-top {
+    margin-bottom: 40px;
+    margin-top: 20px;
+  }
+
+  .image {
+    text-align: center;
+  }
+
+  .status {
+    margin-top: 16px;
+    height: 26px;
+    color: #727272;
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 21px;
+    text-align: center;
+  }
+
+  .discover-progressbar {
+    .p-progressbar {
+      border-radius: 12px;
+      .p-progressbar-value {
+        border-radius: 12px;
+      }
+    }
+  }
+}
+
+:host ::ng-deep .p-progressbar-determinate {
+  height: 12px;
+  border-radius: 12px;
+  .p-progressbar-value {
+      background-color: #AECFF6;
+      border-radius: 12px;
+  }
+}

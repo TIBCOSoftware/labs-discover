@@ -1,0 +1,27 @@
+.settings-main {
+  margin-right: 24px;
+}
+
+.ss-settings {
+  margin: 10px 5px 10px 0px;
+  padding: 20px 10px;
+  border: 1px solid #e7e7e7;
+  border-radius: 15px;
+  background-color: #f4f4f4 !important;
+  height: 70%;
+}
+
+.ss-inner {
+  position: relative;
+  margin-left: 10px;
+}
+
+.right-button {
+  position: absolute;
+  margin-right: 5px;
+  right: 2%;
+}
+
+.settings-container {
+  overflow: visible;
+}

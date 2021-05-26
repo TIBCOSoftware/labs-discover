@@ -11,22 +11,22 @@
 /* You can add global styles to this file, and also import other style files */
 @font-face {
   font-family: Source Sans Pro;
-  src: url("assets/fonts/SourceSansPro-Regular.ttf");
+  src: url("/assets/Fonts/SourceSansPro-Regular.ttf");
 }
 
 @font-face {
   font-family: Source Sans Pro Light;
-  src: url("assets/fonts/SourceSansPro-Light.ttf");
+  src: url("/assets/Fonts/SourceSansPro-Light.ttf");
 }
 
 @font-face {
   font-family: Source Sans Pro ExtraLight;
-  src: url("assets/fonts/SourceSansPro-ExtraLight.ttf");
+  src: url("/assets/Fonts/SourceSansPro-ExtraLight.ttf");
 }
 
 @font-face {
   font-family: Source Sans Pro Semibold;
-  src: url("assets/fonts/SourceSansPro-SemiBold.ttf");
+  src: url("/assets/Fonts/SourceSansPro-SemiBold.ttf");
 }
 
 body * {
@@ -82,12 +82,12 @@ body .md-datepicker-calendar-pane {
   font-size: 30px;
   letter-spacing: 0;
   line-height: 38px;
-  margin-right: 20px;
-  margin-left: 10px;
+  padding-right: 20px;
+  padding-left: 10px;
 }
 
 .page-container {
-  margin: 20px;
+  padding: 20px;
   background-color: white;
 }
 
@@ -181,4 +181,12 @@ h3 {
 
 .search-highlight {
   background-color: yellow !important;
+}
+
+uxpl-button::part(button){
+  min-width: 100px
+}
+
+uxpl-left-nav-multi {
+  height: 100%;
 }

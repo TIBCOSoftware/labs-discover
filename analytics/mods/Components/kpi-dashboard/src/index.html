@@ -1,0 +1,48 @@
+<!-- 
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+ -->
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+  <title>KPI dashboard</title>
+
+  <script type="module" src="/build/kpi-dashboard.esm.js"></script>
+  <script nomodule src="/build/kpi-dashboard.js"></script>
+
+</head>
+
+<body>
+
+  <!-- <kpi-card name="Stencil" value="Super" icon="fa-dollar-sign"></kpi-card> -->
+  <kpi-chart
+    data='[{"name":"Events","value":"317508","icon":"fas fa-box-open fa-fw"}, {"name":"Cases","value":"67447","icon":"fas fa-box-open"},{"name":"Variants","value":"3851","icon":"fas fa-box-open"}, {"name":"Activities","value":"37","icon":"fas fa-box-open"}]'>
+  </kpi-chart>
+
+  <script>
+    // let cards = JSON.parse('[{"name":"Events","value":"317508","icon":"fas fa-box-open fa-fw"}, {"name":"Cases","value":"67447","icon":"fas fa-box-open"},{"name":"Variants","value":"3851","icon":"fas fa-box-open"}, {"name":"Activities","value":"37","icon":"fas fa-box-open"}]');
+    let chart = document.querySelector("kpi-chart");
+    // chart.cards = cards;
+    chart.addEventListener('configSaved', event => {
+      console.log('event received');
+      let chart = document.querySelector("kpi-chart");
+      let cards = JSON.parse(chart.data);
+      let config = event.detail;
+      config.mapping.forEach(ele => {
+        let card = cards.find(card => card.name === ele.name);
+        card.icon = ele.icon;
+      });
+      chart.data = JSON.stringify(cards);
+
+    });
+
+  </script>
+</body>
+
+</html>

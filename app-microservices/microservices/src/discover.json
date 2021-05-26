@@ -1,0 +1,481 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "TIBCO Labs discover: Microservice API",
+    "version": "1.0.0",
+    "description": "Microservice API"
+  },
+  "servers": [
+    {
+      "url": "http://discover.cloud.tibco.com:8080",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Repository",
+      "description": "Repository operations"
+    },
+    {
+      "name": "Templates",
+      "description": "Templates operations"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "Analysis": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AnalysisData"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Actions"
+            }
+          }
+        },
+        "required": [
+          "data",
+          "metadata",
+          "actions"
+        ]
+      },
+      "AnalysisData": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "description": "TBD",
+            "type": "string",
+            "example": "PAM-000003"
+          },
+          "Name": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Description": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Dataset": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Template": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "State": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Mapping": {
+            "$ref": "#/components/schemas/Mapping"
+          }
+        },
+        "required": [
+          "Name",
+          "Description",
+          "Dataset",
+          "Mapping"
+        ]
+      },
+      "AnalysisRequest": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Description": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Dataset": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Mapping": {
+            "$ref": "#/components/schemas/Mapping"
+          }
+        },
+        "required": [
+          "Name",
+          "Description",
+          "Dataset",
+          "Mapping"
+        ]
+      },
+      "Mapping": {
+        "type": "object",
+        "properties": {
+          "CaseID": {
+            "description": "TBD",
+            "type": "string",
+            "example": "PAM-000003"
+          },
+          "Activity": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Starttime": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Endtime": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Scheduledstart": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Scheduledend": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Requester": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Resource": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Resourcegroup": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "Otherattributes": {
+            "description": "TBD",
+            "type": "boolean",
+            "example": null
+          }
+        },
+        "required": [
+          "CaseID",
+          "Activity",
+          "Starttime"
+        ]
+      },
+      "Actions": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "label": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          }
+        }
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "createdBy": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "createdOn": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "modifiedBy": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          },
+          "modifiedOn": {
+            "description": "TBD",
+            "type": "string",
+            "example": null
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/repository/analysis": {
+      "get": {
+        "description": "Get all analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Get all analysis for TIBCO Labs Discover.",
+        "operationId": "getAnalysis",
+        "responses": {
+          "200": {
+            "description": "Returns all analysis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Analysis"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The auth token is missing"
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Create a new analysis.",
+        "operationId": "createAnalysis",
+        "requestBody": {
+          "description": "The analysis data to create.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analysis is created succesfully."
+          },
+          "401": {
+            "description": "Bad request. The auth token is missing"
+          }
+        }
+      }
+    },
+    "/repository/analysis/{name}": {
+      "get": {
+        "description": "Get an analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Get a analysis for TIBCO Labs Discover.",
+        "operationId": "getAnalysisDetails",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Analysis name to get.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a analysis.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Analysis"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. The auth token is missing"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        }
+      },
+      "put": {
+        "description": "Update a analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Get all analysis for TIBCO Labs Discover.",
+        "operationId": "updateAnalysis",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Analysis name to update.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The analysis to update.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update a analysis."
+          },
+          "401": {
+            "description": "Bad request. The auth token is missing"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Delete a analysis for TIBCO Labs Discover.",
+        "operationId": "deleteAnalysis",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Analysis name to delete.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete a analysis."
+          },
+          "401": {
+            "description": "Bad request. The auth token is missing"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        }
+      }
+    },
+    "/repository/analysis/{name}/template/{template}": {
+      "post": {
+        "description": "Assign a template to an analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Assign a template to an analysis.",
+        "operationId": "setAnalysisTemplate",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Analysis name to delete.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "template",
+            "in": "path",
+            "description": "Template to be assigned to the analysis.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete a analysis."
+          },
+          "401": {
+            "description": "Bad request. The auth token is missing"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        }
+      }
+    },
+    "/repository/analysis/{name}/action/{action}": {
+      "post": {
+        "description": "Delete a analysis.",
+        "tags": [
+          "Repository"
+        ],
+        "summary": "Delete a analysis for TIBCO Labs Discover.",
+        "operationId": "runAnalysisAction",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Analysis name to delete.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "in": "path",
+            "description": "Action to be executed.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete a analysis."
+          },
+          "401": {
+            "description": "Bad request. The auth token is missing"
+          },
+          "404": {
+            "description": "Record not found."
+          }
+        }
+      }
+    }
+  }
+}

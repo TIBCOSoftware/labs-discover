@@ -1,0 +1,42 @@
+.icon-grid-container {
+  min-width: 100px;
+}
+
+.icon-table {
+  box-sizing: border-box;
+  display: inline-block;
+  border: 1px solid #B6B6B6;
+  border-radius: 3px;
+  background-color: #FFFFFF;
+  padding: 5px;
+  margin: 5px 0px;
+}
+
+.icon-cell {
+  margin: 3px;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  /*color: #AECFF6;*/
+  border: 2px solid #FFFFFF;
+  border-radius: 3px;
+}
+
+.icon-cell:hover {
+  background-color: #f4f9ff;
+  color: #1774E5;
+  cursor: pointer;
+}
+
+.disabled {
+  color: #B6B6B6;
+}
+
+.disabled:hover {
+  color: #000000;
+}
+
+.selected {
+  background-color: #f4f9ff;
+  border-color: #1774E5;
+}

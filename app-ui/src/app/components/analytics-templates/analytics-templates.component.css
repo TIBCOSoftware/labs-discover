@@ -1,0 +1,132 @@
+.analytics-dashboard-top-level {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  /*border: 2px solid red;*/
+}
+
+.analytics-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /*border: 2px solid blueviolet;*/
+}
+
+.select-which-analyti {
+  height: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.filter-header {
+  margin-left: 64px;
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.filter-type {
+  display: flex;
+  flex-direction: row;
+  /*justify-content: flex-start;*/
+  align-items: flex-start;
+  align-content: flex-start;
+  margin-top: 24px;
+}
+
+.filter-type-label {
+  height: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-right: 13px;
+}
+
+.filter-item{
+  box-sizing: border-box;
+  height: 24px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+  border: 1px solid #DEDEDE;
+  border-radius: 3px;
+  padding: 2px 8px 1px 8px;
+  margin-left: 8px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.filter-item:hover{
+  background-color: #1774e54d;
+  border-color: #1774e54d;
+}
+
+.analytic-cards-container {
+  margin: 24px 36px 24px 36px;
+  /*border: 2px solid blueviolet;*/
+  height: 100%;
+  overflow: auto;
+}
+
+.search-container {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: row;
+  /*border: 2px solid blue;*/
+  margin-right: 64px;
+}
+
+.search-icon{
+  align-self: flex-end;
+}
+
+.filter-sub-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.add-rule-box {
+  box-sizing: border-box;
+  border: 1px dashed #1774E5;
+  border-radius: 3px;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 6px 0 rgba(114,114,114,0.33);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  height: 112px;
+  width: 135px;
+  padding: 20px;
+  font-family: "Source Sans Pro";
+  margin-left: 28px;
+}
+
+.add-rule-box:hover {
+  background-color: #f1f7ff;
+  cursor: pointer;
+}
+
+.add-rule-box:hover > span {
+  color: black;
+}
+
+.filter-enabled {
+  background-color: #DEDEDE;
+}
+
+uxpl-card-grid::part(grid-container) {
+  overflow-y: hidden;
+}
+
+

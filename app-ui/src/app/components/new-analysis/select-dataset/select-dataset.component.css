@@ -1,0 +1,23 @@
+.center {
+  /*border: 2px solid chartreuse;*/
+  margin: auto;
+  width: 60%;
+  height: 200px;
+  padding: 10px;
+  margin-bottom: 30%;
+  margin-top: 80px;
+}
+  
+.no-data-available {
+  color: #4A4A4A;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  letter-spacing: 0.96px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.img-center{
+  margin: auto;
+  width: 204px;
+}

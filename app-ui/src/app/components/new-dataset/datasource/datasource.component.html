@@ -1,0 +1,45 @@
+<div>
+
+  <div>
+    <div>Choose how you want to add a data source.</div>
+    <div>
+      <uxpl-toggle-text [selected]="data.type" [options]="dataSourceOptions" (uxplSelectionChanged)="changeDataSourceMethod($event)"></uxpl-toggle-text>
+    </div>
+  </div>
+
+  <div style="margin-top: 16px;">
+    <div *ngIf="data.type=='csv'">
+      <div *ngIf="files ; else loadingData">
+        <div *ngIf="files.length==0">
+          <div>
+            <div>
+              <div>File</div>
+              <csv-upload [filename]="dataSource.FileName" [filetypes]="'csv'" [filesize]="1000" (uploadFile)="onUploadFile($event)" size="big"></csv-upload>
+            </div>
+          </div>
+        
+          <div *ngIf="isError" class="datasource-error">
+            <uxpl-empty-state-system type="system error" [message]="errorMessage" [description]="errorDescription"></uxpl-empty-state-system>
+          </div>
+        </div>
+        <div *ngIf="files.length>0">
+          <csv-list [files]="files" [dataset]="data" [file]="file" (fileSelected)="selectCsvFile($event)" (uploadFile)="onUploadFile($event)" ></csv-list>
+        </div>
+      </div>
+      <ng-template #loadingData>
+        <div class="loading-indicator">
+          <uxpl-spinner style="height: 150px; min-width: 150px; max-width: 150px;" appearance="light"
+                        message="Loading files..."></uxpl-spinner>
+        </div>
+      </ng-template>
+    </div>
+
+    <div *ngIf="data.type=='tdv'">
+      <div>
+        <tdv-list [tdvs]="tdvViews" [selectedTdv]="data?.TdvView" (tdvSelected)="selectTdvView($event)" (refreshTdvs)="refreshTdvs()"></tdv-list>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>

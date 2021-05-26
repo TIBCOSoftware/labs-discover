@@ -2,9 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { DiscoverConfiguration } from 'src/app/models/configuration';
-import { stringify } from '@angular/compiler/src/util';
-import {MatDialog} from "@angular/material/dialog";
-import {MessageTopicService} from "@tibco-tcstk/tc-core-lib";
+import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
 
 @Component({
   templateUrl: './settings-analytics.component.html',
@@ -29,12 +27,13 @@ export class SettingsAnalyticsComponent implements OnInit {
     this.handleReset();
   }
 
+  /*
   ngAfterViewInit() {
     this.editor.getEditor().setOptions({
         enableBasicAutocompletion: true
     });
     this.editor.getEditor().setValue(this.getText());
-  }
+  }*/
 
   public handleSave = (): void => {
     if (!isEqual(this.discover, this.configService.config.discover)) {

@@ -1,0 +1,124 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Datasets ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is a dataset?",
+            "label": "What is a dataset?",
+            "title": "What is a dataset?",
+            "url": "assets/help/application/Datasets-What-Is.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Settings ...",
+            "label": "What types of data sources can I manage?",
+            "title": "What types of data sources can I manage?",
+            "url": "assets/help/application/Datasets-Datasources-Types.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What file formats are supported?",
+            "label": "What file formats are supported?",
+            "title": "What file formats are supported?",
+            "url": "assets/help/application/Datasets-Files-Formats.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What is the file size limit?",
+            "label": "What is the file size limit?",
+            "title": "What is the file size limit?",
+            "url": "assets/help/application/Datasets-Files-Size.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Why use TIBCO Data Virtualisation?",
+            "label": "Why use TIBCO Data Virtualisation?",
+            "title": "Why use TIBCO Data Virtualisation?",
+            "url": "assets/help/application/Datasets-Why-Use-TDV.html",
+            "content": "",
+            "default": "true"
+          }        ]
+      },
+      {
+        "type": "inline",
+        "name": "How do I ...",
+        "label": "How do I  ...",
+        "title": "How do I  ...",
+        "item": [
+
+          {
+            "type": "inline",
+            "name": "Create a new Dataset?",
+            "label": "Create a new Dataset?",
+            "title": "Create a new Dataset?",
+            "url": "assets/help/application/Datasets-How-Do-I-Create.html",
+            "content": "",
+            "default": "true"
+          },        
+          {
+            "type": "inline",
+            "name": "Edit a Dataset?",
+            "label": "Edit a Dataset?",
+            "title": "Edit a Dataset?",
+            "url": "assets/help/application/Datasets-How-Do-I-Edit.html",
+            "content": "",
+            "default": "true"
+          },        
+          {
+            "type": "inline",
+            "name": "Remove a Dataset?",
+            "label": "Remove a Dataset?",
+            "title": "Remove a Dataset?",
+            "url": "assets/help/application/Datasets-How-Do-I-Remove.html",
+            "content": "",
+            "default": "true"
+          },       
+          {
+            "type": "inline",
+            "name": "Preview a Dataset?",
+            "label": "Preview a Dataset?",
+            "title": "Preview a Dataset?",
+            "url": "assets/help/application/Datasets-How-Do-I-Preview.html",
+            "content": "",
+            "default": "true"
+          }        
+          ]
+      },    {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

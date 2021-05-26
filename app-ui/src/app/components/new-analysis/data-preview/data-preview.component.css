@@ -1,0 +1,67 @@
+:host {
+  height: 100%;
+}
+
+.data-preview-container {
+  display:flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%
+}
+
+.spotfire-viewer-container {
+  display:flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%
+}
+
+.map-panel {
+  width: 228px;
+  padding: 4px 16px;
+}
+
+.side-section {
+  display:flex;
+  flex-direction: column;
+  align-content: stretch;
+  background-color: #f4f4f4;
+}
+
+.section-top {
+  display:flex;
+  flex-direction: row;
+  margin-top: 15px;
+  justify-content: space-between;
+}
+
+.left-header {
+  margin-left: 16px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 27px;
+}
+
+.icon {
+  color: #1774E5;
+  margin-right: 18px;
+  right: 0px;
+}
+
+.icon:hover {
+  color: #005bcb;
+  cursor: pointer;
+}
+
+::ng-deep .tTip {
+  white-space: pre-line;
+  font-size: 16px;
+  color: #727272;
+  font-family: "Source Sans Pro";
+  letter-spacing: 0;
+  line-height: 18px;
+  text-align: center;
+}

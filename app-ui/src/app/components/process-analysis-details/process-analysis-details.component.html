@@ -1,88 +1,59 @@
 <mat-card class="cont-card" *ngIf="processAnalysis">
   <mat-card-header>
-    <mat-card-title>{{processAnalysis.Name}} ({{processAnalysis.state}})</mat-card-title>
-    <mat-card-subtitle>{{processAnalysis.Description}}</mat-card-subtitle>
+    <mat-card-title>{{processAnalysis.data.name}} ({{processAnalysis.metadata.state}})</mat-card-title>
+    <mat-card-subtitle>{{processAnalysis.data.description}}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <table style="width:100%;">
       <tr class="cell-row">
         <td class="cell-header-main">Created By</td>
-        <td class="cont-detail">{{processAnalysis.CreatedBy}}</td>
+        <td class="cont-detail">{{processAnalysis.metadata.createdBy}}</td>
         <td class="cont-space"></td>
         <td class="cell-header-main">Case ID</td>
-        <td class="cont-detail" *ngIf="processAnalysis.EventMap">{{processAnalysis.EventMap.case_id}}</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.caseId}}</td>
         <td class="cont-space"></td>
-        <td class="cell-header-main">Input Type</td>
-        <td class="cont-detail">{{processAnalysis.InputType}}</td>
+        <td class="cell-header-main">Start time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.startTime}}</td>
       </tr>
       <tr class="cell-row">
         <td class="cell-header-main">Created On</td>
-        <td class="cont-detail">{{processAnalysis.CreatedOn | date: 'short'}}</td>
+        <td class="cont-detail">{{processAnalysis.metadata.createdOn | date: 'short'}}</td>
         <td class="cont-space"></td>
         <td class="cell-header-main">Activity</td>
-        <td class="cont-detail" *ngIf="processAnalysis.EventMap">{{processAnalysis.EventMap.activity_id}}</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.activity}}</td>
         <td class="cont-space"></td>
-        <td class="cell-header-main">File Name</td>
-        <td class="cont-detail" *ngIf="processAnalysis.Datasource && processAnalysis.Datasource.File"><a *ngIf="processAnalysis.Datasource.File.FileName && processAnalysis.Datasource.File.FilePath" target="_blank" href="{{processAnalysis.Datasource.File.FilePath}}">{{processAnalysis.Datasource.File.FileName}}</a></td>
+        <td class="cell-header-main">End time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.endTime}}</td>
       </tr>
       <tr class="cell-row">
-        <td class="cell-header-main">Organization</td>
-        <td class="cont-detail">{{processAnalysis.Organisation}}</td>
+        <td class="cell-header-main">Template</td>
+        <td class="cont-detail">{{templateName}}</td>
         <td class="cont-space"></td>
         <td class="cell-header-main">Resource</td>
-        <td class="cont-detail" *ngIf="processAnalysis.EventMap">{{processAnalysis.EventMap.resource_id}}</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.resource}}</td>
         <td class="cont-space"></td>
-        <td class="cell-header-main">Date Time Format</td>
-        <td class="cont-detail" *ngIf="processAnalysis.Datasource.File?.DateTimeFormat">{{processAnalysis.Datasource.File.DateTimeFormat}}</td>
-        <td class="cont-detail" *ngIf="processAnalysis.Datasource.TDV?.DateTimeFormat">{{processAnalysis.Datasource.TDV.DateTimeFormat}}</td>
-        <td class="cont-space"></td>
+        <td class="cell-header-main">Scheduled start time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.scheduledStart}}</td>
       </tr>
       <tr class="cell-row">
         <td class="cell-header-main">ID</td>
-        <td class="cont-detail">{{processAnalysis.ID}}</td>
+        <td class="cont-detail">{{processAnalysis.id}}</td>
         <td class="cont-space"></td>
-        <td class="cell-header-main">Start Time</td>
-        <td class="cont-detail" *ngIf="processAnalysis.EventMap">{{processAnalysis.EventMap.activity_start_time}}</td>
+        <td class="cell-header-main">Department</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.resourceGroup}}</td>
         <td class="cont-space"></td>
-        <td class="cell-header-main">Encoding</td>
-        <td class="cont-detail" *ngIf="processAnalysis.Datasource && processAnalysis.Datasource.File">{{processAnalysis.Datasource.File.Encoding}}</td>
-        <td class="cont-space"></td>
+        <td class="cell-header-main">Scheduled end time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.scheduledEnd}}</td>
       </tr>
       <tr class="cell-row">
         <td class="cell-header-main"></td>
         <td class="cont-detail"></td>
         <td class="cont-space"></td>
-        <td class="cell-header-main"></td>
-        <td class="cont-detail"></td>
+        <td class="cell-header-main">Requester</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.requester}}</td>
         <td class="cont-space"></td>
-        <td class="cell-header-main"></td>
-        <td class="cont-detail"></td>
-        <td class="cont-space"></td>
-      </tr>
-      <tr class="cell-row">
-        <td class="cell-header-main">Case Ref</td>
-        <td class="cont-detail">{{processAnalysis.caseReference}}</td>
-        <td class="cont-space"></td>
-        <!-- TODO: Add in other fields
-        <td class="cell-header-main">Other Fields</td>
-        <td class="cont-detail" *ngIf="processAnalysis.EventMap">{{processAnalysis.EventMap.otherAttributes}}</td>-->
-        <td class="cell-header-main">End Time</td>
-        <td class="cont-detail" *ngIf="processAnalysis.EventMap">{{processAnalysis.EventMap.activity_end_time}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Separator</td>
-        <td class="cont-detail" *ngIf="processAnalysis.Datasource && processAnalysis.Datasource.File">{{processAnalysis.Datasource.File.Separator}}</td>
-        <td class="cont-space"></td>
-      </tr>
-      <tr class="cell-row">
-        <td class="cell-header-main"></td>
-        <td class="cont-detail"></td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main"></td>
-        <td class="cont-detail" ></td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Process Mining</td>
-        <td class="cont-detail" *ngIf="processAnalysis.ProcessMining" >{{processAnalysis.ProcessMining.Status}}({{processAnalysis.ProcessMining.Progress}}%): {{processAnalysis.ProcessMining.Message}}</td>
-        <td class="cont-space"></td>
+        <td class="cell-header-main">Other attributes</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.otherAttributes}}</td>
       </tr>
     </table>
   </mat-card-content>

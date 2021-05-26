@@ -1,0 +1,20 @@
+{
+  "name": "spotfire-mod-example",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "npm install && npm run server",
+    "server": "node development-server.js src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  },
+  "dependencies": {
+    "@types/cytoscape": "^3.14.4",
+    "cytoscape": "^3.15.1",
+    "cytoscape-panzoom": "^2.5.3"
+  }
+}

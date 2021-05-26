@@ -1,0 +1,10 @@
+<div class="admin-container">
+  <div class="admin-left-nav">
+      <uxpl-left-nav-multi #leftNav [tabs]="leftNavTabs" (selected)="handleClick($event)" collapse></uxpl-left-nav-multi>
+  </div>
+  <div class="admin-main">
+      <div class="tcs-admin-router-pane">
+          <router-outlet></router-outlet>
+      </div>
+  </div>
+</div>

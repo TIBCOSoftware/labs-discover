@@ -1,0 +1,17 @@
+
+<div class="action-confirm" id="discover-action-confirm">
+  <div *ngIf="!doable" class="list-used-templates">
+    <div class="popup-text">{{rejectMessage}}</div>
+    <div class="popup-row">
+      <uxpl-button (clicked)="cancelAction()">Ok</uxpl-button>
+    </div>
+  </div>
+
+  <div *ngIf="doable">
+    <div class="popup-text">{{confirmQuestion}}</div>
+    <div class="popup-row">
+      <uxpl-button type="no-border" (clicked)="cancelAction()">{{noBtnLabel}}</uxpl-button>
+      <uxpl-button type="cta" class="delete-button" (clicked)="continue()" [ngClass]="{'delete': type=='delete', 'cancel': type=='cancel'}" >{{yesBtnLabel}}</uxpl-button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+.parse-options-csv-container {
+  display: flex;
+  flex-direction: row;
+
+  .parse-options-csv-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .parse-options-csv-margin {
+    margin-left: 40px;
+  }
+
+  .field-margin {
+    margin-left: 16px;
+  }
+
+  .small-field-margin {
+    margin-left: 8px;;
+  }
+
+  .all-space {
+    justify-content: flex-start;
+  }
+  
+}
+
+
+

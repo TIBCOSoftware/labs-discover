@@ -1,0 +1,31 @@
+{
+    "apiVersion": "1.0",
+    "version": "1.0",
+    "name": "KPI mod",
+    "id": "spotfire-mod-kpi",
+    "icon": "icon.svg",
+    "externalResources": ["http://127.0.0.1"],
+    "properties": [
+        {
+            "name": "config",
+            "type": "string",
+            "defaultValue": "{}"
+        }
+    ],
+    "dataViewDefinition": {
+        "axes": [
+            {
+                "name": "Keys",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Values",
+                "mode": "continuous",
+                "placement": "none",
+                "allowMultipleMeasures": true
+            }
+        ]
+    },
+    "files": []
+}

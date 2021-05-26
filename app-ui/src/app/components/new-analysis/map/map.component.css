@@ -1,6 +1,13 @@
-.map-row {
+.map-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.map-column {
+  display: flex;
+  flex-direction: column;
 }
 
 .map-field {
@@ -9,6 +16,20 @@
 
 .map-field-margin {
   margin-left: 15px;
+}
+
+.map-section {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.map-preview-table {
+  overflow: hidden;
+  padding-left: 16px;
+  width: 100%;
 }
 
 .parse-options-csv-date-format {
@@ -37,7 +58,7 @@
   padding: 15px;
   border-radius: 6px;
   margin: 15px;
- 
+
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
@@ -55,4 +76,34 @@
 .table-element {
   padding: 1rem 1rem 1rem 0 !important;
   font-size: 12px;
+}
+
+.auto-map-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: -50px;
+}
+
+.auto-map-details:first-child > td {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.mapping-section {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.map-left-panel {
+  border-right-color: #DEDEDE;
+  border-right-width: 2px;
+  border-right-style: solid;
+  padding-right: 16px;
+  min-width: 300px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }

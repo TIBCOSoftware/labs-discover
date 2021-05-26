@@ -1,7 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { NewAnalysisDatasource, NewAnalysisParse, NewAnalysisMapping, NewAnalysisStepStatus } from '../../../models/discover';
+import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+import {NewAnalysisStepStatus} from '../../../models/discover';
 import {get} from 'lodash';
-import {ParsingService} from '../../../service/parsing.service';
+import {DatasetService} from 'src/app/service/dataset.service';
+import {forkJoin} from 'rxjs';
+import {ConfigurationService} from 'src/app/service/configuration.service';
+import {DiscoverBackendService} from 'src/app/service/discover-backend.service';
+import {Mapping} from 'src/app/model/mapping';
 
 @Component({
   selector: 'map',
@@ -10,57 +14,93 @@ import {ParsingService} from '../../../service/parsing.service';
 })
 export class MapComponent implements OnInit {
 
-  @Input() datasource: NewAnalysisDatasource;
-  @Input() parse: NewAnalysisParse;
-  @Input() data: NewAnalysisMapping;
-  @Input() columns: string[];
-  @Input() previewColumns: any[];
-  @Input() previewData: any[];
+  @Input() data: Mapping;
+  @Input() selectedDataset: string;
+  @Input() advancedMode: boolean
   @Output() status: EventEmitter<NewAnalysisStepStatus> = new EventEmitter();
+  @Output() advance: EventEmitter<boolean> = new EventEmitter();
 
-  public availableColumns: any[];
-  public dateOptions: string[] = [];
+  public previewColumns: string[];
+  public previewData: any;
+  public availableColumns: string[];
+  public previewOptions = [
+    {label: 'Full data', value: 'full-data'},
+    {label: 'Mapped data', value: 'mapped-data'}
+  ];
+  public previewValue: string = this.previewOptions[0].value;
+  public firstVisit: boolean;
 
-  constructor(protected parsingService: ParsingService) { }
+  constructor(
+    protected tcmdService: DatasetService,
+    protected configService: ConfigurationService,
+    protected backendService: DiscoverBackendService
+  ) {
+  }
 
   ngOnInit(): void {
-    this.updateStatus();
-    this.availableColumns = this.columns.map(element => { return {label: element, value: element}; });
+    this.firstVisit = Object.keys(this.data).length === 0 ? true : false;
+    const columns$ = this.backendService.getColumnsFromSpark(this.selectedDataset, this.configService.config.claims.globalSubcriptionId);
+    const preview$ = this.backendService.getPreviewFromSpark(this.selectedDataset, this.configService.config.claims.globalSubcriptionId);
+
+    forkJoin([columns$, preview$]).subscribe(results => {
+      this.availableColumns = results[0].map(column => column.COLUMN_NAME);
+      this.previewColumns = this.calculateColumns(this.availableColumns);
+      this.previewData = JSON.parse(results[1]);
+    });
   }
 
-  public handleSelection = ($event, field): void =>{
-    if (field === 'other'){
-      this.data[field] = $event.detail.map(element => element.value);
-    } else {
-      this.data[field] = $event.detail?.value;
-    }
-    this.updateStatus();
+  public clearMap = (): void => {
+    Object.keys(this.data).forEach(v => delete this.data[v]);
+    this.previewColumns = this.calculateColumns(this.previewValue === 'full-data' ? this.availableColumns : this.filterMappedColumns());
   }
 
-  private updateStatus = (): void => {
-    const status = this.data.caseId !== undefined && this.data.activity !== undefined && this.data.start !== undefined;
-    const stepStatus = {
-      step: 'map',
-      completed: status
-    } as NewAnalysisStepStatus;
-    this.status.emit(stepStatus);
+  private calculateColumns = (columns: string[]): any[] => {
+    return columns.map(column => {
+      const newColumn = {
+        headerName: column,
+        field: column,
+        sortable: false,
+        filter: false,
+        resizable: false
+      };
+      return newColumn;
+    })
+  }
+
+  public updateStatus = (event): void => {
+    this.status.emit(event);
+    this.previewColumns = this.calculateColumns(this.previewValue === 'full-data' ? this.availableColumns : this.filterMappedColumns());
   }
 
   public getObjectValue = (rowdata, column): string => {
-    let value = get(rowdata, column.field);
-    return value;
+    return get(rowdata, column.field);
   }
 
-  public handleUpdate = (event, fieldName) => {
-    this.parse[fieldName] = event.detail.value;;
+  public toggleAdvanced = (event): void => {
+    if (this.advancedMode !== event.detail.checked) {
+      this.advance.emit();
+    }
   }
 
-  public calculateOption = (field: string): any[] => {
-    const values = Object.values(this.data);
-    let options = this.availableColumns.filter(column => {
-      return !values.includes(column.value) || this.data[field]?.includes(column.value);
+  public isDisabledChangeVisualization = (): boolean => {
+    return false;
+  }
+
+  public handlePreviewColumns = (event): void => {
+    this.previewValue = event.detail.value;
+    this.previewColumns = this.calculateColumns(this.previewValue === 'full-data' ? this.availableColumns : this.filterMappedColumns());
+  }
+
+  private filterMappedColumns = (): string[] => {
+    const mappedColumns = []
+    Object.keys(this.data).forEach((element) => {
+      if (typeof (this.data[element]) === 'string') {
+        mappedColumns.push(this.data[element]);
+      }
     });
-    options.sort((a,b)=> a.label.toLowerCase().localeCompare(b.label.toLowerCase()) )
-    return options;
+    const columnsForTable = this.availableColumns.filter(el => {
+      return mappedColumns.indexOf(el) >= 0;
+    });
+    return columnsForTable;
   }
 }

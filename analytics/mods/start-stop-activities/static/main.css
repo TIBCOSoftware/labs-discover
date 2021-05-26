@@ -1,0 +1,53 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#board {
+    display: flex;
+    height:100%;
+    width: 100%;
+}
+/* 
+#board-content {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: nowrap;
+    align-content: flex-start;
+    justify-content: flex-start;
+    
+} */
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+    height: 100%;
+}
+
+.card {
+    margin: 6px 0 6px 6px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 1px 2px 1px rgb(0 0 0 / 6%);
+    padding: 12px 10px;
+}
+
+.header-card {
+    border-top: 2px solid rgb(2, 188, 212);
+} 

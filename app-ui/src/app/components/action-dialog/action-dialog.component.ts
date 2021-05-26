@@ -33,8 +33,8 @@ export class ActionDialogComponent implements OnInit {
     ngOnInit() {
         this.data.result = 'CANCEL';
         this.appId = this.data.appId;
-        this.sandboxId = this.data.sandboxId;  
-        this.actionId = this.data.actionId;      
+        this.sandboxId = this.data.sandboxId;
+        this.actionId = this.data.actionId;
         this.buttonText = this.data.label;
         this.caseRef = this.data.caseReference;
         this.ensureText = 'Are you sure ?';

@@ -1,0 +1,139 @@
+.file-upload-container {
+  &.big {
+    text-align: center;
+    .file-upload {
+      height: calc(90vh - 422px);
+      min-height: 300px;
+      display: inherit;
+      padding-top: 100px;
+      .upload-content {
+        .desc {
+          display: inline-block;
+        }
+      }
+    }
+  }
+  .file-upload {
+    padding: 16px;
+    border: 2px dashed #B6B6B6;
+    min-width: 340px;
+    width: 100%;
+    
+    display: flex;
+  
+    svg {
+      path {
+        fill: #E0E0E0;
+      }
+    }
+  
+    &:hover, &.fileover {
+      background-color: #F4FAFD;
+      border-color: #1774E5;
+      svg {
+        path {
+          fill: #1774E5;
+        }
+      }
+    }
+  
+    &.fileselected {
+      border: 1px solid #DEDEDE;
+      svg {
+        path {
+          fill: #727272;
+        }
+      }
+    }
+  
+    &.error {
+      border: 1px dashed #DB0000;
+      svg {
+        path {
+          fill: #E0E0E0;
+        }
+      }
+    }
+  
+    .upload-content {
+      margin-left: 16px;
+      height: 27px;
+      font-family: "Source Sans Pro";
+      font-size: 18px;
+      letter-spacing: 0;
+      line-height: 27px;
+  
+      #fileDropRef {
+        display: none;
+      }
+  
+      .desc {
+        color: #727272;
+        // width: 200px;
+      }
+  
+      .file-input-label {
+        color: #1774E5;
+        font-weight: 600;
+        cursor: pointer;
+      }
+  
+      .filename {
+        height: 24px;
+        color: #212121;
+        font-size: 16px;
+        line-height: 24px;
+        color: #727272;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 200px;
+      }
+  
+      .changefile {
+        height: 21px;
+        color: #1774E5;
+        font-size: 14px;
+        line-height: 21px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .loading-indicator {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .error-msg {
+    display: flex;
+    margin-top: 8px;
+  
+    .error-icon {
+      margin-top: 2px;
+    }
+  
+    .error-text {
+      margin-left: 10px;
+      height: 24px;
+      color: #212121;
+      font-family: "Source Sans Pro";
+      font-size: 16px;
+      letter-spacing: 0;
+      line-height: 24px;
+  
+      .error-title {
+        font-weight: bold;
+      }
+    }
+  }
+  
+  ::ng-deep .filenameTooltip {
+    word-break: break-all !important;
+    white-space: normal !important;
+  }
+}
+
+
+

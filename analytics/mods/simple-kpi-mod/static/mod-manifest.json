@@ -1,0 +1,25 @@
+{
+    "apiVersion": "1.0",
+    "version": "1.0",
+    "name": "Simple KPI Chart",
+    "id": "simple-kpi-mod",
+    "externalResources": [],
+    "icon": "icon.svg",
+    "properties": [],
+    "dataViewDefinition": {
+        "axes": [
+            {
+                "name": "Key",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Value",
+                "mode": "continuous",
+                "placement": "none",
+                "allowMultipleMeasures": true
+            }
+        ]
+    },
+    "files": []
+}

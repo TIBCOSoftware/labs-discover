@@ -15,10 +15,6 @@
   line-height: 21px;
   text-align: left;
 }
-.cont-detail:hover {
-  color: #0081cb;
-  cursor: nw-resize;
-}
 
 .cont-space{
   width: 5px;

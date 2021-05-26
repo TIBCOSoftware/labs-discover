@@ -1,18 +1,84 @@
-  .map-row {
-    display: flex;
-    flex-direction: row;
-    min-height: 47px;
-    height: 47px;
-  }
+.map-row {
+  display: flex;
+  flex-direction: row;
+  min-height: 47px;
+  height: 47px;
+}
 
-  .map-field {
-    flex: 1 1 0%;
-  }
+.map-field {
+  flex: 1 1 0%;
+}
 
-  .map-field-margin {
-    margin-left: 15px;
-  }
+.map-field-margin {
+  margin-left: 15px;
+}
 
-  uxpl-form-field {
-    height: 30px;
-  }
+uxpl-form-field {
+  height: 30px;
+}
+
+.analysis-confirmation-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  /*height: 100%;*/
+}
+
+.analysis-left {
+  padding-left: 25px;
+  width: 30%;
+}
+
+.analysis-right {
+  width: 60%;
+}
+
+.item-header {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+
+.header-location {
+  vertical-align: top;
+  width: 110px;
+}
+
+.spec-title {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.item-detail {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  /*max-width: 200px;*/
+  word-break: break-word;
+}
+
+.detail-table {
+  border-collapse: separate;
+  border-spacing: 0 18px;
+}
+
+.detail-row {
+  /*padding-top: 18px;*/
+}
+
+.middle-divider {
+  border: 1px solid #DEDEDE; /*  background-color: #DEDEDE; */
+  width: 1px;
+  margin-left: 48px;
+  margin-right: 48px;
+}

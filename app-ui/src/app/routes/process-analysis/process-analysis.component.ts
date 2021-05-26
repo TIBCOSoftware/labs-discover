@@ -1,17 +1,13 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { ConfigurationService } from '../../service/configuration.service';
-import { LiveAppsService, CaseInfoList, CaseInfo, TcCaseProcessesService, CaseActionsList } from '@tibco-tcstk/tc-liveapps-lib';
-import {delay, flatMap, map, retryWhen, take} from 'rxjs/operators';
-import { Datasource, NewAnalysis } from '../../models/discover';
-import { DatasourceService } from '../../service/datasource.service';
+import { concatMap, delay, filter, map, repeatWhen, take } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { WizardComponent } from 'src/app/components/new-analysis/wizard/wizard.component';
 import { MatDialog } from '@angular/material/dialog';
-import { forkJoin } from 'rxjs';
-import { MessageTopicService } from '@tibco-tcstk/tc-core-lib';
-import { ActionDialogComponent } from '../../components/action-dialog/action-dialog.component';
-import {CaseCacheService} from "../../service/custom-case-cache.service";
-import { DatePipe } from '@angular/common';
+import { MessageTopicService, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
+import { DatePipe, Location } from '@angular/common';
+import { NoFormComponent } from '../../components/forms/no-form/no-form.component';
+import { RepositoryService } from 'src/app/api/repository.service';
+import { Observable } from 'rxjs';
+import { Analysis } from 'src/app/model/analysis';
 
 @Component({
   selector: 'app-process-analysis',
@@ -21,28 +17,25 @@ import { DatePipe } from '@angular/common';
 export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
 
   private REFRESH_DELAY_MS = 1000;
-  private actionFilter = ['$'];
 
-  public cases: any[];
-  public search: string = '';
-  public caseActions: Map<string, any>;
-  public showTable = false;
-  //cases && cases.length === 0
-  // cases && cases.length > 0
+  public cases: any[] = [];
+  public search = '';
+  public loading = false;
+
+  public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
+
+  public statusMap: {[key: string]: any} = {};
 
   constructor(
-    protected configService: ConfigurationService,
-    protected liveapps: LiveAppsService,
-    protected datasource: DatasourceService,
     protected router: Router,
-    protected caseProcessesService: TcCaseProcessesService,
     protected messageService: MessageTopicService,
     protected dialog: MatDialog,
     protected datePipe: DatePipe,
-    /* TODO: Use Case Cache and ActionCache protected caseCache: CaseCacheService*/) { }
+    protected location: Location,
+    protected repositoryService: RepositoryService
+  ) {}
 
   ngOnInit(): void {
-    this.caseActions = new Map<string, any>();
   }
 
   ngAfterViewInit(): void {
@@ -50,93 +43,91 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
   }
 
   public refresh = (): void => {
-    this.showTable = false;
-    this.cases = [];
-    this.caseActions.clear();
-    this.liveapps.getCasesWithUserInfo(this.configService.config.sandboxId, this.configService.config.discover.analysis.applicationId, '1', 0, 100).pipe(
-      flatMap((caseList: CaseInfoList) => {
-        const validCases = caseList.caseinfos.
-          filter(el => el.untaggedCasedataObj.state !== 'Completed').
-          sort((a, b) => (a.untaggedCasedataObj.AnalysisID > b.untaggedCasedataObj.AnalysisID) ? 1 : ((b.untaggedCasedataObj.AnalysisID > a.untaggedCasedataObj.AnalysisID) ? -1 : 0));
-
-        this.cases = validCases.map(element => {
-          let newElement = element.untaggedCasedataObj
-          newElement.caseReference = element.caseReference;
-          newElement.CreatedBy = element.metadata.createdByDetails.firstName + ' ' + element.metadata.createdByDetails.lastName;
-          newElement.CreatedOn = this.datePipe.transform(element.metadata.creationTimestamp, 'fullDate');
-          newElement.ModifiedBy = element.metadata.modifiedByDetails.firstName + ' ' + element.metadata.modifiedByDetails.lastName;
-          newElement.ModifiedOn = this.datePipe.transform(element.metadata.modificationTimestamp, 'fullDate');
-          return newElement;
-        });
-        this.showTable = true;
-        const caseRefs$ = validCases.map(element => this.caseProcessesService.getCaseActionsForCaseRef(element.caseReference, this.configService.config.sandboxId, this.configService.config.discover.analysis.applicationId, '1'));
-        return forkJoin(caseRefs$).pipe(
-          map( caseactionsResponse => {
-            caseactionsResponse.forEach((caseActions, index) => {
-              const caseReference = validCases[index].caseReference;
-              let filteredCaseActions = [];
-              if (this.actionFilter) {
-                caseActions.actions = caseActions.actions.filter(act => {
-                  // check if it matches any of the actionFilters
-                  let test = true;
-                  this.actionFilter.forEach(actfilter => {
-                    if (test && act.label.substr(0, actfilter.length) === actfilter) {
-                      test = false;
-                    }
-                  });
-                  return test;
-                });
-              }
-              filteredCaseActions = caseActions.actions;
-              this.caseActions.set(caseReference, filteredCaseActions);
-            })
-          })
-        );
+    this.loading = true;
+    this.repositoryService.getAnalysis().pipe(
+      map(analysisList => {
+        this.cases = analysisList.filter(el => el.metadata.state !== 'Completed').sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
+        if (this.cases.length > 0) {
+          // start progress query for those who doesn't have status yet
+          this.startPollingStatus();
+        }
       })
     ).subscribe(
-      null,
-      error => {
-        console.log("***** error " + error.error.errorMsg);
-      }
+      success => {this.loading = false},
+      error => {this.loading = false}
     );
   }
 
-  public handleClick = (caseReference): void => {
-    const selectedCase = this.cases.filter(c => c.caseReference === caseReference)[0];
-    var datasource: Datasource = {
-      datasourceId: selectedCase.ID,
-      description: selectedCase.Description,
-      caseRef: selectedCase.caseReference,
-      idDefinition: '',
-      addSuffix: (selectedCase.Spotfire && selectedCase.Spotfire.AddSuffix_1 === 'Yes' ? true : false),
-      analysisName: selectedCase.Name,
-      analysisDescription: selectedCase.Description,
-      analysisCreatedBy: selectedCase.CreatedBy,
-      analysisCreatedOn: selectedCase.CreatedOn
-    };
-    this.datasource.setDatasource(datasource);
+  private startPollingStatus() {
+    this.stopPollingStatus();
 
-    this.datasource.setCurrentDatasource(datasource).pipe(
-      map(_ => {
-        this.router.navigate(['/discover/analytics']);
-      })
-    ).subscribe();
+    for (let i = 0; i < this.cases.length; i ++) {
+      const analysis = this.cases[i];
+      const analysisId = analysis.id;
+      if (analysis.metadata && analysis.metadata.state == 'Process mining') {
+        const progress = {
+          message: 'Process mining',
+          stop: false
+        };
+        this.pollAnalysisStatus(analysisId, progress).subscribe(
+          resp => {
+            if (resp.metadata && resp.metadata.state) {
+              analysis.metadata = Object.assign({}, resp.metadata);
+              analysis.actions = resp.actions;
+              progress.stop = true;
+              this.statusMap[analysisId] = null;
+            } else {
+              // stopped by setting progress.stop = true
+              progress.message = 'Stopped';
+            }
+          }
+        );
+        this.statusMap[analysisId] = progress;
+      }
+    }
   }
 
-  public newAnalysisDialog = (analysisData?: NewAnalysis, caseReference?: string, actionId?: string): void => {
-    const dialogRef = this.dialog.open(WizardComponent, {
-      width: '100%',
-      height: '90%',
-      data: {
-        analysisData: analysisData,
-        actionId: actionId,
-        caseReference: caseReference
-      }
-    });
+  private pollAnalysisStatus(analysisId: string, progress: any): Observable<Analysis> {
+    return this.repositoryService.repositoryAnalysisIdStatusGet(analysisId).pipe(
+      repeatWhen(obs => obs.pipe(delay(2000))),
+      filter(data => {
+        if (data.progression != 0) {
+          progress.percentage = data.progression;
+          progress.status = data.message;
+        }
+        return progress.stop == true || (data.progression != null && data.progression == 100)
+      }),
+      take(1)
+    ).pipe(
+      concatMap(resp => {
+        return this.repositoryService.getAnalysisDetails(analysisId).pipe(
+          repeatWhen(obs => obs.pipe(delay(1000))),
+          filter(data => (progress.stop == true || data.metadata.state != 'Process mining')),
+          take(1)
+        );
+      })
+    );
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      this.messageService.sendMessage('integratedHelp', 'discover/process-analysis');
-    });
+  private stopPollingStatus() {
+    for(const analysisId in this.statusMap) {
+      if (this.statusMap[analysisId]) {
+        this.statusMap[analysisId].stop = true;
+      }
+    }
+    this.statusMap = {};
+  }
+
+  public openAnalytics = (id: string): void => {
+    this.router.navigate(['/discover/analytics', id]);
+  }
+
+  public showNewAnalysis = (): void => {
+    this.router.navigate(['/discover/new-analysis']);
+  }
+
+  public showTemplates = (): void => {
+    this.router.navigate(['/discover/templates']);
   }
 
   public handleSearch = ($event): void => {
@@ -144,76 +135,47 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
   }
 
   public handleActionSelected = (event): void => {
-    if (event.label === 'Edit') {
-      this.liveapps.getCaseByRef(this.configService.config.sandboxId, event.caseReference).pipe(
-        map(data => {
-            console.log("***** Case: ", data);
-            this.newAnalysisDialog(data.untaggedCasedataObj, event.caseReference, event.actionId);
-          }
-        )
-      ).subscribe()
-    } else {
-      const processID = event.actionId;
-      console.log('Process ID: ', processID);
-      if (processID != '') {
-        if (!event.noData) {
-          console.log('Opening Dialog');
-          const dialogRef = this.dialog.open(ActionDialogComponent, {
-            width: '70%',
-            height: '70%',
-            maxWidth: '100vw',
-            maxHeight: '100vh',
-            panelClass: 'tcs-style-dialog',
-            data: {
-              ...event,
-              appId: this.configService.config.discover.analysis.applicationId,
-              sandboxId: this.configService.config.sandboxId,
-            }
-          });
-          dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-              this.messageService.sendMessage('news-banner.topic.message', event.label + ' successful...');
-              window.setTimeout(() => {
-                this.refresh();
-                }, this.REFRESH_DELAY_MS);
-              /*this.refreshCasesAfterSubmit(caseRef);*/
-            } else {
-              console.log('Dialog Single Action Cancelled...');
-            }
-          });
-        } else {
-          console.log('Running Process... ');
-          this.liveapps.runProcess(this.configService.config.sandboxId, this.configService.config.discover.analysis.applicationId, processID, event.caseReference, {}).pipe(
-            // retry(3),
-            retryWhen(errors => {
-              return errors.pipe(
-                delay(2000),
-                take(3)
-              );
-            }),
-            take(1)
-          ).subscribe(response => {
-              console.log('Got Response: ', response);
-              if (response) {
-                if (!response.data.errorMsg) {
-                  response.data = JSON.parse(response.data);
-                  this.messageService.sendMessage('news-banner.topic.message', event.label + ' successful...');
-                  window.setTimeout(() => {
-                    this.refresh();
-                  }, this.REFRESH_DELAY_MS);
-                  //this.refreshCasesAfterSubmit(caseRef);
-                } else {
-                  console.error('Unable to run the action');
-                  console.error(response.data.errorMsg);
-                }
-              }
-            }, error => {
-              console.error('Unable to run the action');
-              console.error(error);
-            }
-          );
+    console.log('handleActionSelected: ', event);
+    if (event.name === 'Rerun') {
+      // Send message to clear SF report
+      this.messageService.sendMessage('clear-analytic.topic.message', 'OK');
+    }
+    if (event.name === 'Edit') {
+      this.router.navigate(['/discover/edit-analysis', event.analysisId]);
+    } else if (event.name === 'change-template') {
+      this.router.navigate(['/discover/select-template', event.analysisId]);
+    } else if (event.name === 'Purge') {
+      // Default dialog
+      const dialogRef = this.dialog.open(NoFormComponent, {
+        width: '500px',
+        height: '300px',
+        maxWidth: '100vw',
+        maxHeight: '100vh',
+        panelClass: 'tcs-style-dialog',
+        data: {
+          ...event,
+          title: event.name,
         }
-      }
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          this.messageService.sendMessage('news-banner.topic.message', event.name + ' successful...');
+          window.setTimeout(() => {
+            this.refresh();
+          }, this.REFRESH_DELAY_MS);
+        } else {
+          console.log('Dialog Single Action Cancelled...');
+        }
+      });
+    } else {
+      this.repositoryService.runAnalysisAction(event.analysisId, event.action).subscribe(
+        res => {
+          this.refresh();
+          this.messageService.sendMessage('news-banner.topic.message', event.name + ' successful...');
+        },
+        err => this.messageService.sendMessage('news-banner.topic.message', event.name + ' error...')
+      );
     }
   }
 }

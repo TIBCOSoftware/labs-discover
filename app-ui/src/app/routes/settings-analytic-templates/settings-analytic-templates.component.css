@@ -1,0 +1,13 @@
+.settings-main {
+  margin-right: 24px;
+}
+
+.settings-container {
+  overflow: hidden;
+}
+
+.settings-container {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 156px);
+}

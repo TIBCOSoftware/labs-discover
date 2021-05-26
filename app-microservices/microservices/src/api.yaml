@@ -1,0 +1,1021 @@
+openapi: 3.0.1
+info:
+  title: TIBCO Discover public API
+  description: TIBCO Discover public API
+  license:
+    name: TIBCO
+    url: http://tibco.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Discover app
+  url: https://www.tibco.com/solutions/process-mining-solutions
+servers:
+  - url: https://discover.cloud.tibco.com
+    description: The remote api servers
+  - url: https://discover.labs.tibcocloud.com
+    description: The production api server
+  - url: /catalog
+    description: The local api server
+security:
+  - bearerAuth: []
+tags:
+  - name: Catalog
+    description: The datasets API to create, update, delete dataset for Discover app.
+  - name: Repository
+    description: The analysis API to create, update, delete analysis for Discover app.
+  - name: Visualisation
+    description: The templates API to create, update, delete templates for Discover app.
+  - name: Configuration
+    description: The configuration API to create, update, delete configuration for Discover app.
+paths:
+  /catalog/datasets:
+    get:
+      tags:
+        - Catalog
+      description: Get all linked dataset from the tcmd discover app
+      summary: Get All Datasets of Discover Application
+      responses:
+        '200':
+          description: Returns all the datasets that associated with the TIBCO CLOUD Discover web application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetArray'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  /catalog/dataset/{id}:
+    get:
+      tags:
+        - Catalog
+      description: Get the dataset details by a given dataset id.
+      summary: Get dataset details.
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the dataset detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetDetail'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: Record not found.
+    delete:
+      tags:
+        - Catalog
+      description: Delete dataset of given id.
+      summary: Delete dataset.
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Record deleted.
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+    put:
+      tags:
+        - Catalog
+      description: Update dataset.
+      summary: Update dataset after it is created
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/DatasetDetail'
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing or the dataset id in payload is different with the id in path parameter
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  /catalog/dataset/exist:
+    post:
+      tags:
+        - Catalog
+      description: Check whether the dataset is existing with name and id. If id is present in payload then check whether there is a dataset with the same name of different dataset id other than the specified one.
+      summary: Check whether the dataset is existing with name and id. 
+      requestBody:
+        description: The name and id
+        content:
+          "application/json": 
+            schema: 
+              $ref: '#/components/schemas/CheckExist'
+      responses:
+        '200':
+          description: Returns the dataset detail.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/CheckExistResult'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  /catalog/dataset:
+    post:
+      tags:
+        - Catalog
+      description: Create a new dataset
+      summary: Create a new dataset
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/DatasetDetail'
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '409':
+          description: The dataset of the name is already exist.
+  /catalog/status:
+    post:
+      tags:
+        - Catalog
+      description: The api for process mining backend to send the real time status to dataset.
+      summary: Save dataset preview status
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/PreviewStatus'
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '409':
+          description: The dataset of the name is already exist.
+  /catalog/status/{id}:
+    get:
+      tags:
+        - Catalog
+      description: The api for process mining backend to send the real time status to dataset.
+      summary: Save dataset preview status
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/PreviewStatus'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: The dataset of the id is not found.
+  /repository/analysis:
+    get:
+      description: Get all analysis.
+      tags: [Repository]
+      summary: Get all analysis for TIBCO Labs Discover.
+      operationId: getAnalysis
+      responses:
+        200:
+          description: Returns all analysis.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Analysis'
+        400:
+          description: Bad request. The auth token is missing
+    post:
+      description: Create a new analysis.
+      tags: [Repository]
+      summary: Create a new analysis.
+      operationId: createAnalysis
+      requestBody:
+          description: The analysis data to create.
+          content: 
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/AnalysisRequest'
+      responses:
+        200:
+          description: Analysis is created succesfully.
+        401:
+          description: Bad request. The auth token is missing
+  '/repository/analysis/{name}':
+    get:
+      description: Get an analysis.
+      tags: [Repository]
+      summary: Get a analysis for TIBCO Labs Discover.
+      operationId: getAnalysisDetails
+      parameters:
+        - name: 'name'
+          in: 'path'
+          description: Analysis name to get.
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Returns an analysis.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Analysis"
+        400:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+    put:
+      description: Update an analysis.
+      tags: [Repository]
+      summary: Update an analysis for TIBCO Labs Discover.
+      operationId: updateAnalysis
+      parameters:
+        - name: name
+          in: path
+          description: Analysis name to update.
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        description: The analysis to update.
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/AnalysisRequest'
+      responses:
+        200:
+          description: Update an analysis.
+        401:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+    delete:
+      description: Delete an analysis.
+      tags: [Repository]
+      summary: Delete an analysis for TIBCO Labs Discover.
+      operationId: deleteAnalysis
+      parameters:
+        - name: name
+          in: path
+          description: Analysis name to delete.
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Delete a analysis.
+        401:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+  '/repository/analysis/{name}/template/{template}':
+    post:
+      description: Assign a template to an analysis.
+      tags: [Repository]
+      summary: Assign a template to an analysis.
+      operationId: setAnalysisTemplate
+      parameters:
+        - name: name
+          in: path
+          description: Analysis name to delete.
+          required: true
+          schema:
+            type: "string"
+        - name: template
+          in: path
+          description: Template to be assigned to the analysis.
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Delete a analysis.
+        401:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+  '/repository/analysis/{name}/action/{action}':
+    post:
+      description: Execute an action for an analysis.
+      tags: [Repository]
+      summary: Execute an action for an analysis.
+      operationId: runAnalysisAction
+      parameters:
+        - name: name
+          in: path
+          description: Analysis name to delete.
+          required: true
+          schema:
+            type: "string"
+        - name: action
+          in: path
+          description: Action to be executed.
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Delete a analysis.
+        401:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+  /repository/analysis/{id}/status:
+    get:
+      description: Returns the status the analysis is.
+      tags: [Repository]
+      summary: Returns the status the analysis is.
+      parameters:
+        - name: 'id'
+          in: 'path'
+          description: Analysis id to update.
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Returns an analysis status.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisStatus"
+        400:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+    post:
+      description: Report the spark job asociated to the current analysis.
+      tags: [Repository]
+      summary: Report the status for the proces mining jobspark job asociated to the current analysis.
+      operationId: reportStatusForAnalysis
+      parameters:
+        - name: 'id'
+          in: 'path'
+          description: Analysis id to update.
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+          description: The analysis data to create.
+          content: 
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/AnalysisStatus'
+      responses:
+        200:
+          description: The analysis status is reported succesfully.
+        401:
+          description: Bad request. The auth token is missing
+  /visualisation/templates:
+    get:
+      description: Get all templates.
+      tags: [Visualisation]
+      summary: Get all templates for TIBCO Labs Discover.
+      operationId: getTemplates
+      responses:
+        200:
+          description: Returns all templates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Template'
+        400:
+          description: Bad request. The auth token is missing
+    post:
+      description: Create a new template.
+      tags: [Visualisation]
+      summary: Create a new template.
+      operationId: createTemplate
+      requestBody:
+        description: The template to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Template'
+      responses:
+        200:
+          description: Template is created succesfully.
+        400:
+          description: Bad request. The auth token is missing
+  /visualisation/templates/{id}:
+    get:
+      description: Get a template.
+      tags: [Visualisation]
+      summary: Get a template for TIBCO Labs Discover.
+      operationId: getTemplate
+      parameters:
+        - name: id
+          in: path
+          description: Template unique identifier.
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Returns a template.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Template"
+        400:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+    put:
+      description: Update a template.
+      tags: [Visualisation]
+      summary: Update a template for TIBCO Labs Discover.
+      operationId: updateTemplate
+      parameters:
+        - name: id
+          in: path
+          description: Template unique identifier.
+          required: true
+          schema:
+            type: number
+      requestBody:
+        description: The template to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Template'
+      responses:
+        200:
+          description: Update a template.
+        400:
+          description: Bad request. The auth token is missing
+        404:
+          description: Template not found.
+    delete:
+      description: Delete a template.
+      tags: [Visualisation]
+      summary: Delete a template for TIBCO Labs Discover.
+      operationId: deleteTemplate
+      parameters:
+        - name: id
+          in: path
+          description: Template unique identifier.
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: Delete a template.
+        400:
+          description: Bad request. The auth token is missing
+        404:
+          description: Record not found.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: CIC oauth token
+  schemas:
+    Dataset:
+      type: object
+      properties:
+        datasetid:
+          type: string
+          description: The dataset id assigned by Process mining process.
+        name:
+          type: string
+          description: The name of the dataset
+        fileName:
+          type: string
+          description: The csv file name.
+        description:
+          type: string
+          description: The dataset description.
+        createdDate:
+          type: integer
+          description: The dataset created datetime.
+        status:
+          type: string
+          description: The final status of dataset preview which is returned by process mining.
+          example: COMPLETED
+        lastPreviewDate:
+          type: integer
+          description: The datetime of last data preview. 
+    DatasetArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Dataset'
+    DatasetDetail:
+      type: object
+      properties:
+        Dataset_Id:
+          type: string
+          description: The dataset id.
+        Dataset_Name:
+          type: string
+          description: The name of the dataset
+        Dataset_Description:
+          type: string
+          description: The description of the dataset
+        schema:
+          type: array
+          description: The columns of the csv file
+          items:
+            $ref: '#/components/schemas/Schema'
+        Dataset_Source:
+          type: object
+          description: The dataset source properties.
+          $ref: '#/components/schemas/DatasetSource'
+        createdDate:
+          type: integer
+          description: The dataset created datetime.
+        updatedDate:
+          type: integer
+          description: The dateset updated datetime.
+        status:
+          type: string
+          description: The final data preview status
+        lastPreviewDate:
+          type: integer
+          description: The last data preview datetime.
+        PublishedView:
+          type: string
+          description: The published view data source path.
+        previewStatus:
+          type: object
+          description: The latest preview status received from process minning
+          $ref: '#/components/schemas/PreviewStatus'
+    DatasetSource:
+      type: object
+      properties:
+        Encoding:
+          type: string
+          description: The charset encoding of the data source file
+          example: utf-8
+        FileEscapeChar:
+          type: string
+          description: The escape char of the data source file
+        FileName:
+          type: string
+          description: The file name of the data source csv file.
+        FileQuoteChar:
+          type: string
+          description: The quote char of the data source file
+        FileSeparator:
+          type: string
+          description: The separator char to parse the data source file.
+        FileHeaders:
+          type: boolean
+          description: Whether the data source csv file has column headers
+        MainAssetId:
+          type: integer
+          description: The preferred asset id in TIBCO Cloud Metadata
+        FilePath:
+          type: string
+          description: The S3 url of data source file
+        DatasourceType:
+          type: string
+          description: The data source type
+          example: File-Delimited
+        System:
+          type: string
+          description: The value to distinguish the application that dataset belongs to
+          example: '10000'
+        InstanceId:
+          type: integer
+          description: The id of the TIBCO Cloud Metadata instance
+        Infrastructure:
+          type: integer
+          description: The infrastructure id in TIBCO Cloud Metadata.
+      required:
+        - Encoding
+    Schema:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The column header name of the csv file.
+        type:
+          type: string
+          description: The value type of the column, such timestamp, numeric, string, int
+          example: timestamp
+        format:
+          type: string
+          description: The timestamp format of the value. It's 'None' if the type is not timestamp
+          example: mm/dd/yyyy HH:MM
+        featureType:
+          type: string
+          description: The feature type. It's None if no featureType is set.
+        importance:
+          type: string
+          description: The property to describe how important the column is in process mining
+          example: Low
+        id:
+          type: integer
+          description: The asset id of the column in TIBCO Cloud Metadata.
+    PreviewStatus:
+      type: object
+      properties:
+        Organisation:
+          type: string
+          description: The orgId which is the subscription id in CIC.
+        JobName:
+          type: string
+          description: The spark job name
+        DatasetID:
+          type: string
+          description: The dataset id.
+        Message:
+          type: string
+          description: The Message describing the process mining status.
+        Level:
+          type: string
+          description: The log level
+          example: INFO
+        Progression:
+          type: integer
+          description: The progress of preview. It's a number from 0 to 100. 0 means error. 100 means the preview process is completed.
+        TimeStamp:
+          type: integer
+          description: The timestamp of the status.
+    CheckExist:
+      type: object
+      properties:
+        Dataset_Id:
+          type: string
+          description: The dataset id
+        Dataset_Name:
+          type: string
+          description: The dataset name
+      required:
+        - "Dataset_Id"
+    CheckExistResult:
+      type: object
+      properties:
+        exist:
+          type: boolean
+          description: It's true is the dataset of the name is found, otherwise return false. 
+    DatasetUpdated:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The status returned from Redis server
+        datasetId:
+          type: string
+          description: The dataset id.
+    Analysis:
+      type: object
+      properties:
+        data: 
+          $ref: "#/components/schemas/AnalysisData"
+        metadata: 
+          $ref: "#/components/schemas/Metadata"
+        actions:
+          type: array
+          items: 
+            $ref: "#/components/schemas/Actions"
+      required:
+        - data
+        - metadata
+        - actions
+    AnalysisData:
+      type: object
+      properties:
+        ID: 
+          description: TBD
+          type: string
+          example: PAM-000003
+        Name: 
+          description: TBD
+          type: string
+          example: 
+        Description:
+          description: TBD
+          type: string
+          example: 
+        Dataset:
+          description: TBD
+          type: string
+          example: 
+        Template:
+          description: TBD
+          type: string
+          example: 
+        State:
+          description: TBD
+          type: string
+          example: 
+        Mapping:
+          $ref: "#/components/schemas/Mapping"
+        Filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/TypeValue"
+        Groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/TypeValue"
+      required:
+        - Name
+        - Description
+        - Dataset
+        - Mapping
+    AnalysisRequest:
+      type: object
+      properties:
+        Name: 
+          description: TBD
+          type: string
+          example: 
+        Description:
+          description: TBD
+          type: string
+          example: 
+        Dataset:
+          description: TBD
+          type: string
+          example: 
+        Mapping:
+          $ref: "#/components/schemas/Mapping"
+        Filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/TypeValue"
+        Groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/TypeValue"
+      required:
+        - Name
+        - Description
+        - Dataset
+        - Mapping
+    TypeValue:
+      type: object
+      properties:
+        Name: 
+          description: TBD
+          type: string
+        Description:
+          description: TBD
+          type: string
+        Type:
+          description: TBD
+          type: string
+        Value: 
+          description: TBD
+          type: array
+          items:
+            type: string
+        IncludeEmpty: 
+          description: TBD
+          type: boolean
+      required:
+        - Type
+        - Value
+    Mapping:
+      type: object
+      properties:
+        CaseID: 
+          description: TBD
+          type: string
+          example: PAM-000003
+        Activity: 
+          description: TBD
+          type: string
+          example: 
+        Starttime:
+          description: TBD
+          type: string
+          example: 
+        Endtime:
+          description: TBD
+          type: string
+          example: 
+        Scheduledstart:
+          description: TBD
+          type: string
+          example: 
+        Scheduledend:
+          description: TBD
+          type: string
+          example: 
+        Requester:
+          description: TBD
+          type: string
+          example: 
+        Resource:
+          description: TBD
+          type: string
+          example: 
+        Resourcegroup:
+          description: TBD
+          type: string
+          example: 
+        Otherattributes:
+          description: TBD
+          type: boolean
+          example: 
+      required:
+        - CaseID
+        - Activity
+        - Starttime
+    Actions:
+      type: object
+      properties:
+        id: 
+          description: TBD
+          type: string
+          example: 
+        label: 
+          description: TBD
+          type: string
+          example: 
+    AnalysisStatus:
+      type: object
+      properties:
+        Organisation: 
+          description: TBD
+          type: string
+          example:
+        JobName:
+          description: TBD
+          type: string
+          example:
+        AnalysisID:
+          description: TBD
+          type: string
+          example:
+        CaseRef:
+          description: TBD
+          type: string
+          example:
+        Message:
+          description: TBD
+          type: string
+          example:
+        Level:  
+          description: TBD
+          type: string
+          enum:
+            - ERROR
+            - INFO
+          example:
+        Progression:
+          description: TBD
+          type: number
+          example:
+        TimeStamp: 
+          description: TBD
+          type: string
+          example:
+    Metadata:
+      type: object
+      properties:
+        createdBy: 
+          description: TBD
+          type: string
+          example: 
+        createdOn: 
+          description: TBD
+          type: string
+          example: 
+        modifiedBy: 
+          description: TBD
+          type: string
+          example: 
+        modifiedOn: 
+          description: TBD
+          type: string
+          example: 
+    Template:
+      type: object
+      properties:
+        id:
+          description: Unique Identifier for a Template
+          type: number
+          example: 1
+        name: 
+          description: Template name
+          type: string
+          example: Healthcare
+        type: 
+          description: The type of template. General and Vertical are provided and can't be edited. User defined templates can be modified.
+          type: string
+          enum: [General, Vertical, User defined]
+          example: Vertical
+        description: 
+          description: HTML enabled field to describe a template on a card.
+          type: string
+          example: This template is suited to discover how your processes are executed.
+        splash: 
+          description: Location of an Icon or Image to display on the card.
+          type: string
+          example: 
+        spotfireLocation: 
+          description: Location of the Spotfire Report to use for this template
+          type: string
+          example: /Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest
+        menuConfig: 
+          description: Set of menu entries that are shown for this template
+          type: array
+          items: 
+            $ref: "#/components/schemas/TemplateMenuConfig"
+        enabled:
+          description: Determines if a template is enabled or disabled (No UI implementation for this yet)
+          type: boolean
+        icon:
+          description: Location of the Icon of the Template
+          type: string
+        marking:
+          $ref: "#/components/schemas/TemplateMarkingConfig"
+        previewParameters:
+          description: TBD
+          type: string
+      required:
+        - name
+        - type
+    TemplateMenuConfig:
+      type: object
+      properties:
+        id:
+          description: Exact name of the Spotfire Tab to Use
+          type: string
+        label:
+          description: Menu Label
+          type: string
+        icon:
+          description: Location of the icon of the menu item (can be icon locator from the UXPL Components (for example; pl-icon-home)
+          type: string
+        enabled: 
+          description: Indicator if this menu item is shown or not
+          type: boolean
+        isDefault:
+          description: Set the page as a default when loading a report
+          type: boolean
+        child:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateMenuConfig"
+      required:
+        - id
+        - label
+    TemplateMarkingConfig:
+      type: object
+      properties:
+        listenOnMarking:
+          description: TBD
+          type: string
+        casesSelector:
+          description: TBD
+          type: string
+        variantSelector:
+          description: TBD
+          type: string

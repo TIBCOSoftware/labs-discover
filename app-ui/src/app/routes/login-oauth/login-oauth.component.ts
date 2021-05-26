@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {LoginContext} from '@tibco-tcstk/tc-liveapps-lib';
-import {ConfigurationService} from "../../service/configuration.service";
-import {CaseCacheService} from "../../service/custom-case-cache.service";
+import { ActivatedRoute, Router } from '@angular/router';
+import { ConfigurationService } from "../../service/configuration.service";
 
 @Component({
   selector: 'laapp-login-oauth',
@@ -11,7 +9,7 @@ import {CaseCacheService} from "../../service/custom-case-cache.service";
 })
 export class LoginOauthComponent implements OnInit {
 
-  constructor(private router: Router, private route: ActivatedRoute, protected config: ConfigurationService, protected cCache: CaseCacheService) { }
+  constructor(private router: Router, private route: ActivatedRoute, protected config: ConfigurationService) { }
 
   ngOnInit(): void {
   }
@@ -28,15 +26,7 @@ export class LoginOauthComponent implements OnInit {
 
   // handle login
   async handleLogin() {
-    await this.config.refresh().then(
-      () => {
-        const appIds = this.config.config.discover.investigations.applications.map(
-          el => {
-            return el.applicationId;
-          });
-        this.cCache.init(this.config.config.sandboxId, appIds);
-      }
-    );
+    await this.config.refresh();
     // these session variables aren't used anywhere by the libraries but might be useful in an application
     sessionStorage.setItem('csdkAppLoggedIn', Date.now().toString());
     const returnUrl = this.route.snapshot.queryParams.returnUrl || '/splash';

@@ -1,0 +1,108 @@
+.template-basic-info-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 26px;
+}
+
+.template-name {
+  display: flex;
+  flex-direction: row;
+}
+
+.template-basic-info-left-panel {
+  width: 486px;
+  max-width: 486px;
+  padding-right: 48px;
+  border-right-color: #DEDEDE;
+  border-right-width: 2px;
+  border-right-style: solid;
+}
+
+.template-basic-info-right-panel {
+  margin-left: 48px;
+}
+
+.template-basic-info-card {
+  margin-top: 8px;
+  margin-left: -28px;
+}
+
+.label-header{
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+
+.label-header-red {
+  color: red;
+}
+
+.section-title {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+
+.basic-text {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-top: 8px;
+}
+
+.template-name-text {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-left: 10px;
+}
+
+.advanced {
+  margin-top: 15px;
+}
+
+.advanced-switch {
+  display: flex;
+  flex-direction: row;
+  margin-top: 8px;
+}
+
+.advanced-label{
+  margin-top: 6px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+
+.description-input::part(text-area) {
+  padding: 12px 16px;
+}
+
+.description-input {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.custom-icon-label {
+  margin-top: 32px;
+  margin-bottom: -5px;
+  color: #727272;
+  font-family: "Source Sans Pro";
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 21px;
+}

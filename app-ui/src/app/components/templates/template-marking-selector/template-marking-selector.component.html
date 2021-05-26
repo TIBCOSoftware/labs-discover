@@ -1,0 +1,16 @@
+<div class="marking-selector-container">
+  <div class="drop-down-container" *ngIf="showDropDowns">
+    <uxpl-select-input class="dropdown" label="Marking to use for {{type}}" allow-clear
+                       [options]="markingDropDownOptions"
+                       [value]="mConfig?.markingName"
+                       (uxplSelection)="updateValue($event, 'marking');"></uxpl-select-input>
+    <uxpl-select-input class="dropdown" label="Data Table to use for {{type}}" allow-clear
+                       [options]="dataTableDropDownOptions"
+                       [value]="mConfig?.dataTable"
+                       (uxplSelection)="updateValue($event, 'dataTable');"></uxpl-select-input>
+    <uxpl-select-input class="dropdown" label="Column to use for {{type}}" allow-clear
+                       [options]="columnDropDownOptions"
+                       [value]="mConfig?.columnName"
+                       (uxplSelection)="updateValue($event, 'column');"></uxpl-select-input>
+  </div>
+</div>

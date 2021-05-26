@@ -1,7 +1,14 @@
 .process-analysis-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
+
+/* .process-analysis-container{
+  background-color: #FFFFFF;
+  margin-top: 15px;
+}
+ */
 
 .search-icon {
   display: flex;
@@ -44,16 +51,37 @@
 
 .process-analysis-wrapper{
   background-color: #FFFFFF;
-}
-
-.process-analysis-container{
+  overflow: auto;
   height: 100%;
-  background-color: #FFFFFF;
-  margin-top: 15px;
 }
 
 .icon-position {
   margin-bottom: -15px;
+}
+
+.img-center{
+  margin: auto;
+  width: 204px;
+}
+
+.center {
+  margin: auto;
+  margin-top: 20vh;
+}
+
+.nodata-msg {
+  color: #4A4A4A;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  letter-spacing: 0.96px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 

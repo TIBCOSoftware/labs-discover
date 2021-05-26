@@ -1,33 +1,35 @@
 import {
+  AfterViewInit,
   Component,
-  ComponentFactory, ComponentFactoryResolver, ComponentRef,
   ElementRef,
   Input,
   OnChanges,
   OnInit,
+  SimpleChange,
   SimpleChanges,
-  ViewChild, ViewContainerRef
+  ViewChild
 } from '@angular/core';
 import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
-import {MessageTopicService, TcCoreCommonFunctions} from "@tibco-tcstk/tc-core-lib";
-import {FullSpotfireConfig, NewInvestigation, TCM_Message_discover_actions} from "../../models/discover";
+import {NewInvestigation} from '../../models/discover';
 import {Location} from '@angular/common';
-import {Router} from "@angular/router";
-import {SfContainerComponent} from "../sf-container/sf-container.component";
-import {ObjectHeaderConfig} from "@tibco-tcstk/tc-web-components/dist/types/models/objectHeaderConfig";
-import {UxplPopup} from "@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup";
-import {MatDialog} from "@angular/material/dialog";
-import {
-  CaseType,
-  FormConfig,
-  LiveAppsService
-} from "@tibco-tcstk/tc-liveapps-lib";
-import {CustomFormDefs} from "@tibco-tcstk/tc-forms-lib";
-import {delay, retryWhen, take} from "rxjs/operators";
-import {ConfigurationService} from "../../service/configuration.service";
-import {MessagingWrapperService} from "../../service/messaging-wrapper.service";
-import {CaseCacheService} from "../../service/custom-case-cache.service";
-
+import {ActivatedRoute, Router} from '@angular/router';
+import {ObjectHeaderConfig} from '@tibco-tcstk/tc-web-components/dist/types/models/objectHeaderConfig';
+import {ConfigurationService} from '../../service/configuration.service';
+import {NavMenu} from '@tibco-tcstk/tc-web-components/dist/types/models/leftNav';
+import {SpotfireDocument, SpotfireViewerComponent} from '@tibco/spotfire-wrapper';
+import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
+import {escapeCharsForJSON, getSFLink, stripDisabledMenuItems} from '../../functions/templates';
+import {OauthService} from '../../service/oauth.service';
+import {delay, last, retryWhen, take} from 'rxjs/operators';
+import {AnalyticsMenuConfigUI, CaseConfig} from '../../models/configuration';
+import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
+import {LiveAppsService} from '@tibco-tcstk/tc-liveapps-lib';
+import _ from 'lodash';
+import {CreateCaseMenuComponent} from '../create-case-menu/create-case-menu.component';
+import {RepositoryService} from 'src/app/api/repository.service';
+import {VisualisationService} from 'src/app/api/visualisation.service';
+import {notifyUser} from '../../functions/message';
+import { Analysis } from 'src/app/model/analysis';
 
 @Component({
   selector: 'analytics-dashboard',
@@ -36,428 +38,340 @@ import {CaseCacheService} from "../../service/custom-case-cache.service";
 })
 export class AnalyticsDashboardComponent implements OnInit, OnChanges {
 
-  // Spotfire general configuration
-  @Input() fullSpotfireConfig: FullSpotfireConfig;
+  @Input() analysis: string;
+
+  @ViewChild('leftNav', {static: false}) leftNav: ElementRef<UxplLeftNav>;
+  @ViewChild('analysis', {static: false}) analysisRef: SpotfireViewerComponent;
+  @ViewChild('popup', {static: false}) popup: ElementRef<UxplPopup>;
+  @ViewChild('createcase', {static: false}) createCaseMenu: CreateCaseMenuComponent;
 
   public objHeaderConfig: ObjectHeaderConfig;
+  public leftNavTabs: NavMenu[];
+  public spotfireDXP: string;
+  public analysisParameters: string;
+  public spotfireServer;
+  public markingOn: string;
+  public casesSelector: string;
+  public variantSelector: string;
 
-  // Spotfire wrapper configuration
-  public configuration: any;
-  public analysisError: boolean;
+  private enableMenu: boolean;
+  public markedVariants: string[];
+  public markedCases: string[];
+  public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
+  public hideSelectProcess = false;
 
-  constructor(protected location: Location,
-    protected router: Router,
-    protected resolver: ComponentFactoryResolver,
-    protected dialog: MatDialog,
-    protected configService: ConfigurationService,
-    protected liveApps: LiveAppsService,
-    protected messageService: MessageTopicService,
-    protected config: ConfigurationService,
-    protected tcm: MessagingWrapperService,
-    protected caseCache: CaseCacheService)
-  {
-    this.messageService.getMessage('analytic.can.be.refreshed').subscribe(
-      async (message) => {
-        if (message.text === 'OK') {
-            this.refreshEnabled = true;
-            this.refreshVisible = true;
-        }
+  public investigationConfig: CaseConfig[];
+  public document: any;
+  private templateNameToUse: string;
+  private analysisIdToUse: string;
+  public defaultTab: AnalyticsMenuConfigUI;
+
+  // private gotDoc = false;
+
+  constructor(
+    private location: Location,
+    private route: ActivatedRoute,
+    private router: Router,
+    private configService: ConfigurationService,
+    private messageService: MessageTopicService,
+    private oService: OauthService,
+    private liveApps: LiveAppsService,
+    private repositoryService: RepositoryService,
+    protected visualisationService: VisualisationService
+  ) {
+    this.messageService.getMessage('clear-analytic.topic.message').subscribe(
+      (message) => {
+        console.log('Clearing Analytic: ' + message.text);
+        this.spotfireDXP = null;
       });
   }
 
-  public ngOnInit() {
-    this.analysisError = false;
-
+  ngOnInit(): void {
+    this.investigationConfig = this.configService?.config?.discover?.investigations?.caseConfig;
+    this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
   }
 
-  private createObjectHeader = (): void => {
-    const formatDate = new Date(this.fullSpotfireConfig.dataSource.analysisCreatedOn).toLocaleDateString("en-US", {
+  public async ngOnChanges(changes: SimpleChanges) {
+    if (changes.analysis.previousValue !== changes.analysis.currentValue) {
+      if (changes.analysis.currentValue !== '') {
+        this.templateNameToUse = null;
+        this.route.queryParams.pipe(take(1)).subscribe(params => {
+          this.templateNameToUse = params.forceTemplate;
+          this.analysisIdToUse = changes.analysis.currentValue.slice(0, changes.analysis.currentValue.lastIndexOf('-'));
+          this.repositoryService.getAnalysisDetails(this.analysis).subscribe(
+            async (analysis) => {
+              if (this.templateNameToUse == null) {
+                this.templateNameToUse = analysis.data.templateId;
+              }
+              analysis.data.templateId = this.templateNameToUse;
+              this.createObjectHeader(analysis);
+              const templateToUse = await this.visualisationService.getTemplate(Number(this.templateNameToUse)).toPromise();
+              if (templateToUse) {
+                this.hideSelectProcess = true;
+                this.leftNavTabs = stripDisabledMenuItems(templateToUse.menuConfig);
+                for (const tab of this.leftNavTabs) {
+                  const myTab = tab as AnalyticsMenuConfigUI;
+                  if (myTab.enabled && myTab.isDefault) {
+                    this.defaultTab = myTab;
+                  }
+                }
+                let defTabParameter = '';
+                if (this.defaultTab && this.defaultTab.id) {
+                  defTabParameter = 'SetPage(pageTitle="' + this.defaultTab.id + '");';
+                }
+                const newAnalyisParameters = 'AnalysisId="' + this.analysisIdToUse + '";&Token="' + this.oService.token + '";' + defTabParameter;
+                let doAnalysisParametersChange = false;
+                if (newAnalyisParameters !== this.analysisParameters) {
+                  this.analysisParameters = newAnalyisParameters;
+                  doAnalysisParametersChange = true;
+                }
+                if (templateToUse.marking) {
+                  this.markingOn = templateToUse.marking.listenOnMarking;
+                  this.casesSelector = templateToUse.marking.casesSelector;
+                  this.variantSelector = templateToUse.marking.variantSelector;
+                } else {
+                  this.markingOn = '*';
+                }
+                // Only re-load the DXP if it is different or the analysis parameters change
+                if (doAnalysisParametersChange || (this.spotfireDXP !== templateToUse.spotfireLocation)) {
+                  this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
+
+                  // Trick to force reloading of dxp
+                  this.spotfireDXP = null;
+                  setTimeout(() => {
+                    this.leftNav?.nativeElement?.setTab(this.defaultTab, true);
+                    this.spotfireDXP = templateToUse.spotfireLocation;
+                  }, 0);
+                  // Sometime the left tab is not selected, this code ensures it is
+                  setTimeout(() => {
+                    this.leftNav.nativeElement.setTab(this.defaultTab, true);
+                  }, 100);
+                }
+              } else {
+                this.hideSelectProcess = false;
+                notifyUser('ERROR', 'Can\'t find template: ' + this.templateNameToUse, this.messageService);
+              }
+            }
+          );
+        });
+      }
+    }
+  }
+
+  private createObjectHeader = async (analysis: Analysis): Promise<void> => {
+    const templateDetails = await this.visualisationService.getTemplate(Number(analysis.data.templateId)).toPromise();
+    const formatDate = new Date(analysis.metadata.createdOn).toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
-
     this.objHeaderConfig = {
       title: {
-        value: this.fullSpotfireConfig.name,
+        value: analysis.data.name,
         isEdit: false,
         editing: false
       },
       details: [
-        {
-          value: 'Created by ' + this.fullSpotfireConfig.dataSource.analysisCreatedBy,
-          isEdit: false,
-          editing: false
-        },
-        {
-          value: 'Created on ' + formatDate,
-          isEdit: false,
-          editing: false
-        },
-        {
-          value: this.fullSpotfireConfig.dataSource.analysisDescription,
-          isEdit: false,
-          editing: false
-        }
+        {isEdit: false, editing: false, value: 'Created by ' + analysis.metadata.createdBy},
+        {isEdit: false, editing: false, value: 'Created on ' + formatDate},
+        {isEdit: false, editing: false, value: analysis.data.description},
+        {isEdit: true, editing: false, value: 'Template: ' + templateDetails.name, eventOnEdit: true, id: 'template'}
       ],
       externalOptions: false,
-      options: [],
-      backIconLocation: TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, "assets/svg/ic-back.svg")
+      options: []
     };
   }
 
-  @ViewChild('spotfireContainer', {read: ViewContainerRef, static: false}) container;
-  componentRef: ComponentRef<SfContainerComponent>;
+  public setSpotfireConfiguration = (): any => {
+    const mode = false;
+    return {
+      showAbout: mode,
+      showAnalysisInformationTool: mode,
+      showAuthor: mode,
+      showClose: mode,
+      showCustomizableHeader: false,
+      showDodPanel: mode,
+      showExportFile: mode,
+      showFilterPanel: true,
+      showHelp: false,
+      showLogout: false,
+      showPageNavigation: false,
+      showStatusBar: false,
+      showToolBar: mode,
+      showUndoRedo: mode
+    };
+  }
 
-  @ViewChild('leftNav', {static: false}) leftNav: ElementRef<UxplLeftNav>;
-
-  @ViewChild('popup', {static: false}) popup: ElementRef<UxplPopup>;
-
-  public leftNavTabs = [];
-
-  public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
-  public parameters: string;
-  public sfReady = false;
-  public application: CaseType;
-  public variantMarkedOnTable = "";
+  public goProcessAnalysis = (): void => {
+    this.router.navigate(['/discover/process-analysis']);
+  }
 
   createInv(investigation: NewInvestigation) {
+    let createInvestigation = true;
     if (investigation == null) {
-      // this.popup.nativeElement.show = false;
       this.popup.nativeElement.show = true;
     } else {
-      let appId = '';
-      let actionId = '';
-      if (this.variantMarkedOnTable && this.variantMarkedOnTable != null) {
-        if (investigation.type == "Compliance") {
-          // TODO: Get Nicely from config
-          appId = this.configService.config.discover.investigations.applications[0].applicationId;
-          actionId = this.configService.config.discover.investigations.applications[0].creatorId;
-
-          this.INITIAL_CASE_DATA = {
-            "Discovercompliance": {
-              "ShortDescription": investigation.summary,
-              "LongDescription": investigation.additionalDetails,
-              "Context": {
-                "ContextType": "Variants",
-                "ContextID": this.variantMarkedOnTable
-              },
-              "DataSourceName": this.fullSpotfireConfig.dataSource.analysisName,
-              "DataSourceId": this.fullSpotfireConfig.dataSource.datasourceId,
-              "CommentsHistory": []
-            }
-          }
+      if (!investigation.analysisId) {
+        investigation.analysisId = this.analysisIdToUse;
+      }
+      if (!investigation.templateName) {
+        investigation.templateName = this.templateNameToUse;
+      }
+      let appId;
+      let actionId;
+      let CASE_TEMPLATE;
+      for (const inConf of this.investigationConfig) {
+        if (inConf.customTitle === investigation.type) {
+          appId = inConf.appId;
+          actionId = inConf.creatorId;
+          CASE_TEMPLATE = inConf.creatorConfig;
         }
-        if (investigation.type == "Improvement") {
-          // TODO: Get Nicely from config
-          appId = this.configService.config.discover.investigations.applications[1].applicationId;
-          actionId = this.configService.config.discover.investigations.applications[1].creatorId;
-          this.INITIAL_CASE_DATA = {
-            "Discoverimprovement": {
-              "ShortDescription": investigation.summary,
-              "LongDescription": investigation.additionalDetails,
-              "Context": {
-                "ContextType": "Variants",
-                "ContextID": this.variantMarkedOnTable
-              },
-              "DataSourceName": this.fullSpotfireConfig.dataSource.analysisName,
-              "DataSourceId": this.fullSpotfireConfig.dataSource.datasourceId,
-              "CommentsHistory": []
-            }
-          }
+      }
+      if (appId && actionId && CASE_TEMPLATE) {
+        let CASE_DATA_OBJECT = {};
+        let CASE_DATA = JSON.stringify(CASE_TEMPLATE);
+        // JSON Escape the characters
+        CASE_DATA = CASE_DATA.replace('@@SUMMARY@@', escapeCharsForJSON(investigation.summary));
+        CASE_DATA = CASE_DATA.replace('@@DETAILS@@', escapeCharsForJSON(investigation.additionalDetails));
+        CASE_DATA = CASE_DATA.replace('@@CONTEXT_TYPE@@', escapeCharsForJSON(investigation.contextType));
+        CASE_DATA = CASE_DATA.replace('@@CONTEXT_IDS@@', escapeCharsForJSON(investigation.contextIds.toString()));
+        CASE_DATA = CASE_DATA.replace('@@TEMPLATE_NAME@@', escapeCharsForJSON(investigation.templateName));
+        CASE_DATA = CASE_DATA.replace('@@ANALYSIS_ID@@', escapeCharsForJSON(investigation.analysisId));
+        try {
+          CASE_DATA_OBJECT = JSON.parse(CASE_DATA);
+        } catch (e) {
+          createInvestigation = false;
+          console.error('Error Parsing initial case data ', e);
+          this.reportError('ERROR Creating Investigation: Unsupported Characters');
         }
+        if (createInvestigation) {
+          // Get the APP Id and the Action ID
+          this.liveApps.runProcess(this.configService.config.sandboxId, appId, actionId, null, CASE_DATA_OBJECT).pipe(
+            // retry(3),
+            retryWhen(errors => {
+              return errors.pipe(
+                delay(2000),
+                take(3)
+              );
+            }),
+            take(1)
+          ).subscribe(response => {
+              if (response) {
+                if (!response.data.errorMsg) {
+                  this.messageService.sendMessage('news-banner.topic.message', investigation.type + ' investigation created successfully...');
 
-        this.liveApps.runProcess(this.configService.config.sandboxId, appId, actionId, null, this.INITIAL_CASE_DATA).pipe(
-          // retry(3),
-          retryWhen(errors => {
-            return errors.pipe(
-              delay(2000),
-              take(3)
-            );
-          }),
-          take(1)
-        ).subscribe(response => {
-            if (response) {
-              if (!response.data.errorMsg) {
-                this.messageService.sendMessage('news-banner.topic.message', investigation.type + ' investigation created successfully...');
-                //this.clickMenuTrigger.closeMenu();
-                // Do a refresh on the cache cache.
-                this.caseCache.hardRefresh(appId);
-                this.popup.nativeElement.show = false;
-              } else {
-                console.error('Unable to run the action');
-                console.error(response.data.errorMsg);
+                  this.popup.nativeElement.show = false;
+                } else {
+                  console.error('Unable to run the action');
+                  console.error(response.data.errorMsg);
+                }
               }
+            }, error => {
+              console.error('Unable to run the action');
+              console.error(error);
             }
-          }, error => {
-            console.error('Unable to run the action');
-            console.error(error);
-          }
-        );
-
+          );
+        }
+      } else {
+        this.reportError('ERROR Creating Investigation: Config Not Found');
       }
     }
   }
 
-  private setUpSfServer = (): void => {
-    this.sfClickReady = false;
-    this.parameters = 'AnalysisId = "' + this.fullSpotfireConfig.dataSource.datasourceId + '";';
-    if(this.configService.config.discover.analytics.edit){
-      this.configuration = {
-        showAbout: true,
-        showAnalysisInformationTool: true,
-        showAuthor: true,
-        showClose: true,
-        showCustomizableHeader: false,
-        showDodPanel: true,
-        showExportFile: true,
-        showFilterPanel: true,
-        showHelp: false,
-        showLogout: false,
-        showPageNavigation: false,
-        showStatusBar: true,
-        showToolBar: true,
-        showUndoRedo: true
-      };
-    } else {
-      this.configuration =  {
-        showAbout: false,
-        showAnalysisInformationTool: false,
-        showAuthor: false,
-        showClose: false,
-        showCustomizableHeader: false,
-        showDodPanel: false,
-        showExportFile: false,
-        showFilterPanel: true,
-        showHelp: false,
-        showLogout: false,
-        showPageNavigation: false,
-        showStatusBar: true,
-        showToolBar: false,
-        showUndoRedo: false
-      };
-    }
-    this.upDateSFComponent();
+  private reportError(error: string) {
+    notifyUser('ERROR', error, this.messageService);
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.fullSpotfireConfig.currentValue?.dataSource?.datasourceId !== changes.fullSpotfireConfig.previousValue?.dataSource?.datasourceId){
-      this.setUpSFTabs();
-      this.createObjectHeader();
-      if (this.fullSpotfireConfig.hasAnalytics) {
-          this.setUpSfServer();
-          this.sfReady = true;
-      }
+  handleClick = (event: any): void => {
+    if (this.enableMenu && event?.detail.id) {
+      this.analysisRef.page = event.detail.id;
+      this.analysisRef.openPage(event.detail.id);
     }
+  };
+
+  public marking(data) {
+    this.markedCases = _.get(data, this.casesSelector);
+    this.markedVariants = _.get(data, this.variantSelector);
   }
 
-  setUpSFTabs() {
-    if (this.fullSpotfireConfig.hasAnalytics) {
-      this.leftNavTabs = this.configService.config.discover.analytics.menuConfig;
+  public disableAddToReferenceButton = (): boolean => {
+    return this.markedCases === undefined;
+  }
 
-      // Set first tab as active
-      setTimeout(() => {
-        this.leftNav.nativeElement.setTab(this.leftNavTabs[0]);
-      }, 0);
-    } else {
-      this.leftNavTabs = [];
-    }
+  public disableRemoveFromReferenceButton = (): boolean => {
+    return this.markedVariants === undefined;
+  }
+
+  public disableCheckUncheckButtons = (): boolean => {
+    return this.markedCases === undefined;
+  }
+
+  public disableInvestigation = (): boolean => {
+    return false;
+  }
+
+  public addToReference = (): void => {
+    console.log('***** addToReference');
+  }
+
+  public removeFromReference = (): void => {
+    console.log('***** removeFromReference');
+  }
+
+  public check = (): void => {
+    console.log('***** check');
+  }
+
+  public uncheck = (): void => {
+    console.log('***** cheuncheckck');
+  }
+
+  public editTemplate() {
+    console.log('this.analysis ', this.analysis);
+
+    this.router.navigate(['/discover/select-template', this.analysis]);
+
+    // /discover/select-template/analytics
+  }
+
+  public setDocument = (event): void => {
+    this.enableMenu = true;
+    this.document = event;
   }
 
   selectAnalytic() {
     this.router.navigate(['/discover/process-analysis']);
   }
 
-  public createInvestigationEnabled = false;
-  public createInvestigationVisible = false;
-
-  public checkingEnabled = false;
-  public checkingVisible = false;
-
-  public referenceEnabled = false;
-  public referenceVisible = false;
-
-  public refreshEnabled = true;
-  public refreshVisible = true;
-
-  // public markedAsCheckedEnabled = false;
-
-  sfClickReady = false;
-  handleClick = (event: any): void => {
-    if (this.sfClickReady) {
-      //Open Page
-      if (this.componentRef) {
-        const page = event.detail.id;
-        this.componentRef.instance.page = page;
-        this.componentRef.instance.setPage(page);
-        this.refreshVisible = true;
-        this.createInvestigationVisible = true;
-        this.referenceVisible = false;
-        this.checkingVisible = false;
-
-        if (page == 'Overview') {
-          this.createInvestigationVisible = false;
-        }
-        if (page == 'Variants Overview') {
-          this.createInvestigationVisible = false;
-        }
-        if (page == 'Reference Model') {
-          this.referenceVisible = true;
-          //this.refreshEnabled = true;
-        }
-        if (page == 'Compliance') {
-          //this.refreshEnabled = true;
-        }
-        if (page == 'Compliance' || page == 'Activities Performance' || page == 'Resources' || page == 'Case Context') {
-          this.checkingVisible = true;
-        }
-      }
-    } else {
-      this.sfClickReady = true;
-    }
-  };
-
-  public casesMarkedOnTable = [];
-  public uncompliantVariantsMarkedOnTable = [];
-  public uncompliantVariantsMarkedOnTableNumber = [];
-
-  // public variantsEnabled = false;
-
-  public marking(data) {
-    let enableInvestigationButton = false;
-    this.checkingEnabled = false;
-    this.referenceEnabled = false;
-
-    this.uncompliantVariantsMarkedOnTable = this.getElementsFromMarking(data, 'variants', 'UncompliantVariants', 'variant_id');
-    this.casesMarkedOnTable = this.getElementsFromMarking(data, 'variants', 'UncompliantVariants', 'variant_id');
-
-    if (this.uncompliantVariantsMarkedOnTable && this.uncompliantVariantsMarkedOnTable.length > 0) {
-      this.referenceEnabled = true;
-      this.checkingEnabled = true;
-      this.uncompliantVariantsMarkedOnTableNumber = [];
-      for (let id of this.uncompliantVariantsMarkedOnTable) {
-        let idN: number = Number(id);
-        this.uncompliantVariantsMarkedOnTableNumber.push(idN);
-      }
-    }
-
-    if (this.casesMarkedOnTable && this.casesMarkedOnTable.length > 0) {
-      let tempVarId = this.casesMarkedOnTable[0];
-      enableInvestigationButton = true;
-      for (let variant of this.casesMarkedOnTable) {
-        if (variant != tempVarId) {
-          enableInvestigationButton = false;
-        }
-      }
-      if (enableInvestigationButton) {
-        this.variantMarkedOnTable = this.casesMarkedOnTable[0];
-      }
-    }
-    this.createInvestigationEnabled = enableInvestigationButton;
-
+  showCreateCaseMenu() {
+    this.popup.nativeElement.show = !this.popup.nativeElement.show;
+    this.createCaseMenu.setupAdditionalInfo();
   }
 
-  // Function to get an array of elements from a SF marking
-  // TODO: Move to library
-  private getElementsFromMarking(markObject, tableName, markingName, elementName) {
-    let re = [];
-    if (markObject[markingName]) {
-      if (markObject[markingName][tableName]) {
-        if (markObject[markingName][tableName][elementName]) {
-          re = markObject[markingName][tableName][elementName];
-        }
-      }
-    }
-    return re;
-  }
+  // TODO: Finish the research
+  openConnectedPage() {
+    console.log('     Server: ', this.spotfireServer);
+    console.log('        DXP: ', this.spotfireDXP);
+    console.log('Active Page: ', this.analysisRef.page);
 
-  public INITIAL_CASE_DATA = {};
-  //TODO: Get from config
-  public customFormDefs: CustomFormDefs;
-  public legacyCreators: boolean = false;
-  public formsFramework: string = 'material-design';
-  public formConfig: FormConfig = null;
+    // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/analysis?file=Teams/01DDN0HS3RNGPZ5PJRMVAKC2M4/Sales%20and%20Marketing&waid=bvgTE8jUjkKZ-S3fKPi3w-2914000b5cQprx&wavid=0
+    const sfURL = this.spotfireServer + '/spotfire/wp/analysis?file=' + this.spotfireDXP;
+    window.open(sfURL);
+    /// list.getElementsByTagName("LI")[0].innerHTML = "Milk";
+    const sfHost = document.getElementById('mySFViewer');
+    const iFrame = sfHost.getElementsByTagName('iFrame')[0] as HTMLIFrameElement;
+    console.log('iFrame: ', iFrame.contentWindow);
+    console.log('iFrame URL: ', iFrame.contentWindow.location.href)
 
+    // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/OpenAnalysis?file=fb071c82-2127-45ee-aafe-c6ebd9433dc6&waid=sXHQCNLuD0CG3ogwa4tZC-2914000b5cQprx&wavid=0
 
-  upDateSFComponent() {
-    if (this.container) {
-      this.container.clear();
-    }
-    const factory: ComponentFactory<SfContainerComponent> = this.resolver.resolveComponentFactory(SfContainerComponent);
-    this.componentRef = this.container.createComponent(factory);
-    this.componentRef.instance.sfProps = this.configuration;
-    this.componentRef.instance.sfServer = this.configService.config.discover.analytics.server;
-    this.componentRef.instance.sfAnalysis = this.configService.config.discover.analytics.template;
-    this.componentRef.instance.page = this.configService.config.discover.analytics.menuConfig[0].id;
-    // TODO: Get from config
-    // this.componentRef.instance.sfMarkingOn = this.markingOn;
-    this.componentRef.instance.sfMarkingOn = '{"variants": ["*"]}';
-    this.componentRef.instance.parameters = this.parameters;
-    //TODO: Get from config
-    this.componentRef.instance.sfMarkingMaxRows = 1000;
-    this.componentRef.instance.markingEvent.subscribe(event => {
-      this.marking(event);
-    });
-    this.componentRef.instance.handleErrorMessage.subscribe(_ => {
-      this.analysisError = true;
-    })
-  }
+    // The opened page:
+    // https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/analysis?file=Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest_nicolas_v2&waid=nQ0t0-0odke-nhaXr_kkA-2913585d62gYK0&wavid=1
 
-  public ADD_REFERENCE = 'Reference added';
-  public REMOVE_REFERENCE = 'Reference removed';
-  public CHECK = 'Checked';
-  public UNCHECK = 'Unchecked';
+    // The iframe page
+    //  https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/OpenAnalysis?file=8e6b6a38-95f5-447f-9068-2cb8b43ec216&waid=nQ0t0-0odke-nhaXr_kkA-2913585d62gYK0&wavid=0
 
-  handleTCMButton(event, mType: string) {
-    let isReference = 0;
-    let caseType = '';
-    let label = '';
-
-    if (mType == this.ADD_REFERENCE) {
-      isReference = 1;
-      caseType = 'reference';
-      //label = 'checked';
-    }
-
-    if (mType == this.REMOVE_REFERENCE) {
-      isReference = 0;
-      caseType = 'reference';
-      //label = 'unchecked';
-    }
-
-    if (mType == this.CHECK) {
-      caseType = 'variants';
-      label = 'checked';
-    }
-
-    if (mType == this.UNCHECK) {
-      caseType = 'variants';
-      label = 'unchecked';
-    }
-
-    // Data online items to mark as checked from selection
-    //TODO: Get the state dynamically
-    //TODO: Get state and ref from investigation
-    const data: TCM_Message_discover_actions = {
-      analysis_id: this.fullSpotfireConfig.dataSource.datasourceId,
-      ids: this.uncompliantVariantsMarkedOnTableNumber,
-      label: label,
-      case_type: caseType,
-      isReference: isReference,
-      LAcase_state: 'None',
-      LAcase_ref: 'None',
-      timestamp: (new Date()).getTime() + ''
-    };
-    this.tcm.sendDiscoverActionsMessage(data, mType);
-  }
-
-  // Refreshing the screen
-  refresh() {
-    const d = new Date();
-    const dformat = [d.getDate(), d.getMonth() + 1, d.getFullYear()].join('/') + ' ' + [d.getHours(), d.getMinutes(), d.getSeconds()].join(':');
-    this.componentRef.instance.setProp('refreshTS', dformat);
-    // this.refreshEnabled = false;
   }
 
 }

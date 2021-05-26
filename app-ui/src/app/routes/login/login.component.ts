@@ -6,7 +6,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {LoginContext} from '@tibco-tcstk/tc-liveapps-lib';
 import {LoginPrefill} from '@tibco-tcstk/tc-core-lib';
 import {ConfigurationService} from "../../service/configuration.service";
-import {CaseCacheService} from "../../service/custom-case-cache.service";
 
 @Component({
   selector: 'app-login',
@@ -19,7 +18,7 @@ export class LoginComponent implements OnInit {
   loginContext: LoginContext;
   loginPrefill: LoginPrefill;
 
-  constructor(private router: Router, private route: ActivatedRoute, protected config: ConfigurationService, protected cCache: CaseCacheService) {
+  constructor(private router: Router, private route: ActivatedRoute, protected config: ConfigurationService) {
   }
 
   handleUseOauth() {
@@ -34,15 +33,7 @@ export class LoginComponent implements OnInit {
 
   // handle login
   async handleLogin (loginContext: LoginContext) {
-    await this.config.refresh().then(
-      () => {
-        const appIds = this.config.config.discover.investigations.applications.map(
-          el => {
-            return el.applicationId;
-          });
-        this.cCache.init(this.config.config.sandboxId, appIds);
-      }
-    );
+    await this.config.refresh();
     // these session variables aren't used anywhere by the libraries but might be useful in an application
     sessionStorage.setItem('csdkAppLoggedIn', Date.now().toString());
     sessionStorage.setItem('csdkAppLoginContext', JSON.stringify(loginContext));

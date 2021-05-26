@@ -1,0 +1,51 @@
+{
+    "apiVersion": "1.0",
+    "version": "2.0",
+    "name": "Variant Viewer",
+    "id": "variant-viewer",
+    "icon": "images/bus-15.svg",
+    "properties": [
+    ],
+    "dataViewDefinition": {
+        "colorAxis": {
+            "mode": "dual",
+            "dropTarget": {
+                "icon": "Color",
+                "description": "Color by {0}"
+            }
+        },
+        "axes": [
+            {
+                "name": "Compare by",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Order by",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Name",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Start",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "End",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Resource",
+                "mode": "categorical",
+                "placement": "none"
+            }
+        ]
+    },
+    "files": ["index.html", "main.css", "main.js", "images/gear-dark.png", "images/gear-light.png"]
+}

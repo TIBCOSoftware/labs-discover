@@ -15,3 +15,20 @@
   justify-content: flex-end;
   width: 100%;
 }
+
+.ct-radio {
+  margin-top: 5px;
+}
+
+.radio-item {
+  margin-top: 3px;
+}
+
+.additional-info {
+  margin-left: 10px;
+  color: #727272;
+  font-family: "Source Sans Pro";
+  font-size: 13px;
+  /*letter-spacing: 0;*/
+  /*line-height: 21px;*/
+}

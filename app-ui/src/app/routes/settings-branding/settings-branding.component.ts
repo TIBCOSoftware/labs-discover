@@ -19,6 +19,8 @@ export class SettingsBrandingComponent implements OnInit {
 
   public discover: DiscoverConfiguration;
 
+  showAdvanced = false;
+
   constructor(
     protected configService: ConfigurationService,
     protected generalConfigService: TcGeneralConfigService,
@@ -29,6 +31,7 @@ export class SettingsBrandingComponent implements OnInit {
     protected documentService: TcDocumentService) { }
 
   ngOnInit(): void {
+    this.showAdvanced = false;
     this.handleReset();
   }
 
@@ -40,6 +43,14 @@ export class SettingsBrandingComponent implements OnInit {
     if (object === 'landingPage'){
       set(this.discover.landingPage, path, event.detail.value);
     }
+
+    if (object === 'advanced'){
+      if(!this.discover.analyticsSF){
+        this.discover.analyticsSF = {previewDXPLocation: ''};
+      }
+      set(this.discover.analyticsSF, path, event.detail.value);
+    }
+
   }
 
   public handleSave = (): void => {

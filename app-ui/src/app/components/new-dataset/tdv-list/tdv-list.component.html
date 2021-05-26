@@ -1,0 +1,58 @@
+<div class="tdv-list-container">
+  <div class="title-bar">
+    <div class="title-left">
+      <div class="table-title">Available TDV views</div>
+      <div class="search-container">
+        <uxpl-form-field style="margin-bottom:15px;" type="text" valid required="true" value=""
+                        (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+        <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
+      </div>
+    </div>
+    <div class="title-right" (click)="refresh()">
+      <span class="icon-container">
+        <uxpl-icon class="icon" icon="pl-icon-refresh" width="20px" height="20px" color="#1774E5"></uxpl-icon>
+      </span>
+      <div class="upload-csv-link"><span>Refresh</span></div>
+    </div>
+  </div>
+  <div>
+    <div class="data-wrapper" *ngIf="tdvs == null || tdvs.length>0; else nodata">
+      <p-table #tdvTable [columns]="cols" [value]="tdvs" [globalFilterFields]="['DatasetName', 'Annotation']"
+        dataKey="name" id="pTable" styleClass="custom-table-css" [rowHover]="false"
+        [rows]="15" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [loading]="tdvs == null" [filterDelay]="0">
+        <ng-template pTemplate="header" let-columns>
+          <tr>
+            <th *ngFor="let col of columns" [pSortableColumn]="col.field"  class="top-row">
+              {{col.header}}
+              <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
+                          ariaLabelDesc="Activate to sort in descending order"
+                          ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+            </th>
+            <th class="top-row-empty"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tdv>
+          <tr class="rowhover" id="toHightlight" [ngClass]="{selected: selectedTdv?.DatasetName==tdv.DatasetName}">
+            <td class="no-padding data-row hovereffect"><div [innerHTML]="tdv.DatasetName | highlight: searchTerm : 'Multi-Match'"></div></td>
+            <td class="no-padding data-row hovereffect"><div [innerHTML]="tdv.Annotation | highlight: searchTerm : 'Multi-Match'"></div></td>
+            <td class="no-padding data-row hovereffect"><div>{{getRelTime(tdv.ModificationTime)}}</div></td>
+            <td class="no-padding data-row hovereffect"><div>{{getRelTime(tdv.CreationTime)}}</div></td>
+            <td class="no-padding">
+              <button (click)="selectTdv(tdv)" *ngIf="selectedTdv?.DatasetName!=tdv.DatasetName">select</button>
+              <div class="selected" *ngIf="selectedTdv?.DatasetName==tdv.DatasetName">selected</div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <ng-template #nodata>
+      <div class="center">
+        <div class="img-center">
+          <img width="204" [src]="noDataIconLocation">
+        </div>
+        <div class="nodata-msg">No tdv view to select.</div>
+      </div>
+    </ng-template>
+  </div>
+  
+</div>

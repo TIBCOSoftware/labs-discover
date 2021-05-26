@@ -1,0 +1,17 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+
+body{
+    margin: 10px;
+    overflow: hidden;
+}
+
+#btn-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 170px)); 
+    gap: 10px;
+    justify-content: center;
+}

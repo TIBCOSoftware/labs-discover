@@ -1,0 +1,28 @@
+{
+    "apiVersion": "1.0",
+    "version": "1.1",
+    "name": "Start & Stop activities",
+    "id": "start-stop-activities",
+    "externalResources": [],
+    "icon": "icon.svg",
+    "properties": [
+        {
+            "name": "settings",
+            "type": "string",
+            "defaultValue": "{}"
+        }
+    ],
+    "dataViewDefinition": {
+        "axes": [
+            {
+                "name": "Activity",
+                "mode": "categorical",
+                "placement": "none",
+                "automaticConfiguration": {
+                    "expressionHeuristics": "none"
+                }
+            }
+        ]
+    },
+    "files": []
+}

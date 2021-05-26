@@ -1,8 +1,11 @@
-import { CollectionViewer, DataSource } from "@angular/cdk/collections";
-import { BehaviorSubject, Observable, Subscription } from "rxjs";
+import { Injectable } from "@angular/core";
 import * as papa from 'papaparse';
 import { LazyLoadEvent } from 'primeng/api';
+import { BehaviorSubject, Observable, Subscription } from "rxjs";
 
+@Injectable({
+  providedIn: 'root'
+})
 export class CsvNgpDataSource {
   private _pageSize = 15;
   private _cachedData: any[] = [];
@@ -16,16 +19,16 @@ export class CsvNgpDataSource {
   private columnSeparator: string;
   private lines = 15;
   private localConfig: any;
-  private filePath: string;
+  private file: string | File;
   private nextPageIdx = 0;
   private fileComplete = false;
   private parsing = false;
   private firstTime = false;
 
-  constructor(filePath: string, pagesize: number, config?: any) {
+  constructor(file: string | File, pagesize: number, config?: any) {
     this._pageSize = pagesize;
     this.lines = pagesize;
-    this.filePath = filePath;
+    this.file = file;
     this.localConfig = config ? config : {};
   }
 
@@ -59,19 +62,19 @@ export class CsvNgpDataSource {
           this.columnsArray = result.data;
           this.columnSeparator = result.meta.delimiter;
         } else {
-            if (result.data.length > 0) {
-              this.data.push(this.createObjectFromColumns(result.data));
-            }
+          if (result.data.length > 0) {
+            this.data.push(this.createObjectFromColumns(result.data));
+          }
         }
         if (this.itemCount === this.lines) {
-            this._fetchedPages.add(this.nextPageIdx);
-            this._cachedData.splice(this.nextPageIdx * this._pageSize, this._pageSize,
-              ...Array.from({length: this._pageSize})
-                  .map((_, i) => this.data[this.nextPageIdx * this._pageSize + i ]));
-            this._dataStream.next([...this._cachedData, undefined]);
-            this.parser.pause();
-          }
-          this.itemCount++;
+          this._fetchedPages.add(this.nextPageIdx);
+          this._cachedData.splice(this.nextPageIdx * this._pageSize, this._pageSize,
+            ...Array.from({length: this._pageSize})
+                .map((_, i) => this.data[this.nextPageIdx * this._pageSize + i ]));
+          this._dataStream.next([...this._cachedData, undefined]);
+          this.parser.pause();
+        }
+        this.itemCount++;
       }
     }
     this._fetchPage(0);
@@ -109,7 +112,7 @@ export class CsvNgpDataSource {
     if (!this.fileComplete) {
       if (!this.parsing) {
         this.parsing = true;
-        papa.parse(this.filePath, this.localConfig);
+        papa.parse(this.file, this.localConfig);
       } else if (this._fetchedPages.has(page)) {
         return;
       } else {

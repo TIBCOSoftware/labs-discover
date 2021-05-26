@@ -11,79 +11,92 @@ export class ParsingService {
 
   DATE_FORMATS: string[] =
   [
-    "yyyy-MM-dd'T'HH:mm:ssZZ",
-    "dd-MM-yyyy HH:mm:ss.SSS",
-    "M.d.yy H:mm",
-    "d.M.yy H:mm",
-    "DD/MM/YYYY h:m:s",
-    "dd/mm/yyyy hh:mm:ss",
-    "MM/DD/YYYY HH:mm:ss",
-    "dd/MM/yyyy’T’HH:mm:ss.SSS",
-    "yyyy/MM/dd HH:mm:ss.SSS",
-    "yyyy-MM-dd HH:mm:ss.SSS",
-    "yyyy/MM/dd HH:mm:ss",
-    "yyyy-MM-dd HH:mm:ss",
-    "dd-MM-yyyy HH:mm:ss",
-    "dd.MM.yyyy HH:mm:ss",
-    "MM/dd/yyyy KK:mm:ss aa",
-    "dd-MM-yyyy HH:mm",
-    "dd.MM.yyyy HH:mm",
-    "yyyy-MM-dd HH:mm",
-    "MM/dd/yy HH:mm",
-    "dd/MM/yy HH:mm",
-    "dd.MM.yy HH:mm",
-    "yyyy/MM/dd",
-    "yyyy-MM-dd’T’HH:mm:ss.SSS",
-    "yyyy-MM-dd'T'HH:mm:ss*SSSZZZZ",
-    "yyyy MMM dd HH:mm:ss.SSS zzz",
-    "MMM dd HH:mm:ss ZZZZ yyyy",
-    "dd/MMM/yyyy:HH:mm:ss ZZZZ",
-    "MMM dd, yyyy hh:mm:ss a",
-    "MMM dd yyyy HH:mm:ss",
-    "MMM dd HH:mm:ss yyyy",
-    "MMM dd HH:mm:ss ZZZZ",
-    "yyyy-MM-dd'T'HH:mm:ssZZZZ",
-    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-    "yyyy-MM-dd HH:mm:ss ZZZZ",
-    "yyyy-MM-dd HH:mm:ss,SSS",
-    "yyyy/MM/dd*HH:mm:ss",
-    "yyyy MMM dd HH:mm:ss.SSS*zzz",
-    "yyyy MMM dd HH:mm:ss.SSS",
-    "yyyy-MM-dd HH:mm:ss,SSSZZZZ",
-    "yyyy-MM-dd HH:mm:ss.SSS",
-    "yyyy-MM-dd HH:mm:ss.SSSZZZZ",
+    "d/M/y",
+    "d-M-y",
+    "d.M.y",
+    "M/d/y",
+    "M-d-y",
+    "M.d.y",
+    "y/M/d",
+    "y-M-d",
+    "y.M.d",
+    "d/M/y H:m",
+    "d/M/y H:m:s",
+    "d/M/y H:m:s.S",
+    "d-M-y H:m",
+    "d-M-y H:m:s",
+    "d-M-y H:m:s.S",
+    "d.M.y H:m",
+    "d.M.y H:m:s",
+    "d.M.y H:m:s.S",
+    "M/d/y H:m",
+    "M/d/y H:m:s",
+    "M/d/y H:m:s.S",
+    "M-d-y H:m",
+    "M-d-y H:m:s",
+    "M-d-y H:m:s.S",
+    "M.d.y H:m",
+    "M.d.y H:m:s",
+    "M.d.y H:m:s.S",
+    "y/M/d H:m",
+    "y/M/d H:m:s",
+    "y/M/d H:m:s.S",
+    "y-M-d H:m",
+    "y-M-d H:m:s",
+    "y-M-d H:m:s.S",
+    "y.M.d H:m",
+    "y.M.d H:m:s",
+    "y.M.d H:m:s.S",
+    "y/d/M H:m",
+    "y/d/M H:m:s",
+    "y/d/M H:m:s.S",
+    "y-d-M H:m",
+    "y-d-M H:m:s",
+    "y-d-M H:m:s.S",
+    "y.d.M H:m",
+    "y.d.M H:m:s",
+    "y.d.M H:m:s.S",
+    "d/M/y h:m a",
+    "d/M/y h:m:s a",
+    "d/M/y h:m:s.S a",
+    "d-M-y h:m a",
+    "d-M-y h:m:s a",
+    "d-M-y h:m:s.S a",
+    "d.M.y h:m a",
+    "d.M.y h:m:s a",
+    "d.M.y h:m:s.S a",
+    "M/d/y h:m a",
+    "M/d/y h:m:s a",
+    "M/d/y h:m:s.S a",
+    "M-d-y h:m a",
+    "M-d-y h:m:s a",
+    "M-d-y h:m:s.S a",
+    "M.d.y h:m a",
+    "M.d.y h:m:s a",
+    "M.d.y h:m:s.S a",
+    "y/M/d h:m a",
+    "y/M/d h:m:s a",
+    "y/M/d h:m:s.S a",
+    "y-M-d h:m a",
+    "y-M-d h:m:s a",
+    "y-M-d h:m:s.S a",
+    "y.M.d h:m a",
+    "y.M.d h:m:s a",
+    "y.M.d h:m:s.S a",
+    "y/d/M h:m a",
+    "y/d/M h:m:s a",
+    "y/d/M h:m:s.S a",
+    "y-d-M h:m a",
+    "y-d-M h:m:s a",
+    "y-d-M h:m:s.S a",
+    "y.d.M h:m a",
+    "y.d.M h:m:s a",
+    "y.d.M h:m:s.S a ",
     "yyyy-MM-dd'T'HH:mm:ss.SSS",
     "yyyy-MM-dd'T'HH:mm:ss",
     "yyyy-MM-dd'T'HH:mm:ss'Z'",
     "yyyy-MM-dd'T'HH:mm:ss.SSS",
-    "yyyy-MM-dd'T'HH:mm:ss",
-    "yyyy-MM-dd*HH:mm:ss:SSS",
-    "yyyy-MM-dd*HH:mm:ss",
-    "yy-MM-dd HH:mm:ss,SSS",
-    "yy-MM-dd HH:mm:ss,SSS",
-    "yy-MM-dd HH:mm:ss",
-    "yy/MM/dd HH:mm:ss",
-    "yyMMdd HH:mm:ss",
-    "yyyyMMdd HH:mm:ss.SSS",
-    "MM/dd/yy*HH:mm:ss",
-    "MM/dd/yyyy*HH:mm:ss",
-    "MM/dd/yyyy*HH:mm:ss*SSS",
-    "MM/dd/yy HH:mm:ss ZZZZ",
-    "MM/dd/yyyy HH:mm:ss ZZZZ",
-    "HH:mm:ss",
-    "HH:mm:ss.SSS",
-    "HH:mm:ss,SSS",
-    "dd/MMM HH:mm:ss,SSS",
-    "dd/MMM/yyyy:HH:mm:ss",
-    "dd/MMM/yyyy HH:mm:ss",
-    "dd-MMM-yyyy HH:mm:ss",
-    "dd-MMM-yyyy HH:mm:ss.SSS",
-    "dd MMM yyyy HH:mm:ss",
-    "dd MMM yyyy HH:mm:ss*SSS",
-    "MMdd_HH:mm:ss",
-    "MMdd_HH:mm:ss.SSS",
-    "MM/dd/yyyy hh:mm:ss a:SSS",
-    "MM/dd/yyyy hh:mm:ss a"
+    "yyyy-MM-dd'T'HH:mm:ss"
   ]
 
   constructor(protected config: ConfigurationService) {
@@ -91,6 +104,23 @@ export class ParsingService {
 
   public validateSingleDate = (value: string, pattern: string): boolean => {
       return DateTime.fromFormat(value, pattern).isValid;
+  }
+
+  /**
+   * Validate a single string to the predefined date/time format.
+   * @param value 
+   * @returns 
+   */
+  public validateDateAgainstDateFormats(value: string): boolean {
+    let valid = false;
+    const dateFormats = this.config.config.discover.dateTimeFormats ? this.config.config.discover.dateTimeFormats : this.DATE_FORMATS;
+    for (let i = 0; i < dateFormats.length; i++) {
+      if (this.validateSingleDate(value, dateFormats[i])) {
+        valid = true;
+        break;
+      }
+    }
+    return valid;
   }
 
   public predictDateFormat(dateStrings: string[][], dateOptions?: string[], previousResult?: DateParsingResult): DateParsingResult {
@@ -155,5 +185,42 @@ export class ParsingService {
     })
     return previousResult;
   }
+
+  public readonly supportedEncoding = [
+    "ISO-8859-1",
+    "ISO-8859-2",
+    "ISO-8859-3",
+    "ISO-8859-5",
+    "ISO-8859-15",
+    "US-ASCII",
+    "UTF-8",
+    "UTF-16",
+    "windows-1252"
+  ];
+
+  public readonly encodingNameForJavaIO = [
+    "ISO8859_1",
+    "ISO8859_2",
+    "ISO8859_3",
+    "ISO8859_5",
+    "ISO8859_15",
+    "ASCII",
+    "UTF8",
+    "UTF-16",
+    "Cp1252"
+  ];
+
+  public getSupportEncoding(): string[] {
+    return this.supportedEncoding;
+  }
+
+  public getJavaIOEncoding(encoding: string) {
+    const index = this.supportedEncoding.indexOf(encoding);
+    if (index != -1) {
+      return this.encodingNameForJavaIO[index];
+    }
+    return encoding;
+  }
+
 
 }

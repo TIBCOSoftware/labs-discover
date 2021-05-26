@@ -1,0 +1,47 @@
+<!--
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Filtering rules</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="all" href="uxpl.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="main.css" />
+
+    <link rel="stylesheet" type="text/css" media="all" href="bootstrap.min.css"/>
+    <link rel="stylesheet" href="VueQueryBuilder.css" />
+
+    <script src="vue.min.js"></script>
+    <script src="VueQueryBuilder.umd.min.js"></script>
+
+    <script
+        id="spotfire-loader">var Spotfire = function (e) { "use strict"; return e.initialize = function (e) { var t = "sfTemp" + 1e4 * Math.random() + "Cb", r = window; r[t] = e; var a = { subject: "GetUrl", callbackId: -1, options: { cbId: t } }; r.addEventListener("message", (function e(t) { if (t.source !== r.parent || !t.data.src) return; r.removeEventListener("message", e); var a = document, n = a.createElement("script"); n.src = t.data.src, (a.head || a.body).appendChild(n) })), r.parent.postMessage(a, "*") }, e }({});</script>
+    <script src="main.js"></script>
+</head>
+
+<body>
+    <div class="column">
+    <div id="query-builder">
+        <vue-query-builder :rules="rules" :labels="labels" :max-depth="maxDepth" :v-model="query"></vue-query-builder>
+    </div>
+    <div id="action-buttons">
+        <button id="apply-filter-btn" type="button" class="pl-button pl-button--primary">
+            Filter
+        </button>
+        <button id="reset-filter-btn" type="button" class="pl-button pl-button--secondary">
+            Reset
+        </button>
+    </div>
+    </div>
+</body>
+
+</html>

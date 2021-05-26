@@ -6,12 +6,11 @@
   <div class="rowC content discover-container">
     <div [hidden]="hideAnalytics" style="height: 100%">
       <div class="analytics-container">
-        <analytics-dashboard [fullSpotfireConfig]="fullSpotfireConfig"
-                             class="analytics-dashboard"></analytics-dashboard>
+        <analytics-dashboard [analysis]="analysisID" class="analytics-dashboard"></analytics-dashboard>
       </div>
     </div>
-    <div [hidden]="!hideAnalytics" style="height: 100%">
-        <router-outlet></router-outlet>
+    <div [hidden]="!hideAnalytics" style="height: 100%; overflow: hidden">
+      <router-outlet></router-outlet>
     </div>
     <upload-status></upload-status>
   </div>

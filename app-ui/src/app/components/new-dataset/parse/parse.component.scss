@@ -1,0 +1,13 @@
+.parse-preview-container {
+  margin-top: 30px;
+}
+
+:host ::ng-deep .p-datatable-wrapper {
+  max-height: calc(90vh - 500px);
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}

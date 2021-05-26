@@ -1,0 +1,112 @@
+{
+    "apiVersion": "1.0",
+    "version": "3.6",
+    "name": "Network Graph",
+    "id": "network-graph",
+    "icon": "icon.svg",
+    "externalResources": ["https://unpkg.com", "https://use.fontawesome.com", "https://code.jquery.com", "https://cdn.jsdelivr.net"],
+    "properties": [
+        {
+            "name": "labelConfig",
+            "type": "string",
+            "defaultValue": ""
+        },
+        {
+            "name": "layout",
+            "type": "string",
+            "defaultValue": "dagre"
+        },
+        {
+            "name": "nodeShape",
+            "type": "string",
+            "defaultValue": "round-rectangle"
+        }
+    ],
+    "dataViewDefinition": {
+        "colorAxis": {
+            "mode": "dual",
+            "dataTypes": {
+                "allowBoolean": true,
+                "allowNumeric": true,
+                "allowDateTime": true,
+                "allowString": true,
+                "allowTimeSpan": true
+            },
+            "dropTarget": {
+                "icon": "Color",
+                "description": "Color by {0}"
+            }
+        },
+        "axes": [
+            {
+                "name": "Datasets",
+                "mode": "categorical",
+                "placement": "none",
+                "legendItem": {
+                    "defaultVisibility": "hidden"
+                },
+                "propertyControl": {
+                    "visibility": "hidden"
+                },
+                "automaticConfiguration": {
+                    "expressionHeuristics": "none"
+                }
+            },
+            {
+                "name": "Source",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Target",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Parent",
+                "mode": "continuous",
+                "placement": "none",
+                "dataTypes": {
+                    "allowBoolean": true,
+                    "allowNumeric": true,
+                    "allowDateTime": true,
+                    "allowString": true,
+                    "allowTimeSpan": true
+                }
+            },
+            {
+                "name": "Column Names",
+                "mode": "categorical",
+                "placement": "none",
+                "legendItem": {
+                    "defaultVisibility": "hidden"
+                },
+                "propertyControl": {
+                    "visibility": "hidden"
+                },
+                "automaticConfiguration": {
+                    "expressionHeuristics": "none"
+                }
+            },
+            {
+                "name": "Size by",
+                "mode": "continuous",
+                "placement": "none"
+            },
+            {
+                "name": "Tooltip",
+                "mode": "continuous",
+                "placement": "none",
+                "allowMultipleMeasures": true,
+                "dataTypes": {
+                    "allowBoolean": true,
+                    "allowNumeric": true,
+                    "allowDateTime": true,
+                    "allowString": true,
+                    "allowTimeSpan": true
+                }
+            }
+        ]
+    },
+    "files": ["index.html", "main.css", "main.js", "graph.js", "spotfire-cytoscape-style.js", "spotfire-cytoscape-layout.js"]
+}

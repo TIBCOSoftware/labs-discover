@@ -1,0 +1,634 @@
+{
+  "investigations": {
+    "numberApplications": 3,
+    "caseConfig": [
+      {
+        "customTitle": "Compliance",
+        "appId": "%%Compliance_App_Id%%",
+        "creatorId": "%%Compliance_Creator_Id%%",
+        "creatorConfig": {
+          "Discovercompliance": {
+            "ShortDescription": "@@SUMMARY@@",
+            "LongDescription": "@@DETAILS@@",
+            "ContextType": "@@CONTEXT_TYPE@@",
+            "ContextId": "@@CONTEXT_IDS@@",
+            "DataSourceName": "@@TEMPLATE_NAME@@",
+            "DataSourceId": "@@ANALYSIS_ID@@",
+            "CommentsHistory": []
+          }
+        },
+        "allowMultiple": false,
+        "headerFields": [
+          {
+            "label": "ID",
+            "field": "ComplianceID"
+          },
+          {
+            "label": "Description Simon",
+            "field": "ShortDescription"
+          },
+          {
+            "label": "Type",
+            "field": "Context.ContextType"
+          },
+          {
+            "label": "Analysis",
+            "field": "DataSourceName"
+          },
+          {
+            "label": "Created on",
+            "field": "META:creationTimestamp",
+            "format": "DATE"
+          },
+          {
+            "field": "CUSTOM:caseReference",
+            "label": "Case Reference"
+          },
+          {
+            "label": "State",
+            "field": "state"
+          }
+        ],
+        "detailTitle": {
+          "label": "ID",
+          "field": "ComplianceID"
+        },
+        "showMilestones": true,
+        "detailFields": [
+          [
+            {
+              "label": "Description",
+              "field": "ShortDescription"
+            },
+            {
+              "label": "Full Description",
+              "field": "LongDescription"
+            },
+            {
+              "label": "Decision",
+              "field": "ComplianceDecision"
+            }
+          ],
+          [
+            {
+              "label": "Type",
+              "field": "Context.ContextType"
+            },
+            {
+              "label": "Analysis Name",
+              "field": "AnalysisName",
+              "format": "EVENT-LINK"
+            },
+            {
+              "label": "Escalation",
+              "field": "Escalation.Comment"
+            }
+          ],
+          [
+            {
+              "label": "ID",
+              "field": "ComplianceID"
+            },
+            {
+              "label": "Analysis ID",
+              "field": "DataSourceId"
+            },
+            {
+              "label": "Resolution",
+              "field": "Resolution.Comment"
+            }
+          ],
+          [
+            {
+              "label": "Case Reference",
+              "field": "CUSTOM:caseReference"
+            },
+            {
+              "label": "Variant ID",
+              "field": "Context.ContextID"
+            },
+            {
+              "label": "Comments",
+              "field": "CommentsHistory",
+              "format": "ARRAY"
+            }
+          ]
+        ],
+        "states": [
+          {
+            "name": "Created",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Ready.svg"
+          },
+          {
+            "name": "Investigation",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Escalated",
+            "color": "#FEF7EA",
+            "icon": "assets/images/states/Process mining.svg"
+          },
+          {
+            "name": "Compliant",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          },
+          {
+            "name": "Out of Compliance",
+            "color": "#F9E1E4",
+            "icon": "assets/images/states/Not ready.svg"
+          },
+          {
+            "name": "Cancelled",
+            "color": "#f4f4f4",
+            "icon": "assets/images/states/Archived.svg"
+          },
+          {
+            "name": "Resolved",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          }
+        ]
+      },
+      {
+        "customTitle": "Improvement",
+        "appId": "%%Improvement_App_Id%%",
+        "creatorId": "%%Improvement_Creator_Id%%",
+        "creatorConfig": {
+          "Discoverimprovement": {
+            "ShortDescription": "@@SUMMARY@@",
+            "LongDescription": "@@DETAILS@@",
+            "ContextType": "@@CONTEXT_TYPE@@",
+            "ContextId": "@@CONTEXT_IDS@@",
+            "DataSourceName": "@@TEMPLATE_NAME@@",
+            "DataSourceId": "@@ANALYSIS_ID@@",
+            "CommentsHistory": []
+          }
+        },
+        "headerFields": [
+          {
+            "label": "ID",
+            "field": "ImprovementID"
+          },
+          {
+            "label": "Created on",
+            "field": "META:creationTimestamp",
+            "format": "DATE"
+          },
+          {
+            "label": "Description",
+            "field": "ShortDescription"
+          },
+          {
+            "label": "Type",
+            "field": "Context.ContextType"
+          },
+          {
+            "label": "Analysis",
+            "field": "DataSourceName"
+          },
+          {
+            "label": "State",
+            "field": "state"
+          }
+        ],
+        "detailTitle": {
+          "label": "Description",
+          "field": "ShortDescription"
+        },
+        "showMilestones": true,
+        "detailFields": [
+          [
+            {
+              "label": "Description",
+              "field": "ShortDescription"
+            },
+            {
+              "label": "Full Description",
+              "field": "LongDescription"
+            },
+            {
+              "label": "",
+              "field": ""
+            }
+          ],
+          [
+            {
+              "label": "Type",
+              "field": "Context.ContextType"
+            },
+            {
+              "label": "Datasource Name",
+              "field": "DataSourceName",
+              "format": "EVENT-LINK"
+            },
+            {
+              "label": "Decision",
+              "field": "Decision"
+            }
+          ],
+          [
+            {
+              "label": "ID",
+              "field": "ImprovementID"
+            },
+            {
+              "label": "Datasource ID",
+              "field": "DataSourceId"
+            },
+            {
+              "label": "Resolution",
+              "field": "Resolution.Comment"
+            }
+          ],
+          [
+            {
+              "label": "Case Reference",
+              "field": "CUSTOM:caseReference"
+            },
+            {
+              "label": "Variant ID",
+              "field": "Context.ContextID"
+            },
+            {
+              "label": "Comments",
+              "field": "CommentsHistory",
+              "format": "ARRAY"
+            }
+          ]
+        ],
+        "states": [
+          {
+            "name": "Created",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Investigation",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Escalated",
+            "color": "#FEF7EA",
+            "icon": "assets/images/states/Process mining.svg"
+          },
+          {
+            "name": "Already Exists",
+            "color": "#f9e1e4",
+            "icon": "assets/images/states/Not ready.svg"
+          },
+          {
+            "name": "Under consideration",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Implementation",
+            "color": "#fef7ea",
+            "icon": "assets/images/states/Process mining.svg"
+          },
+          {
+            "name": "Implemented",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          },
+          {
+            "name": "Rejected",
+            "color": "#f9e1e4",
+            "icon": "assets/images/states/Not ready.svg"
+          },
+          {
+            "name": "Cancelled",
+            "color": "#f4f4f4",
+            "icon": "assets/images/states/Archived.svg"
+          },
+          {
+            "name": "Resolved",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          }
+        ]
+      },
+      {
+        "customTitle": "Reviews",
+        "appId": "%%Review_App_Id%%",
+        "creatorId": "%%Review_Creator_Id%%",
+        "headerFields": [
+          {
+            "field": "AnalysisId",
+            "label": "Analysis Id"
+          },
+          {
+            "field": "ContextType",
+            "label": "Context Type"
+          }
+        ],
+        "states": [
+          {
+            "name": "Created",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Investigation"
+          },
+          {
+            "name": "Appointment"
+          },
+          {
+            "name": "Monitoring"
+          },
+          {
+            "name": "Diagnosed"
+          },
+          {
+            "name": "Not diagnosed"
+          }
+        ],
+        "detailFields": [
+          [
+            {
+              "field": "AnalysisId",
+              "label": "Analysis Id"
+            }
+          ]
+        ],
+        "detailTitle": {
+          "label": "ID",
+          "field": "ComplianceID"
+        },
+        "showMilestones": true,
+        "creatorConfig": {
+          "DiscoverReview": {
+            "ShortDescription": "@@SUMMARY@@",
+            "LongDescription": "@@DETAILS@@",
+            "ContextType": "@@CONTEXT_TYPE@@",
+            "ContextId": "@@CONTEXT_IDS@@",
+            "DataSourceName": "@@TEMPLATE_NAME@@",
+            "DataSourceId": "@@ANALYSIS_ID@@",
+            "CommentsHistory": []
+          }
+        }
+      }
+    ]
+  },
+  "landingPage": {
+    "key": "",
+    "description": "",
+    "title": "Welcome to your Discover App",
+    "subtitle": "Discover, understand and Improve Your Business Processes from Operation Systems event logs data.",
+    "highlights": [
+      {
+        "title": "Learn from your data",
+        "iconURL": "ic-graph.svg",
+        "content": "Objectively visualize, identify, and quantify bottlenecks and inefficiencies in your business processes."
+      },
+      {
+        "title": "Prioritize improvements",
+        "iconURL": "ic-community.svg",
+        "content": "Raise out of compliance issues and process improvement requests. Collaborate with other teams to swiftly improve processes."
+      },
+      {
+        "title": "Predict with confidence",
+        "iconURL": "ic-documentation.svg",
+        "content": "Anticipate process outcomes such as future path, duration and cost with predictive analytics and apply it to your in-flight cases."
+      }
+    ],
+    "backgroundURL": "ProcessMiningsmall.jpg",
+    "actionButtons": [
+      {
+        "text": "Get started",
+        "route": "/starterApp/pd/datasource-administration"
+      }
+    ],
+    "verticalPadding": 0,
+    "roles": [],
+    "priority": 0
+  },
+  "general": {
+    "browserTitle": "TIBCO Cloud Discover",
+    "applicationTitle": "Discover",
+    "welcomeMessage": "My Cases Dashboard",
+    "roles": [],
+    "documentationUrl": "assets/help.html"
+  },
+  "dateTimeFormats": [
+    "d/M/y",
+    "d-M-y",
+    "d.M.y",
+    "M/d/y",
+    "M-d-y",
+    "M.d.y",
+    "y/M/d",
+    "y-M-d",
+    "y.M.d",
+    "d/M/y H:m",
+    "d/M/y H:m:s",
+    "d/M/y H:m:s.S",
+    "d-M-y H:m",
+    "d-M-y H:m:s",
+    "d-M-y H:m:s.S",
+    "d.M.y H:m",
+    "d.M.y H:m:s",
+    "d.M.y H:m:s.S",
+    "M/d/y H:m",
+    "M/d/y H:m:s",
+    "M/d/y H:m:s.S",
+    "M-d-y H:m",
+    "M-d-y H:m:s",
+    "M-d-y H:m:s.S",
+    "M.d.y H:m",
+    "M.d.y H:m:s",
+    "M.d.y H:m:s.S",
+    "y/M/d H:m",
+    "y/M/d H:m:s",
+    "y/M/d H:m:s.S",
+    "y-M-d H:m",
+    "y-M-d H:m:s",
+    "y-M-d H:m:s.S",
+    "y.M.d H:m",
+    "y.M.d H:m:s",
+    "y.M.d H:m:s.S",
+    "y/d/M H:m",
+    "y/d/M H:m:s",
+    "y/d/M H:m:s.S",
+    "y-d-M H:m",
+    "y-d-M H:m:s",
+    "y-d-M H:m:s.S",
+    "y.d.M H:m",
+    "y.d.M H:m:s",
+    "y.d.M H:m:s.S",
+    "d/M/y h:m a",
+    "d/M/y h:m:s a",
+    "d/M/y h:m:s.S a",
+    "d-M-y h:m a",
+    "d-M-y h:m:s a",
+    "d-M-y h:m:s.S a",
+    "d.M.y h:m a",
+    "d.M.y h:m:s a",
+    "d.M.y h:m:s.S a",
+    "M/d/y h:m a",
+    "M/d/y h:m:s a",
+    "M/d/y h:m:s.S a",
+    "M-d-y h:m a",
+    "M-d-y h:m:s a",
+    "M-d-y h:m:s.S a",
+    "M.d.y h:m a",
+    "M.d.y h:m:s a",
+    "M.d.y h:m:s.S a",
+    "y/M/d h:m a",
+    "y/M/d h:m:s a",
+    "y/M/d h:m:s.S a",
+    "y-M-d h:m a",
+    "y-M-d h:m:s a",
+    "y-M-d h:m:s.S a",
+    "y.M.d h:m a",
+    "y.M.d h:m:s a",
+    "y.M.d h:m:s.S a",
+    "y/d/M h:m a",
+    "y/d/M h:m:s a",
+    "y/d/M h:m:s.S a",
+    "y-d-M h:m a",
+    "y-d-M h:m:s a",
+    "y-d-M h:m:s.S a",
+    "y.d.M h:m a",
+    "y.d.M h:m:s a",
+    "y.d.M h:m:s.S a ",
+    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+    "yyyy-MM-dd'T'HH:mm:ss",
+    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+    "yyyy-MM-dd'T'HH:mm:ss"
+  ],
+  "id": "%%SS_ID%%",
+  "ssConfig": {
+    "caseIdWords": [
+      "case",
+      "ID",
+      "Agent",
+      "OpportunityId",
+      "Service ID",
+      "number",
+      "Problem Number",
+      "Case_ID",
+      "UniqueReqID"
+    ],
+    "activityWords": [
+      "activity",
+      "task",
+      "operation",
+      "Customer ID",
+      "StageName",
+      "Operation",
+      "incident_state",
+      "Problem Status",
+      "Activity",
+      "ProcessName"
+    ],
+    "resourceWords": [
+      "user",
+      "agent",
+      "resource",
+      "Agent",
+      "Resource",
+      "OwnerId",
+      "Operation",
+      "ComponentName"
+    ],
+    "startWords": [
+      "Start",
+      "start",
+      "begin",
+      "initial",
+      "Start Date",
+      "CreatedDate",
+      "sys_updated_at",
+      "Time_Stamp",
+      "Timestamp"
+    ],
+    "endWords": [
+      "End",
+      "end",
+      "finish",
+      "End Date"
+    ],
+    "doAddAdditional": true,
+    "debug": false,
+    "threshold": "0.80",
+    "CaseID": [
+      "case",
+      "ID",
+      "Agent",
+      "OpportunityId",
+      "Service ID",
+      "number",
+      "Problem Number",
+      "Case_ID",
+      "UniqueReqID"
+    ],
+    "Activity": [
+      "activity",
+      "task",
+      "operation",
+      "Customer ID",
+      "StageName",
+      "Operation",
+      "incident_state",
+      "Problem Status",
+      "Activity",
+      "ProcessName"
+    ],
+    "Starttime": [
+      "Start",
+      "start",
+      "begin",
+      "initial",
+      "Start Date",
+      "CreatedDate",
+      "sys_updated_at",
+      "Time_Stamp",
+      "Timestamp"
+    ],
+    "Endtime": [
+      "End",
+      "end",
+      "finish",
+      "End Date"
+    ],
+    "Scheduledend": [
+      "End",
+      "end",
+      "finish",
+      "End Date"
+    ],
+    "Scheduledstart": [
+      "Start",
+      "start",
+      "begin",
+      "initial",
+      "Start Date",
+      "CreatedDate",
+      "sys_updated_at",
+      "Time_Stamp",
+      "Timestamp"
+    ],
+    "Resource": [
+      "user",
+      "agent",
+      "resource",
+      "Agent",
+      "sys_created_by",
+      "Resource",
+      "OwnerId",
+      "Operation",
+      "ComponentName"
+    ]
+  },
+  "analyticsSF": {
+    "previewDXPLocation": "%%Discover_Spotfire_Path%%/preview/project_discover_preview_latest",
+    "customServer": ""
+  }
+}

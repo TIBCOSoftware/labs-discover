@@ -1,0 +1,1251 @@
+{
+  "investigations": {
+    "numberApplications": 2,
+    "caseConfig": [
+      {
+        "customTitle": "Compliance",
+        "appId": "3805",
+        "creatorId": "18756",
+        "creatorConfig" : {
+          "Discovercompliance": {
+            "ShortDescription": "@@SUMMARY@@",
+            "LongDescription": "@@DETAILS@@",
+            "Context": {
+              "ContextType": "@@CONTEXT_TYPE@@",
+              "ContextID": "@@CONTEXT_IDS@@"
+            },
+            "DataSourceName": "@@TEMPLATE_NAME@@",
+            "DataSourceId": "@@DATASET_ID@@",
+            "CommentsHistory": []
+          }
+        },
+        "allowMultiple": false,
+        "headerFields": [
+          {
+            "label": "ID",
+            "field": "ComplianceID"
+          },
+          {
+            "label": "Description Simon",
+            "field": "ShortDescription"
+          },
+          {
+            "label": "Type",
+            "field": "Context.ContextType"
+          },
+          {
+            "label": "Analysis",
+            "field": "DataSourceName"
+          },
+          {
+            "label": "Created on",
+            "field": "META:creationTimestamp",
+            "format": "DATE"
+          },
+          {
+            "label": "State",
+            "field": "state"
+          },
+          {
+            "field": "CUSTOM:caseReference",
+            "label": "Case Reference"
+          }
+        ],
+        "detailTitle": {
+          "label": "ID",
+          "field": "ComplianceID"
+        },
+        "showMilestones": true,
+        "detailFields": [
+          [
+            {
+              "label": "Description",
+              "field": "ShortDescription"
+            },
+            {
+              "label": "Full Description",
+              "field": "LongDescription"
+            },
+            {
+              "label": "Decision",
+              "field": "ComplianceDecision"
+            }
+          ],
+          [
+            {
+              "label": "Type",
+              "field": "Context.ContextType"
+            },
+            {
+              "label": "Analysis Name",
+              "field": "DataSourceName",
+              "format": "EVENT-LINK"
+            },
+            {
+              "label": "Escalation",
+              "field": "Escalation.Comment"
+            }
+          ],
+          [
+            {
+              "label": "ID",
+              "field": "ComplianceID"
+            },
+            {
+              "label": "Analysis ID",
+              "field": "DataSourceId"
+            },
+            {
+              "label": "Resolution",
+              "field": "Resolution.Comment"
+            }
+          ],
+          [
+            {
+              "label": "Case Reference",
+              "field": "CUSTOM:caseReference"
+            },
+            {
+              "label": "Variant ID",
+              "field": "Context.ContextID"
+            },
+            {
+              "label": "Comments",
+              "field": "CommentsHistory",
+              "format": "ARRAY"
+            }
+          ]
+        ],
+        "states": [
+          {
+            "name": "Created",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Ready.svg"
+          },
+          {
+            "name": "Investigation",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Escalated",
+            "color": "#FEF7EA",
+            "icon": "assets/images/states/Process mining.svg"
+          },
+          {
+            "name": "Compliant",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          },
+          {
+            "name": "Out of Compliance",
+            "color": "#F9E1E4",
+            "icon": "assets/images/states/Not ready.svg"
+          },
+          {
+            "name": "Cancelled",
+            "color": "#f4f4f4",
+            "icon": "assets/images/states/Archived.svg"
+          },
+          {
+            "name": "Resolved",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          }
+        ]
+      },
+      {
+        "customTitle": "Improvement",
+        "appId": "3806",
+        "creatorId": "18767",
+        "creatorConfig" : {
+          "Discoverimprovement": {
+            "ShortDescription": "@@SUMMARY@@",
+            "LongDescription": "@@DETAILS@@",
+            "Context": {
+              "ContextType": "@@CONTEXT_TYPE@@",
+              "ContextID": "@@CONTEXT_IDS@@"
+            },
+            "DataSourceName": "@@TEMPLATE_NAME@@",
+            "DataSourceId": "@@DATASET_ID@@",
+            "CommentsHistory": []
+          }
+        },
+        "headerFields": [
+          {
+            "label": "ID",
+            "field": "ImprovementID"
+          },
+          {
+            "label": "Created on",
+            "field": "META:creationTimestamp",
+            "format": "DATE"
+          },
+          {
+            "label": "Description",
+            "field": "ShortDescription"
+          },
+          {
+            "label": "Type",
+            "field": "Context.ContextType"
+          },
+          {
+            "label": "Analysis",
+            "field": "DataSourceName"
+          },
+          {
+            "label": "State",
+            "field": "state"
+          }
+        ],
+        "detailTitle": {
+          "label": "Description",
+          "field": "ShortDescription"
+        },
+        "showMilestones": true,
+        "detailFields": [
+          [
+            {
+              "label": "Description",
+              "field": "ShortDescription"
+            },
+            {
+              "label": "Full Description",
+              "field": "LongDescription"
+            },
+            {
+              "label": "",
+              "field": ""
+            }
+          ],
+          [
+            {
+              "label": "Type",
+              "field": "Context.ContextType"
+            },
+            {
+              "label": "Datasource Name",
+              "field": "DataSourceName",
+              "format": "EVENT-LINK"
+            },
+            {
+              "label": "Decision",
+              "field": "Decision"
+            }
+          ],
+          [
+            {
+              "label": "ID",
+              "field": "ImprovementID"
+            },
+            {
+              "label": "Datasource ID",
+              "field": "DataSourceId"
+            },
+            {
+              "label": "Resolution",
+              "field": "Resolution.Comment"
+            }
+          ],
+          [
+            {
+              "label": "Case Reference",
+              "field": "CUSTOM:caseReference"
+            },
+            {
+              "label": "Variant ID",
+              "field": "Context.ContextID"
+            },
+            {
+              "label": "Comments",
+              "field": "CommentsHistory",
+              "format": "ARRAY"
+            }
+          ]
+        ],
+        "states": [
+          {
+            "name": "Created",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Investigation",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Escalated",
+            "color": "#FEF7EA",
+            "icon": "assets/images/states/Process mining.svg"
+          },
+          {
+            "name": "Already Exists",
+            "color": "#f9e1e4",
+            "icon": "assets/images/states/Not ready.svg"
+          },
+          {
+            "name": "Under consideration",
+            "color": "#E0F0F9",
+            "icon": "assets/images/states/Added.svg"
+          },
+          {
+            "name": "Implementation",
+            "color": "#fef7ea",
+            "icon": "assets/images/states/Process mining.svg"
+          },
+          {
+            "name": "Implemented",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          },
+          {
+            "name": "Rejected",
+            "color": "#f9e1e4",
+            "icon": "assets/images/states/Not ready.svg"
+          },
+          {
+            "name": "Cancelled",
+            "color": "#f4f4f4",
+            "icon": "assets/images/states/Archived.svg"
+          },
+          {
+            "name": "Resolved",
+            "color": "#E1F7EB",
+            "icon": "assets/images/states/Ready.svg"
+          }
+        ]
+      },
+      {
+        "customTitle": "Reviews",
+        "appId": "3908",
+        "headerFields": [
+          {
+            "field": "ReviewID",
+            "label": "Review ID"
+          },
+          {
+            "field": "LongDescription",
+            "label": "Long Description"
+          },
+          {
+            "field": "ShortDescription",
+            "label": "Short Description"
+          },
+          {
+            "field": "DatasetName",
+            "label": "Dataset Name"
+          }
+        ],
+        "states": [],
+        "detailFields": [
+          [
+            {
+              "field": "CUSTOM:caseReference",
+              "label": "Case Reference"
+            },
+            {
+              "field": "CommentsHistory",
+              "label": "Long Description",
+              "format": "ARRAY"
+            }
+          ]
+        ],
+        "detailTitle": {
+          "field": "LongDescription",
+          "label": "Long Description"
+        },
+        "showMilestones": true,
+        "allowMultiple": false,
+        "creatorId": "19724",
+        "creatorConfig" : {
+          "DiscoverReview": {
+            "ShortDescription": "@@SUMMARY@@",
+            "LongDescription": "@@DETAILS@@",
+            "ContextType": "@@CONTEXT_TYPE@@",
+            "ContextId": "@@CONTEXT_IDS@@",
+            "DatasetName": "@@TEMPLATE_NAME@@",
+            "DatasetId": "@@DATASET_ID@@",
+            "CommentsHistory": []
+          }
+        }
+      }
+    ]
+  },
+  "analysis": {
+    "applicationId": "3807",
+    "creatorId": "18779"
+  },
+  "csv": {
+    "folder": "processdiscovery2_datasources"
+  },
+  "tdv": {
+    "enable": false,
+    "bdsServer": "",
+    "bdsPort": 443,
+    "username": "",
+    "password": "",
+    "jdbcPort": 9400,
+    "workers": 5,
+    "k8sEnable": false,
+    "k8sNamespace": "",
+    "k8sPodName": ""
+  },
+  "messaging": {
+    "endpoint": "wss://01dzbgce4xgn899zq7ns238vk3-apps.eu.messaging.cloud.tibco.com/channel",
+    "key": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJnc2JjIjoiMDFEWkJHQ0U0WEdOODk5WlE3TlMyMzhWSzMiLCJpYXQiOjE2MDY0NjUxNzksInN1YiI6IjI4NzEyMWIxZjlmOTRhNjU4OWZiZmQ0YWEwYjQxYzcwIn0.lhjssZr9c6X9yWyPleiNghohrf5fykjcCJBS2cSc_kqNLlA_7GVFoMgcvX_tLAJoRui_Fi17t2w--P5YTRgz4jJgBXAXpRy-gQ7A5SS0-fjCfZCyWKwKa0kJ-6Nhm6eY6LrvKNOCDTHutd3WuNlAnwUuVcpHjFliDgfFKOiR7-NlDCZt0DW-xP9NMPXUfsI_aA3YKfCuowenObM6oEYAsHtIeY5c_S3K2tmLkSfJZKHJmUWadZ7VY7dMfpOybrRFdQaOL5KY8h-OkKV08FCOTWY2PJg10fMzu0F-pLLOcpULkem1cZQRbzmgph9AvoSTuqQgPO4Ekk7Oovomuz-W6A",
+    "configURL": "https://eu-west-1.integration.cloud.tibcoapps.com/vngd47aqyyem2iz6nh774n6d4uvx57wy"
+  },
+  "storage": {
+    "type": "aurora",
+    "batchSize": 100000,
+    "partitions": 60,
+    "url": "jdbc:postgresql://discover.cluster-ctg1yow2ghhv.eu-west-1.rds.amazonaws.com:5432/discoqa",
+    "driver": "org.postgresql.Driver",
+    "username": "qa_rw",
+    "password": "\"fcuk2vxf76tb8kvdte8  \""
+  },
+  "analytics": {
+    "server": "https://labs.spotfire-cloud.com",
+    "template": "/Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest",
+    "menuConfig": [
+      {
+        "id": "Overview",
+        "label": "Overview",
+        "icon": "assets/images/analytics/ic_home.svg",
+        "child": []
+      },
+      {
+        "id": "Variants Overview",
+        "label": "Variants",
+        "icon": "assets/images/analytics/ic_explore.svg",
+        "child": [
+          {
+            "id": "Top Frequents Variants",
+            "label": "Top Frequency",
+            "icon": ""
+          },
+          {
+            "id": "Bottom Performance Variants",
+            "label": "Bottom Performance",
+            "icon": ""
+          }
+        ]
+      },
+      {
+        "id": "Variants Map",
+        "label": "Process Map",
+        "icon": "assets/images/analytics/ic-process_map.svg",
+        "child": []
+      },
+      {
+        "id": "Activities Frequency",
+        "label": "Activities",
+        "icon": "assets/images/analytics/ic-activities.svg",
+        "child": [
+          {
+            "id": "Activities Performance",
+            "label": "Performance",
+            "icon": ""
+          }
+        ]
+      },
+      {
+        "id": "Resources",
+        "label": "Resources Graph",
+        "icon": "assets/images/analytics/ic-community.svg",
+        "child": []
+      },
+      {
+        "id": "Reference Model",
+        "label": "Reference Model",
+        "icon": "assets/images/analytics/ic-model.svg"
+      },
+      {
+        "id": "Compliance",
+        "label": "Compliance",
+        "icon": "assets/images/analytics/ic-compliance.svg"
+      },
+      {
+        "id": "Case Context",
+        "label": "Cases",
+        "icon": "assets/images/analytics/ic-cases.svg",
+        "child": [
+          {
+            "id": "Case Attributes",
+            "label": "Attributes",
+            "icon": ""
+          }
+        ]
+      },
+      {
+        "id": "Filters",
+        "label": "Filters",
+        "icon": "assets/images/analytics/ic_filter.svg",
+        "child": [
+          {
+            "id": "Filters Activities",
+            "label": "Activities",
+            "icon": ""
+          }
+        ]
+      },
+      {
+        "id": "Config",
+        "label": "DevTools",
+        "icon": "assets/images/analytics/ic_maintenance.svg",
+        "child": []
+      }
+    ],
+    "marking": [
+      {
+        "type": "Compliance",
+        "table": "Cases",
+        "marking": "Case"
+      },
+      {
+        "type": "Compliance",
+        "table": "Variants",
+        "marking": "Variant"
+      },
+      {
+        "type": "Improvement",
+        "table": "Cases",
+        "marking": "Case"
+      },
+      {
+        "type": "Compliance",
+        "table": "Variants",
+        "marking": "Variant"
+      }
+    ]
+  },
+  "landingPage": {
+    "key": "",
+    "description": "",
+    "title": "Welcome to your Discover App",
+    "subtitle": "Discover, understand and Improve Your Business Processes from Operation Systems event logs data.",
+    "highlights": [
+      {
+        "title": "Learn from your data",
+        "iconURL": "ic-graph.svg",
+        "content": "Objectively visualize, identify, and quantify bottlenecks and inefficiencies in your business processes."
+      },
+      {
+        "title": "Prioritize improvements",
+        "iconURL": "ic-community.svg",
+        "content": "Raise out of compliance issues and process improvement requests. Collaborate with other teams to swiftly improve processes."
+      },
+      {
+        "title": "Predict with confidence",
+        "iconURL": "ic-documentation.svg",
+        "content": "Anticipate process outcomes such as future path, duration and cost with predictive analytics and apply it to your in-flight cases."
+      }
+    ],
+    "backgroundURL": "ProcessMiningsmall.jpg",
+    "actionButtons": [
+      {
+        "text": "Get started",
+        "route": "/starterApp/pd/datasource-administration"
+      }
+    ],
+    "verticalPadding": 0,
+    "roles": [],
+    "priority": 0
+  },
+  "general": {
+    "browserTitle": "TIBCO Cloud Discover App",
+    "applicationTitle": "Discover",
+    "welcomeMessage": "My Cases Dashboard",
+    "roles": [],
+    "documentationUrl": "assets/help.html"
+  },
+  "dateTimeFormats": [
+    "d/M/y",
+    "d-M-y",
+    "d.M.y",
+    "M/d/y",
+    "M-d-y",
+    "M.d.y",
+    "y/M/d",
+    "y-M-d",
+    "y.M.d",
+    "d/M/y H:m",
+    "d/M/y H:m:s",
+    "d/M/y H:m:s.S",
+    "d-M-y H:m",
+    "d-M-y H:m:s",
+    "d-M-y H:m:s.S",
+    "d.M.y H:m",
+    "d.M.y H:m:s",
+    "d.M.y H:m:s.S",
+    "M/d/y H:m",
+    "M/d/y H:m:s",
+    "M/d/y H:m:s.S",
+    "M-d-y H:m",
+    "M-d-y H:m:s",
+    "M-d-y H:m:s.S",
+    "M.d.y H:m",
+    "M.d.y H:m:s",
+    "M.d.y H:m:s.S",
+    "y/M/d H:m",
+    "y/M/d H:m:s",
+    "y/M/d H:m:s.S",
+    "y-M-d H:m",
+    "y-M-d H:m:s",
+    "y-M-d H:m:s.S",
+    "y.M.d H:m",
+    "y.M.d H:m:s",
+    "y.M.d H:m:s.S",
+    "y/d/M H:m",
+    "y/d/M H:m:s",
+    "y/d/M H:m:s.S",
+    "y-d-M H:m",
+    "y-d-M H:m:s",
+    "y-d-M H:m:s.S",
+    "y.d.M H:m",
+    "y.d.M H:m:s",
+    "y.d.M H:m:s.S",
+    "d/M/y h:m a",
+    "d/M/y h:m:s a",
+    "d/M/y h:m:s.S a",
+    "d-M-y h:m a",
+    "d-M-y h:m:s a",
+    "d-M-y h:m:s.S a",
+    "d.M.y h:m a",
+    "d.M.y h:m:s a",
+    "d.M.y h:m:s.S a",
+    "M/d/y h:m a",
+    "M/d/y h:m:s a",
+    "M/d/y h:m:s.S a",
+    "M-d-y h:m a",
+    "M-d-y h:m:s a",
+    "M-d-y h:m:s.S a",
+    "M.d.y h:m a",
+    "M.d.y h:m:s a",
+    "M.d.y h:m:s.S a",
+    "y/M/d h:m a",
+    "y/M/d h:m:s a",
+    "y/M/d h:m:s.S a",
+    "y-M-d h:m a",
+    "y-M-d h:m:s a",
+    "y-M-d h:m:s.S a",
+    "y.M.d h:m a",
+    "y.M.d h:m:s a",
+    "y.M.d h:m:s.S a",
+    "y/d/M h:m a",
+    "y/d/M h:m:s a",
+    "y/d/M h:m:s.S a",
+    "y-d-M h:m a",
+    "y-d-M h:m:s a",
+    "y-d-M h:m:s.S a",
+    "y.d.M h:m a",
+    "y.d.M h:m:s a",
+    "y.d.M h:m:s.S a ",
+    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+    "yyyy-MM-dd'T'HH:mm:ss",
+    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+    "yyyy-MM-dd'T'HH:mm:ss"
+  ],
+  "id": "11871",
+  "ssConfig": {
+    "caseIdWords": [
+      "case",
+      "ID",
+      "Agent",
+      "OpportunityId",
+      "Service ID",
+      "number",
+      "Problem Number",
+      "Case_ID",
+      "UniqueReqID"
+    ],
+    "activityWords": [
+      "activity",
+      "task",
+      "operation",
+      "Customer ID",
+      "StageName",
+      "Operation",
+      "incident_state",
+      "Problem Status",
+      "Activity",
+      "ProcessName"
+    ],
+    "resourceWords": [
+      "user",
+      "agent",
+      "resource",
+      "Agent",
+      "sys_created_by",
+      "Resource",
+      "OwnerId",
+      "Operation",
+      "ComponentName",
+      "Problem Involved Action Owner First Name"
+    ],
+    "startWords": [
+      "Start",
+      "start",
+      "begin",
+      "initial",
+      "Start Date",
+      "CreatedDate",
+      "sys_updated_at",
+      "Problem Change DateTime",
+      "Time_Stamp",
+      "Timestamp"
+    ],
+    "endWords": [
+      "End",
+      "end",
+      "finish",
+      "End Date"
+    ],
+    "doAddAdditional": true,
+    "debug": false,
+    "threshold": "0.80",
+    "CaseID": [
+      "case",
+      "ID",
+      "Agent",
+      "OpportunityId",
+      "Service ID",
+      "number",
+      "Problem Number",
+      "Case_ID",
+      "UniqueReqID"
+    ],
+    "Activity": [
+      "activity",
+      "task",
+      "operation",
+      "Customer ID",
+      "StageName",
+      "Operation",
+      "incident_state",
+      "Problem Status",
+      "Activity",
+      "ProcessName"
+    ],
+    "Starttime": [
+      "Start",
+      "start",
+      "begin",
+      "initial",
+      "Start Date",
+      "CreatedDate",
+      "sys_updated_at",
+      "Problem Change DateTime",
+      "Time_Stamp",
+      "Timestamp"
+    ],
+    "Endtime": [
+      "End",
+      "end",
+      "finish",
+      "End Date"
+    ],
+    "Scheduledend": [
+      "End",
+      "end",
+      "finish",
+      "End Date"
+    ],
+    "Scheduledstart": [
+      "Start",
+      "start",
+      "begin",
+      "initial",
+      "Start Date",
+      "CreatedDate",
+      "sys_updated_at",
+      "Time_Stamp",
+      "Timestamp"
+    ],
+    "Resource": [
+      "user",
+      "agent",
+      "resource",
+      "Agent",
+      "sys_created_by",
+      "Resource",
+      "OwnerId",
+      "Operation",
+      "ComponentName",
+      "Problem Involved Action Owner First Name"
+    ]
+  },
+  "analyticTemplates": [
+    {
+      "name": "Discovery",
+      "type": "General",
+      "description": "<p>This template is suited to discover how your processes are executed.</p><p> You expect to find a main process that is followed by a majority of cases, and learn about performance, volumes, outliers....</p>",
+      "splash": "assets/tempAT/Discovery.png",
+      "spotfireLocation": "/Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest",
+      "menuConfig": [
+        {
+          "id": "Overview",
+          "label": "Overview",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "Variants Overview",
+          "label": "Variants",
+          "icon": "pl-icon-explore",
+          "child": [
+            {
+              "id": "Top Frequents Variants",
+              "label": "Top Frequency",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            },
+            {
+              "id": "Bottom Performance Variants",
+              "label": "Bottom Performance",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Variants Map",
+          "label": "Process Map",
+          "icon": "pl-icon-support",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "Activities Frequency",
+          "label": "Activities",
+          "icon": "pl-icon-invite",
+          "child": [
+            {
+              "id": "Activities Performance",
+              "label": "Performance",
+              "icon": "pl-icon-invite",
+              "enabled": true,
+              "iconCode": "pl-icon-invite"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Resources",
+          "label": "Resources Graph",
+          "icon": "pl-icon-community",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "Reference Model",
+          "label": "Reference Model",
+          "icon": "",
+          "enabled": true
+        },
+        {
+          "id": "Compliance",
+          "label": "Compliance",
+          "icon": "pl-icon-license-agreements",
+          "enabled": true
+        },
+        {
+          "label": "Cases",
+          "icon": "pl-icon-app-switcher",
+          "child": [
+            {
+              "id": "Bursts",
+              "label": "Bursts",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Viewer",
+              "label": "Journeys",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Path",
+              "label": "Paths",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Attributes",
+              "label": "Attributes",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Audit",
+              "label": "Audit",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Filters",
+          "label": "Filters",
+          "icon": "pl-icon-filter",
+          "child": [
+            {
+              "id": "Filters Activities",
+              "label": "Activities",
+              "icon": "pl-icon-filter",
+              "enabled": true,
+              "iconCode": "pl-icon-filter"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Config",
+          "label": "DevTools",
+          "icon": "pl-icon-maintenance",
+          "child": [],
+          "enabled": true
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "name": "Compliance",
+      "type": "General",
+      "description": "<p>This template is suited to compare execution of your business processes against a reference model.</p><p>You already know the process and set of variants that should be followed, and want to check compliance to policies and rules ....</p>",
+      "splash": "assets/tempAT/Compliance.png",
+      "spotfireLocation": "/Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest",
+      "menuConfig": [
+        {
+          "id": "Overview",
+          "label": "Overview",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "Variants Overview",
+          "label": "Variants",
+          "icon": "pl-icon-explore",
+          "child": [
+            {
+              "id": "Top Frequents Variants",
+              "label": "Top Frequency",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            },
+            {
+              "id": "Bottom Performance Variants",
+              "label": "Bottom Performance",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Reference Model",
+          "label": "Reference Model",
+          "icon": "",
+          "enabled": true
+        },
+        {
+          "id": "Compliance",
+          "label": "Compliance",
+          "icon": "pl-icon-license-agreements",
+          "enabled": true
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "name": "Journey",
+      "type": "General",
+      "description": "<p>This template is suited to analyze individual journeys such as patients in a hospital or customer journeys. </p><p>The challenge in such scenarios is to find the main process using similarities, grouping and other techniques....</p>",
+      "splash": "assets/tempAT/Journey.png",
+      "spotfireLocation": "/Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest",
+      "menuConfig": [
+        {
+          "id": "Overview",
+          "label": "Overview",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "label": "Cases",
+          "icon": "pl-icon-app-switcher",
+          "child": [
+            {
+              "id": "Bursts",
+              "label": "Bursts",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Viewer",
+              "label": "Journeys",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Path",
+              "label": "Paths",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Attributes",
+              "label": "Attributes",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            },
+            {
+              "id": "Case Audit",
+              "label": "Audit",
+              "icon": "pl-icon-app-switcher",
+              "enabled": true,
+              "iconCode": "pl-icon-app-switcher"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Activities Frequency",
+          "label": "Activities",
+          "icon": "pl-icon-invite",
+          "child": [
+            {
+              "id": "Activities Performance",
+              "label": "Performance",
+              "icon": "pl-icon-invite",
+              "enabled": true,
+              "iconCode": "pl-icon-invite"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Resources",
+          "label": "Resources Graph",
+          "icon": "pl-icon-community",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "Filters",
+          "label": "Filters",
+          "icon": "pl-icon-filter",
+          "child": [
+            {
+              "id": "Filters Activities",
+              "label": "Activities",
+              "icon": "pl-icon-filter",
+              "enabled": true,
+              "iconCode": "pl-icon-filter"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Config",
+          "label": "DevTools",
+          "icon": "pl-icon-maintenance",
+          "child": [],
+          "enabled": true
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "name": "Healthcare",
+      "type": "Vertical",
+      "description": "This template is suited to analyze patients’ journeys where each case follows a different path. ",
+      "icon": "assets/tempAT/Vertical.png",
+      "spotfireLocation": "/Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/UseCase_8Mar_v2",
+      "menuConfig": [
+        {
+          "id": "README",
+          "label": "Overview",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "SETUP",
+          "label": "Setup",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "USE CASE",
+          "label": "Use Case",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "",
+          "label": "Cases",
+          "icon": "pl-icon-explore",
+          "child": [
+            {
+              "id": "Case Selection 1",
+              "label": "Case Selection 1",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            },
+            {
+              "id": "Case Selection 2",
+              "label": "Case Selection 2",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            },
+            {
+              "id": "Case Selection 3",
+              "label": "Case Selection 3",
+              "icon": "pl-icon-explore",
+              "enabled": true,
+              "iconCode": "pl-icon-explore"
+            }
+          ],
+          "enabled": true
+        },
+        {
+          "id": "Case Journey Viewer",
+          "label": "Case Journeys",
+          "icon": "pl-icon-support",
+          "enabled": true
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "name": "My Copy of Healthcare",
+      "type": "User defined",
+      "description": "This template is suited to analyze patients’ journeys where each case follows a different path. ",
+      "icon": "https://img.icons8.com/bubbles/2x/user-male.png",
+      "spotfireLocation": "/Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/UseCase_8Mar_v2_user_defined2",
+      "menuConfig": [
+        {
+          "id": "README",
+          "label": "Overview",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "SETUP",
+          "label": "Setup",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "id": "USE CASE",
+          "label": "Use Case",
+          "icon": "pl-icon-home",
+          "child": [],
+          "enabled": true
+        },
+        {
+          "label": "Case Selection 3",
+          "id": "Case Selection 3",
+          "icon": "pl-icon-home",
+          "enabled": true,
+          "child": []
+        },
+        {
+          "id": "Case Journey Viewer",
+          "label": "My Case Journeys",
+          "icon": "pl-icon-calendar",
+          "enabled": true
+        },
+        {
+          "label": "MyPage",
+          "id": "MyPage",
+          "icon": "pl-icon-home",
+          "enabled": true,
+          "child": []
+        }
+      ],
+      "enabled": true,
+      "splash": ""
+    },
+    {
+      "name": "HULA",
+      "type": "User defined",
+      "description": "This template is suited to analyze  patients",
+      "splash": "",
+      "spotfireLocation": "/Teams/01EKWAMNQ2425FR0WR90MBBNHR/Prototypes/UseCase_8Mar_v4",
+      "menuConfig": [
+        {
+          "label": "Use Case",
+          "id": "USE CASE",
+          "icon": "pl-icon-home",
+          "enabled": true,
+          "child": []
+        },
+        {
+          "label": "Setup",
+          "id": "SETUP",
+          "icon": "pl-icon-maintenance",
+          "enabled": true,
+          "child": []
+        },
+        {
+          "label": "Case Selection 1",
+          "id": "Case Selection 1",
+          "icon": "pl-icon-filter",
+          "enabled": true,
+          "child": []
+        },
+        {
+          "label": "Case Selection 2",
+          "id": "Case Selection 2",
+          "icon": "pl-icon-filter",
+          "enabled": true,
+          "child": []
+        },
+        {
+          "label": "Case Selection 3",
+          "id": "Case Selection 3",
+          "icon": "pl-icon-filter",
+          "enabled": true,
+          "child": []
+        },
+        {
+          "label": "Case Journey Viewer",
+          "id": "Case Journey Viewer",
+          "icon": "pl-icon-region",
+          "enabled": true,
+          "child": []
+        }
+      ],
+      "enabled": true,
+      "icon": "assets/tempAT/UserDefined.png"
+    }
+  ]
+}

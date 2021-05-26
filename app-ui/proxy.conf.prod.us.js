@@ -343,39 +343,47 @@ const PROXY_CONFIG = {
   }
 }
 
+// A switch to see if we need to update from the cookie (this is switched off if the OAUTH Token is injected from tibco-cloud.properties)
+let replaceTCSTKSESSION = true;
 // Add the authorization header to request using the value from the TCSTKSESSION cookie
 function addOauthHeader(proxyReq, req) {
   // check for existing auth header
-  let authHeaderExists = false;
-  Object.keys(req.headers).forEach(function (key) {
-    if (key.toLowerCase() === 'authorization') {
-      authHeaderExists = true;
-    }
-  });
-  if (authHeaderExists === false) {
+  if (replaceTCSTKSESSION) {
+    let authHeaderExists = false;
     Object.keys(req.headers).forEach(function (key) {
-      if (key === 'cookie') {
-        log('DEBUG', req.headers[key]);
-        cookies = req.headers[key].split('; ');
-        cookies.forEach((cook => {
-          if (cook.startsWith('TCSTKSESSION=')) {
-            const authKey = cook.replace('TCSTKSESSION=', '');
-            proxyReq.setHeader('Authorization', 'Bearer ' + authKey);
-            // log('DEBUG', 'Added auth header');
-          }
-        }))
+      if (key.toLowerCase() === 'authorization') {
+        authHeaderExists = true;
       }
     });
+    if (authHeaderExists === false) {
+      Object.keys(req.headers).forEach(function (key) {
+        if (key === 'cookie') {
+          log('DEBUG', req.headers[key]);
+          let cookies = req.headers[key].split('; ');
+          cookies.forEach((cook => {
+            if (cook.startsWith('TCSTKSESSION=')) {
+              const authKey = cook.replace('TCSTKSESSION=', '');
+              proxyReq.setHeader('Authorization', 'Bearer ' + authKey);
+              log('DEBUG', 'Added auth header');
+            }
+          }))
+          log('DEBUG', 'After: ', proxyReq.headers);
+        }
+      });
+    }
   }
+
 }
 
 // Function for logging
-const debug = false;
-function log(level, message){
-  if((debug && level == 'DEBUG') || level != 'DEBUG') {
-    console.log('[PROXY INTERCEPTOR] (' + level + '): ' + message);
+const debug = true;
+
+function log(level, ...message) {
+  if ((debug && level == 'DEBUG') || level != 'DEBUG') {
+    console.log('[PROXY INTERCEPTOR] (' + level + '): ', ...message);
   }
 }
+
 
 try {
   const propReader = require('properties-reader');
@@ -384,24 +392,53 @@ try {
     if (tcProp) {
       const cloudProps = tcProp.path();
       if (cloudProps.CloudLogin && cloudProps.CloudLogin.OAUTH_Token && cloudProps.CloudLogin.OAUTH_Token.trim() != '') {
-        for (let endpoint in PROXY_CONFIG) {
-          //console.log('ENDPOINT: ' , endpoint);
-          //console.log(PROXY_CONFIG[endpoint]['headers']);
-          let token = cloudProps.CloudLogin.OAUTH_Token;
-          const key = 'Token:';
-          if (token.indexOf(key) > 0) {
-            token = token.substring(token.indexOf(key) + key.length);
+        let token = cloudProps.CloudLogin.OAUTH_Token;
+        // Do not replace the token on the fly.
+        replaceTCSTKSESSION = false;
+        if (token == 'USE-GLOBAL') {
+          const {resolve} = require('path')
+          const globalPath = resolve(process.execPath, '../../lib/node_modules');
+          const globalProp = propReader(globalPath + '/@tibco-tcstk/common/global-tibco-cloud.properties').path();
+          if (globalProp.CloudLogin && globalProp.CloudLogin.OAUTH_Token && globalProp.CloudLogin.OAUTH_Token.trim() != '') {
+            token = globalProp.CloudLogin.OAUTH_Token;
+
+          } else {
+            console.error('Token set to USE-GLOBAL, but no global token found...');
           }
-          if (PROXY_CONFIG[endpoint] && PROXY_CONFIG[endpoint]['headers']) {
-            PROXY_CONFIG[endpoint]['headers']['Authorization'] = "Bearer " + token;
-            console.log('Added OAUTH to: ' + endpoint);
+        }
+        if (token != 'USE-GLOBAL') {
+          for (let endpoint in PROXY_CONFIG) {
+            // console.log('ENDPOINT: ' , endpoint);
+            // console.log(PROXY_CONFIG[endpoint]['headers']);
+            const key = 'Token:';
+            if (token.indexOf(key) > 0) {
+              token = token.substring(token.indexOf(key) + key.length);
+            }
+            if (PROXY_CONFIG[endpoint] && PROXY_CONFIG[endpoint]['headers']) {
+              PROXY_CONFIG[endpoint]['headers']['Authorization'] = "Bearer " + token;
+              console.log('Added OAUTH to: ' + endpoint + ' Token: ' + token);
+            }
           }
         }
       }
+    }
+  },
+  "/s/ghknokhoemng/ebx-ca-tabula/": {
+    "target": {
+      "host": "eu.metadata.cloud.tibco.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://eu.liveapps.cloud.tibco.com"
     }
   }
 } catch (err) {
   console.warn('Warning on Injecting OAUTH, likely tibco-cloud.properties does not exits, or you need to run: npm install --save-dev properties-reader');
 }
+
 
 module.exports = PROXY_CONFIG;

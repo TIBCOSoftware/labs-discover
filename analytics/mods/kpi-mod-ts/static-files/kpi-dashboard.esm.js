@@ -1,0 +1,1 @@
+import{p as a,b as c}from"./p-83877caf.js";a().then(a=>c([["p-95e10767",[[0,"kpi-chart",{data:[1],cards:[32]},[[0,"configSaved","configSavedHandler"]]],[1,"kpi-config",{open:[1028],transparent:[4],cards:[1040]}],[0,"kpi-card",{name:[1],value:[1],icon:[1]}],[1,"fas-icon-picker",{name:[1],value:[1025]}]]]],a));

@@ -1,0 +1,106 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    height:100%;
+}
+body {
+    margin:0px;
+    height:100%;
+}
+
+div.content {
+    height:100%;
+    display: flex;
+    flex-direction: row;
+}
+
+div.content > div.visualization {
+    height:100%;
+}
+
+div.content > div.visualization > div.title {
+    text-align: center;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
+div.content > div.trip-stops-list {
+    padding-top:10px;
+}
+
+div.content > div.trip-stops-list > div.trip-stop {
+    display:flex;
+    margin-top:-10px;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container  {
+  
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-graphic-container > svg {
+    width:40px;
+    height:80px;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-graphic-container.done > svg > circle {
+    stroke: dodgerblue;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-graphic-container.next > svg > circle {
+    stroke: darkorange;
+}
+
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-graphic-container.done > svg > rect {
+    fill: dodgerblue;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-stop  {
+    font-size:14px;
+    padding-top:7px;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-schedule  {
+    font-size:12px;
+    display:flex;
+    padding-top:5px;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-schedule > div {
+    width:80px;
+    min-width:80px;
+}
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-realtime  {
+    font-size:12px;
+    display:flex;
+    padding-top:5px;
+    font-style:italic;
+    font-weight:bold;
+}
+  
+ div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-realtime > div {
+    width:80px;
+    min-width:80px;
+ }
+  
+div.content > div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-realtime > div.early {
+    color:darkorange;
+}
+  
+div.content >  div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-realtime > div.ontime {
+    color:seagreen;
+}
+  
+div.content >  div.trip-stops-list > div.trip-stop > div.trip-stop-detail-container > div.trip-stop-detail-realtime > div.late {
+    color:red;
+}
+  
+  

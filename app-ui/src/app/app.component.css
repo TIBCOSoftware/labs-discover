@@ -40,3 +40,15 @@ router-outlet + * {
 .box .rowC.content {
   flex: 1 1 auto;
 }
+
+.version {
+  position: absolute;
+  text-align: right;
+  right: 10px;
+  bottom: 3px;
+  background-color: #fff;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 12px;
+  height: 14px;
+}

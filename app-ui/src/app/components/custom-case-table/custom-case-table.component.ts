@@ -1,11 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CurrencyPipe, DatePipe} from '@angular/common';
-import {CaseConfig, CaseEvent, CaseField} from "../../models/configuration";
-import {CaseInfo} from "@tibco-tcstk/tc-liveapps-lib";
-import {FilterUtils} from "primeng/utils";
-import {CaseCacheService} from "../../service/custom-case-cache.service";
-import {MessageTopicService} from "@tibco-tcstk/tc-core-lib";
-import {ActivatedRoute} from "@angular/router";
+import {CaseConfig, CaseEvent, CaseField} from '../../models/configuration';
+import {CaseInfo} from '@tibco-tcstk/tc-liveapps-lib';
+import {FilterUtils} from 'primeng/utils';
+import {CaseService} from '../../service/custom-case.service';
+import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
+import {ActivatedRoute} from '@angular/router';
 import get = Reflect.get;
 import _ from 'lodash';
 
@@ -14,7 +14,13 @@ import _ from 'lodash';
   templateUrl: './custom-case-table.component.html',
   styleUrls: ['./custom-case-table.component.scss']
 })
-export class CustomCaseTableComponent implements OnInit {
+export class CustomCaseTableComponent implements OnInit, OnChanges {
+
+  constructor(private caseService: CaseService,
+              private messageService: MessageTopicService,
+              private route: ActivatedRoute,
+              private datePipe: DatePipe) {
+  }
 
   /**
    * sandboxId - this comes from claims resolver
@@ -47,7 +53,7 @@ export class CustomCaseTableComponent implements OnInit {
   public cols: any[];
   public first = 0;
 
-  public showPagination: boolean = false;
+  public showPagination = false;
   public NUMBER_OF_ITEMS_BEFORE_PAGINATION = 50;
 
 
@@ -56,11 +62,8 @@ export class CustomCaseTableComponent implements OnInit {
   public showAdditionalSpinner: boolean;
   @ViewChild('dt', {static: true}) dt;
 
-  constructor(protected caseCache: CaseCacheService,
-              protected messageService: MessageTopicService,
-              protected route: ActivatedRoute,
-              protected datePipe: DatePipe) {
-  }
+  // TODO: Move this to config
+  protected DATE_OPTIONS = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
 
   ngOnInit() {
     this.cols = [
@@ -68,7 +71,7 @@ export class CustomCaseTableComponent implements OnInit {
       {field: 'caseReference', header: 'Name'}*/
     ];
     // Getting column definitions from config
-    for (let hed of this.cConfig.headerFields) {
+    for (const hed of this.cConfig.headerFields) {
       this.cols.push({field: hed.label, header: hed.label});
     }
     (async () => {
@@ -85,19 +88,19 @@ export class CustomCaseTableComponent implements OnInit {
   }
 
   async loadCases() {
-    this.cases = await this.caseCache.getCasesP(this.cConfig.appId);
+    this.cases = await this.caseService.getCasesP(this.cConfig.appId);
     this.casesTable = new Array<any>();
     if(this.cases.length > this.NUMBER_OF_ITEMS_BEFORE_PAGINATION){
       this.showPagination = true;
     }
-    for (let cas of this.cases) {
-      const newCase = {};
+    for (const cas of this.cases) {
+      const newCase:any = {};
       // Always get case Reference and State
-      newCase['caseReference'] = cas.caseReference;
+      newCase.caseReference = cas.caseReference;
       if (cas.untaggedCasedataObj) {
-        newCase['state'] = cas.untaggedCasedataObj.state;
+        newCase.state = cas.untaggedCasedataObj.state;
         // TODO: MAKE RE-Usable function for details as well.
-        for (let hed of this.cConfig.headerFields) {
+        for (const hed of this.cConfig.headerFields) {
           let field = 'untaggedCasedataObj.' + hed.field;
           if (hed.field.startsWith('META:')) {
             field = 'metadata.' + hed.field.substring(hed.field.lastIndexOf('META:') + 5);
@@ -107,7 +110,7 @@ export class CustomCaseTableComponent implements OnInit {
           }
           newCase[hed.label] = _.get(cas, field);
           if(hed.format){
-            if(hed.format == 'DATE'){
+            if(hed.format === 'DATE'){
               newCase[hed.label] = this.datePipe.transform(newCase[hed.label], 'fullDate');
             }
           }
@@ -118,8 +121,8 @@ export class CustomCaseTableComponent implements OnInit {
   }
 
   public getCaseInfo(tableInfo: any):CaseInfo{
-    for(let casA of this.cases){
-      if(tableInfo.caseReference == casA.caseReference){
+    for(const casA of this.cases){
+      if(tableInfo.caseReference === casA.caseReference){
          return casA;
       }
     }
@@ -128,10 +131,10 @@ export class CustomCaseTableComponent implements OnInit {
 
   public handleSelection() {
     this.selectedCases = [];
-    for(let casS of this.selectedCasesTable){
+    for(const casS of this.selectedCasesTable){
       // TODO: look at map array
-      for(let casA of this.cases){
-        if(casS.caseReference == casA.caseReference){
+      for(const casA of this.cases){
+        if(casS.caseReference === casA.caseReference){
           this.selectedCases.push(casA);
         }
       }
@@ -148,7 +151,7 @@ export class CustomCaseTableComponent implements OnInit {
   public onRowClick(rowData, $event) {
     let itemIsNotYetSelected = true;
     for (let i = 0; i < this.selectedCasesTable.length; i++) {
-      if (rowData.caseReference == this.selectedCases[i].caseReference) {
+      if (rowData.caseReference === this.selectedCases[i].caseReference) {
         // Row was already selected
         this.selectedCases.splice(i, 1);
         itemIsNotYetSelected = false;
@@ -163,13 +166,13 @@ export class CustomCaseTableComponent implements OnInit {
 
   public getNgClass(field, data) {
     let re = null;
-    if (field == 'state') {
+    if (field === 'state') {
       const cellData = data[field];
       if (cellData) {
-        if (cellData.trim() == 'Not cleared') {
+        if (cellData.trim() === 'Not cleared') {
           re = 'neutral';
         }
-        if (cellData.trim() == 'Cleared') {
+        if (cellData.trim() === 'Cleared') {
           re = 'good';
         }
       }
@@ -178,11 +181,11 @@ export class CustomCaseTableComponent implements OnInit {
   }
 
   public getStateColor(state) {
-    //console.log('Get Color for state: ' + state);
-    //TODO: optimize with lookup table
+    // console.log('Get Color for state: ' + state);
+    // TODO: optimize with lookup table
     if(this.cConfig.states){
-      for(let st of this.cConfig.states){
-        if(st.name == state){
+      for(const st of this.cConfig.states){
+        if(st.name === state){
           return st.color;
         }
       }
@@ -192,8 +195,8 @@ export class CustomCaseTableComponent implements OnInit {
 
   public getStateIcon(state){
     if(this.cConfig.states){
-      for(let st of this.cConfig.states){
-        if(st.name == state){
+      for(const st of this.cConfig.states){
+        if(st.name === state){
           if(st.icon){
             return st.icon;
           }
@@ -202,9 +205,6 @@ export class CustomCaseTableComponent implements OnInit {
     }
     return 'assets/images/states' + state + '.svg';
   }
-
-  // TODO: Move this to config
-  protected DATE_OPTIONS = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
 
   public obtainData = (rowData: any, col: any): string => {
     return get(rowData, col);
