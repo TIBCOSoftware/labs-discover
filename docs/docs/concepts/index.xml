@@ -1,0 +1,179 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – Concepts</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/</link>
+    <description>Recent content in Concepts on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/concepts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: What is an Event Log?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-an-event-log/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-an-event-log/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Your existing Operational systems, equipment&amp;rsquo;s, devices, workforce already produce Event logs Data in Operational systems&lt;/p&gt;
+&lt;p&gt;Process Mining Data sources and associated data formats can vary widely, 
+  but process mining only needs at least &lt;strong&gt;three key attributes: &lt;/strong&gt;
+&lt;ul&gt;
+   &lt;li&gt;a case ID (unique identifier)&lt;/li&gt;
+   &lt;li&gt;a timestamp&lt;/li&gt;
+   &lt;li&gt; an activity name&lt;/li&gt;
+ &lt;/ul&gt; 
+ These three attributes represent “an activity performed at a point in time, as part of a single case or process”. 
+&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../events.png&#34; alt=&#34;LABS Discover Events&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+  Once this information is provided, process mining analyzes, correlates, and reconciles this data , 
+  and provides graph-based views of the results to business process stakeholders, 
+  who can then start the exploration and insight discovery process.
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is Process Mining?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-process-mining/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-process-mining/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+  Instead of reading a process diagram that is likely out of date, or performing lengthy and time-consuming interviews with the people involved in process execution, 
+  process mining leverages &lt;strong&gt;Event Log Data&lt;/strong&gt; and analytical techniques to intelligently process data that is already produced by operational systems. 
+&lt;/p&gt;
+&lt;p&gt;
+  Whether the data source is a system or application supporting an operator, 
+  data produced by IoT devices, data sitting in a database, or data stored in a data lake, 
+  that data is available to whomever is able to connect to it.  
+  Process mining focuses on this event log data in order to run in a semi-automated way.    
+&lt;/p&gt;
+&lt;h4 id=&#34;use-cases-of-process-mining&#34;&gt;Use Cases of Process Mining&lt;/h4&gt;
+&lt;p&gt;All types and sizes of processes and organizations&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../usecases.png&#34; alt=&#34;LABS Discover User cases&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is the Business Value?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-the-business-value/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-the-business-value/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+  Once identified counter measures are in place, the process mining analysis can be rerun to track and measure the impact of the changes.
+  In fact, process mining should not be thought of as a one-off project, but more as a continuous process hygiene helping the business. 
+&lt;/p&gt;
+&lt;p&gt;
+  Given the critical nature of processes in digital transformation programs, 
+  process mining can often be seen as the first step towards optimization, given its ability to discover, at scale, 
+  how processes are effectively running, before re-engineering them.
+&lt;/p&gt;
+&lt;p&gt;
+Process mining gives business two things:
+&lt;ul&gt;
+  &lt;li&gt;Objectivity&lt;/li&gt;
+  &lt;li&gt;Direction&lt;/li&gt;
+&lt;/ul&gt; 
+&lt;p&gt;It helps you quantify the inefficiencies and tell you what to change first, for maximum impact and cost saving to the business.&lt;/p&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;business-value-augmented-operational-insight&#34;&gt;Business value, Augmented Operational Insight&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Improve end-to-end process visibility&lt;/li&gt;
+&lt;li&gt;Compare the real process with designed process to identify the root causes of process inefficiencies (compliance analysis)&lt;/li&gt;
+&lt;li&gt;See company’s performance in real time through KPI dashboard&lt;/li&gt;
+&lt;li&gt;Easy and fast detection of bottlenecks on regular basis&lt;/li&gt;
+&lt;li&gt;Identify best process analysis and improvement approaches&lt;/li&gt;
+&lt;li&gt;Ensure a more efficient operational monitoring&lt;/li&gt;
+&lt;li&gt;Reduce costs and time to discover processes as they are executed&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is a Process Analysis?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-a-process-analysis/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-a-process-analysis/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+  A &lt;strong&gt;Process Analysis&lt;/strong&gt; corresponds to a processs mining analysis against a particular data set. 
+  For example, it could be corresponding to the &#34;Purchase to pay&#34; or &#34;Invoice approval&#34; process coming from an SAP system.
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: our Architecture</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</link>
+      <pubDate>Sun, 05 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;high-level-view&#34;&gt;High Level view&lt;/h2&gt;
+&lt;p&gt;The current Architecture of Project Discover, from an high-level perspective&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;Architecture.png&#34; alt=&#34;LABS Discover Architecture&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Key components:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO Cloud, User Management, Live Apps for Case Management, Live Apps for Lifecycle&lt;/li&gt;
+&lt;li&gt;Web App UI hosted in Live Apps&lt;/li&gt;
+&lt;li&gt;Data Virtualization, Connectivity, ETL, Event Logs&lt;/li&gt;
+&lt;li&gt;Spark for Algorithm Compute layer and storage of your choice (e.g. PostgreSQL)&lt;/li&gt;
+&lt;li&gt;Spotfire for Process Mining Visualizations and data visualizations&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;tibco-product-list&#34;&gt;TIBCO Product List&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO Cloud™ Integration&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Live Apps&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Spotfire®&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Messaging&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Optional, for Data preparation and access:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO® Data Science - Team Studio&lt;/li&gt;
+&lt;li&gt;TIBCO® Data Virtualization&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: our Algorithm</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</link>
+      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;high-level-view&#34;&gt;High Level view&lt;/h2&gt;
+&lt;p&gt;The current Algorithm pipeline of Project Discover, from an high-level perspective&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;processMining.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

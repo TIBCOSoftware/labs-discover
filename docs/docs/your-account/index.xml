@@ -1,0 +1,38 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – Your account</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/</link>
+    <description>Recent content in Your account on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Thu, 19 Nov 2020 00:00:00 +0000</lastBuildDate>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/your-account/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Settings</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/</guid>
+      <description>
+        
+        
+        &lt;p&gt;The settings sections are restricted to administrators. 
+    It allows to achieve customizations of the application without coding. 
+    Check our all sections and remember to save your changes using save button. 
+ &lt;/p&gt;
+&lt;p&gt;
+  Settings are &lt;strong&gt;global&lt;/strong&gt; to the application so it will apply to all its users.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>

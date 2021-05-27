@@ -1,0 +1,915 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project Discover™ – Documentation</title>
+    <link>https://tibcosoftware.github.io/labs-discover/docs/</link>
+    <description>Recent content in Documentation on Project Discover™</description>
+    <generator>Hugo -- gohugo.io</generator>
+    
+	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+      
+        
+      
+    
+    
+    <item>
+      <title>Docs: Branding</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-branding/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-branding/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../Branding.png&#34; alt=&#34;Branding&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;can-i-adjust-the-application-branding&#34;&gt;Can I adjust the Application Branding&lt;/h4&gt;
+&lt;p&gt;Yes. In the General section you can change the application title.
+&lt;/p&gt;
+&lt;h4 id=&#34;can-i-adjust-the-welcome-screen&#34;&gt;Can I adjust the Welcome Screen&lt;/h4&gt;
+&lt;p&gt;Yes. The Welcome screen has the following structure:
+    &lt;li&gt;A title&lt;/li&gt;
+    &lt;li&gt;A sub-title&lt;/li&gt;
+    &lt;li&gt;3 sections describing the application capabilities. Each of them has an icon associated, and is made of a title and a description&lt;/li&gt;
+    &lt;li&gt;A background image&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;
+   You can change all text, upload new image and icons, to brand your own landing page.
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: General</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-general/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-general/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-General.png&#34; alt=&#34;General&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Here you can configure the necessary &lt;strong&gt;TIBCO Cloud components&lt;/strong&gt;  used to manage the lifecycle of Process analysis.
+&lt;/p&gt;
+&lt;h4 id=&#34;messaging&#34;&gt;Messaging&lt;/h4&gt;
+&lt;p&gt;The following &lt;strong&gt;TIBCO Cloud Messaging&lt;/strong&gt;  configurations are required
+    &lt;li&gt;Messaging endpoint&lt;/li&gt;
+    &lt;li&gt;Messaging API Key&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;Those elements can be found in your TIBCO Cloud Messaging subscription&lt;/p&gt;
+&lt;h4 id=&#34;integration&#34;&gt;Integration&lt;/h4&gt;
+&lt;p&gt;The following &lt;strong&gt;TIBCO Cloud Integration&lt;/strong&gt;  configurations are required
+    &lt;li&gt;Integration endpoint&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;Those elements can be found in your TIBCO Cloud Integration subscription&lt;/p&gt;
+&lt;h4 id=&#34;live-apps&#34;&gt;Live Apps&lt;/h4&gt;
+&lt;p&gt;The following &lt;strong&gt;TIBCO Cloud Live Apps&lt;/strong&gt; configurations are required
+    &lt;li&gt;Application used to manage the Process Analysis lifecycle&lt;/li&gt;
+    &lt;li&gt;Creator used to create cases of the above&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;Those elements can be found in your TIBCO Cloud Live Apps subscription&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Import Wizard</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/importwizard/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/importwizard/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+The purpose of this wizard is to drive you through the creation of a new process analysis
+First, you will be able to bring your data in the form of a virtualized data view or a file.
+Once done, a new entry will appear in the process analysis table and the process mining algorithm will start automatically.
+Finally, after some minutes, the entry will move to a &lt;strong&gt;Ready&lt;/strong&gt; state and you will be able to view analytics.
+&lt;/p&gt;
+&lt;h3 id=&#34;can-i-edit-an-import-wizard-later-&#34;&gt;can I edit an Import Wizard later ?&lt;/h3&gt;
+&lt;p&gt;
+Yes. Listed process analysis can be edited using the &lt;strong&gt;Edit&lt;/strong&gt; action available on each line. 
+This action is only available in &lt;strong&gt;Ready&lt;/strong&gt; and &lt;strong&gt;Not ready&lt;/strong&gt; status.
+&lt;/p&gt;
+&lt;h3 id=&#34;whats-next-&#34;&gt;whats next ?&lt;/h3&gt;
+&lt;p&gt;
+Once created, a new entry will be added in the Process Analysis table.
+The execution of process mining algorithm will start automatically.
+After a few minutes, the entry will enter a &lt;strong&gt;Ready&lt;/strong&gt; state which means you can start visual analytics by clicking on &lt;Strong&gt;view Analytics&lt;/Strong&gt;
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Overview</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-overview/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-overview/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visOverview.png&#34; alt=&#34;Overview Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A set of KPIs allow you to quickly visualize &lt;/p&gt;
+    &lt;li&gt;Nb of Events&lt;/li&gt;
+    &lt;li&gt;Nb of Cases&lt;/li&gt;
+    &lt;li&gt;Nb of Variants&lt;/li&gt;
+    &lt;li&gt;Nb of Activities&lt;/li&gt;
+    &lt;li&gt;Median and average case duration&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;
+  Open cases are also visualized on a timeline, allowing you to filter start and end times using the zoom slider and the filter panel.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 1 name &amp; description</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step1/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step1/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep1.png&#34; alt=&#34;new Analysis Step 1&#34;&gt;&lt;/p&gt;
+&lt;p&gt;These Name will then appear in the process analysis table.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is an Event Log?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-an-event-log/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-an-event-log/</guid>
+      <description>
+        
+        
+        &lt;p&gt;Your existing Operational systems, equipment&amp;rsquo;s, devices, workforce already produce Event logs Data in Operational systems&lt;/p&gt;
+&lt;p&gt;Process Mining Data sources and associated data formats can vary widely, 
+  but process mining only needs at least &lt;strong&gt;three key attributes: &lt;/strong&gt;
+&lt;ul&gt;
+   &lt;li&gt;a case ID (unique identifier)&lt;/li&gt;
+   &lt;li&gt;a timestamp&lt;/li&gt;
+   &lt;li&gt; an activity name&lt;/li&gt;
+ &lt;/ul&gt; 
+ These three attributes represent “an activity performed at a point in time, as part of a single case or process”. 
+&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../events.png&#34; alt=&#34;LABS Discover Events&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+  Once this information is provided, process mining analyzes, correlates, and reconciles this data , 
+  and provides graph-based views of the results to business process stakeholders, 
+  who can then start the exploration and insight discovery process.
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Data</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/data/</link>
+      <pubDate>Fri, 16 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/data/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;data-types&#34;&gt;Data Types&lt;/h2&gt;
+&lt;p&gt;Discover support to upload and manage CSV Files.
+For other types of data sources, you can use the New Process Analysis wizard to connect to any TIBCO Data Virtualization views. e.g. Databases, Big Data Clusters, or ready to use Application Connectors.&lt;/p&gt;
+&lt;h2 id=&#34;csv-files&#34;&gt;CSV Files&lt;/h2&gt;
+&lt;h4 id=&#34;file-size&#34;&gt;File Size&lt;/h4&gt;
+&lt;p&gt;You can upload files up to 500MB,
+for bigger data sets, please use TIBCO Data Virtualization.&lt;/p&gt;
+&lt;h4 id=&#34;file-formats&#34;&gt;File Formats&lt;/h4&gt;
+&lt;p&gt;Upload your files in &lt;strong&gt;CSV Format&lt;/strong&gt; only.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Please note that zip files are not supported.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 2 data source type</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step2/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step2/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep2.png&#34; alt=&#34;new Analysis Step 2&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Select the type of data source you want to connect data from. Choose one of:&lt;/p&gt;
+  &lt;ol&gt;
+    &lt;li&gt;TIBCO Data Virtualization&lt;/li&gt;
+    &lt;li&gt;CSV Files&lt;/li&gt;
+  &lt;/ol&gt;
+  &lt;p&gt;When selecting &lt;strong&gt;CSV Files&lt;/strong&gt; you will then need to choose a file from a drop down. 
+    If you need to upload a new CSV file, please use the Data tab from the top menu bar.
+  Once the file is selected, you are presented a preview of the content, so you can double check it.
+  &lt;/p&gt;
+  &lt;p&gt;When selecting &lt;strong&gt;TIBCO Data Virtualization&lt;/strong&gt; you will then need to choose a combination of site, database and table.
+    Those are introspected from your Data Virtualization server. 
+  Once the table is selected, you are presented a preview of the content, so you can double check it.
+  &lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Variants</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-variants/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-variants/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visVariants.png&#34; alt=&#34;Variants Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+  Variants can be explored, focusing on:
+  &lt;li&gt;Distribution by frequency or performance&lt;/li&gt;
+  &lt;li&gt;Top frequency: discover the most frequent paths corresponding to your 80% cases.&lt;/li&gt;
+  &lt;li&gt;Bottom performance: discover the worst cases in terms of duration and identify the outliers.&lt;/li&gt;
+&lt;/p&gt;  
+&lt;p&gt;
+  Select one or more variants from the table and visualize the corresponding process map.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is Process Mining?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-process-mining/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-process-mining/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+  Instead of reading a process diagram that is likely out of date, or performing lengthy and time-consuming interviews with the people involved in process execution, 
+  process mining leverages &lt;strong&gt;Event Log Data&lt;/strong&gt; and analytical techniques to intelligently process data that is already produced by operational systems. 
+&lt;/p&gt;
+&lt;p&gt;
+  Whether the data source is a system or application supporting an operator, 
+  data produced by IoT devices, data sitting in a database, or data stored in a data lake, 
+  that data is available to whomever is able to connect to it.  
+  Process mining focuses on this event log data in order to run in a semi-automated way.    
+&lt;/p&gt;
+&lt;h4 id=&#34;use-cases-of-process-mining&#34;&gt;Use Cases of Process Mining&lt;/h4&gt;
+&lt;p&gt;All types and sizes of processes and organizations&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../usecases.png&#34; alt=&#34;LABS Discover User cases&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Cases</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/cases/</link>
+      <pubDate>Wed, 14 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/cases/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-are-investigations&#34;&gt;What are Investigations&lt;/h2&gt;
+&lt;p&gt;An &lt;strong&gt;investigation&lt;/strong&gt; is a result of a negative finding in the process mining analysis.
+Ir represents an issue, or a potential area of improvement, that cannot be ignored and needs to be reported to case resolvers.
+A typical investigation follows a process that start from initial verification, investigation of the root cause, qualification of the issue (confirmed or false positive)
+and finally a resolution in the form of counter measures that will take effect and be checked again in the next round of procss mining.&lt;/p&gt;
+&lt;h3 id=&#34;what-are-the-investigation-types&#34;&gt;What are the Investigation Types&lt;/h3&gt;
+  &lt;p&gt;Two investigation types are possible: &lt;/p&gt;
+  &lt;li&gt; &lt;strong&gt;Compliance&lt;/strong&gt; &lt;/li&gt;
+  &lt;li&gt; &lt;strong&gt;Improvements&lt;/strong&gt; &lt;/li&gt;
+&lt;h2 id=&#34;what-is-compliance&#34;&gt;What is Compliance&lt;/h2&gt;
+&lt;p&gt;A &lt;strong&gt;Compliance&lt;/strong&gt; investigation is an issue discovered during the process mining analysis that needs to be reported and tracked until resolution.&lt;/p&gt;
+&lt;h2 id=&#34;what-is-improvement&#34;&gt;What is Improvement&lt;/h2&gt;
+&lt;p&gt;An &lt;strong&gt;Improvement&lt;/strong&gt; investigation is proposal made by the process stakeholder to improve a certain area of the process, following inefficiencies discovered during the process mining analysis.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Lifecycle</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/lifecycle/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/lifecycle/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;what-is-the-process-analysis-lifecycle&#34;&gt;What is the Process Analysis Lifecycle&lt;/h2&gt;
+&lt;p&gt;Once created using the wizard, Process analysis may follow the list of statuses below.&lt;/p&gt;
+    &lt;li&gt; &lt;strong&gt;Added&lt;/strong&gt;: Initial status after creation from the wizard. Once Added, the analysis goes directly to the Process Mining status.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Process Mining&lt;/strong&gt;: Once here, the computation of the process mining algorithm(s) is sent to the backend.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Ready&lt;/strong&gt;: Process Mining has been successfully completed and analysis is ready to view analytics.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Not Ready&lt;/strong&gt;: Process Mining has terminated with errors. Those errors should be reviewed and the analysis should be edited and re-run. &lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Archived&lt;/strong&gt;: This is like a read only mode. the analysis can see be viewed but not modified. &lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Purged&lt;/strong&gt;: Analysis is marked for removal and should be removed automatically from the list.&lt;/li&gt;
+    &lt;li&gt; &lt;strong&gt;Completed&lt;/strong&gt;: This terminate status means the analysis can be permanently deleted from the system.&lt;/li&gt;
+&lt;br&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Note: in State &amp;lsquo;Process Mining&amp;rsquo;, a progress bar is visible on the status to track the overall progress. Once completed, the analysis goes automatically either in Ready ot Not Ready status.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Process Map</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-map/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-map/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visProcessMap.png&#34; alt=&#34;Process Map Visualization&#34;&gt;&lt;/p&gt;
+ &lt;p&gt;
+   Typical features include:
+   &lt;li&gt;Node color represent a metric (frequency or performance)&lt;/li&gt;
+   &lt;li&gt;Zoom in and out to explore the process&lt;/li&gt;
+   &lt;li&gt;Support of multiple layouts&lt;/li&gt;
+   &lt;li&gt;Ability to select nodes and edges for filtering purpose&lt;/li&gt;
+   &lt;li&gt;Configurable labels on edges (including Nb events &amp; duration)&lt;/li&gt;
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 3 parsing options</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step3/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step3/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep3.png&#34; alt=&#34;new Analysis Step 3&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Parsing options depend on the type of data source&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;For CSV Files&lt;/strong&gt;&lt;/p&gt;
+    &lt;li&gt;Specify the column separator. While CSV stands for Comma Separated Values, some files may use a different separator.&lt;/li&gt;
+    &lt;li&gt;Specify the special characters used for quote, escape and comment in values. &lt;/li&gt;
+    &lt;li&gt;Specify the encoding of the file such as UTF-8 &lt;/li&gt;
+    &lt;li&gt;Specify additional parsing options such as skip comments or empty lines&lt;/li&gt;
+    &lt;li&gt;Specify the number of lines you want to preview from the File &lt;/li&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;For Data Virtualization views&lt;/strong&gt;&lt;/p&gt;
+    &lt;li&gt;Specify the encoding of the data such as UTF-8 &lt;/li&gt;
+    &lt;li&gt;Specify the number of lines you want to preview from the data &lt;/li&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is the Business Value?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-the-business-value/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-the-business-value/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+  Once identified counter measures are in place, the process mining analysis can be rerun to track and measure the impact of the changes.
+  In fact, process mining should not be thought of as a one-off project, but more as a continuous process hygiene helping the business. 
+&lt;/p&gt;
+&lt;p&gt;
+  Given the critical nature of processes in digital transformation programs, 
+  process mining can often be seen as the first step towards optimization, given its ability to discover, at scale, 
+  how processes are effectively running, before re-engineering them.
+&lt;/p&gt;
+&lt;p&gt;
+Process mining gives business two things:
+&lt;ul&gt;
+  &lt;li&gt;Objectivity&lt;/li&gt;
+  &lt;li&gt;Direction&lt;/li&gt;
+&lt;/ul&gt; 
+&lt;p&gt;It helps you quantify the inefficiencies and tell you what to change first, for maximum impact and cost saving to the business.&lt;/p&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;business-value-augmented-operational-insight&#34;&gt;Business value, Augmented Operational Insight&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Improve end-to-end process visibility&lt;/li&gt;
+&lt;li&gt;Compare the real process with designed process to identify the root causes of process inefficiencies (compliance analysis)&lt;/li&gt;
+&lt;li&gt;See company’s performance in real time through KPI dashboard&lt;/li&gt;
+&lt;li&gt;Easy and fast detection of bottlenecks on regular basis&lt;/li&gt;
+&lt;li&gt;Identify best process analysis and improvement approaches&lt;/li&gt;
+&lt;li&gt;Ensure a more efficient operational monitoring&lt;/li&gt;
+&lt;li&gt;Reduce costs and time to discover processes as they are executed&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Activities</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-activities/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-activities/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visActivities.png&#34; alt=&#34;Activities Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;
+  Two main categorizations are proposed:
+&lt;li&gt;by frequency&lt;/li&gt;
+&lt;li&gt;by performance&lt;/li&gt;
+ &lt;/p&gt;
+&lt;p&gt;
+  Each set of visualizations include a time distribution, and a tree map representing resources performing the activities. 
+&lt;/p&gt;
+&lt;p&gt;Select one or more activities to drill down into details.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 4 data source columns</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step4/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step4/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep4.png&#34; alt=&#34;new Analysis Step 4&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;In this step you will tell us what columns from the source data correspond to the expected data needed to run process mining.&lt;/p&gt;
+  &lt;p&gt;mandatory mappings are:&lt;/p&gt;  
+  &lt;li&gt;&lt;strong&gt;CaseId&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Activity name&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Activity start timestamp&lt;/strong&gt;&lt;/li&gt;
+  &lt;p&gt;&lt;/p&gt; 
+  &lt;p&gt;optional mappings are:&lt;/p&gt;  
+  &lt;li&gt;Resource&lt;/li&gt;
+  &lt;li&gt;Activity end timestamp&lt;/li&gt;
+  &lt;li&gt;Extra attributes. &lt;i&gt;Note this one allows multiple selection&lt;/i&gt;&lt;/li&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: What is a Process Analysis?</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-a-process-analysis/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/what-is-a-process-analysis/</guid>
+      <description>
+        
+        
+        &lt;p&gt;
+  A &lt;strong&gt;Process Analysis&lt;/strong&gt; corresponds to a processs mining analysis against a particular data set. 
+  For example, it could be corresponding to the &#34;Purchase to pay&#34; or &#34;Invoice approval&#34; process coming from an SAP system.
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Analytics</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-analytics/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-analytics/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../Analytics.png&#34; alt=&#34;Analytics&#34;&gt;&lt;/p&gt;
+&lt;h4 id=&#34;enable-web-authoring&#34;&gt;Enable Web Authoring&lt;/h4&gt;
+&lt;p&gt;Spotfire Web Authoring can get toggled on or off&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Note: this capability requires the web authoring role on Spotfire.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;spotfire-server-configuration&#34;&gt;Spotfire Server Configuration&lt;/h4&gt;
+&lt;p&gt;The default Spotfire server is TIBCO Cloud Spotfire. &lt;br&gt;
+However you can toggle that settings off and enter the URL of your own managed server.&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Online Help</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/onlinehelp/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/onlinehelp/</guid>
+      <description>
+        
+        
+        &lt;p&gt;The Discover UI provides a contextual Online Help, based on current visible screen.&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../OnlineHelp.png&#34; alt=&#34;Online Help&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Try it out!&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Resource Graph</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-resource-graph/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-resource-graph/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visResourceGraph.png&#34; alt=&#34;Resource Graph Visualization&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;
+    The purpose is to help discover some patterns related to how resources are involved and interact with each other in processes.
+ &lt;/p&gt;
+ &lt;p&gt;
+   A table lists resources ranked by number of activities performed. 
+   &lt;li&gt;select one or more resources to see details, including the list of activities performed by the selection.  &lt;/li&gt;
+ &lt;/p&gt;
+ &lt;p&gt;
+   The graph represent &lt;strong&gt;resources&lt;/strong&gt; as nodes and &lt;strong&gt;connections&lt;/strong&gt; as edges. 
+   A connection between two resources represents two consecutive activities in the same case. 
+   Of course, an edge can represent more than one occurrences of such connection, for one or more cases.
+ &lt;/p&gt;
+ &lt;p&gt;
+   A filter panel allows 
+   &lt;li&gt;setting a minimum number of activities, as a way to filter resources&lt;/li&gt;
+   &lt;li&gt;setting a minimum number of activities, as a way to filter resources and connections&lt;/li&gt;
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 5 datetime format</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step5/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step5/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep5.png&#34; alt=&#34;new Analysis Step 5&#34;&gt;&lt;/p&gt;
+&lt;p&gt;In this step, you need to tell us the &lt;strong&gt;format of the datetime&lt;/strong&gt; column, so that we can parse it.
+    We try to guess the format and give you the final word to confirm it.
+  &lt;/p&gt;
+  &lt;p&gt; In case of &lt;strong&gt;ambiguity&lt;/strong&gt;, we propose you the list of possible matching formats, 
+    and we suggest you browse more rows in the data source in order to remove the ambiguity.
+    An example of such ambiguity is: 1/2/2020: you cannot tell which number is the month and which number is the day.
+    But if you read more lines you may find 1/25/2020 which indicates the the month is first. 
+  &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Database</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-database/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-database/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-Database.png&#34; alt=&#34;Database&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;You can specify the details of the Database used to store the output of the process mining.
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Reference Model</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-reference-model/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-reference-model/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visReferenceModel.png&#34; alt=&#34;Reference Model Visualization&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;Here&#39;s how it works:
+    &lt;li&gt;Initially the reference model is empty.&lt;/li&gt;
+    &lt;li&gt;As you discover variants, you can Add one or more to the reference model.&lt;/li&gt;
+    &lt;li&gt;The reference model is then persisted in the backend, therefore next time you open the analysis it will appear.&lt;/li&gt;
+    &lt;li&gt;Once set, you can check compliance of the cases against that reference set.&lt;/li&gt;
+    &lt;li&gt;At any time, you can add/remove variants from the reference model.&lt;/li&gt;
+  &lt;/p&gt;
+  &lt;p&gt;
+  Setting the reference model does not require any modeling. 
+  Instead, it follows a discovery approach, expecting the data and cases to contain at least one occurrence of them.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Step 6 review</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step6/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/new-process-analysis/step6/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../newAnalysisStep6.png&#34; alt=&#34;new Analysis Step 6&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This is the final step. Please review the summary of previous selections and finalize the creation of the new analysis by clicking on &lt;strong&gt;Finish&lt;/strong&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Orchestration</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-orchestration/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-orchestration/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-Orchestration.png&#34; alt=&#34;Orchestration&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;You can specify the details of the spark orchestrator responsible for running process mining on the backend.
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Compliance</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-compliance/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-compliance/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visCompliance.png&#34; alt=&#34;Compliance Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A variant is qualified as non compliant if it doesn&#39;t follow any of the variants that constitute the reference model. 
+    Only the paths are considered for compliance checking.&lt;/p&gt;
+&lt;p&gt;What you can see at a glance is:&lt;/p&gt;
+&lt;li&gt;The level of non compliance in the form of the number of variants, and % of cases that aren&#39;t compliant with the reference set. &lt;/li&gt;
+&lt;li&gt;A table showing all non compliant variants
+&lt;li&gt;A visual representation of the differences between the reference model and a selected non compliant variant&lt;/li&gt; 
+&lt;/p&gt;
+&lt;p&gt;
+   The table of non compliant variants can be sorted by any of these columns:
+   &lt;li&gt;Degree of non compliance, expressed as the number of difference between the variant (row) and the reference model&lt;/li&gt;
+   &lt;li&gt;Number of cases&lt;/li&gt;
+   &lt;li&gt;Duration metrics&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;
+   You can select a variant in the table and perform the following actions:
+   &lt;li&gt;Visualize the process compared to the reference model.   &lt;/li&gt;
+   &lt;li&gt;Mark the variant as checked so that next time you open the analysis you won&#39;t need to inspect it again. &lt;/li&gt;
+   &lt;li&gt;Raise an investigation so that the non compliance can be escalated, validated and the root cause problem resolved so that it doesn&#39;t occur again in the future &lt;/li&gt;
+  &lt;li&gt;Track the status of the investigation&lt;/li&gt;
+&lt;/p&gt;
+&lt;p&gt;Graph Color Codes&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;../compare-colors.png&#34; alt=&#34;Compliance Visualization&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Process Mining</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-process-mining/</link>
+      <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-platform-process-mining/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../P-ProcessMining.png&#34; alt=&#34;ProcessMining&#34;&gt;&lt;/p&gt;
+  &lt;p&gt;You can specify the details of the spark orchestrator responsible for running process mining on the backend.
+ &lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Cases</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-cases/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-cases/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../visCases.png&#34; alt=&#34;Cases Visualization&#34;&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;usually cases get selected from a variant selection&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;
+    It allows to drill down into the details of each case and view their event history.
+    Cases are listed and can be compared visually by selecting them.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Filters</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-filters/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/vis-filters/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;..//visFilters.png&#34; alt=&#34;Filters Visualization&#34;&gt;&lt;/p&gt;
+&lt;p&gt;This template is a starting point. It is designed as &lt;strong&gt;generic&lt;/strong&gt;, so that you can use it against any data source.  
+   You will find default visualizations for Process Maps, Variants, Cases, Resources and many more.
+&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: Add-On&#39;s</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-add-ons/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/your-account/app-settings/settings-add-ons/</guid>
+      <description>
+        
+        
+        &lt;p&gt;&lt;img src=&#34;../Addons.png&#34; alt=&#34;Discover Addons&#34;&gt;&lt;/p&gt;
+&lt;p&gt;The following add-ons are available
+    &lt;li&gt;TIBCO Data Virtualization (TDV)&lt;/li&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;why-to-use-tdv&#34;&gt;Why to use TDV&lt;/h4&gt;
+&lt;p&gt;TIBCO Data Virtualization helps you access, combine and provision your event logs data from your supporting systems. 
+&lt;p&gt;TIBCO DV allows you to:&lt;/p&gt;
+&lt;li&gt;&lt;strong&gt;Connect to your operational systems&lt;/strong&gt; using of our 200+ connectors&lt;/li&gt;
+&lt;li&gt;Create &lt;strong&gt;virtual views&lt;/strong&gt; of your data ready to be consumed by analytics and process mining. 
+No more complex ETL needed, your data doesn&#39;t need to move!&lt;/li&gt; 
+&lt;li&gt;&lt;strong&gt;Federate multiple sources&lt;/strong&gt; as your business processes touch multiple operational systems. &lt;/li&gt;
+&lt;li&gt;Deliver&lt;strong&gt; High performance&lt;/strong&gt; access to your data. &lt;/li&gt;
+&lt;/p&gt;
+&lt;h4 id=&#34;how-to-configure-tdv&#34;&gt;How to configure TDV&lt;/h4&gt;
+&lt;p&gt;You can use your own managed TIBCO Data Virtualization and bring your data to the solution. 
+&lt;p&gt;Use this setting screen to configure:&lt;/p&gt;
+&lt;li&gt;The URL and port of the Business Directory Server. Note that a proxy is needed to allow the Web Application to access Business Directory APIs 
+    hosted on a different domain. Configure that proxy to allow CORS headers.
+&lt;/li&gt;
+&lt;li&gt;The  port of your TDV Server. Please remember to white list the IP address of your TDV server so that it can be reached from the backend. 
+    The hostname of your TDV server is not needed here because it is provided dynamically by the Business Directory Server as you pick views. 
+&lt;/li&gt; 
+&lt;li&gt;Username and password to access the above.&lt;/li&gt;
+&lt;/p&gt;
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: How To&#39;s</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/analytics/howtos/</link>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/analytics/howtos/</guid>
+      <description>
+        
+        
+        &lt;h3 id=&#34;can-i-customize-visualizations&#34;&gt;Can I customize Visualizations&lt;/h3&gt;
+&lt;p&gt;
+Absolutely. This is even recommended to fulfill your Business use case! &lt;br&gt;You can use TIBCO Cloud Spotfire Analyst to edit the DXP.
+&lt;p&gt;For example you can:&lt;/p&gt;
+  &lt;li&gt;Change visualizations (eg. from bar chart to line chart)&lt;/li&gt;
+  &lt;li&gt;Add or remove visualizations, for example to best represent custom attributes such as a regional attribute best represented on a map chart.  &lt;/li&gt;
+  &lt;li&gt;Add more data sources, correlated with the business processes, such as CRM data. You can then define relations between the data tables&lt;/li&gt;
+  &lt;li&gt;add more data preparation, data science, AI/ML&lt;/li&gt;
+  &lt;li&gt;Add or remove tabs&lt;/li&gt;
+  &lt;li&gt;and much more !&lt;/li&gt;
+&lt;/p&gt;
+  &lt;p&gt;The template is stored in the TIBCO Spotfire Library.  
+    The link can be found and configured under the Settings configuration tab, in the analytics section.
+ &lt;/p&gt;
+&lt;h3 id=&#34;can-i-maximize-visualizations&#34;&gt;Can I maximize Visualizations&lt;/h3&gt;
+&lt;p&gt;Yes. Every single visualization can be maximized by clicking on the corresponding symbol on the top right corner of the visualization header.&lt;/p&gt;
+&lt;h3 id=&#34;can-i-raise-investigations&#34;&gt;Can I raise Investigations&lt;/h3&gt;
+&lt;p&gt;Yes. In the Compliance tab, you can select a variant from the non compliant variants table, and then click on the &lt;strong&gt;+Investigation&lt;/strong&gt; button.
+Fill a short and detailed description and a new case will be created.&lt;/p&gt;
+&lt;h3 id=&#34;can-i-track-the-status&#34;&gt;Can I track the Status&lt;/h3&gt;
+&lt;p&gt;Yes. The variants table in the Compliance tab contains a &lt;strong&gt;Status&lt;/strong&gt; column allowing you to track the status of that variant inspection.&lt;/p&gt;
+&lt;p&gt;The status is one of:&lt;/p&gt;
+&lt;li&gt;unchecked (default) Enabled by clicking on the &#34;Uncheck&#34; button&lt;/li&gt; 
+&lt;li&gt;checked: means inspected. Enabled by clicking on the &#34;Check&#34; button.&lt;/li&gt; 
+&lt;li&gt;Compliance or Improvement: Means an investigation has been raised.&lt;/li&gt;
+&lt;br&gt;
+In case an investigation is created, you can find tracking information in the next two columns:
+&lt;br&gt;&lt;br&gt;
+&lt;li&gt;Case Type: subject of the case (eg. Variant) &lt;/li&gt;
+&lt;li&gt;Case Status: status of the case in the case management component. &lt;/li&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: our Architecture</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</link>
+      <pubDate>Sun, 05 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/architecture/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;high-level-view&#34;&gt;High Level view&lt;/h2&gt;
+&lt;p&gt;The current Architecture of Project Discover, from an high-level perspective&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;Architecture.png&#34; alt=&#34;LABS Discover Architecture&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Key components:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO Cloud, User Management, Live Apps for Case Management, Live Apps for Lifecycle&lt;/li&gt;
+&lt;li&gt;Web App UI hosted in Live Apps&lt;/li&gt;
+&lt;li&gt;Data Virtualization, Connectivity, ETL, Event Logs&lt;/li&gt;
+&lt;li&gt;Spark for Algorithm Compute layer and storage of your choice (e.g. PostgreSQL)&lt;/li&gt;
+&lt;li&gt;Spotfire for Process Mining Visualizations and data visualizations&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;tibco-product-list&#34;&gt;TIBCO Product List&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO Cloud™ Integration&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Live Apps&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Spotfire®&lt;/li&gt;
+&lt;li&gt;TIBCO Cloud™ Messaging&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Optional, for Data preparation and access:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TIBCO® Data Science - Team Studio&lt;/li&gt;
+&lt;li&gt;TIBCO® Data Virtualization&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: our Algorithm</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</link>
+      <pubDate>Thu, 05 Jan 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/concepts/algo/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;high-level-view&#34;&gt;High Level view&lt;/h2&gt;
+&lt;p&gt;The current Algorithm pipeline of Project Discover, from an high-level perspective&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;processMining.png&#34; alt=&#34;&#34;&gt;&lt;/p&gt;
+
+      </description>
+    </item>
+    
+    <item>
+      <title>Docs: 3rd Party</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/3rd-party/</link>
+      <pubDate>Tue, 14 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/3rd-party/</guid>
+      <description>
+        
+        
+        &lt;h2 id=&#34;used-3rd-party-libraries&#34;&gt;used 3rd Party Libraries&lt;/h2&gt;
+&lt;p&gt;Used within Spotfire JSViz 3.5.1.0 with TIBCO Component Exchange License, all just referenced and not included.&lt;/p&gt;
+&lt;h3 id=&#34;angular-js&#34;&gt;Angular JS&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;angularjs	1.7.9	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-animate	1.7.9	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-animate.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-animate.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-aria	1.7.9	MIT	
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-aria.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-aria.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-messages	1.7.9	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-messages.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-messages.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-material	1.1.20	MIT	
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.js&#34;&gt;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;angular-material	1.1.20	MIT		
+&lt;a href=&#34;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.css&#34;&gt;https://ajax.googleapis.com/ajax/libs/angular_material/1.1.20/angular-material.min.css&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;material-icons	3.0.1	Apache 2.0		
+&lt;a href=&#34;https://fonts.googleapis.com/icon?family=Material+Icons&#34;&gt;https://fonts.googleapis.com/icon?family=Material+Icons&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;fontawesome	5.12.0	SIL OFL		
+&lt;a href=&#34;https://use.fontawesome.com/releases/v5.12.0/css/all.css&#34;&gt;https://use.fontawesome.com/releases/v5.12.0/css/all.css&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;cytoscape&#34;&gt;Cytoscape&lt;/h3&gt;
+&lt;p&gt;from &lt;a href=&#34;https://js.cytoscape.org&#34;&gt;https://js.cytoscape.org&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;cytoscape.js	3.13.0	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape@3.13.0/dist/cytoscape.min.js&#34;&gt;https://unpkg.com/cytoscape@3.13.0/dist/cytoscape.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-dagre	2.2.2	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape-dagre@2.2.2/cytoscape-dagre.js&#34;&gt;https://unpkg.com/cytoscape-dagre@2.2.2/cytoscape-dagre.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-panzoom	2.5.3	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape-panzoom.js&#34;&gt;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape-panzoom.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-panzoom	2.5.3	MIT		
+&lt;a href=&#34;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape.js-panzoom.css&#34;&gt;https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape.js-panzoom.css&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;cytoscape-popper	1.0.6	MIT	No	
+&lt;a href=&#34;https://unpkg.com/cytoscape-popper@1.0.6/cytoscape-popper.js&#34;&gt;https://unpkg.com/cytoscape-popper@1.0.6/cytoscape-popper.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;others&#34;&gt;others&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;dagrejs	0.8.5	MIT		
+&lt;a href=&#34;https://unpkg.com/dagre@0.8.5/dist/dagre.min.js&#34;&gt;https://unpkg.com/dagre@0.8.5/dist/dagre.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;popperjs	1.16.0	MIT		
+&lt;a href=&#34;https://unpkg.com/popper.js@1.16.0/dist/umd/popper.js&#34;&gt;https://unpkg.com/popper.js@1.16.0/dist/umd/popper.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;tippy.js	4.3.5	MIT		
+&lt;a href=&#34;https://unpkg.com/tippy.js@4.3.5/umd/index.all.js&#34;&gt;https://unpkg.com/tippy.js@4.3.5/umd/index.all.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;jQuery	3.4.1	MIT		
+&lt;a href=&#34;https://code.jquery.com/jquery-3.4.1.min.js&#34;&gt;https://code.jquery.com/jquery-3.4.1.min.js&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+      </description>
+    </item>
+    
+  </channel>
+</rss>
