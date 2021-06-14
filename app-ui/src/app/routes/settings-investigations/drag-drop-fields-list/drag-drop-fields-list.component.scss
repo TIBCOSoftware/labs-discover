@@ -1,0 +1,89 @@
+$Denim: #1774E5;
+$ToryBlue: #0E4F9E;
+$DarkGray: #212121;
+
+.menu-list {
+  max-width: 100%;
+  min-height: 40px;
+  display: block;
+  background: white;
+  overflow: hidden;
+
+  color: $DarkGray;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+  font-weight: normal;
+  border: 1px solid #B6B6B6;
+  border-radius: 3px;
+
+  .placeholder {
+    width: 100%;
+    height: 2px;
+    background-color: $Denim;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    opacity: 1;
+  }
+}
+
+.menu-item {
+  padding: 5px 5px;
+  color: $Denim;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: white;
+  cursor: pointer;
+
+  border: 1px solid #DEDEDE;
+  color: $DarkGray;
+  .name {
+    .drag-handler {
+      color: $DarkGray;
+      &:hover {
+        cursor: move;
+      }
+      float: left;
+    }
+    .title {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: 150px;
+      margin-top: 3px;
+    }
+  }
+
+  .action-btn {
+    display: none;
+    cursor: pointer;
+  }
+
+  &.active-menu {
+    color: $ToryBlue;
+  }
+
+  &:hover {
+    background-color: #dee2e3;
+    .action-btn {
+      display: block;
+    }
+  }
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

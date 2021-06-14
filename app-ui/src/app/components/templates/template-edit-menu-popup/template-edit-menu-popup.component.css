@@ -1,0 +1,50 @@
+.edit-menu-container{
+  display: flex;
+  flex-direction: column;
+  margin: 24px 16px;
+  overflow: visible;
+  width: 315px;
+  cursor: default;
+  z-index: 50000;
+}
+
+.edit-menu-bottom-button-bar{
+  margin-top: 35px;
+  display: flex;
+  flex-direction: row;
+  align-content: flex-end;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+
+.icon-label {
+  margin-top: 24px;
+  color: #727272;
+  font-family: "Source Sans Pro";
+  font-size: 13px;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+
+.menu-icon {
+  color: #AECFF6;
+  margin-top: 25px;
+  margin-left: 10px;
+}
+
+.icon-selector {
+  /*border: 1px solid purple;
+  height: 152px;
+  width: 100%;*/
+}
+
+.icon-select {
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+}
+
+.default-checkbox {
+  margin-top: 20px;
+}

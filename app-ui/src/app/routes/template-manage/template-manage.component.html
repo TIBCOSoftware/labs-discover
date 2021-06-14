@@ -1,0 +1,41 @@
+<div class="select-template-top">
+  <uxpl-object-header [config]="objHeaderConfig" (back)="goProcessAnalysis()">
+    <uxpl-button slot="navigation-content" class="icon-position" id="#refresh" type="no-border"
+                 icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refresh()">
+      Refresh
+    </uxpl-button>
+    <uxpl-button slot="navigation-content" id="#newAnalysis" icon="assets/images/svg/plus.svg" (clicked)="goTemplate()"
+                 width="121px">
+      Create
+    </uxpl-button>
+  </uxpl-object-header>
+  <div class="template-selector-wrapper">
+    <list-templates [templates]="templates" mode="copy" (selected)="templateAction($event)"></list-templates>
+  </div>
+</div>
+
+<div id="popup-host" [ngStyle]="{ 'top': popupY , 'left': popupX}" class="popup-wrapper">
+  <uxpl-popup #deletePopup id="deletepopup" slot="popup" x-position="after" y-position="above"
+              content-id="my-delete-popup" max-width="328px" [maxHeight]="maxDeletePopupHeight">
+    <div id="my-delete-popup" class="popup-host">
+      <div *ngIf="usedByAnalysis.length > 0" class="list-used-templates">
+        <div class="popup-text">This template is used by these process analysis:</div>
+        <div *ngFor="let ana of usedByAnalysis" class="popup-text"
+        ><strong>{{ana}}</strong>
+        </div>
+        <div class="popup-text">Before deleting, ensure the template isn't used.</div>
+        <uxpl-button (clicked)="cancelDelete()">Ok</uxpl-button>
+      </div>
+
+      <div *ngIf="usedByAnalysis.length == 0">
+        <div class="popup-text">Are you sure you want to delete the template <strong>{{templateToDeleteName}}</strong>? It
+          can't be undone...
+        </div>
+        <div class="popup-row">
+          <uxpl-button type="no-border" (clicked)="cancelDelete()">Cancel</uxpl-button>
+          <uxpl-button type="danger" class="delete-button" (clicked)="reallyDeleteTemplate()">Yes, delete</uxpl-button>
+        </div>
+      </div>
+    </div>
+  </uxpl-popup>
+</div>

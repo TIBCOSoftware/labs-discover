@@ -1,0 +1,364 @@
+$Denim: #1774E5;
+$ToryBlue: #0E4F9E;
+$DarkGray: #212121;
+
+.settings-main {
+  margin-right: 24px;
+}
+
+.platform-line {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-field {
+  flex: 1 1 0%;
+}
+
+.flex-margin {
+  margin-right: 15px;
+}
+
+.menu-ul {
+  padding: 0;
+  width: 228px;
+
+  .menu-li {
+    background-color: rgb(244, 244, 244);
+    overflow-x: hidden;
+    font-size: 16px;
+    transition: all 0.4s ease-out 0s;
+    height: 40px;
+    border: 1px solid black;
+    margin: 3px 0;
+    padding-left: 10px;
+    color: $Denim;
+    font-family: "Source Sans Pro";
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+
+    &.active-menu {
+      color: #0E4F9E;
+    }
+  }
+}
+
+.attribute-field {
+  border: solid 1px black;
+  padding: 4px;
+  margin: 2px;
+  cursor: pointer;
+}
+
+.menu-list {
+  width: 300px;
+  max-width: 100%;
+  // border: solid 1px #ccc;
+  min-height: 40px;
+  display: block;
+  background: white;
+  border-radius: 4px;
+  overflow: hidden;
+
+  &.table-header {
+    width: 420px;
+    color: $DarkGray;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 21px;
+    font-weight: normal;
+    border: 1px solid #B6B6B6;
+    border-radius: 3px;
+  }
+
+  .placeholder {
+    width: 100%;
+    height: 2px;
+    background-color: $Denim;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    opacity: 1;
+  }
+}
+
+.menu-item {
+  padding: 10px 5px;
+  // border-bottom: solid 1px #ccc;
+  color: $Denim;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  // width: 100%;
+  // max-width: 300px;
+
+  &.table-header {
+    border: 1px solid #DEDEDE;
+    color: $DarkGray;
+    .name {
+      .title {
+        font-weight: normal;
+      }
+    }
+  }
+
+  .name {
+    .drag-handler {
+      color: $DarkGray;
+      &:hover {
+        cursor: move;
+      }
+      float: left;
+    }
+    .title {
+      float: right;
+      height: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 24px;
+    }
+  }
+
+  .action-btn {
+    display: none;
+    cursor: pointer;
+  }
+
+  &.active-menu {
+    color: $ToryBlue;
+  }
+
+  &:hover {
+    background-color: #dee2e3;
+    .action-btn {
+      display: block;
+    }
+  }
+}
+
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.nav {
+  .nav-title {
+    float: left;
+    height: 27px;
+    color: #212121;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 27px;
+  }
+  .action {
+    float: right;
+    display: flex;
+    cursor: pointer;
+    .add-icon {
+      color: $Denim;
+    }
+    .add-label {
+      height: 20px;
+      color: $Denim;
+      font-size: 16px;
+      letter-spacing: 0;
+      line-height: 20px;
+    }
+  }
+}
+
+.no-table-columns {
+  height: 268px;
+  width: 422px;
+  border: 1px solid #B6B6B6;
+  border-radius: 3px;
+  background-color: #FFFFFF;
+
+  .no-fields-image {
+    text-align: center;
+    margin-top: 47px;
+  }
+
+  .desc {
+    height: 52px;
+    color: $Denim;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 21px;
+    text-align: center;
+    margin: auto;
+    margin-top: 8px;
+    color: #727272;
+    width: 280px;
+    .add-all {
+      color: $Denim;
+      cursor: pointer;
+    }
+  }
+}
+
+.section {
+  margin-bottom: 48px;
+  .section-title {
+    height: 27px;
+    color: #212121;
+    font-family: "Source Sans Pro";
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 27px;
+    margin-bottom: 8px;
+  }
+  .section-desc {
+    color: #212121;
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+  }
+}
+
+.menu-detail {
+  margin-left: 40px;
+  width: 100%;
+  .action-btn {
+    float: right;
+  }
+}
+
+.add-field-form {
+  width: 240px;
+  margin-left: 30px;
+  .input {
+    margin-bottom: 24px;
+  }
+  .no-avaiable-table-fields {
+    height: 24px;
+    color: #727272;
+    font-family: "Source Sans Pro";
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+  }
+
+  .action-panel {
+    display: flex;
+    justify-content: space-between;
+    .link-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      .link {
+        height: 24px;
+        color: $Denim;
+        font-size: 16px;
+        letter-spacing: 0;
+        line-height: 24px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.detail-table-form {
+  display: flex;
+  margin-top: 22px;
+}
+
+.detail-fields-table {
+  display: flex;
+  border: 1px solid #B6B6B6;
+  border-radius: 3px;
+}
+
+.hover-pointer {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.confirm-overlay {
+  width: 312px;
+  border-radius: 3px;
+  border: 1px solid #B6B6B6;
+  box-shadow: 0 -2px 2px 0 rgb(0 0 0 / 10%);
+  background-color: #FFFFFF;
+}
+
+.center {
+  margin: auto;
+  margin-top: 20vh;
+
+  .img-center{
+    margin: auto;
+    width: 204px;
+  }
+
+  .nodata-msg {
+    color: #4A4A4A;
+    font-family: "Source Sans Pro";
+    font-size: 18px;
+    letter-spacing: 0.96px;
+    line-height: 22px;
+    text-align: center;
+  }
+}
+
+.detail-col {
+  width: 210px;
+  border: 1px solid #DEDEDE;
+}
+
+.table-fields-list {
+  width: 422px;
+}
+
+::ng-deep .menu-item {
+  &.table-cdk-preview {
+    width: 420px;
+  }
+  &.detail-cdk-preview {
+    width: 210px;
+  }
+}
+
+::ng-deep .menu-list-container {
+  width: 228px;
+  .menu-list {
+    border: none !important;
+  }
+  .menu-item {
+    // height: 24px;
+    color: $Denim;
+    font-family: "Source Sans Pro";
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+    border: none !important;
+    .title {
+      margin-top: 0 !important;
+      color: $Denim;
+    }
+  }
+}
+

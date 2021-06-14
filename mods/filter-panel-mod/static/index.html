@@ -1,0 +1,120 @@
+<!--
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Gauge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="all" href="uxpl.min.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="main.css" />
+
+    <script
+        id="spotfire-loader">var Spotfire = function (e) { "use strict"; return e.initialize = function (e) { var t = "sfTemp" + 1e4 * Math.random() + "Cb", r = window; r[t] = e; var a = { subject: "GetUrl", callbackId: -1, options: { cbId: t } }; r.addEventListener("message", (function e(t) { if (t.source !== r.parent || !t.data.src) return; r.removeEventListener("message", e); var a = document, n = a.createElement("script"); n.src = t.data.src, (a.head || a.body).appendChild(n) })), r.parent.postMessage(a, "*") }, e }({});</script>
+    <script src="uxpl.umd.min.js"></script>
+    <script src="main.js"></script>
+</head>
+
+<body>
+
+    <div class="filter-panel">
+
+        <div class="panel-content">
+            <div id="time-select">
+                Keep cases that were
+                <div class="pl-dropdown" data-pl-dropdown-role="dropdown">
+                    <button type="button" class="pl-button pl-button--primary" id="dropdown-button"
+                        data-pl-dropdown-role="toggler" aria-haspopup="true" aria-expanded="false">
+                        <span></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="pl-button__icon" role="img" aria-hidden="true"
+                            width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                            <path fill-rule="evenodd"
+                                d="M6.031 9c-.884 0-1.357.996-.774 1.632L11.999 18l6.744-7.368c.584-.636.109-1.632-.775-1.632H6.031z" />
+                        </svg>
+                    </button>
+                    <div role="dialog" class="pl-dropdown__flyout" data-pl-dropdown-role="target">
+                        <ul role="menu" class="pl-dropdown-menu">
+                            <li class="pl-dropdown-menu__item" role="none">
+                                <button type="button" role="menuitem" class="pl-dropdown-menu__action">
+                                    Started
+                                </button>
+                            </li>
+                            <li class="pl-dropdown-menu__item" role="none">
+                                <button type="button" role="menuitem" class="pl-dropdown-menu__action">
+                                    Open
+                                </button>
+                            </li>
+                            <li class="pl-dropdown-menu__item" role="none">
+                                <button type="button" role="menuitem" class="pl-dropdown-menu__action">
+                                    Closed
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                between
+                <div class="pl-form-field pl-form-field--text-input date-input">
+                    <input type="text" class="pl-form-field__input" placeholder="Placeholder" id="start-timestamp" />
+                    <!-- <label class="pl-form-field__label" for="start-timestamp"
+                      >Start date</label
+                    > -->
+                    <div class="pl-form-field__helper-text">
+                        Start date
+                    </div>
+                </div>
+                and
+                <div class="pl-form-field pl-form-field--text-input date-input">
+                    <input type="text" class="pl-form-field__input" placeholder="Placeholder" id="end-timestamp" />
+                    <!-- <label class="pl-form-field__label" for="changeME-text-input"
+                      >End date</label
+                    > -->
+                    <div class="pl-form-field__helper-text">
+                        End date
+                    </div>
+                </div>
+                .
+            </div>
+
+            <div id="action-buttons">
+                <div class="pl-text-toggle">
+                    <input class="pl-text-toggle__input" type="radio" id="filter-on-cases" name="text-toggle"
+                        checked />
+                    <label class="pl-text-toggle__label" for="filter-on-cases">Cases</label>
+
+                    <input class="pl-text-toggle__input" type="radio" id="filter-on-events" name="text-toggle" />
+                    <label class="pl-text-toggle__label" for="filter-on-events">Events</label>
+                </div>
+
+                <button id="apply-filter-btn" type="button" class="pl-button pl-button--primary">
+                    Filter
+                </button>
+                <button id="reset-filter-btn" type="button" class="pl-button pl-button--secondary">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <div id="filter-icon">
+            <button type="button" class="pl-button pl-button--primary pl-button--icon-only">
+                <svg xmlns="http://www.w3.org/2000/svg" class="pl-button__icon" width="24" height="24"
+                    fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                        d="M3.5 2h16.192a.5.5 0 0 1 .424.766l-6.884 10.979V22L9.96 20.333v-6.588L3.076 2.765A.5.5 0 0 1 3.5 2z" />
+                </svg>
+            </button>
+            <div id="nb-filters" class="notification-badge is-hidden"></div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

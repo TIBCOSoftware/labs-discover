@@ -1,0 +1,47 @@
+<div class="advanced-container">
+  <div class="advanced-left">
+    <div class="section-title" (dblclick)="showAdvanced = !showAdvanced">Advanced</div>
+    <uxpl-form-field *ngIf="showAdvanced" style="margin-top: 15px; margin-bottom: 35px;" label="DXP Location" type="text" valid
+                     required="true" [value]="template?.spotfireLocation"
+                     (uxplChanged)="handleUpdate($event, 'spotfireLocation')"></uxpl-form-field>
+    <!--
+    <uxpl-form-field *ngIf="showAdvanced" style="margin-top: 15px; margin-bottom: 35px;" label="Alternative Spotfire Server" type="text" valid
+                     [value]="template?.spotfireServer"
+                     (uxplChanged)="handleUpdate($event, 'spotfireServer')"></uxpl-form-field> -->
+    <uxpl-form-field *ngIf="showAdvanced" style="margin-top: 15px; margin-bottom: 15px;" label="Icon URL" type="text" valid
+                     [value]="template?.icon"
+                     (uxplChanged)="handleUpdate($event, 'icon')"></uxpl-form-field>
+    <uxpl-form-field *ngIf="showAdvanced" style="margin-top: 15px; margin-bottom: 15px;" label="Splash Icon URL" type="text" valid
+                     [value]="template?.splash"
+                     (uxplChanged)="handleUpdate($event, 'splash')"></uxpl-form-field>
+    <div class="section-title">Creation of Investigations</div>
+    <uxpl-form-field *ngIf="showAdvanced"  style="margin-top: 30px; margin-bottom: 30px;"
+                     label="Listen on Marking (use * to listen to all markings)" type="text" valid
+                     [value]="template?.marking?.listenOnMarking"
+                     (uxplChanged)="handleUpdateMarking($event, 'listenOnMarking')"></uxpl-form-field>
+    <uxpl-form-field *ngIf="showAdvanced"  style="margin-top: 30px; margin-bottom: 30px;"
+                     label="Case Selector: <Marking Name>.<Table Name>.<Column Name>" type="text" valid
+                     [value]="template?.marking?.casesSelector"
+                     (uxplChanged)="handleUpdateMarking($event, 'casesSelector')"></uxpl-form-field>
+    <template-marking-selector [type]="'cases'" [template]="template" [dataOptions]="dataOptions" (updateMConfig)="casesMConfig = $event; updateMarkingListener()"
+                               [markingOptions]="markingOptions"></template-marking-selector>
+    <uxpl-form-field *ngIf="showAdvanced" style="margin-top: 30px; margin-bottom: 30px;"
+                     label="Variant Selector: <Marking Name>.<Table Name>.<Column Name>" type="text" valid
+                     [value]="template?.marking?.variantSelector"
+                     (uxplChanged)="handleUpdateMarking($event, 'variantSelector')"></uxpl-form-field>
+    <template-marking-selector [type]="'variant'" [template]="template" [dataOptions]="dataOptions" (updateMConfig)="variantMConfig = $event; updateMarkingListener()"
+                               [markingOptions]="markingOptions"></template-marking-selector>
+
+    <uxpl-form-field style="margin-top: 30px; margin-bottom: 30px;" label="Preview Parameters"
+                     hint="Use @@OAUTH_TOKEN@@ to inject the OAUTH Token dynamically" type="text" valid
+                     [value]="template?.previewParameters"
+                     (uxplChanged)="handleUpdate($event, 'previewParameters')"></uxpl-form-field>
+  </div>
+  <div class="middle-divider"></div>
+  <div class="advanced-right">
+    <div class="section-title">Card preview</div>
+    <div class="template-basic-info-card">
+      <template-card [cardConfig]="template" mode="select"></template-card>
+    </div>
+  </div>
+</div>

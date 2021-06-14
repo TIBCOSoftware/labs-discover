@@ -1,0 +1,93 @@
+.cont-card {
+  background-color: #f4f4f4;
+  margin: 24px;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.cont-detail {
+  padding-left: 15px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+  text-align: left;
+}
+
+.cont-detail:hover {
+  color: #0081cb;
+  cursor: default;
+}
+
+.cont-detail-link {
+  color: #2ca7ff;
+  text-decoration: underline;
+}
+
+.cont-detail-link:hover {
+  color: #0081cb;
+  cursor: pointer;
+}
+
+/*
+.cont-space{
+  width: 5px;
+  border: 1px solid black;
+}*/
+
+.case-details-cell{
+  /*display: flex;
+  flex-direction: row;*/
+  /*border: 1px solid red;*/
+}
+
+.case-details-cell-wrappr{
+  display: flex;
+  flex-direction: row;
+}
+
+.cell-header{
+  text-align: right;
+  width: 300px;
+  /*border: 1px solid blue;*/
+}
+.cell-header-main{
+  text-align: right;
+  width: 125px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 13px;
+  text-transform: uppercase;
+  /*border: 1px solid orange;*/
+}
+
+.cell-row{
+  /*border-bottom: 1px solid #757575;*/
+}
+
+.cell-header-main {
+  align-self: center;
+}
+
+
+md-tooltip .md-content {
+  height: auto;
+}
+md-tooltip.tt-multiline .md-content {
+  height: auto;
+}
+md-tooltip ._md-content {
+  height: auto;
+}
+md-tooltip.tt-multiline ._md-content {
+  height: auto;
+}
+
+.header-sections {
+  display: flex;
+  flex-direction: row;
+}

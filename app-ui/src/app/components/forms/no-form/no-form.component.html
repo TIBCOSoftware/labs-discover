@@ -1,0 +1,17 @@
+<div class="tcs-dialog-outer-div">
+  <mat-toolbar class="tcs-dialog-toolbar">
+      <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex>
+          <span class="tcs-dialog-toolbar-text">{{ data.title }}</span>
+      </div>
+      <uxpl-icon class="search-icon" icon="pl-icon-close" width="24px" height="24px" (click)="closeDialog(false)"></uxpl-icon>
+  </mat-toolbar>
+  <div mat-dialog-content class="tcs-dialog" fxLayout="column">
+    <div>
+      Are you sure you to perform this action?
+    </div>
+    <div>
+      <uxpl-button class="icon-position" type="secondary" (clicked)="closeDialog(false)">Cancel</uxpl-button>
+      <uxpl-button class="icon-position" type="primary" (clicked)="executeAction()">OK</uxpl-button>
+    </div>
+  </div>
+</div>

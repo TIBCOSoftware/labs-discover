@@ -1,0 +1,60 @@
+<mat-card class="cont-card" *ngIf="processAnalysis">
+  <mat-card-header>
+    <mat-card-title>{{processAnalysis.data.name}} ({{processAnalysis.metadata.state}})</mat-card-title>
+    <mat-card-subtitle>{{processAnalysis.data.description}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <table style="width:100%;">
+      <tr class="cell-row">
+        <td class="cell-header-main">Created By</td>
+        <td class="cont-detail">{{processAnalysis.metadata.createdBy}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Case ID</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.caseId}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Start time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.startTime}}</td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">Created On</td>
+        <td class="cont-detail">{{processAnalysis.metadata.createdOn | date: 'short'}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Activity</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.activity}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">End time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.endTime}}</td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">Template</td>
+        <td class="cont-detail">{{templateName}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Resource</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.resource}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Scheduled start time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.scheduledStart}}</td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">ID</td>
+        <td class="cont-detail">{{processAnalysis.id}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Department</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.resourceGroup}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Scheduled end time</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.scheduledEnd}}</td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main"></td>
+        <td class="cont-detail"></td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Requester</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.requester}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Other attributes</td>
+        <td class="cont-detail">{{processAnalysis.data.mappings.otherAttributes}}</td>
+      </tr>
+    </table>
+  </mat-card-content>
+</mat-card>

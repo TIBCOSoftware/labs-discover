@@ -1,0 +1,88 @@
+<div>
+  <div>
+    Schedule how frequently you want to fetch data for your analysis.
+  </div>
+  <div style="display: flex; flex-direction: row; align-items: baseline;">
+    Fetch data&nbsp;
+    <uxpl-select [value]="runValue" [options]="runOptions" width="150px" (uxplChanged)="updateRunValue($event)"></uxpl-select>
+  </div>
+  <div *ngIf="showRepeatingLine()" style="display: flex; flex-direction: row; ">
+    repeating&nbsp;
+    <a (click)='showRepeatingOptionsMenu()' style="display: flex; flex-direction: column;">
+      {{repeatingDayValue}}
+      <uxpl-popup [show]="showRepeatingOptions" id="popup" slot="popup" x-position="after" content-id="my-popup-content" max-width="300px" max-height="350px">
+       <!-- note my-popup-content passed to uxpl-popup as content-id to allow popup to ignore click events on the content -->
+       <div id="my-popup-content" style="display:flex; flex-direction: column; justify-content: flex-end; overflow: auto; padding: 20px; width: 100%;">
+        <uxpl-radio-group [value]="columnSeparator" (uxplChanged)="setColumnSeparator($event)">
+          <uxpl-radio value="days">
+            <div style="display: flex; flex-direction: row;">
+              every
+              <uxpl-form-field consise type="number" style="max-width: 50px;" valid [value]="customColumnSeparator"></uxpl-form-field>
+              days
+            </div>
+          </uxpl-radio>
+
+          <uxpl-radio value="week" class="align-radio">
+            <div style="display:flex; flex-direction: column;">
+              every week
+              <uxpl-select-day type='week' mode='multiple'></uxpl-select-day>
+            </div>
+          </uxpl-radio>
+          
+          <uxpl-radio value="month" class="align-radio">
+            <div style="display:flex; flex-direction: column;">
+              every month on
+              <uxpl-select-day type='month'></uxpl-select-day>
+            </div>
+          </uxpl-radio>
+        </uxpl-radio-group>
+        <div style="display:flex; flex-direction: row; justify-content: space-between;">
+          <uxpl-button type="no-border">Clear</uxpl-button>
+          <uxpl-button type="primary">Apply</uxpl-button>
+        </div>
+      </div>
+      </uxpl-popup> 
+    </a>&nbsp;
+    <a (click)='showRepeatingValueOptionsMenu()' style="display: flex; flex-direction: column; ">
+      {{repeatingTimeValue}}
+      <uxpl-popup [show]="showRepeatingValueOptions" id="popup" slot="popup" x-position="after" content-id="my-popup-content" max-width="400px" max-height="180px">
+        <!-- note my-popup-content passed to uxpl-popup as content-id to allow popup to ignore click events on the content -->
+        <div id="my-popup-content" style="display:flex; flex-direction: column; justify-content: flex-end; overflow: auto; padding: 20px; width: 100%;">
+          <uxpl-radio-group [value]="columnSeparator" (uxplChanged)="setColumnSeparator($event)">
+            <uxpl-radio value="time">
+              <div style="display:contents">
+                At &nbsp;
+                <uxpl-form-field slot="content" type="number" valid consise [value]="customColumnSeparator" style="max-width: 50px;"></uxpl-form-field>
+                <uxpl-button width="34px" height="24px" [type]="myButton('AM')">AM</uxpl-button>
+                <uxpl-button width="34px" height="24px" [type]="myButton('PM')">PM</uxpl-button>
+              </div>
+            </uxpl-radio>
+            <uxpl-radio value="interval">
+              <div style="display:contents">
+                Every&nbsp;
+                <uxpl-form-field slot="content" type="number" valid consise [value]="customColumnSeparator" style="max-width: 50px;"></uxpl-form-field>
+                <uxpl-button width="50px" height="24px" [type]="typeUnitButton('hours')" (clicked)="setUnitButton('hours')">hours</uxpl-button>
+                <uxpl-button width="67px" height="24px" [type]="typeUnitButton('minutes')" (clicked)="setUnitButton('minutes')">minutes</uxpl-button>
+                <uxpl-button width="64px" height="24px" [type]="typeUnitButton('seconds')" (clicked)="setUnitButton('seconds')">seconds</uxpl-button>
+              </div>
+            </uxpl-radio>
+            <uxpl-radio value="month" mode='multiple'>
+              <div style="display:contents">
+                Every hour, 
+                <uxpl-form-field slot="content" type="number" valid consise [value]="customColumnSeparator" style="max-width: 50px;"></uxpl-form-field>
+                minutes after the hour
+              </div>
+            </uxpl-radio>
+          </uxpl-radio-group>
+          <div style="display:flex; flex-direction: row; justify-content: space-between;">
+            <uxpl-button type="no-border">Clear</uxpl-button>
+            <uxpl-button type="primary">Apply</uxpl-button>
+          </div>
+        </div>
+      </uxpl-popup>
+    </a>
+  </div>
+</div>
+
+
+

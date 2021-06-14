@@ -1,0 +1,101 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    height: 100vh;
+}
+
+.filter-panel {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 4px;
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.panel-content > * {
+    margin : 10px 0;
+}
+
+@media screen and (min-width: 1060px) { 
+    .panel-content {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+    }
+
+    .panel-content > * {
+        margin : 0 10px;
+    }
+} 
+
+#action-buttons > * {
+    margin: 0 10px;
+}
+
+#time-select {
+    display: flex;
+    align-items: center;
+}
+
+#dropdown-button {
+    margin : 0 10px;
+}
+
+.date-input {
+    margin: 0 10px;
+    position: relative;
+    top: 10px;
+}
+
+
+#filter-icon {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    
+    color: white;
+    font-size: 10px;
+    height: 17px;
+    width: 17px;
+    background: red;
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .is-hidden {
+      display: none;
+  }
+
+  .pl-text-toggle {
+      height: 34px;
+  }
+
+  /* .pl-text-toggle__input:checked + .pl-text-toggle__label {
+      background-color: #1774e5;
+  } */
+
+  .pl-text-toggle__label {
+      font-size: inherit;
+  }

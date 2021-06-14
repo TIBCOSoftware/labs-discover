@@ -1,0 +1,21 @@
+<div fxLayout="row" style="margin-top: 10px;">
+    <div fxLayout="row" fxLayoutAlign="start center">
+        <div *ngIf="showNotification" style="margin-left: 15px;" class="toolbar-notification">{{notificationText}}</div>
+    </div>
+    <div fxLayout="row" fxFlex fxLayoutAlign="end center">
+        <action-button-bar [buttons]="actionButtons"
+                           (actionButtonClicked)="handleButtonClicked($event)"></action-button-bar>
+      <!--
+        <icon-button (click)="handleButtonClicked(refreshTB)" [text]="'Refresh'"
+                     [iconLocation]="'assets/img/pl-icon-refresh.svg'"></icon-button>
+        <div *ngIf="showCreateNew" (click)="handleButtonClicked(newTB)" class="new-button" style="margin-right: 15px;">{{createNewText}}</div>
+      -->
+      <uxpl-button id="#newAnalysis" icon="assets/images/svg/plus.svg" (clicked)="handleButtonClicked(newTB)">
+        {{createNewText}}
+      </uxpl-button>
+      <uxpl-button id="#refresh" type="secondary" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="handleButtonClicked(refreshTB)" type="no-border">
+        Refresh
+      </uxpl-button>
+
+    </div>
+</div>

@@ -1,0 +1,22 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+
+html, body, #mod-container {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.area {
+    fill: steelblue;
+    clip-path: url(#clip);
+  }
+  
+  .zoom {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+  }

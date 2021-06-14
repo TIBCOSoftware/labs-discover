@@ -1,0 +1,30 @@
+<div class="analytics-dashboard-top-level">
+  <div class="filter-header">
+    <div class="select-which-analyti">Select which analytics template to view your process analysis as:</div>
+    <div class="filter-sub-header">
+      <div class="filter-type">
+        <div class="filter-type-label">Filter by type:</div>
+        <div *ngFor="let fil of filterTypes; let i = index" [ngClass]="{'filter-enabled': filterEnabled[i]}" class="filter-item" (click)="filterSelected(fil)">{{fil}}
+        </div>
+      </div>
+      <div class="search-container">
+        <uxpl-form-field type="text" valid label="Search"
+                         (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+        <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
+      </div>
+    </div>
+  </div>
+  <div class="analytic-cards-container">
+    <uxpl-card-grid>
+      <div *ngFor="let temp of filteredTemplates;" >
+        <analytic-card  [cardConfig]="temp" [highLight]="highLight" [isSelected]="temp.name == selectedTemplate?.name" (templateSelected)="templateSelectedCard($event)"></analytic-card>
+      </div>
+      <div>
+        <div class="add-rule-box" (click)="addTemplate()">
+          <mat-icon svgIcon="tcs-plus-icon"></mat-icon>
+          <span style="margin-left: 14px">Add template</span>
+        </div>
+      </div>
+    </uxpl-card-grid>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+.fixActionRow {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+  
+.spacer {
+    flex-grow: 1;
+}
+
+.highlight-icon-section {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.highlight-line {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.hightlight-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-icon {
+    width: 500px;
+}
+
+.field-title {
+    width: 500px;
+}
+
+.splash-oval {
+    border: solid 3px #c8d4e8;
+    border-radius: 43px;
+    align-content: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 86px;
+    height: 86px;
+    place-content: center;
+    align-items: center;
+    flex-direction: row;
+    box-sizing: border-box;
+    display: flex;
+}
+
+.splash-oval-icon {
+    margin-bottom: -5px;
+    height: 50px; 
+    width: 50px
+}

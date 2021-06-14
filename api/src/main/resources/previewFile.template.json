@@ -1,0 +1,114 @@
+{
+  "apiVersion": "sparkoperator.k8s.io/v1beta2",
+  "kind": "SparkApplication",
+  "metadata": {
+    "name": "spark-preview",
+    "namespace": "spark-operator"
+  },
+  "spec": {
+    "type": "Scala",
+    "mode": "cluster",
+    "image": "tibcosoftware/labs-discover-spark-preview:3.0",
+    "imagePullPolicy": "Always",
+    "imagePullSecrets": [
+      "regcred"
+    ],
+    "mainClass": "com.tibco.labs.main",
+    "mainApplicationFile": "local:///opt/spark/jars/tibcosoftware-labs-discover-spark-preview.jar",
+    "arguments": [
+      "assetID",
+      "organisationid"
+    ],
+    "sparkVersion": "3.1.1",
+    "sparkConf": {
+      "spark.serializer": "org.apache.spark.serializer.KryoSerializer"
+    },
+    "timeToLiveSeconds": 30,
+    "restartPolicy": {
+      "type": "OnFailure",
+      "onFailureRetries": 1,
+      "onFailureRetryInterval": 10,
+      "onSubmissionFailureRetries": 5,
+      "onSubmissionFailureRetryInterval": 20
+    },
+    "volumes": [
+      {
+        "name": "persistent-storage",
+        "persistentVolumeClaim": {
+          "claimName": "efs-claim"
+        }
+      },
+      {
+        "name": "spark-local-dir-scratch",
+        "hostPath": {
+          "path": "/tmp",
+          "type": "Directory"
+        }
+      }
+    ],
+    "driver": {
+      "cores": 4,
+      "memory": "4096m",
+      "labels": {
+        "version": "3.1.1"
+      },
+      "envFrom": [
+        {
+          "secretRef": {
+            "name": "discover-secret"
+          }
+        }
+      ],
+      "serviceAccount": "spark-operator-spark",
+      "volumeMounts": [
+        {
+          "name": "persistent-storage",
+          "mountPath": "/data"
+        },
+        {
+          "name": "spark-local-dir-scratch",
+          "mountPath": "/tmp"
+        }
+      ],
+      "annotations": {
+        "sidecar.istio.io/inject": "false"
+      }
+    },
+    "executor": {
+      "cores": 4,
+      "instances": 1,
+      "memory": "32768m",
+      "labels": {
+        "version": "3.1.1"
+      },
+      "envFrom": [
+        {
+          "secretRef": {
+            "name": "discover-secret"
+          }
+        }
+      ],
+      "volumeMounts": [
+        {
+          "name": "persistent-storage",
+          "mountPath": "/data"
+        },
+        {
+          "name": "spark-local-dir-scratch",
+          "mountPath": "/tmp"
+        }
+      ],
+      "annotations": {
+        "sidecar.istio.io/inject": "false"
+      }
+    },
+    "monitoring": {
+      "exposeDriverMetrics": false,
+      "exposeExecutorMetrics": false,
+      "prometheus": {
+        "jmxExporterJar": "/prometheus/jmx_prometheus_javaagent-0.11.0.jar",
+        "port": 8090
+      }
+    }
+  }
+}

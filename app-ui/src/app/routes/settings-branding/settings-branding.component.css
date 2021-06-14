@@ -1,0 +1,44 @@
+.settings-main {
+  margin-right: 24px;
+}
+
+.capability-line {
+  display:flex;
+}
+
+.capability-line-icon {
+  flex: 1 1 0%;
+  margin-right: 15px;
+}
+
+.capability-line-title {
+  flex: 2 1 0%;
+  margin-right: 15px;
+}
+
+.capability-line-description {
+  flex: 3 1 0%;
+}
+
+.settings-subcategory {
+  margin-left: 24px;
+}
+
+.settings-main {
+  margin-right: 24px;
+}
+
+.settings-line {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.setting-background-image {
+    width: 500px;
+}
+
+.advanced:hover {
+  cursor: pointer;
+  color: #0e4f9e;
+}

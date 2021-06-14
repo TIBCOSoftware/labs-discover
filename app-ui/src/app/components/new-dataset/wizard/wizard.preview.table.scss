@@ -1,0 +1,16 @@
+
+::ng-deep div.dataset-preview-table {
+  .p-datatable-wrapper {
+      table {
+          table-layout: fixed;
+          tr {
+              th, td {
+                  width: 150px;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+              }
+          }
+      }
+  }
+}

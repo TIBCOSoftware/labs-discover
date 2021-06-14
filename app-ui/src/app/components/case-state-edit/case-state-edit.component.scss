@@ -1,0 +1,27 @@
+
+.state-icon {
+  cursor: pointer;
+}
+
+.state-color-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+}
+
+.case-state-edit {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-content {
+  height: 100%;
+}
+
+.error {
+  position: absolute;
+  top: 50px;
+  left: 30px;
+  color: #db0000;
+}

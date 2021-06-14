@@ -1,0 +1,30 @@
+<div class="template-basic-info-container">
+  <div class="template-basic-info-left-panel">
+    <uxpl-select-input *ngIf="isNewTemplate" label="Base template to duplicate from" [value]="template.id"
+                       [options]="templateLabels" (uxplSelection)="handleTemplateSelection($event)"></uxpl-select-input>
+    <uxpl-form-field style="margin-top: 5px; margin-bottom: 5px;" label="Template name"
+                     type="text" [valid]="!isValid('name')"
+                     required="true" [value]="template.name" [hint]="nameHint"
+                     (uxplChanged)="handleUpdate($event, 'name')"></uxpl-form-field>
+
+    <uxpl-textarea class="description-input" [value]="template.description"
+                   (uxplChanged)="handleUpdate($event, 'description')">Template description
+    </uxpl-textarea>
+    <div class="custom-icon-label">Customize template icon (Optional)</div>
+    <icon-grid [icon]="template.icon" [iconGrid]="ICON_GRID" [iconColor]="'#727272'"
+               (selectedIcon)="selectCardIcon($event)"></icon-grid>
+  </div>
+  <div class="template-basic-info-right-panel">
+    <div class="section-title">Card preview</div>
+    <div class="template-basic-info-card">
+      <template-card *ngIf="template.type"  [cardConfig]="template" mode="select"></template-card>
+    </div>
+    <div class="section-title advanced">Advanced options</div>
+    <div class="basic-text">Toggle an additional tab to customize your template further.</div>
+    <div class="advanced-switch">
+      <div class="advanced-label">Additional options tab</div>
+      <uxpl-switch-input [checked]="doAdvancedTab" (uxplChange)="toggleAdvanced($event);" id="#switch" value=true
+                         style="margin-left: 10px;"></uxpl-switch-input>
+    </div>
+  </div>
+</div>

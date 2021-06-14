@@ -1,0 +1,13 @@
+ports:
+  http: 8080
+  debug: 5859
+  healthCheck: 8558
+
+spec:
+  datasets: 'http://users.swagger.io/v2/swagger.json'
+
+# none/debug/info
+loglevel: debug
+
+servers: 
+  metadata: 'https://eu.metadata.cloud.tibco.com'

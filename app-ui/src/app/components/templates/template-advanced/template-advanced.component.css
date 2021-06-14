@@ -1,0 +1,32 @@
+.advanced-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+  height: 100%;
+}
+
+.advanced-left {
+  padding-left: 25px;
+  width: 60%;
+}
+
+.advanced-right {
+  width: 30%;
+}
+
+.middle-divider {
+  border: 1px solid #DEDEDE; /*  background-color: #DEDEDE; */
+  width: 1px;
+  margin-left: 48px;
+  margin-right: 48px;
+}
+
+.section-title {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-bottom: 30px;
+}

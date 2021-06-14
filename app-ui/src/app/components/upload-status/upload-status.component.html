@@ -1,0 +1,19 @@
+<uxpl-modal [visible]="uploads.length > 0" id="modal" [heading]="uploadMessage" max-height="200px" (closed)="handleClose()">
+  <div style="display: block;">
+    <div class="upload-details" *ngFor="let upload of uploads">
+      <div class="upload-text">{{upload.name}}</div>
+      <div class="spinner-container">
+        <mat-progress-spinner *ngIf="upload.status === 'uploading' || upload.status === 'finalizing'"
+          strokeWidth="3"
+          diameter="24"
+          class="upload-spinner"
+          color="red"
+          mode="determinate"
+          [value]="upload.progress">
+        </mat-progress-spinner>
+        <uxpl-icon *ngIf="upload.status === 'uploaded'" class="upload-icon" icon="pl-icon-success-24" width="24px" height="24px" style="max-height: 24px;" color="#039145"></uxpl-icon>
+        <uxpl-icon *ngIf="upload.status === 'failed'" class="upload-icon" icon="pl-icon-warning-circle-24" width="24px" height="24px" style="max-height: 24px;" color="#DB0000"></uxpl-icon>
+      </div>
+    </div>
+  </div>
+</uxpl-modal>

@@ -1,0 +1,80 @@
+<div *ngIf="availableColumns" class="map-container">
+  <div style="display: flex; flex-direction: row; margin: 10px 0px 32px 0px; justify-content: space-between; align-items: center; ">
+    <div *ngIf="firstVisit" style="display: flex; flex-direction: row;">
+      <uxpl-icon icon="pl-icon-hint" height="18px" width="20px" style="margin-right: 10px"></uxpl-icon>
+      Your dataset fields have been auto-mapped based on your previous analysis mappings. Adjust each mapping manually  or clear all to reset.
+    </div>
+  </div>
+  <div class="mapping-section">
+    <div class="map-left-panel">
+      <map-panel [data]="data" [availableColumns]="availableColumns" [datasetId]="selectedDataset" (status)="updateStatus($event)"></map-panel>
+      <div class="map-section advanced-margin">
+        Advanced options
+      </div>
+      <div class="map-column">
+        <p>Toggle additional tabs to further customize your analysis</p>
+        <uxpl-switch-input [checked]="advancedMode" (uxplChange)="toggleAdvanced($event)">Additional preparation tab</uxpl-switch-input>
+      </div>
+    </div>
+    <div class="map-preview-table" *ngIf="previewColumns">
+      <div style="display: flex; flex-direction: row; align-items: baseline; justify-content: space-between;">
+        <div>
+          Preview
+        </div>
+        <div style="display: flex; flex-direction: row; align-items: baseline;">
+          <uxpl-button type="no-border" (clicked)="clearMap()">Clear all</uxpl-button>
+          <uxpl-toggle-text [selected]="previewValue" [options]="previewOptions" [disabled]="isDisabledChangeVisualization()" (uxplSelectionChanged)="handlePreviewColumns($event)"></uxpl-toggle-text>
+        </div>
+      </div>
+      <div style="overflow: auto; height: calc( 100% - 53px);">
+        <tcpmg-generic-table  [columnDefs]="previewColumns" [rowData]="previewData"
+        [autoLayout]="false" [showSortIcon]="false"
+        [showExpandButton]="false" [paginator]="false"
+        [showCurrentPageReport]="false" [showFilterRow]="false">
+      </tcpmg-generic-table>
+      </div>
+    </div>
+    <!-- <div *ngIf="isError" class="datasource-error">
+      <uxpl-empty-state-system type="system error" [message]="errorMessage" [description]="errorDescription"></uxpl-empty-state-system>
+    </div> -->
+    <div *ngIf="previewColumns === undefined" class="center"> <!-- *ngIf="!isError && (previewColumns === undefined || previewColumns?.length === 0)" class="center"> -->
+      <div class="img-center">
+        <img width="204" [src]="'assets/images/png/no-data.png'">
+      </div>
+      <div class="no-data-available"><br></div>
+      <div class="no-data-available" style="font-weight: bold">No preview data available.<br></div>
+      <div class="no-data-available"><br></div>
+    </div>
+  </div>
+
+  <!-- <div *ngIf="previewColumns?.length > 0" class="map-preview-container">
+    <div class="map-section">Data Preview</div>
+    <div class="datasource-csv-preview">
+      <p-table #dt [columns]="previewColumns" [value]="previewData" styleClass="custom-table-css"
+      autoLayout="true" dataKey="name" [resizableColumns]="false" scrollHeight="flex"
+      rows="15" showCurrentPageReport="false">
+        <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="top-row">
+            {{col.headerName}}
+          </th>
+        </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-previewData let-expanded="expanded" let-columns="columns" let-rowIndex="rowIndex">
+          <tr>
+            <td *ngFor="let col of columns" [ngStyle]="{'text-align': col.align != undefined? col.align : 'left' }" class="table-element">
+              {{ getObjectValue(previewData, col) }}
+            </td>
+          </tr>
+        </ng-template>
+          <ng-template pTemplate="body" let-previewData let-expanded="expanded" let-columns="columns" let-rowIndex="rowIndex">
+            <tr [ngClass]="{'auto-map-details': firstRowAdded }">
+              <td *ngFor="let col of columns" [ngStyle]="{'text-align': col.align != undefined ? col.align : 'left' }" class="table-element">
+                {{ getObjectValue(previewData, col) }}
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+    </div>
+  </div> -->
+</div>

@@ -1,0 +1,20 @@
+<div class="edit-menu-container" id="my-popup-content" *ngIf="menuNodeItem">
+  <uxpl-form-field *ngIf="showLabel" type="text" valid label="Menu item label"  [value]="menuLabel" style="margin-top: -17px"
+                   (uxplChanged)="updateValue($event, 'label');"></uxpl-form-field>
+  <uxpl-select-input *ngIf="analyticTabLabels" label="Analytic tab to use" [value]="menuId" [options]="analyticTabLabels" style="margin-top: 24px"
+                     (uxplSelection)="updateValue($event, 'id');"></uxpl-select-input>
+  <uxpl-checkbox class='default-checkbox' [checked]="menuNodeItem?.isDefault" (clicked)="checkDefault($event)">Is default page</uxpl-checkbox>
+  <div class="icon-select">
+    <div *ngIf="!menuNodeItem?.icon" class="icon-label">No Icon</div>
+    <div *ngIf="menuNodeItem?.icon" class="icon-label">Icon</div>
+    <uxpl-icon *ngIf="menuNodeItem?.icon" class="menu-icon" height="20px" width="20px" icon="{{menuNodeItem?.icon}}"></uxpl-icon>
+  </div>
+  <div class="icon-selector">
+      <icon-grid [icon]="menuNodeItem.icon" [iconGrid]="iconGrid" [iconColor]="iconColor" (selectedIcon)="selectIcon($event)"></icon-grid>
+  </div>
+  <div class="edit-menu-bottom-button-bar">
+    <uxpl-button (clicked)="menuItem.emit(originalNode)" id="#cancelButton" type="no-border">Cancel</uxpl-button>
+    <uxpl-button (clicked)="menuItem.emit(menuNodeItem);" id="#saveButton" >Save</uxpl-button>
+  </div>
+</div>
+

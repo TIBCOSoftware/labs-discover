@@ -1,0 +1,40 @@
+.cont-card {
+  background-color: #f4f4f4;
+  margin: 24px;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.cont-detail {
+  padding-left: 15px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+  text-align: left;
+}
+
+.cont-space{
+  width: 5px;
+}
+
+.cell-header{
+  text-align: right;
+  width: 300px;
+}
+.cell-header-main{
+  text-align: right;
+  width: 125px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 13px;
+  text-transform: uppercase;
+}
+
+.cell-row{
+  /*border-bottom: 1px solid #757575;*/
+}

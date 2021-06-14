@@ -1,0 +1,41 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Add-ons</h1>
+    <div class="settings-buttons">
+        <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+        <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>      
+  </div>
+  <div class="settings-container"> 
+    <div>
+      <h2>Data virtualization</h2>
+      <div>
+        <uxpl-switch-input [checked]="discover.tdv.enable" (uxplChange)="handleDataVirtualization($event);">Enable</uxpl-switch-input>
+        <div></div>
+        <div>
+          <h3>Business Directory</h3>
+          <div>Used by the New Process Analysis Wizard UI to browse the catalog of available views. Please use a proxy to allow CORS headers.</div>
+          <div [tcDisable]="disableDVSection()" class="addons-line">
+            <uxpl-form-field class="flex-field flex-margin" label="Business Directory Server" type="text" valid required="true" [value]="discover.tdv.bdsServer" (uxplChanged)="handleUpdate($event, 'bdsServer')"></uxpl-form-field>
+            <uxpl-form-field class="flex-field" label="Port" type="number" valid required="true" [value]="discover.tdv.bdsPort" (uxplChanged)="handleUpdate($event, 'bdsPort')"></uxpl-form-field>
+          </div>
+          <h3>TDV Server</h3>
+          <div>Used by the backend to connect to selected view. Remember to white list the IP of your TDV Server so it can be reached by the Process Miner.</div>
+          <div class="addons-line">
+            <uxpl-form-field class="flex-field flex-margin" [disabled]="disableDVSection()" label="JDBC Port" type="number" valid required="true" [value]="discover.tdv.jdbcPort" (uxplChanged)="handleUpdate($event, 'jdbcPort')"></uxpl-form-field>
+            <uxpl-form-field class="flex-field flex-margin" [disabled]="disableDVSection()" label="Workers" type="number" valid required="true" [value]="discover.tdv.workers" (uxplChanged)="handleUpdate($event, 'workers')"></uxpl-form-field>
+            <uxpl-switch-input class="flex-field flex-margin" [checked]="discover.tdv.k8sEnable" [disabled]="disableDVSection()" (uxplChange)="handleK8SSupport($event);">Kubernetes support</uxpl-switch-input>
+            <uxpl-form-field class="flex-field flex-margin" [disabled]="disableDVSection() || disableK8SSection()" label="TDV K8S namespace" type="text" valid required="true" [value]="discover.tdv.k8sNamespace" (uxplChanged)="handleUpdate($event, 'k8sNamespace')"></uxpl-form-field>
+            <uxpl-form-field class="flex-field" [disabled]="disableDVSection() || disableK8SSection()" label="TDV K8S pod name" type="text" valid required="true" [value]="discover.tdv.k8sPodName" (uxplChanged)="handleUpdate($event, 'k8sPodName')"></uxpl-form-field>
+          </div>
+          <h3>Security</h3>
+          <div>Please provide username and password to connect to both Business Directory and TDV Server </div>
+          <div [tcDisable]="disableDVSection()" class="addons-line">
+            <uxpl-form-field class="flex-field flex-margin" label="Username" type="text" valid required="true" [value]="discover.tdv.username" (uxplChanged)="handleUpdate($event, 'username')"></uxpl-form-field>
+            <uxpl-form-field class="flex-field" label="Password" type="password" valid required="true" [value]="discover.tdv.password" (uxplChanged)="handleUpdate($event, 'password')"></uxpl-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

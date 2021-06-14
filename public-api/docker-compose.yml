@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+
+  redis:
+    image: tibcosoftware/redis:latest
+    command: /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    volumes: 
+      - ./container_data/redis/data:/data
+      - ./container_data/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    restart: on-failure
+
+  insights:
+    image: redislabs/redisinsight
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./container_data/redisinsight:/db
+    restart: on-failure
+    depends_on: 
+      - redis
+
+  microservice:
+    image: tibcosoftware/labs-discover-api-analysis:0.1.0
+    environment: 
+      - LOGLEVEL=debug
+      - LIVEAPPS=https://eu.liveapps.cloud.tibco.com
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8080:8080"
+      - "8558:8558"
+    depends_on: 
+      - redis

@@ -1,0 +1,45 @@
+.tcs-dialog-outer-div {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tcs-dialog-toolbar {
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dcdcdc;
+  min-height: 63px;
+}
+
+.tcs-dialog-toolbar-text {
+  font-family: Source Sans Pro;
+  font-size: 18px;
+  font-weight: 600;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+
+.tcs-dialog.mat-dialog-content {
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+}
+
+.tcs-dialog-icons {
+  margin-top: 3px;
+  margin-right: 2px;
+  height: 20px;
+  width: 20px;
+}
+
+.tcs-dialog-icons:hover {
+  cursor: pointer;
+}
+
+:host ::ng-deep .tcs-dialog-icons:hover .svg-content {
+  fill: #0081cb;
+}
+

@@ -1,0 +1,24 @@
+<div class="splash-content" [ngClass]="backGroundImage ? 'custom-splash-bg' : 'default-splash-bg'" [ngStyle]="backGroundImage ? {'background-repeat': 'round', 'background-color': '#FFF', 'background-image': 'url(' + backGroundImage + ')'} : ''">
+  <div class="welcome-text">{{title}}</div>
+  <div class="details-container">
+    <div class="welcome-details">{{subTitle}}</div>
+  </div>
+  <div class="highlights-container">
+    <div class="highlights-content">
+      <div *ngFor="let highlight of highlights" class="highlight">
+        <div class="icon">
+          <div class="track-icon">
+            <uxpl-icon [url]="highlight.iconURL"></uxpl-icon>
+          </div>
+        </div>
+        <div class="highlight-content">
+          <div class="highlight-title">{{highlight.title}}</div>
+          <div class="highlight-text">{{highlight.content}}</div>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <uxpl-button class="start-button" type="primary" width="144px" height="40px" (click)="getStartedClick('')">Get started</uxpl-button>
+      </div>
+    </div>
+  </div>
+</div>

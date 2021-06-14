@@ -1,0 +1,72 @@
+<div class="template-analytics-container">
+  <div class="analytics-info">
+    <div class="spec-title">DXP selection</div>
+    <uxpl-radio-group class="dxp-radio" [value]="analyticsChoice" (uxplChanged)="dxpRadioChange($event)">
+      <uxpl-radio *ngIf='isNewTemplate' class='radio-item' value="COPY">Create a copy</uxpl-radio>
+      <uxpl-radio class='radio-item' value="EXISTING">Use DXP from your Cloud Teams Folder</uxpl-radio>
+      <uxpl-radio class='radio-item' value="CUSTOM">Custom DXP location</uxpl-radio>
+    </uxpl-radio-group>
+
+    <uxpl-form-field *ngIf='showForm("COPY")' class="template-dxp-input" label="New DXP name"
+                     type="text" [valid]="!isValid('newLocation')" [hint]="nameHint"
+                     required [value]="newLocation.substr(newLocation.lastIndexOf('/')+1)"
+                     (uxplChanged)="setName($event)"></uxpl-form-field>
+    <table class="detail-table" *ngIf='showForm("COPY")'>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Original DXP</div>
+        </td>
+        <td>
+          <div class="item-detail">{{stripOrgF(initialLocation)}}</div>
+        </td>
+      </tr>
+    </table>
+    <uxpl-select-input *ngIf='showForm("EXISTING")' class='dxp-selector' allow-clear label="DXP location"
+                       allow-input [value]="newLocation"
+                       [options]="availableDXPs" (uxplSelection)="setSelectDXP($event)">
+    </uxpl-select-input>
+    <uxpl-form-field *ngIf='showForm("CUSTOM")' style="margin-top: 15px; margin-bottom: 35px;" label="DXP Location"
+                     type="text"
+                     [value]="newLocation" required valid
+                     (uxplChanged)="setCustomDXP($event)">
+    </uxpl-form-field>
+  </div>
+
+  <div class="middle-divider"></div>
+
+  <div class="right-specs">
+    <div class="spec-title">DXP information</div>
+    <table class="detail-table">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">DXP location</div>
+        </td>
+        <td>
+          <div *ngIf='!isNewTemplate' class="item-detail-dxp">
+            <a target="_blank" href="">{{newLocation}}</a>
+            <uxpl-icon class='open-sf-icon' height="18px" width="18px" icon="pl-icon-new-tab-window"
+                       (click)="openSFReport()"></uxpl-icon>
+          </div>
+          <div *ngIf='isNewTemplate' class="item-detail-dxp">{{newLocation}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">DXP folder</div>
+        </td>
+        <td>
+          <div class="item-detail">{{ getFolder(newLocation) }}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">DXP name</div>
+        </td>
+        <td>
+          <div class="item-detail">{{ getName(newLocation) }}</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+

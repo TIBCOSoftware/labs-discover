@@ -1,0 +1,27 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Platform</h1>
+    <div class="settings-buttons">
+      <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+      <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+    </div>      
+  </div>
+  <div class="settings-container">    
+    <div>
+      <h2>Orchestration</h2>
+      <div class="platform-line">
+        <div style="margin-top: 20px; width: 90%">
+          Environment 
+          <div *ngIf="environment || changed"
+            ace-editor
+            [text]="environment"
+            [options]="aceEditorOptions"
+            [readOnly]="false"
+            [autoUpdateContent]="false"
+            (textChanged)="handleUpdateEnvironment($event)"     
+            style="margin-top: 20px; min-height: 500px; max-height: 500px; width:90%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

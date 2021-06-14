@@ -1,0 +1,62 @@
+<ng-template #tmplNode let-node="node">
+  <div class="node-item" [attr.data-id]="node.uiId" [attr.id]="'node-'+node.uiId" >
+    <div class="menu-item-drag" [@blinking]="animate(node.uiId) ? 'blink' : 'normal'" >
+      <div  class="left-drag-section">
+        <div class="drag-icon">
+          <uxpl-icon height="24px" width="24px" icon="pl-icon-drag"></uxpl-icon>
+        </div>
+        <uxpl-icon class="menu-icon" height="24px" width="24px" icon="{{node.icon}}" [ngClass]="{ 'hide-drag-label' : !node.enabled}"></uxpl-icon>
+        <div class="drag-label" [ngClass]="{ 'hide-drag-label' : !node.enabled, 'default-label': node.isDefault}">{{node.label}} <span *ngIf="node.isDefault">(Default)</span></div>
+      </div>
+      <div  class="right-drag-section">
+        <!--<uxpl-icon *ngIf="node.isDefault" class="right-drag-button defIcon" height="20px" width="20px" icon="pl-icon-checkmark"
+                   ></uxpl-icon>-->
+        <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-edit"
+                   (click)="toggleEditMenuPopup(node, $event)"></uxpl-icon>
+        <uxpl-icon *ngIf="node.enabled" class="right-drag-button" height="20px" width="20px" icon="pl-icon-show"
+                   (click)="toggleVisible(node)"></uxpl-icon>
+        <uxpl-icon *ngIf="!node.enabled" class="right-drag-button" height="20px" width="20px" icon="pl-icon-hide"
+                   (click)="toggleVisible(node)"></uxpl-icon>
+        <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-remove"
+                   (click)="deleteMenuItem(node)"></uxpl-icon>
+      </div>
+    </div>
+    <div class="node-children" cdkDropList [cdkDropListData]="node.child" [id]="node.uiId"
+         [cdkDropListConnectedTo]="dropTargetIds"
+         (cdkDropListDropped)="drop($event)" [cdkDropListSortingDisabled]="true">
+      <!--suppress TypeScriptUnresolvedVariable -->
+      <div *ngFor="let child of node.child" cdkDrag [cdkDragData]="child.uiId" (cdkDragMoved)="dragMoved($event)">
+        <ng-container *ngTemplateOutlet="tmplNode,context:{node:child}"></ng-container>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<div cdkDropList *ngIf="menuNodesIN" [cdkDropListData]="menuNodesIN" [id]="'main'" [cdkDropListConnectedTo]="dropTargetIds"
+     (cdkDropListDropped)="drop($event)" [cdkDropListSortingDisabled]="true">
+  <div *ngFor="let node of menuNodesIN" cdkDrag [cdkDragData]="node.uiId" (cdkDragMoved)="dragMoved($event)">
+    <ng-container *ngTemplateOutlet="tmplNode,context:{node:node}"></ng-container>
+  </div>
+</div>
+
+<div id="popup-host" [ngStyle]="{ 'top': popupY , 'left': popupX}" class="popup-wrapper">
+  <uxpl-popup #popup id="popup" slot="popup" x-position="after" y-position="below" content-id="my-edit-popup" max-width="350px"
+              max-height="450px" >
+    <template-edit-menu-popup id="my-edit-popup" [menuNodeItem]="currentEditNode" style="width: 350px;" [analyticTabs]="analyticTabs"
+                              (menuItem)="updateItem($event)"></template-edit-menu-popup>
+  </uxpl-popup>
+</div>
+
+<!--
+SPOTFIRE API:
+https://eu-west-1.integration.cloud.tibcoapps.com:443/nfvthzbohgelvgmrdqfthqfene7mjz5q/Items?Type=123
+
+<hr />
+<p><strong>current drag drop action:</strong></p>
+<pre>{{dropActionTodo|json}}</pre>
+<hr />
+<p><strong>tree data</strong></p>
+<pre>{{menuNodesIN|json}}</pre>-->
+<!--<hr />
+<p><strong>UI Menu </strong></p>
+<pre>{{uiMenu|json}}</pre>-->

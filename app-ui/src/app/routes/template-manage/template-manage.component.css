@@ -1,0 +1,41 @@
+.template-selector-wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.popup-wrapper {
+  position: absolute;
+  width: 300px;
+  z-index: 100;
+}
+
+.popup-host {
+  display: flex;
+  flex-direction: column;
+  margin: 24px 16px;
+}
+
+.popup-text {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+  text-align: center;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.popup-row {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.list-used-templates {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}

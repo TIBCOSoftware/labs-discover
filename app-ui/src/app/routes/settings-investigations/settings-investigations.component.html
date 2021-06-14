@@ -1,0 +1,246 @@
+<div class="settings-main">
+  <div class="settings-title">
+    <h1>Investigations</h1>
+  </div>
+  <div style="display: flex;">
+    <div class="menu-nav">
+      <div class="nav">
+        <div class="nav-title">Navigation</div>
+        <div class="action" (click)="handleAdd()" *ngIf="caseConfig.length==discover.investigations.caseConfig.length && availableApps && availableApps.length>1">
+          <uxpl-icon height="20px" width="20px" icon="pl-icon-add-circle" class="add-icon"></uxpl-icon>
+          <div class="add-label">Add</div>
+        </div>
+      </div>
+      <div cdkDropList class="menu-list" (cdkDropListDropped)="drop($event)" cdkOverlayOrigin #triggerMenu="cdkOverlayOrigin">
+        <div class="menu-item" *ngFor="let cConf of caseConfig; index as i" cdkDrag [ngClass]="{'active-menu': i == activeCaseConfigIndex}" (click)="selectMenu(i)">
+          <div class="name">
+            <uxpl-icon height="24px" width="24px" icon="pl-icon-drag" class="drag-handler" cdkDragHandle></uxpl-icon>
+            <div class="title">{{cConf.customTitle}}</div>
+          </div>
+          <div class="action-btn" *ngIf="i==this.activeCaseConfigIndex">
+            <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-remove" (click)="clickDeleteMenu(i)"></uxpl-icon>
+          </div>
+          <div class="placeholder" *cdkDragPlaceholder></div>
+          <div class="menu-item" *cdkDragPreview>
+            <div class="name">
+              <uxpl-icon height="24px" width="24px" icon="pl-icon-drag" class="drag-handler"></uxpl-icon>
+              <div class="title">{{cConf.customTitle}}</div>
+            </div>
+          </div>
+        </div>
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="triggerMenu"
+          [cdkConnectedOverlayOpen]="showMenuConfirm"
+          [cdkConnectedOverlayOffsetX]="300"
+          [cdkConnectedOverlayOffsetY]="-(caseConfig.length-newMenuIndex)*49"
+          >
+          <div class="confirm-overlay">
+            <action-confirm id="reset-confirm" confirmQuestion="You have unsaved changes in '{{activeCaseConfig.customTitle}}'. Are you sure you want to discard the changes and swtich to differnet menu?" doable="true" type="delete"
+              yesBtnLabel="Yes, discard" noBtnLabel="No, keep editing" (actionConfirmed)="handleSwitchMenu($event)"></action-confirm>
+          </div>
+        </ng-template>
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="triggerMenu"
+          [cdkConnectedOverlayOpen]="showDeleteConfirm"
+          [cdkConnectedOverlayOffsetX]="300"
+          [cdkConnectedOverlayOffsetY]="-(caseConfig.length-newMenuIndex)*49"
+          >
+          <div class="confirm-overlay">
+            <action-confirm id="delete-confirm" confirmQuestion="Are you sure you want to delete '{{activeCaseConfig.customTitle}}'? It can't be undone." doable="true" type="delete"
+              yesBtnLabel="Yes, delete" noBtnLabel="Cancel" (actionConfirmed)="handleDeleteMenu($event)"></action-confirm>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+    <div class="menu-detail" *ngIf="caseConfig && caseConfig.length>0 ; else noMenu">
+
+      <div class="action-btn">
+        <uxpl-button type="secondary" cdkOverlayOrigin #triggerReset="cdkOverlayOrigin" (clicked)="onClickReset()">Discard changes</uxpl-button>
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="triggerReset"
+          [cdkConnectedOverlayOpen]="showResetConfirm"
+          [cdkConnectedOverlayOffsetY]="238"
+          >
+          <div class="confirm-overlay">
+            <action-confirm id="reset-confirm" confirmQuestion="Discarding your changes will revert this page's configurations back to its previous state. Are you sure you want to continue?" doable="true" type="delete"
+              yesBtnLabel="Yes, discard" noBtnLabel="No, keep editing" (actionConfirmed)="handleReset($event)"></action-confirm>
+          </div>
+        </ng-template>
+        <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Page information</div>
+        <div>
+          <div style="width: calc(50% - 15px);">
+            <uxpl-text-input label="Menu item label" [value]="activeCaseConfig.customTitle" (uxplChanged)="setCustomTitle($event)"></uxpl-text-input>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">LiveApps case information</div>
+        <div class="platform-line">
+          <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Select TIBCO LiveApps application to be used for {{activeCaseConfig.customTitle}}" [value]="appId" [options]="availableApps" (uxplSelection)="handleApplicationSelection($event)"></uxpl-select-input>
+          <uxpl-select-input class="flex-field flex-margin" select-caption="" label="Select TIBCO LiveApps creator to be used for {{activeCaseConfig.customTitle}}" [value]="creatorId" [options]="availableCreators" (uxplSelection)="handleCreatorSelection($event)"></uxpl-select-input>  
+        </div>
+      </div>
+
+      <div class="section" *ngIf="creatorAppProperties && creatorAppProperties[creatorId]">
+        <div class="section-title">Field mappings for case/variant creation</div>
+        <div class="section-desc">
+          When a user creates a case or variant from an analysis, they are asked to input a case type, case id, summary and any additional details. Select which of the case fields the user inputs should be mapped to. 
+        </div>
+        <div style="display: flex;">
+          <uxpl-select-input class="flex-field flex-margin" select-caption="" 
+            label="Case type (case or variant)" [value]="creatorSelections['CONTEXT_TYPE']" [options]="creatorSelectOptions['CONTEXT_TYPE']" (uxplSelection)="handleCreatorConfigSelection($event, 'CONTEXT_TYPE')" (click)="handleClick($event, 'CONTEXT_TYPE')"></uxpl-select-input>
+          <uxpl-select-input class="flex-field flex-margin" select-caption="" 
+            label="Case id (case or variant)" [value]="creatorSelections['CONTEXT_IDS']" [options]="creatorSelectOptions['CONTEXT_IDS']" (uxplSelection)="handleCreatorConfigSelection($event, 'CONTEXT_IDS')" (click)="handleClick($event, 'CONTEXT_IDS')"></uxpl-select-input>
+        </div>
+        <div style="display: flex;">
+          <uxpl-select-input class="flex-field flex-margin" select-caption="" 
+            label="Summary of investigation" [value]="creatorSelections['SUMMARY']" [options]="creatorSelectOptions['SUMMARY']" (uxplSelection)="handleCreatorConfigSelection($event, 'SUMMARY')" (click)="handleClick($event, 'SUMMARY')"></uxpl-select-input>
+          <uxpl-select-input class="flex-field flex-margin" select-caption="" 
+            label="Additional" [value]="creatorSelections['DETAILS']" [options]="creatorSelectOptions['DETAILS']" (uxplSelection)="handleCreatorConfigSelection($event, 'DETAILS')" (click)="handleClick($event, 'DETAILS')"></uxpl-select-input>
+        </div>
+      </div>
+
+      <div class="section" *ngIf="allFieldsArray && allFieldsArray.length>0">
+        <div class="section-title">Table columns</div>
+        <p class="section-desc">Select which table columns to display from your case application</p>
+        <div style="display: flex;">
+          <div class="table-fields-list">
+            <drag-drop-fields-list  *ngIf="tableFields && tableFields.length>0; else noTableFields" previewClass="table-cdk-preview" labelAttr="label"
+              [fieldList]="tableFields" listId="table-fields-cdk-list" (listItemDropped)="tableFieldDropped($event)" (deleteField)="deleteTableField($event)"></drag-drop-fields-list>
+            <ng-template #noTableFields>
+              <div class="no-table-columns">
+                <div class="no-fields-image">
+                  <img width="150" [src]="noTableFieldsSvgLocation">
+                </div>
+                <div class="desc">
+                  <div>No columns added yet</div>
+                  <div>Add columns manually or <span class="add-all" (click)="addAllTableColumns()">add them all at once</span></div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <div class="add-field-form">
+            <div *ngIf="tableAvailableOptions && tableAvailableOptions.length>0 ; else noTableAvailableOptions">
+              <uxpl-select-input class="input" select-caption="" label="Column field" [value]="inputTableField" [options]="tableAvailableOptions" (uxplSelection)="handleSelectFieldForTable($event)"></uxpl-select-input>
+              <uxpl-text-input class="input" label="Column label" [value]="inputTableLabel" (changed)="handleEditLabelForTable($event)"></uxpl-text-input>
+            </div>
+            <ng-template #noTableAvailableOptions>
+              <div class="no-avaiable-table-fields">No more fields are left to add. </div>
+            </ng-template>
+            <div class="action-panel">
+              <uxpl-button [disabled]="!inputTableField || tableAvailableOptions.length==0" type="secondary" (clicked)="addTableField()">Add</uxpl-button>
+              <div class="link-wrapper" *ngIf="tableAvailableOptions.length==0">
+                <a class="link" (click)="deleteAllTableFields()">Remove all fields</a>
+              </div>
+              <div class="link-wrapper" *ngIf="tableAvailableOptions.length!=0">
+                <a class="link" (click)="addAllTableColumns()">Add all fields</a>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+      </div>
+
+      <div class="section" *ngIf="caseStates && caseStates.length>0">
+        <div class="section-title">Case state</div>
+        <p-table [value]="caseStates" dataKey="id">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>State</th>
+                    <th>Appearance</th>
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-state let-rowIndex="rowIndex">
+                <tr>
+                    <td style="font-size: 14px;">
+                      {{state.name}}
+                    </td>
+                    <td>
+                      <uxpl-tag icon="{{state.icon}}" class="uxpl-tag" color="{{state.color}}">{{state.name}}</uxpl-tag>
+                    </td>
+                    <td>
+                      <span (click)="editStateColorAndIcon(rowIndex)" class="hover-pointer">
+                        <uxpl-icon height="20px" width="20px" icon="pl-icon-edit" class="add-icon"></uxpl-icon>
+                      </span>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+      </div>
+
+      <div class="section" *ngIf="detailAvailableFields.length>0 || flatDetailFields.length>0">
+        <div class="section-title">Case details</div>
+        <div class="section-desc">Select which case details will be displayed when expanding a case row.</div>
+        <div class="platform-line">
+          <uxpl-select-input style="width: 50%;" class="flex-field flex-margin" select-caption="" label="Select the field of {{activeCaseConfig.customTitle}} for the title of details" [value]="detailTitleField" [options]="allFieldsOptons" (uxplSelection)="selectDetailTitle($event)"></uxpl-select-input>
+          <uxpl-checkbox style="    width: 50%;
+          position: relative;
+          top: 28px;
+          margin-left: 50px;" [checked]="showStatesMilestone" (clicked)="checkStatesMilestone($event)">Show states milestones</uxpl-checkbox>
+        </div>
+        <div *ngIf="allFieldsArray && allFieldsArray.length>0">
+          <div class="detail-table-form">
+            <div class="detail-fields-table" *ngIf="flatDetailFields.length > 0; else noDetailFields">
+              <drag-drop-fields-list class="detail-col" previewClass="detail-cdk-preview" labelAttr="label" [fieldList]="detailFieldsGroup[0]" listId="listOne" [cdkDropListConnectedTo]="['listTwo','listThree']" (listItemDropped)="detailColumnAddField($event, 0)" (deleteField)="deleteDetailField($event, 0)"></drag-drop-fields-list>
+              <drag-drop-fields-list class="detail-col" previewClass="detail-cdk-preview" labelAttr="label" [fieldList]="detailFieldsGroup[1]" listId="listTwo" [cdkDropListConnectedTo]="['listOne','listThree']" (listItemDropped)="detailColumnAddField($event, 1)" (deleteField)="deleteDetailField($event, 1)"></drag-drop-fields-list>
+              <drag-drop-fields-list class="detail-col" previewClass="detail-cdk-preview" labelAttr="label" [fieldList]="detailFieldsGroup[2]" listId="listThree" [cdkDropListConnectedTo]="['listOne','listTwo']" (listItemDropped)="detailColumnAddField($event, 2)" (deleteField)="deleteDetailField($event, 2)"></drag-drop-fields-list>
+            </div>
+            <ng-template #noDetailFields>
+              <div class="no-table-columns">
+                <div class="no-fields-image">
+                  <img width="190" [src]="noDetailFieldsSvgLocation">
+                </div>
+                <div class="desc">
+                  <div>No case fields added yet</div>
+                  <div>Add fields manually or <span class="add-all" (click)="addAllDetailFields()">add them all at once</span></div>
+                </div>
+              </div>
+            </ng-template>
+            <div class="add-field-form">
+              <div *ngIf="detailAvailableOptions && detailAvailableOptions.length>0">
+                <uxpl-select-input class="flex-field flex-margin" style="width: 300px;" select-caption="" label="Select a field" [value]="detailField" [options]="detailAvailableOptions" (uxplSelection)="handleSelectFieldForDetail($event)"></uxpl-select-input>
+                <uxpl-text-input label="Label" [value]="detailFieldLabel" (changed)="handleEditLabelForDetail($event)"></uxpl-text-input>
+              </div>
+              <div class="action-panel">
+                <uxpl-button [disabled]="!detailField || detailAvailableFields.length==0" type="secondary" (clicked)="addDetailField()">Add</uxpl-button>
+                <div class="link-wrapper" *ngIf="detailAvailableFields.length!=0">
+                  <a class="link" (click)="addAllDetailFields()">Add all fields</a>
+                </div>
+                <div class="link-wrapper" *ngIf="detailAvailableFields.length==0">
+                  <a class="link" (click)="deleteAllDetailFields()">Remove all fields</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="flatDetailFields.length > 0">
+            <div class="section-desc">Preview</div>
+            <div style="margin-left: -24px;">
+              <custom-case-details [cConfig]="getDetailConfig()" [caseDetail]="getDummyDetailData()" (caseEvent)="caseEventClicked($event)"></custom-case-details>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #noMenu>
+      <div class="center">
+        <div class="img-center">
+          <img width="204" [src]="noDataIconLocation">
+        </div>
+        <div class="nodata-msg">No investigation settings. Please click the '+Add' button to get started.</div>
+      </div>
+    </ng-template>
+  </div>
+  <div class="center" *ngIf="loading">
+    <uxpl-spinner appearance="light" message="Loading..."></uxpl-spinner>
+  </div>
+</div>

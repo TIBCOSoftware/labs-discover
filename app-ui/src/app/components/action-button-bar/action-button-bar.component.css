@@ -1,0 +1,66 @@
+.barfloat{
+    clear: right;
+    position: absolute;
+    margin-top: 5px;
+    right: 15px;
+}
+
+.action-button {
+    box-sizing: border-box;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 8px 3px;
+    border: 1px solid #1774E5;
+    border-radius: 3px;
+    z-index: 100;
+    background-color: #FFFFFF;
+    min-height: 38px;
+    min-width: 130px;
+    text-align: center;
+    color: #1774E5;
+    font-family: "Source Sans Pro";
+    font-size: 16px;
+    letter-spacing: 0;
+    /*line-height: 24px;*/
+    text-align: center;
+}
+
+.action-button:hover {
+    /*height: 21px;*/
+    color: #055DAB;
+    /*background-color: #d8d9dc;*/
+    background-color: #def3fffc;
+    cursor: pointer;
+}
+
+.action-button:disabled {
+    /*height: 21px;*/
+    color: #222222;
+    /*background-color: #d8d9dc;*/
+    background-color: #8c8c8c;
+    border: 0px solid #1774E5;
+}
+
+.action-button-menu {
+    box-sizing: border-box;
+    margin: 10px;
+    padding-top: 4px;
+    border: 1px solid #1774E5;
+    border-radius: 3px;
+    z-index: 10;
+    background-color: #FFFFFF;
+    min-height: 30px;
+    min-width: 130px;
+    text-align: center;
+    color: #1774E5;
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+}
+
+.action-button-menu:hover {
+    /*height: 21px;*/
+    color: #055DAB;
+    /*background-color: #d8d9dc;*/
+    background-color: #def3fffc;
+    cursor: pointer;
+}

@@ -1,0 +1,67 @@
+<div class="analytics-dashboard-top-level">
+  <div class="analytics-wrapper"> <!-- [hidden]="!fullSpotfireConfig.hasAnalytics" -->
+    <uxpl-object-header [config]="objHeaderConfig" (back)="goProcessAnalysis()" (editDetail)="editTemplate()">
+      <!--
+      <uxpl-button slot="navigation-content" style="width: 100px" type='secondary' (clicked)="check()" [disabled]="disableCheckUncheckButtons()">
+        Check
+      </uxpl-button>
+      <uxpl-button slot="navigation-content" style="width: 100px" type='secondary' (clicked)="uncheck()" [disabled]="disableCheckUncheckButtons()">
+        Uncheck
+      </uxpl-button>
+      -->
+      <!-- TODO: Test this functionality
+      <uxpl-button slot="navigation-content" style="margin-right: 20px" type='secondary' (clicked)="openConnectedPage()" >
+        Open Page in New Window
+      </uxpl-button> -->
+      <uxpl-button slot="navigation-content" style="width: 160px" icon="assets/images/svg/plus.svg"
+                   (clicked)="showCreateCaseMenu()" [disabled]="disableInvestigation()">
+        Investigation
+        <uxpl-popup #popup id="popup" slot="popup" x-position="before" content-id="my-popup-content" max-width="400px"
+                    max-height="450px">
+          <create-case-menu #createcase id="my-popup-content" [caseMarking]="markedCases"
+                            [variantMarking]="markedVariants" [investigationConfig]="investigationConfig"
+                            (createInvestigation)="createInv($event)"></create-case-menu>
+        </uxpl-popup>
+      </uxpl-button>
+      <uxpl-button slot="navigation-content" id="#refresh" type="no-border"
+                   icon="assets/images/svg/pl-icon-refresh.svg">
+        Refresh
+      </uxpl-button>
+    </uxpl-object-header>
+    <div class="analytics-dashboard-wrapper" *ngIf="spotfireDXP">
+      <div class="analytics-dashboard-left-nav" >
+        <uxpl-left-nav-multi #leftNav [tabs]="leftNavTabs" (selected)="handleClick($event)" collapse></uxpl-left-nav-multi>
+      </div>
+      <div class="analytics-dashboard-analytics">
+        <div style="width: 100%; height: 100%;">
+          <spotfire-viewer id='mySFViewer' #analysis
+                           [url]="spotfireServer"
+                           [path]="spotfireDXP"
+                           [parameters]="analysisParameters"
+                           [markingOn]="markingOn"
+                           version="10.10"
+                           (document)="setDocument($event)"
+                           (markingEvent)="marking($event)"
+                           [customization]="setSpotfireConfiguration()"
+          >
+          </spotfire-viewer>
+        </div>
+      </div>
+    </div>
+    <!-- <div *ngIf="analysisError && !selectTemplate">
+      <uxpl-empty-state-system type="system error" message="Analytics server is not online" description="Please, contact your TIBCO Spotfire Administrator."></uxpl-empty-state-system>
+    </div>
+  </div> -->
+    <div [hidden]="hideSelectProcess" class="center">
+      <div class="img-center">
+        <img width="204" [src]="noDataIconLocation">
+      </div>
+      <div class="no-data-available"><br></div>
+      <div class="no-data-available" style="font-weight: bold">No process selected.<br></div>
+      <div class="no-data-available"><br></div>
+      <div class="no-data-available"> Select <span class="no-data-available-click" (click)="selectAnalytic()">a process analysis</span>
+        to get started.
+      </div>
+    </div>
+  </div>
+</div>

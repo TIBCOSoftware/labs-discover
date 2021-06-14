@@ -1,0 +1,57 @@
+.icon-button-text{
+    display: inline-block;
+    padding-top: 8px;
+    /*color: #1774E5;*/
+    /*color: white;*/
+    font-family: "Source Sans Pro";
+    font-size: 16px;
+    text-align: center;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+/*
+.icon-button {
+    box-sizing: border-box;
+    margin-left: 3px;
+    margin-right: 10px;
+    border: 1px solid #1774E5;
+    border-radius: 3px;
+    z-index: 100;
+    background-color: #FFFFFF;
+    min-height: 40px;
+    /*min-width: 230px;/
+}
+*/
+.icon-button {
+  box-sizing: border-box;
+  margin-left: 3px;
+  margin-right: 10px;
+  min-height: 40px;
+  border-radius: 3px;
+  border: 1px solid #1774E5;
+  border-radius: 3px;
+  background-color: #1774E5;
+  color: #FFFFFF;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+  text-align: center;
+  min-width: 130px;
+}
+
+.icon-button:hover {
+    color: #055DAB;
+    background-color: #def3fffc;
+    border: 1px solid #def3fffc;
+    cursor: pointer;
+}
+
+.icon {
+    display: inline-block;
+    /*text-indent: -9999px;*/
+    width: 20px;
+    height: 20px;
+    margin: 0px 8px 2px 5px;
+}

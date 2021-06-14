@@ -1,0 +1,180 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Analytics ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "About the general templates ...",
+            "label": "About the general templates",
+            "title": "About the general templates",
+            "url": "assets/help/application/Analytics-About-General-Templates.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Can I customize the visualizations ...",
+            "label": "Can I customize the visualizations?",
+            "title": "Can I customize the visualizations?",
+            "url": "assets/help/application/Analytics-Can-I-Customize-Visualizations.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Where can I find the template ...",
+            "label": "Where can I find the template?",
+            "title": "Where can I find the template?",
+            "url": "assets/help/application/Analytics-Where-Is-This-Template-Stored.html",
+            "content": "",
+            "default": "true"
+          }
+          
+
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about the visualizations ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "Overview ...",
+            "label": "Overview",
+            "title": "Overview",
+            "url": "assets/help/application/Analytics-Visualizations-Overview.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Variants ...",
+            "label": "Variants",
+            "title": "Variants",
+            "url": "assets/help/application/Analytics-Visualizations-Variants.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Process Map ...",
+            "label": "Process Map",
+            "title": "Process Map",
+            "url": "assets/help/application/Analytics-Visualizations-Process-Map.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Activities ...",
+            "label": "Activities",
+            "title": "Activities",
+            "url": "assets/help/application/Analytics-Visualizations-Activities.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Resource Graph ...",
+            "label": "Resource Graph",
+            "title": "Resource Graph",
+            "url": "assets/help/application/Analytics-Visualizations-Resource-Graph.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Reference Model ...",
+            "label": "Reference Model",
+            "title": "Reference Model",
+            "url": "assets/help/application/Analytics-Visualizations-Reference-Model.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Compliance ...",
+            "label": "Compliance",
+            "title": "Compliance",
+            "url": "assets/help/application/Analytics-Visualizations-Compliance.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Cases ...",
+            "label": "Cases",
+            "title": "Cases",
+            "url": "assets/help/application/Analytics-Visualizations-Cases.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about  ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "Can I maximize visualizations in full screen ...",
+            "label": "Can I maximize visualizations in full screen?",
+            "title": "Can I maximize visualizations in full screen?",
+            "url": "assets/help/application/Analytics-Can-I-Maximize-Visualizations.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Can I raise investigations from Analytics ...",
+            "label": "Can I raise investigations from Analytics?",
+            "title": "Can I raise investigations from Analytics?",
+            "url": "assets/help/application/Analytics-Can-I-Raise-Investigation.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Can I track investigation status from Analytics ...",
+            "label": "Can I track investigation status from Analytics?",
+            "title": "Can I track investigation status from Analytics?",
+            "url": "assets/help/application/Analytics-Can-I-Track-Investigation-Status.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

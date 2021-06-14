@@ -1,0 +1,89 @@
+.map-panel-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.map-row {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.map-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.mapping {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: 5px;
+  cursor: default !important;
+}
+
+.map-field {
+  /*flex: 1 1 0%;*/
+  width: 145px;
+
+}
+
+.empty-icon {
+  height: 18px;
+  width: 18px;
+}
+
+.map-icon {
+  margin-left: 4px;
+  padding-top: 6px;
+  /*color: #1774e4;*/
+  color: #B6B6B6;
+}
+
+.map-field-margin {
+  margin-left: 15px;
+}
+
+.map-section {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-bottom: 5px;
+}
+
+.locked-mapping{
+  border: none;
+  border-bottom: 1px solid #b6b6b6;
+  color: #212121;
+  font-size: 16px;
+  /*line-height: 1.5;*/
+  padding-bottom: -10px;
+  width: 145px;
+}
+
+/*
+uxpl-select-input::part(required-label)::after , uxpl-form-field::part(required-label)::after {
+  content:" *";
+  color: red;
+}*/
+
+uxpl-select-input::part(required-label) {
+  display: none;
+}
+uxpl-select-input::part(optional-label) {
+  display: none;
+}
+
+.margintop {
+  margin-top: 10px;
+}
+
+.mapping-label {
+  text-align: right;
+  margin-right: 10px;
+  min-width: 110px;
+}

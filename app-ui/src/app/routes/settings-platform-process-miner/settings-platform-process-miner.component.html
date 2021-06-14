@@ -1,0 +1,39 @@
+<div class="settings-main">
+    <div class="settings-title">
+      <h1>Platform</h1>
+      <div class="settings-buttons">
+        <uxpl-button type="secondary" (clicked)="handleReset()">Reset</uxpl-button>
+        <uxpl-button (clicked)="handleSave()">Save</uxpl-button>
+      </div>      
+    </div>
+    <div class="settings-container">    
+      <div>
+        <h2>Process mining</h2>
+        <div class="platform-line">
+          <div style="margin-top: 20px; width: 90%">
+            Simple job template 
+            <div *ngIf="processMinerSimple || changed"
+              ace-editor
+              [text]="processMinerSimple"
+              [options]="aceEditorOptions"
+              [readOnly]="false"
+              [autoUpdateContent]="false"
+              (textChanged)="handleUpdateProcessMiner($event, 'processMinerSimple')"     
+              style="margin-top: 20px; min-height: 500px; max-height: 500px; width:90%;"></div>
+          </div>
+          <div style="margin-top: 20px; width: 90%">
+            Scheduled job template
+            <div *ngIf="processMinerScheduled || changed"
+              ace-editor
+              [text]="processMinerScheduled"
+              [options]="aceEditorOptions"
+              [readOnly]="false"
+              [autoUpdateContent]="false"
+              (textChanged)="handleUpdateProcessMiner($event, 'processMinerScheduled')"     
+              style="margin-top: 20px; min-height: 500px; max-height: 500px; width:90%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

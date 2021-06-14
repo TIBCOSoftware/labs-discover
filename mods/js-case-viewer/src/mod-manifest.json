@@ -1,0 +1,51 @@
+{
+    "apiVersion": "1.0",
+    "version": "2.1",
+    "name": "Variant Viewer",
+    "id": "variant-viewer",
+    "icon": "icon.svg",
+    "properties": [
+    ],
+    "dataViewDefinition": {
+        "colorAxis": {
+            "mode": "dual",
+            "dropTarget": {
+                "icon": "Color",
+                "description": "Color by {0}"
+            }
+        },
+        "axes": [
+            {
+                "name": "Compare by",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Order by",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Name",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Start",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "End",
+                "mode": "categorical",
+                "placement": "none"
+            },
+            {
+                "name": "Resource",
+                "mode": "categorical",
+                "placement": "none"
+            }
+        ]
+    },
+    "files": ["index.html", "main.css", "main.js"]
+}

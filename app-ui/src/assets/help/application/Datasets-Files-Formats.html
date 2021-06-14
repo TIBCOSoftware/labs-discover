@@ -1,0 +1,32 @@
+<style>
+  .inline   {
+    vertical-align: middle;
+    height: 20px;
+    width: 20px;
+  }
+</style>
+
+  <p>Upload your files in <strong>Well formed CSV Format</strong> only</p>
+  <p> Please note that zip files are not supported.  </P>
+
+    <p> CSV looks easy, but it can be hard to make a CSV file that other people can work with
+
+    </p>
+    <p>
+      Good CSVs look like this:
+      <h6>
+      "OrganisationId,WeekDay","Times","IsOpen","OpeningTimeType"
+      "1186","Monday","09:30-13:00","True","General"
+      "1186","Monday","13:30-17:30","True","General"
+      ...
+    </h6>
+    </p>
+    <p> There are some online services (eg. Lint) that can help you validate your CSV files. </p>
+      <p>Here are some guidelines 
+      <li>The first row is a header row that contains the names of some columns.</li>
+      <li>The rest of the rows are data rows that contain a number of fields.</li>
+      <li>Line endings use CRLF (Windows line endings) and the column names and fields are separated by commas.</li>
+      <li>If a field contains a comma, a line ending or a double quote then the field is escaped by wrapping it in double quotes. 
+        Within a field that's escaped like that, any double quotes are doubled up. </li>
+
+    </p>

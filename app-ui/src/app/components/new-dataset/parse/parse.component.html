@@ -1,0 +1,26 @@
+<div>
+    <div *ngIf="data.type=='csv' && data.csvMethod=='upload' && file!=null">
+        <parse-csv [data]="data" [wizard]="wizard" [file]="file" (handlePreviewData)="refreshCSVPreview($event)"></parse-csv>
+    </div>
+    <div *ngIf="previewData ; else loadingData">
+        <div class="parse-preview-container">
+            <div>Data Preview</div>
+            <div *ngIf="previewColumns?.length > 0" class="dataset-preview-table">
+                <tcpmg-generic-table [columnDefs]="previewColumns" [rowData]="previewData"
+                    [autoLayout]="false" [showSortIcon]="false"
+                    [showExpandButton]="false" [paginator]="false"
+                    [showCurrentPageReport]="false" [showFilterRow]="false"
+                ></tcpmg-generic-table>
+            </div>
+        </div>
+        <div style="margin-top: 12px;">Previewing the first  {{wizard.numberRowsForPreview}} rows</div>
+    </div>
+
+    <ng-template #loadingData>
+        <div class="loading-indicator">
+          <uxpl-spinner style="height: 150px; min-width: 150px; max-width: 150px;" appearance="light"
+                        message="Loading data..."></uxpl-spinner>
+        </div>
+    </ng-template>
+    
+</div>

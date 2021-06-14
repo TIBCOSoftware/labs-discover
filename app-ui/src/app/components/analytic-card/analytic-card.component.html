@@ -1,0 +1,33 @@
+<div class="analytic-card-outer">
+  <div class="analytic-card" [ngClass]="glowCSS" >
+    <div class="top-header" [ngClass]="typeCSS"></div>
+    <div class="middle-content">
+      <div class="heading-container">
+        <div class="icon-container" *ngIf="cardConfig.icon"><img src="{{cardConfig.icon}}"></div>
+        <div class="heading" [innerHTML]="cardConfig.name | highlight: highLight : 'Multi-Match'"></div>
+      </div>
+      <div class="splash" *ngIf="cardConfig.splash">
+        <img class="splash-pic" src="{{cardConfig.splash}}">
+      </div>
+      <div class="description-text" [innerHTML]="cardConfig.description | highlight: highLight : 'Multi-Match'"></div>
+    </div>
+    <div class="bottom-header">
+      <div class="t-type-label">
+        {{cardConfig.type}} TEMPLATE
+      </div>
+      <div *ngIf="isSelected" class="is-selected">
+        <div class="is-selected-label">
+          Selected
+        </div>
+      </div>
+      <div *ngIf="!isSelected" class="select-button" (click)="templateClicked()">
+        <div class="select-label">
+          Select
+        </div>
+        <div>
+          <img src="assets/images/svg/Open.svg">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

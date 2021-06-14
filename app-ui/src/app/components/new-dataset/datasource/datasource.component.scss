@@ -1,0 +1,65 @@
+.datasource-preview {
+  display: flex;
+  flex-direction: column;
+}
+
+.datasource-preview-table {
+  overflow: auto;
+}
+
+.center {
+  /*border: 2px solid chartreuse;*/
+  margin: auto;
+  width: 60%;
+  height: 200px;
+  padding: 10px;
+  margin-bottom: 30%;
+  margin-top: 80px;
+}
+  
+.no-data-available {
+  color: #4A4A4A;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  letter-spacing: 0.96px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.img-center{
+  margin: auto;
+  width: 204px;
+}
+
+.datasource-error {
+  margin-top: 20px;
+}
+
+:host ::ng-deep .p-datatable-wrapper {
+  max-height: calc(90vh - 400px);
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.entry-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 180px;
+  .huge-button {
+    width: 300px;
+    height: 300px;
+    border: 1px solid;
+    box-shadow: 0 2px 8px 0 rgb(0 0 0 / 40%);
+    font-size: 24px;
+    text-align: center;
+    padding-top: 120px;
+    cursor: pointer;
+    &:hover {
+      background-color: rgb(0,0,0, 0.1);
+    }
+  }
+}

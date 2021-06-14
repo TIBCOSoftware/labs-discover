@@ -1,0 +1,71 @@
+<!--<div class="case-table-wrapper">{{cConfig.customTitle}} {{cConfig.appId}} </div> <!- {{cases | json}} -->
+<p-table #dt [columns]="cols" [value]="casesTable" [(selection)]="selectedCasesTable"
+         dataKey="caseReference" id="pTable" styleClass="custom-table-css"
+         [rowHover]="false"
+         [rows]="NUMBER_OF_ITEMS_BEFORE_PAGINATION" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,20,50]" [loading]="loading"
+         [paginator]="showPagination" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         [filterDelay]="0" [(first)]="first" (selectionChange)="handleSelection()">
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th style="width: 50px" class="top-row-empty">
+        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+      </th>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field" class="top-row">
+        {{col.header}}
+        <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
+                    ariaLabelDesc="Activate to sort in descending order"
+                    ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+      </th>
+      <th style="width: 3em" class="top-row-empty"></th>
+    </tr>
+
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-expanded="expanded" let-columns="columns">
+    <tr class="rowhover">
+      <td>
+        <p-tableCheckbox [value]="rowData"></p-tableCheckbox>
+      </td>
+      <td *ngFor="let col of columns" class="data-row hovereffect" [ngClass]="getNgClass(col.field, rowData)"
+          (dblclick)="dt.toggleRow(rowData, $event)" (click)="onRowClick(rowData, $event)">
+
+        <div *ngIf="!cConfig.states">{{obtainData(rowData, col.field) | date:'fullDate' }}</div>
+        <div *ngIf="cConfig.states" >
+          <div *ngIf="col.field != 'State'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div>
+          <div *ngIf="col.field == 'State'">
+            <uxpl-tag icon="{{getStateIcon(rowData[col.field])}}" class="uxpl-tag"
+                      color="{{getStateColor(rowData[col.field])}}">{{obtainData(rowData, col.field)}}</uxpl-tag>
+          </div>
+        </div>
+      </td>
+
+      <td style="width: 30px !important;">
+        <a href="#" [pRowToggler]="rowData">
+          <!--<i [ngClass]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>-->
+          <img *ngIf="!expanded" src="assets/images/svg/ic_caretdown.svg" class="hover-icon">
+          <img *ngIf="expanded" src="assets/images/svg/ic_caretup.svg" class="hover-icon">
+        </a>
+      </td><!--
+        <a href="#" [pRowToggler]="rowData">
+          <i [ngClass]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+        </a>-->
+
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="rowexpansion" let-rowData let-columns="columns">
+    <tr style="background-color: #FFFFFF">
+      <td [attr.colspan]="columns.length + 2">
+        <div class="ui-g ui-fluid" style="font-size:16px;padding:20px; ">
+          <!--Details Screen -->
+          <custom-case-details [cConfig]="cConfig" [caseDetail]="getCaseInfo(rowData)" (caseEvent)="caseEventClicked($event)"></custom-case-details>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="paginatorright" let-state>
+    <div *ngIf="showAdditionalSpinner" class="small-spinner">
+      <div class="pl-spinner upload-spinner-placer">
+        <div class="pl-spinner__icon"></div>
+      </div>
+    </div>
+  </ng-template>
+</p-table>

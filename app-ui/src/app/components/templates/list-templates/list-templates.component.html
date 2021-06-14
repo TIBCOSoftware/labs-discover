@@ -1,0 +1,26 @@
+<div class="templates-wrapper">
+  <div class="filter-header">
+    <div class="filter-sub-header">
+      <div class="filter-type">
+        <div class="filter-type-label">Filter by type:</div>
+        <div *ngFor="let fil of filterTypes; let i = index" [ngClass]="{'filter-enabled': filterEnabled[i]}"
+             class="filter-item" (click)="filterSelected(i)">{{fil}}
+        </div>
+      </div>
+      <div class="search-container">
+        <uxpl-form-field type="text" valid label="Search"
+                         (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+        <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
+      </div>
+    </div>
+  </div>
+  <div class="templates-container">
+    <uxpl-card-grid>
+      <div *ngFor="let template of filteredTemplates">
+        <template-card [cardConfig]="template" [mode]="mode" [isSelected]="isSelected(template.id)"
+                       (selected)="handleSelected($event)" [highLight]="searchValue"></template-card>
+        <!--  [highLight]="highLight" [isSelected]="temp.name == selectedTemplate?.name" -->
+      </div>
+    </uxpl-card-grid>
+  </div>
+</div>

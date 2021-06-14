@@ -1,0 +1,12 @@
+<splash-screen
+  [title]="landingPage.title"
+  [subTitle]="landingPage.subtitle"
+  [backGroundImage]="landingPage.backgroundURL"
+  [topMargin]="landingPage.topMargin"
+  [highlights]="landingPage.highlights"
+  [actionButtons]="landingPage.actionButton"
+  (getStartedEvent)="getStarted()"
+></splash-screen>
+<div class="version">
+    {{ version }}
+</div>

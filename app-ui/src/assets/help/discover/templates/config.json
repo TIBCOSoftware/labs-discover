@@ -1,0 +1,79 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Templates...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What are templates ...",
+            "label": "What are templates?",
+            "title": "What are templates",
+            "url": "assets/help/concepts/What-Are-Templates.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What are the different template types?",
+            "label": "What are the different template types?",
+            "title": "What are the different template types?",
+            "url": "assets/help/application/Templates-Types.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What are the system templates provided?",
+            "label": "What are the system templates provided?",
+            "title": "What are the system templates provided?",
+            "url": "assets/help/application/Templates-System-Provided.html",
+            "content": "",
+            "default": "true"
+          }          
+
+        ]
+      },      
+      {
+        "type": "inline",
+        "name": "How_Do_I",
+        "label": "How do I ...",
+        "title": "How do I ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "Create a new template?",
+            "label": "Create a new template?",
+            "title": "Create a new template?",
+            "url": "assets/help/application/Templates-How-do-I-Create.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },       {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

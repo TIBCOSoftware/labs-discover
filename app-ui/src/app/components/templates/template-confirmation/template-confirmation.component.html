@@ -1,0 +1,90 @@
+<div class="template-confirmation-container">
+  <div class="template-info">
+    <div class="spec-title">Template info</div>
+    <table class="detail-table">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Template name</div>
+        </td>
+        <td>
+          <div class="item-detail">{{template.name}}</div>
+          <!-- <div class="confirm" *ngIf="showNameExist">
+            <span class="label-header label-header-red">{{TEMPLATE_EXISTS}} (You can change this at the basic info tab)</span>
+          </div> -->
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Description</div>
+        </td>
+        <td>
+          <div class="item-detail" [innerHTML]="template.description"></div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Analytics menu</div>
+        </td>
+        <td>
+          <ul>
+            <li class="menu-item" *ngFor="let mItem of template.menuConfig">{{mItem.label}} <b *ngIf="mItem.isDefault">(Default)</b>
+              <ul>
+                <li class="menu-item child-item" *ngFor="let cItem of mItem.child">{{cItem.label}} <b *ngIf="cItem.isDefault">(Default)</b></li>
+              </ul>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="middle-divider"></div>
+  <div class="technical-specs">
+    <div class="spec-title">Technical specs</div>
+    <table class="detail-table">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Icon</div>
+        </td>
+        <td>
+          <div class="item-detail">{{template.icon}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">DXP Location</div>
+        </td>
+        <td>
+          <div *ngIf='!isNewTemplate' class="item-detail-dxp">
+            <a target="_blank" href="">{{template.spotfireLocation}}</a>
+            <uxpl-icon class='open-sf-icon' height="18px" width="18px" icon="pl-icon-new-tab-window" (click)="openSFReport()"></uxpl-icon>
+          </div>
+          <div *ngIf="isNewTemplate" class="item-detail">{{template.spotfireLocation}}</div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">DXP Name</div>
+        </td>
+        <td>
+          <div class="item-detail">{{getName()}}</div>
+        </td>
+      </tr>
+    </table>
+    <div *ngIf="isCopy()" class="copy-dxp">
+      <div class="copy-dxp-switch">
+        <div class="copy-dxp-label">A copy of the DXP will be made:</div>
+      </div>
+
+      <table class="detail-table">
+        <tr class="detail-row">
+          <td class="header-location">
+            <div class="item-header">New DXP Name</div>
+          </td>
+          <td>
+            <div class="item-detail">{{stripOrgF(selectedAnalytics)}}</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>

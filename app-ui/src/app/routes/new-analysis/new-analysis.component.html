@@ -1,0 +1,72 @@
+<div class="new-analysis-container">
+  <uxpl-object-header [config]="objHeaderConfig" (back)="goProcessAnalsysis()">
+    <div *ngIf="!showResult" slot="navigation-content">
+      <uxpl-button type="no-border" width="80px" (clicked)="goProcessAnalsysis()">Cancel
+      </uxpl-button>
+      <uxpl-button type="secondary" width="80px" [hidden]="hide('prev')"
+                   (clicked)="changeTab(-1)">Back
+      </uxpl-button>
+      <uxpl-button type="primary" width="80px" [hidden]="hide('next')"
+                   [disabled]="handleDisableNextButton()" (clicked)="changeTab(1)">Next
+      </uxpl-button>
+      <uxpl-button type="primary" width="80px" [hidden]="hide('finish')" [disabled]="disableSave"
+                   (clicked)="createAnalysis()">{{ getEndButtonText() }}</uxpl-button>
+    </div>
+    <div *ngIf="showResult" slot="navigation-content">
+      <uxpl-button type="secondary" (clicked)="goToAnalysis()">Go to Process Analysis</uxpl-button>
+      <uxpl-button *ngIf="newAnalysisId" (clicked)="goToTemplate()">Select Template</uxpl-button>
+    </div>
+  </uxpl-object-header>
+  <uxpl-stepper [config]="config" (stepClickedIdx)="handleStepClick($event)" [hideNumbers]="mode !== 'create'"
+                style="padding: 24px 32px 24px 32px; height: calc( 100% - 93px)">
+    <div *ngIf="display('basic-info')" class="new-analysis-tab-container" slot="basic-info">
+      <basic-info [name]="newAnalysis.name" [description]="newAnalysis.description" [originalName]="originalName"
+                  (changed)="handleData($event)" (status)="handleStatus($event)"></basic-info>
+    </div>
+    <div *ngIf="display('dataset')" class="new-analysis-tab-container" slot="dataset">
+      <select-dataset [dataset]="newAnalysis.datasetId" (selectedDataset)="handleSelectedDataset($event)"
+                      (status)="handleStatus($event)"></select-dataset>
+    </div>
+    <div *ngIf="display('map')" class="new-analysis-tab-container" slot="map">
+      <map style="overflow: hidden" [selectedDataset]="newAnalysis.datasetId" [data]="newAnalysis.mappings" [advancedMode]="advancedMode" (status)="handleStatus($event)" (advance)="toggleAdvanced()"></map>
+    </div>
+    <div *ngIf="display('dataPreview')" class="new-analysis-tab-container" slot="dataPreview">
+      <!--<data-preview [selectedDataset]="newAnalysis.Dataset" [selectedDatasetName]="datasetName" [mapping]="newAnalysis.Mapping"></data-preview> -->
+    </div>
+    <!--
+    <div *ngIf="display('scheduling')" class="new-analysis-tab-container" slot="scheduling">
+      <scheduler></scheduler>
+    </div> -->
+    <div *ngIf="display('confirmation')" class="new-analysis-tab-container" slot="confirmation">
+      <!-- Test Data: TESTAnalysis | newAnalysis -->
+      <confirmation [data]="newAnalysis"></confirmation>
+    </div>
+  </uxpl-stepper>
+  <!-- Test Data: TESTAnalysis | newAnalysis -->
+  <data-preview #dataPreview *ngIf="showDataPreview" [hidden]="!display('dataPreview')" class="data-preview"
+                [filters]="newAnalysis.filters" [groups]="newAnalysis.groups" [mapping]="newAnalysis.mappings"
+                [selectedDataset]="newAnalysis.datasetId" [selectedDatasetName]="datasetName"></data-preview>
+<!--<hr/>-->
+<!--  <p><strong>data</strong></p>-->
+<!--  <pre>{{newAnalysis|json}}</pre>-->
+
+  <div *ngIf="progress.enabled" class="modal-backdrop">
+    <progress-screen class="overlay-container" [message1]="progress.message1" [message2]="progress.message2" [percentage]="progress.percentage" [status]="progress.status"></progress-screen>
+  </div>
+
+  <div *ngIf="showResult" class="modal-backdrop">
+    <div class="overlay-container">
+      <div>
+        <img width="208" height="160" [src]="successImage">
+      </div>
+      <div *ngIf="success">
+        <div class="result-text">Success!</div>
+        <div class="result-msg">Your process analysis has successfully been added. You can now select a template for this process analysis or manage it from the Process Analysis tab.</div>
+      </div>
+      <div *ngIf="!success">
+        <div class="result-text error">Error!</div>
+        <div class="result-msg">{{errorMsg}}</div>
+      </div>
+    </div>
+  </div>
+</div>

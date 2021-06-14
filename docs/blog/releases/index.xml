@@ -14,6 +14,44 @@
     
     
     <item>
+      <title>Blog: June 2020 release</title>
+      <link>https://tibcosoftware.github.io/labs-discover/blog/2021/06/14/june-2020-release/</link>
+      <pubDate>Mon, 14 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/blog/2021/06/14/june-2020-release/</guid>
+      <description>
+        
+        
+        &lt;p&gt;What’s new in the June 2021 release Project Discover™ ?&lt;/p&gt;
+&lt;p&gt;This release is a major release that contains both architectural enhancements and new process mining features in the Process Control Center.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Architecture:&lt;/b&gt; Simplified, Cloud Native and API led, we now support a multi-tenant database, a setup that could be particularly interesting for partners that may want to offer TIBCO Process mining solution as a service to their customers. We also upgraded to the latest versions of Spark and included various performance improvements.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Datasets:&lt;/b&gt; We simplified the way customers can bring their event logs data coming from their operational systems. Datasets are now managed independently from process analysis and the same dataset can now be reused in multiple process analysis.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Connectors:&lt;/b&gt; TIBCO Data virtualisation is now fully part of the solution and brings a wide range of data source connectivity for databases, files, big data, cloud sources, packaged applications, and more. Overall this represents around 350+ connectors and there’s also a kit for building your custom adapter if needed.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Templates:&lt;/b&gt; You can now fully customize the visual analytics reports, using the full power of TIBCO Cloud Spotfire. Templates will help you associate those reports to your process analysis, customize the navigation menu, and share with your different users. The extensibility options given by templates are limitless.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Investigations:&lt;/b&gt; You can now design your own investigation (case management style) apps in Live Apps and bring them into the Process Control Center with a new visual configurator.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Visual Analytics:&lt;/b&gt; Two templates are now provided: one for previewing your datasets during the process analysis configuration, and one for visualizing the process mining results. We introduced important improvements, including using the new Spotfire Mods feature for various visualisations including the process graph.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;more soon.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Blog: Nov. 2020 release</title>
       <link>https://tibcosoftware.github.io/labs-discover/blog/2020/11/06/nov.-2020-release/</link>
       <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>

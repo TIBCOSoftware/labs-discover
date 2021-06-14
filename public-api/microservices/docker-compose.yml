@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  redis:
+    image: tibcosoftware/redis:latest
+    command: /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    volumes: 
+      - ../container_data/redis/data:/data
+      - ../container_data/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    restart: on-failure
+
+  insights:
+    image: redislabs/redisinsight
+    ports:
+      - "8001:8001"
+    volumes:
+      - ../container_data/redisinsight:/db
+    restart: on-failure
+    depends_on: 
+      - redis
+
+  nginx:
+    image: nginx:1.15
+    volumes:
+      - ../container_data/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../container_data/site:/usr/share/nginx/html
+      - ../container_data/nginx/discover.cloud.tibco.com.crt:/etc/nginx/discover.cloud.tibco.com.crt 
+      - ../container_data/nginx/discover.cloud.tibco.com.key:/etc/nginx/discover.cloud.tibco.com.key
+    ports:
+      - "80:80"
+      - "443:443"
+    network_mode: bridge
+
+  analysis:
+    image: tibcosoftware/labs-discover-api-analysis:0.4.2
+    env_file: 
+      - .env
+    environment: 
+      - LOGLEVEL=debug
+      - LIVEAPPS=https://eu.liveapps.cloud.tibco.com
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CONTROLLER_ANALYSIS=ON
+      - CONTROLLER_TEMPLATES=OFF
+      - CONTROLLER_DATASETS=OFF
+      - CONTROLLER_CONFIGURATION=OFF
+      - CONTROLLER_INVESTIGATIONS=OFF
+      - CONTROLLER_SWAGGER=OFF
+    ports:
+      - "9080:8080"
+      - "9558:8558"
+    depends_on: 
+      - redis  
+        
+  microservice:
+    image: tibcosoftware/labs-discover-api-templates:0.1.0
+    env_file: 
+      - .env
+    environment: 
+      - LOGLEVEL=debug
+      - LIVEAPPS=https://eu.liveapps.cloud.tibco.com
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CONTROLLER_ANALYSIS=ON
+      - CONTROLLER_TEMPLATES=ON
+      - CONTROLLER_DATASETS=OFF
+      - CONTROLLER_CONFIGURATION=OFF
+      - CONTROLLER_INVESTIGATIONS=OFF
+      - CONTROLLER_SWAGGER=ON
+    ports:
+      - "8080:8080"
+      - "8558:8558"
+    depends_on: 
+      - redis

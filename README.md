@@ -7,7 +7,3 @@ Process-Minining Solution, based on TIBCO Products created by TIBCO LABS.
 Link to full documentation Site: https://tibcosoftware.github.io/labs-discover/
 
 ![Logo](https://tibcosoftware.github.io/TIBCO-LABS/about/tibcolabs-brand.png "Labs Logo")
-
-
-
-MAINTENANCE, ABOUT TO BE UPDATED SOON

@@ -1,0 +1,68 @@
+<div class="page-container data-container">
+  <div class="data-title-container">
+    <div class="data-title">
+      <div class="page-title">Datasets</div>
+      <uxpl-form-field style="margin-bottom:15px;" type="text" valid required="true" value=""
+                       (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+      <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
+    </div>
+    <div class="data-title">
+      <uxpl-button (clicked)="newDatasetDialog()">Create</uxpl-button>
+      <uxpl-button type="secondary" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refresh()" width="100">
+        Refresh
+      </uxpl-button>
+    </div>
+  </div>
+  <div class="data-wrapper" *ngIf="loading || (datasets && datasets.length>0); else nodata">
+    <p-table #datasetsTable [columns]="cols" [value]="datasets" [globalFilterFields]="['name', 'description']"
+      dataKey="name" id="pTable" styleClass="custom-table-css" [rowHover]="false"
+      [rows]="15" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [loading]="loading" [filterDelay]="0">
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngFor="let col of columns" [pSortableColumn]="col.field"  class="top-row">
+            {{col.header}}
+            <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
+                        ariaLabelDesc="Activate to sort in descending order"
+                        ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+          </th>
+          <th style="width: 50px" class="top-row-empty"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-dataset>
+        <tr class="rowhover" id="toHightlight">
+          <td class="no-padding data-row hovereffect"><div [innerHTML]="dataset.name | highlight: searchTerm : 'Multi-Match'"></div></td>
+          <td class="no-padding data-row hovereffect"><div [innerHTML]="dataset.description | highlight: searchTerm : 'Multi-Match'"></div></td>
+          <td class="no-padding data-row hovereffect"><div>{{getRelTime(dataset.lastPreviewDate)}}</div></td>
+          <td class="no-padding data-row hovereffect">
+            <uxpl-tag *ngIf="dataset?.status" icon="{{getStateIcon(dataset.status)}}" class="uxpl-tag"
+                      matTooltip="{{getStateTooltip(dataset.status, dataset.message)}}" matTooltipClass="tTip"
+                      color="{{getStateColor(dataset.status)}}">{{displayStatus(dataset.status)}}</uxpl-tag>
+            <mini-progress-bar *ngIf="!dataset.status && statusMap[dataset.datasetid]" [percentage]="statusMap[dataset.datasetid].percentage" [message]="statusMap[dataset.datasetid].message"></mini-progress-bar>
+          </td>
+          <td class="no-padding">
+            <div class="button-container " >
+              <uxpl-options-menu [xPosition]="'before'" [yPosition]="'after'" [iconHeight]="'15px'" [iconWidth]="'15px'" [config]="getOptions(dataset)" (selected)="optionSelect($event, dataset)"></uxpl-options-menu>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <div id="popup-host" [ngStyle]="{ 'top': popupY , 'left': popupX}" class="popup-wrapper" style="position: absolute;">
+    <uxpl-popup #deletePopup id="deletepopup" slot="popup" x-position="after" y-position="above"
+      content-id="delete-action-confirm" max-width="328px" [maxHeight]="maxDeletePopupHeight">
+      <action-confirm *ngIf="datasetOnAction" id="delete-action-confirm" confirmQuestion="Are you sure you want to delete dataset '{{datasetOnAction.name}}'? It can't be undone." doable="true" type="delete" rejectMessage="You can not delete dataset" 
+        yesBtnLabel="Yes, delete it" noBtnLabel="No" (actionConfirmed)=handleDeleteConfirmation($event) [shown]="showDeleteConfirm"></action-confirm>
+    </uxpl-popup>
+    
+  </div>
+  <ng-template #nodata>
+    <div class="center">
+      <div class="img-center">
+        <img width="204" [src]="noDataIconLocation">
+      </div>
+      <div *ngIf="datasets && datasets.length==0" class="nodata-msg">No dataset. Please click Create button to get started.</div>
+      <div *ngIf="!datasets" class="nodata-msg">Fail to get datasets. Please refresh page to try it again.</div>
+    </div>
+  </ng-template>
+</div>

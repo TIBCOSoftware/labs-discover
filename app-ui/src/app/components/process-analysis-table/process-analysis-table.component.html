@@ -1,0 +1,65 @@
+<p-table #dt [columns]="cols" [value]="processAnalyses"
+         dataKey="id" id="pTable" styleClass="custom-table-css"
+         [rowHover]="false"
+         [rows]="NUMBER_OF_ITEMS_BEFORE_PAGINATION" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [loading]="loading"
+         [paginator]="showPagination" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+         [filterDelay]="0">
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field"  class="top-row" [ngClass]="{'top-row-small': col.field == 'State' }">
+        {{col.header}}
+        <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
+                    ariaLabelDesc="Activate to sort in descending order"
+                    ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
+      </th>
+      <th style="width: 250px" class="top-row-empty"></th>
+      <th style="width: 50px" class="top-row-empty"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-i="rowIndex" let-expanded="expanded" let-columns="columns">
+    <tr class="rowhover" id="toHightlight">
+      <td *ngFor="let col of columns" class="no-padding data-row hovereffect" (click)="dt.toggleRow(rowData, $event)">
+
+        <div *ngIf="col.field != 'metadata.state'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div>
+        <div *ngIf="col.field == 'metadata.state'">
+          <uxpl-tag *ngIf="obtainData(rowData, col.field) != 'Process mining'" matTooltip="{{getToolTip(col.field, rowData)}}" matTooltipClass="tTip" icon="{{'assets/images/states/' + getValue(rowData,col.field) + '.svg'}}" class="uxpl-tag"
+                    color="{{getNgClass(col.field, rowData)}}">{{ obtainData(rowData, col.field)}}</uxpl-tag>
+          <mini-progress-bar *ngIf="obtainData(rowData, col.field) == 'Process mining'" [percentage]="statusMap[rowData.id].percentage" [message]="statusMap[rowData.id].message"></mini-progress-bar>
+        </div>
+      </td>
+      <td class="no-padding">
+        <div class="button-container " >
+          <uxpl-options-menu style="margin-top: 5px" x-position="before" menu-height=“160px” y-position="after" icon-height="15px" icon-width="15px" [config]="getAction(rowData)" (selected)="handleCaseActionSelect($event, i)"  (click)="handleOptionClick($event)"></uxpl-options-menu>
+          <uxpl-button *ngIf="rowData.metadata.state == 'Ready' || rowData.metadata.state == 'Archived' " id="#openAnalysis" type="secondary"  (clicked)="buttonClicked(rowData)" [height]="'28px'">
+            <div *ngIf="rowData.data.templateId" class="analysis-button">View analytics  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
+            <div *ngIf="!rowData.data.templateId" class="analysis-button">Select Template  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
+          </uxpl-button>
+        </div>
+      </td>
+      <td class="no-padding" style="width: 30px !important;">
+        <a href="#" [pRowToggler]="rowData">
+          <img *ngIf="!expanded" src="assets/images/svg/ic_caretdown.svg" class="hover-icon">
+          <img *ngIf="expanded" src="assets/images/svg/ic_caretup.svg" class="hover-icon">
+        </a>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="rowexpansion" let-rowData let-columns="columns">
+    <tr style="background-color: #FFFFFF">
+      <td [attr.colspan]="columns.length + 2">
+        <div class="ui-g ui-fluid" style="font-size:16px;padding:20px; ">
+          <process-analysis-details [processAnalysis]="rowData"></process-analysis-details>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<div id="popup-host" [ngStyle]="{ 'top': popupY , 'left': popupX}" class="popup-wrapper">
+  <uxpl-popup #deletePopup id="deletepopup" slot="popup" x-position="after" y-position="above"
+              content-id="my-delete-popup" max-width="328px" [maxHeight]="'190px'">
+    <action-confirm id="my-delete-popup" confirmQuestion="Are you sure you want to delete process analysis <strong>{{paToDeleteName}}</strong> ? It can't be undone..." doable="true" type="delete"
+                    yesBtnLabel="Yes, delete" noBtnLabel="Cancel" (actionConfirmed)="handleDeleteMenu($event)"></action-confirm>
+
+  </uxpl-popup>
+</div>

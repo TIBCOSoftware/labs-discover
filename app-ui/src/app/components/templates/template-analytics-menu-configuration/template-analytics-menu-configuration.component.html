@@ -1,0 +1,37 @@
+<div class="menu-container">
+  <div class="scroll-container">
+    <div class="drag-drop-container">
+      <div class="drag-drop-header">
+        <div class="label-analytic-menu-items">Analytics menu items</div>
+        <div class="add-button">
+          <div class="add-button-wrapper" (click)="add($event)">
+            <uxpl-icon height="20px" width="20px" icon="pl-icon-add-circle"></uxpl-icon>
+            <div class="add-label">Add</div>
+          </div>
+          <div class="add-button-wrapper" *ngIf="pageOptions?.length > 0" (click)="addAll()">
+            <uxpl-icon height="20px" width="20px" icon="pl-icon-add-circle"></uxpl-icon>
+            <div class="add-label">Add All</div>
+          </div>
+          <div class="popup-wrapper" [ngStyle]="{ 'top': popupY , 'left': popupX}">
+            <uxpl-popup #popup id="popup" slot="popup" x-position="after" content-id="my-new-popup" max-width="350px"
+                        max-height="450px">
+              <template-edit-menu-popup id="my-new-popup" [menuNodeItem]="newNode" style="width: 350px;"
+                                        [analyticTabs]="pageOptions"
+                                        (menuItem)="addMenuItem($event)"></template-edit-menu-popup>
+            </uxpl-popup>
+          </div>
+        </div>
+      </div>
+      <template-analytics-menu-dragdrop #dragdrop class="drag-drop" [menuNodesIN]="menuConfig"
+                                        [analyticTabs]="pageOptions" (update)="receiveMenuUpdate($event)"
+                                        (popupOpens)="closeAddPopup()"></template-analytics-menu-dragdrop>
+      <div class="drag-drop-footer">
+        <div class="reset-all-button" (click)="clearAll()">Clear all</div>
+        <div class="reset-all-button" (click)="reset()">Reset</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="middle-divider"></div>
+  <!-- The spotfire report is plotted here from template editor (using css position fixed) -->
+</div>

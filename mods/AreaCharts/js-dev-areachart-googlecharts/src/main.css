@@ -1,0 +1,23 @@
+/*
+* Copyright © 2020. TIBCO Software Inc.
+* This file is subject to the license terms contained
+* in the license file that is distributed with this file.
+*/
+
+html, body, #dashboard-div {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+#chart-container {
+    margin: 0;
+    height: 92%;
+    overflow: hidden;
+}
+#control-container {
+    margin: 0;
+    overflow: hidden;
+}
+svg text {
+    cursor: pointer;
+}

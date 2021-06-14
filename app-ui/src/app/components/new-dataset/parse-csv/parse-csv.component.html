@@ -1,0 +1,39 @@
+
+<div class="parse-options-csv-container">
+  <div class="parse-options-csv-column">
+    <div>
+        File name
+    </div>
+    <div>{{ dataSource.FileName }}</div>
+    <div>Column separator</div>
+    <uxpl-radio-group [value]="columnSeparator" (uxplChanged)="setColumnSeparator($event)">
+      <uxpl-radio value=";">Semicolon</uxpl-radio>
+      <uxpl-radio value=",">Comma</uxpl-radio>
+      <uxpl-radio value="\t">Tab</uxpl-radio>
+      <uxpl-radio value="other">
+        <uxpl-form-field slot="content" label="Other: " type="text" valid [value]="customColumnSeparator"></uxpl-form-field>
+      </uxpl-radio>
+    </uxpl-radio-group>
+  </div>
+  <div class="parse-options-csv-column parse-options-csv-margin all-space">
+    <div style="width: 50%;">
+      <uxpl-select-input class="" label="Encoding" [value]="dataSource.Encoding" [options]="encodingOptions" (uxplSelection)="handleEncodingSelection($event)"></uxpl-select-input>
+    </div>
+    <div class="all-space" style="display: flex; ">
+      <uxpl-form-field class="" label="Quote character" type="text" valid [value]="dataSource.FileQuoteChar" (uxplChanged)="handleUpdate($event, 'FileQuoteChar')"></uxpl-form-field>
+      <uxpl-form-field class="field-margin" label="Escape character" type="text" valid [value]="dataSource.FileEscapeChar" (uxplChanged)="handleUpdate($event, 'FileEscapeChar')"></uxpl-form-field>
+      <!-- <uxpl-form-field class="field-margin" label="Comments character" type="text" valid [value]="dataSource.comments" (uxplChanged)="handleUpdate($event, 'comments')"></uxpl-form-field> -->
+    </div>
+    <div style="display: flex;">
+        <span style="padding-top: 26px;">Numbers of rows to preview</span>
+        <uxpl-form-field class="small-field-margin" type="number" valid [value]="wizard.numberRowsForPreview" min="1" max="100" (uxplChanged)="handleUpdateWizard($event, 'numberRowsForPreview')"></uxpl-form-field>
+        <uxpl-button type="secondary" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="clickedRefresh()" width="100">
+          Refresh
+        </uxpl-button>
+    </div>
+  </div>
+  <!-- <div class="parse-options-csv-margin parse-options-csv-column">
+    <uxpl-checkbox [checked]="dataSource.skipComments" (clicked)="onChecked('skipComments', $event.detail)">Skip comments in file</uxpl-checkbox>
+    <uxpl-checkbox [checked]="dataSource.skipEmptyLines" (clicked)="onChecked('skipEmptyLines', $event.detail)">Skip empty lines</uxpl-checkbox>
+  </div> -->
+</div>

@@ -1,0 +1,32 @@
+<div class='data-preview-container'>
+  <div class="side-section">
+    <div class="section-top" *ngIf="showTopSection">
+      <div *ngIf="!showMapping" class="left-header">Additional options</div>
+      <uxpl-icon *ngIf="!showMapping" class='icon' height="24px" width="24px" icon="icon-switch-mappings" matTooltip="Switch to Mappings"
+                 matTooltipClass="tTip"
+                 (click)="showMapping = !showMapping;"></uxpl-icon>
+      <div *ngIf="showMapping" class="left-header">Mappings</div>
+      <uxpl-icon *ngIf="showMapping" class='icon' height="24px" width="24px" icon="icon-switch-options" matTooltip="Switch to Options"
+                 matTooltipClass="tTip"
+                 (click)="showMapping = !showMapping;"></uxpl-icon>
+    </div>
+    <map-panel *ngIf="showMapping" class='map-panel' [data]="mapping" [datasetId]="selectedDataset" [availableColumns]="availableColumns" advanceMode="false"
+               (status)="updateStatus($event)"
+    ></map-panel>
+    <uxpl-left-nav-multi [hidden]="showMapping"  #leftNav [tabs]="leftNavTabs" (selected)="handleClick($event)" (collapsed)="showTopSection = !$event.detail" collapse></uxpl-left-nav-multi>
+  </div>
+  <div class='spotfire-viewer-container'>
+    <!--<div (click)="extractSpotfireFilterData()">Filter</div>-->
+    <spotfire-viewer #analysis
+                     style="height: 100%;"
+                     [url]="spotfireServer"
+                     [path]="previewDXPLocation"
+                     version="10.10"
+                     [parameters]="analysisParameters"
+                     [customization]="customization"
+                     [page]="page"
+                     (document)="setDocument($event)">
+    </spotfire-viewer>
+  </div>
+</div>
+

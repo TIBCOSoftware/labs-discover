@@ -1,0 +1,223 @@
+{
+        "schema": [
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "eventID",
+                "DataType": "int"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Spend area text",
+                "DataType": "numeric"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Company",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Document Type",
+                "DataType": "double"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Sub spend area text",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Purchasing Document",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Purch. Doc. Category name",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Vendor",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Item Type",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Item Category",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Spend classification text",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Source",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Name",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case GR-Based Inv. Verif.",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Item",
+                "type": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case concept:name",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "case Goods Receipt",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "event User",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "event org:resource",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "event concept:name",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "None",
+                "importance": "None",
+                "ColumnName": "event Cumulative net worth (EUR)",
+                "DataType": "string"
+            },
+            {
+                "featureType": "None",
+                "format": "d/M/yyyy H:m:ss",
+                "importance": "None",
+                "ColumnName": "event time:timestamp",
+                "DataType": "timestamp"
+            },
+            {
+                "featureType": "None",
+                "format": "d/M/yyyy H:m:ss",
+                "importance": "None",
+                "ColumnName": "start time",
+                "DataType": "timestamp"
+            },
+            {
+                "featureType": "None",
+                "format": "d/M/yyyy H:m:ss",
+                "importance": "None",
+                "ColumnName": "end time:timestamp",
+                "DataType": "timestamp"
+            }
+        ],
+        "Dataset_Name": "Test",
+        "Dataset_Description": "some desc",
+        "Dataset_Source": {
+            "DatasourceType": "File-Delimited",
+            "System": "TIBCO CLOUD LIVE APP",
+            "Infrastructure": "TIBCO CLOUD",
+            "Encoding": "UTF-8",
+            "FileEscapeChar": "\\\\",
+            "FileName": "file.csv",
+            "FilePath": "s3:totot.ocm",
+            "FileQuoteChar": "\"",
+            "FileSeparator": ",",
+            "FileHeaders": "true"
+        },
+    "Description": "string",
+    "Filter": [
+      {
+        "Description": "string",
+        "Name": "string",
+        "Type": "string",
+        "Value": "string"
+      }
+    ],
+    "Groups": [
+      {
+        "Description": "string",
+        "Name": "string",
+        "Type": "string",
+        "Value": "string"
+      }
+    ],
+    "ID": "string",
+    "Mapping": {
+      "Activity": "string",
+      "Case_ID": "string",
+      "End_time": "string",
+      "Other_attributes": "string",
+      "Requester": "string",
+      "Resource": "string",
+      "Resource_group": "string",
+      "Scheduled_end": "string",
+      "Scheduled_start": "string",
+      "Start_time": "string"
+    },
+    "Name": "string",
+    "Organization": "string",
+    "Schedule": {
+      "Schedule": "string",
+      "isSchedule": "string"
+    },
+  "reference": "string"
+    }

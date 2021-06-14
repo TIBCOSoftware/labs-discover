@@ -1,0 +1,4 @@
+ports:
+  http: 8080
+  debug: 5858
+  healthCheck: 8558

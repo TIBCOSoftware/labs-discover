@@ -1,0 +1,13 @@
+<div>
+    <div class="basic-info-container" *ngIf="data">
+        <uxpl-form-field id="#datasetLabel" fieldId="datasetLabel" style="margin-top: 5px; margin-bottom: 5px;" label="Name" type="text" [valid]="!nameError" required="true" [value]="data.Dataset_Name" (uxplChanged)="handleUpdate($event, 'Dataset_Name')"></uxpl-form-field>
+        <div *ngIf="nameError" class="error">The label is the same as an existing dataset.</div>
+        <uxpl-form-field id="#datasetDescription" fieldId="datasetDescription" style="margin-top: 5px; margin-bottom: 5px;" label="Description" type="text" valid [value]="data.Dataset_Description" (uxplChanged)="handleUpdate($event, 'Dataset_Description')"></uxpl-form-field>
+    </div>
+</div>
+
+
+
+
+
+

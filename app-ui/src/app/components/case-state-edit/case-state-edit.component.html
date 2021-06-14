@@ -1,0 +1,93 @@
+
+<div class="case-state-edit">
+  <h1 mat-dialog-title>Edit state icon and color</h1>
+  <div mat-dialog-content class="dialog-content">
+    <div style="display: flex; justify-content: space-evenly;">
+      <div class="icon-selector">
+        <h3>Icon</h3>
+        <div>
+          <uxpl-radio-group [value]="icon" (uxplChanged)="changeIcon($event)">
+            <!-- <uxpl-radio *ngFor="let path of stateImageNames" [value]="path">
+              <span class="state-icon">
+                <img src="assets/images/states/{{path}}.svg"/>
+              </span>
+            </uxpl-radio> -->
+            <uxpl-radio value="assets/images/states/Added.svg">
+              <span class="state-icon">
+                <img src="assets/images/states/Added.svg"/>
+              </span>
+            </uxpl-radio>
+            <uxpl-radio value="assets/images/states/Archived.svg">
+              <span class="state-icon">
+                <img src="assets/images/states/Archived.svg"/>
+              </span>
+            </uxpl-radio>
+            <uxpl-radio value="assets/images/states/Not ready.svg">
+              <span class="state-icon">
+                <img src="assets/images/states/Not ready.svg"/>
+              </span>
+            </uxpl-radio>
+            <uxpl-radio value="assets/images/states/Process mining.svg">
+              <span class="state-icon">
+                <img src="assets/images/states/Process mining.svg"/>
+              </span>
+            </uxpl-radio>
+            <uxpl-radio value="assets/images/states/Purged.svg">
+              <span class="state-icon">
+                <img src="assets/images/states/Purged.svg"/>
+              </span>
+            </uxpl-radio>
+            <uxpl-radio value="assets/images/states/Ready.svg">
+              <span class="state-icon">
+                <img src="assets/images/states/Ready.svg"/>
+              </span>
+            </uxpl-radio>
+          </uxpl-radio-group>
+        </div>
+        
+      </div>
+      <div class="color-selector">
+        <h3>Color</h3>
+        <div>
+          <uxpl-radio-group [value]="color" (uxplChanged)="changeColor($event)">
+            <!-- <uxpl-radio *ngFor="let color of stateColors" [value]="color">
+              <span class="state-color-circle" [style.background]="color"></span>
+              <span>{{color}}</span>
+            </uxpl-radio> -->
+            <uxpl-radio value="#E0F0F9">
+              <span class="state-color-circle" style="background-color: #E0F0F9;"></span>
+              <span>#E0F0F9</span>
+            </uxpl-radio>
+            <uxpl-radio value="#FEF7EA">
+              <span class="state-color-circle" style="background-color: #FEF7EA;"></span>
+              <span>#FEF7EA</span>
+            </uxpl-radio>
+            <uxpl-radio value="#F9E1E4">
+              <span class="state-color-circle" style="background-color: #F9E1E4;"></span>
+              <span>#F9E1E4</span>
+            </uxpl-radio>
+            <uxpl-radio value="#E1F7EB">
+              <span class="state-color-circle" style="background-color: #E1F7EB;"></span>
+              <span>#E1F7EB</span>
+            </uxpl-radio>
+            <uxpl-radio value="#F4F4F4">
+              <span class="state-color-circle" style="background-color: #F4F4F4;"></span>
+              <span>#F4F4F4</span>
+            </uxpl-radio>
+            <uxpl-radio value="other">
+              <uxpl-form-field slot="content" label="Other: " type="text" [valid]="!formError" [value]="customColor"></uxpl-form-field>
+              <div *ngIf="formError" class="error">Invalid color. </div>
+            </uxpl-radio>
+          </uxpl-radio-group>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div>
+    <div mat-dialog-actions>
+      <uxpl-button type="secondary" (clicked)="cancel();">Cancel</uxpl-button>
+      <uxpl-button [disabled]="handleDisableSaveBtn()" type="primary" (clicked)="save();">Save</uxpl-button>
+    </div>
+  </div>
+</div>

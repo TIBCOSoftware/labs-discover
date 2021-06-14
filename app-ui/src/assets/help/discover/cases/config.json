@@ -1,0 +1,107 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Investigations ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is an investigation ...",
+            "label": "What is an investigation?",
+            "title": "What is an investigation?",
+            "url": "assets/help/application/Investigations-What-Are-Investigations.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "What types of investigations are possible ...",
+            "label": "What types of investigations are possible?",
+            "title": "What types of investigations are possible?",
+            "url": "assets/help/application/Investigations-What-Are-Investigations-Types.html",
+            "content": "",
+            "default": "true"
+          }
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "How do I",
+        "label": "How do I ...",
+        "title": "How do I ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "Run actions on a case?",
+            "label": "Run actions on a case?",
+            "title": "Run actions on a case?",
+            "url": "assets/help/application/Investigations-How-do-I-Run-Actions.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Display details of a cases?",
+            "label": "Display details of a cases?",
+            "title": "Display details of a cases?",
+            "url": "assets/help/application/Investigations-How-do-I-Display-Details.html",
+            "content": "",
+            "default": "true"
+          },          {
+            "type": "inline",
+            "name": "Create or Edit a new Investigation application?",
+            "label": "Create or Edit a new Investigation application?",
+            "title": "Create or Edit a new Investigation application?",
+            "url": "assets/help/application/Investigations-How-do-I-Create-New-App.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Add a new investigation to the left menu?",
+            "label": "Add a new investigation to the left menu?",
+            "title": "Add a new investigation to the left menu?",
+            "url": "assets/help/application/Investigations-How-do-I-Add-App.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Configure the columns to display for each investigation type?",
+            "label": "Configure the columns to display for each investigation type?",
+            "title": "Configure the columns to display for each investigation type?",
+            "url": "assets/help/application/Investigations-How-do-I-Configure-Columns.html",
+            "content": "",
+            "default": "true"
+          }
+
+        ]
+      },     
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

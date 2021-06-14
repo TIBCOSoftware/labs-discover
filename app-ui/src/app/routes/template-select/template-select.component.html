@@ -1,0 +1,9 @@
+<div class="select-template-top">
+  <uxpl-object-header [config]="objHeaderConfig" (back)="goProcessAnalysis()" (editDetail)="goTemplate()">
+  </uxpl-object-header>
+  <!--  {{ this.analysis | json }} -->
+  <div class="template-selector-wrapper">
+    <list-templates *ngIf="showListTemplates" [templates]="templates" [selectedTemplate]="analysis.data.templateId"
+                    mode="select" (selected)="handleSelectTemplate($event)"></list-templates>
+  </div>
+</div>

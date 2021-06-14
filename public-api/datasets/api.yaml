@@ -1,0 +1,405 @@
+openapi: 3.0.1
+info:
+  title: Discover datasets API
+  description: The datasets API to create, update, delete dataset for Discover app.
+  license:
+    name: TIBCO
+    url: http://tibco.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Discover app
+  url: https://www.tibco.com/solutions/process-mining-solutions
+servers:
+  - url: https://api.discover.labs.tibcocloud.com/catalog
+    description: The remote api servers
+  - url: /catalog
+    description: The local api server
+security:
+  - bearerAuth: []
+
+paths:
+  /datasets:
+    get:
+      tags:
+        - Catalog
+      description: Get all linked dataset from the tcmd discover app
+      summary: Get All Datasets of Discover Application
+      responses:
+        '200':
+          description: Returns all the datasets that associated with the TIBCO CLOUD Discover web application.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetArray'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  '/dataset/{id}':
+    get:
+      tags:
+        - Catalog
+      description: Get the dataset details by a given dataset id.
+      summary: Get dataset details.
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the dataset detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetDetail'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: Record not found.
+    delete:
+      tags:
+        - Catalog
+      description: Delete dataset of given id.
+      summary: Delete dataset.
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Record deleted.
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+    put:
+      tags:
+        - Catalog
+      description: Update dataset.
+      summary: Update dataset after it is created
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/DatasetDetail'
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing or the dataset id in payload is different with the id in path parameter
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  /dataset/exist:
+    post:
+      tags:
+        - Catalog
+      description: Check whether the dataset is existing with name and id. If id is present in payload then check whether there is a dataset with the same name of different dataset id other than the specified one.
+      summary: Check whether the dataset is existing with name and id. 
+      requestBody:
+        description: The name and id
+        content:
+          "application/json": 
+            schema: 
+              $ref: '#/components/schemas/CheckExist'
+      responses:
+        '200':
+          description: Returns the dataset detail.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/CheckExistResult'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  /dataset:
+    post:
+      tags:
+        - Catalog
+      description: Create a new dataset
+      summary: Create a new dataset
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/DatasetDetail'
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '409':
+          description: The dataset of the name is already exist.
+  /status:
+    post:
+      tags:
+        - Catalog
+      description: The api for process mining backend to send the real time status to dataset.
+      summary: Save dataset preview status
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/PreviewStatus'
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '409':
+          description: The dataset of the name is already exist.
+  /status/{id}:
+    get:
+      tags:
+        - Catalog
+      description: The api for process mining backend to send the real time status to dataset.
+      summary: Save dataset preview status
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the dataset id.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/PreviewStatus'
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: The dataset of the id is not found.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: CIC oauth token
+  schemas:
+    Dataset:
+      type: object
+      properties:
+        datasetid:
+          type: string
+          description: The dataset id assigned by Process mining process.
+        name:
+          type: string
+          description: The name of the dataset
+        fileName:
+          type: string
+          description: The csv file name.
+        description:
+          type: string
+          description: The dataset description.
+        createdDate:
+          type: integer
+          description: The dataset created datetime.
+        status:
+          type: string
+          description: The final status of dataset preview which is returned by process mining.
+          example: COMPLETED
+        lastPreviewDate:
+          type: integer
+          description: The datetime of last data preview. 
+    DatasetArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Dataset'
+    DatasetDetail:
+      type: object
+      properties:
+        Dataset_Id:
+          type: string
+          description: The dataset id.
+        Dataset_Name:
+          type: string
+          description: The name of the dataset
+        Dataset_Description:
+          type: string
+          description: The description of the dataset
+        schema:
+          type: array
+          description: The columns of the csv file
+          items:
+            $ref: '#/components/schemas/Schema'
+        Dataset_Source:
+          type: object
+          description: The dataset source properties.
+          $ref: '#/components/schemas/DatasetSource'
+        createdDate:
+          type: integer
+          description: The dataset created datetime.
+        updatedDate:
+          type: integer
+          description: The dateset updated datetime.
+        status:
+          type: string
+          description: The final data preview status
+        lastPreviewDate:
+          type: integer
+          description: The last data preview datetime.
+        PublishedView:
+          type: string
+          description: The published view data source path.
+        previewStatus:
+          type: object
+          description: The latest preview status received from process minning
+          $ref: '#/components/schemas/PreviewStatus'
+    DatasetSource:
+      type: object
+      properties:
+        Encoding:
+          type: string
+          description: The charset encoding of the data source file
+          example: utf-8
+        FileEscapeChar:
+          type: string
+          description: The escape char of the data source file
+        FileName:
+          type: string
+          description: The file name of the data source csv file.
+        FileQuoteChar:
+          type: string
+          description: The quote char of the data source file
+        FileSeparator:
+          type: string
+          description: The separator char to parse the data source file.
+        FileHeaders:
+          type: boolean
+          description: Whether the data source csv file has column headers
+        MainAssetId:
+          type: integer
+          description: The preferred asset id in TIBCO Cloud Metadata
+        FilePath:
+          type: string
+          description: The S3 url of data source file
+        DatasourceType:
+          type: string
+          description: The data source type
+          example: File-Delimited
+        System:
+          type: string
+          description: The value to distinguish the application that dataset belongs to
+          example: '10000'
+        InstanceId:
+          type: integer
+          description: The id of the TIBCO Cloud Metadata instance
+        Infrastructure:
+          type: integer
+          description: The infrastructure id in TIBCO Cloud Metadata.
+      required:
+        - Encoding
+    Schema:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The column header name of the csv file.
+        type:
+          type: string
+          description: The value type of the column, such timestamp, numeric, string, int
+          example: timestamp
+        format:
+          type: string
+          description: The timestamp format of the value. It's 'None' if the type is not timestamp
+          example: mm/dd/yyyy HH:MM
+        featureType:
+          type: string
+          description: The feature type. It's None if no featureType is set.
+        importance:
+          type: string
+          description: The property to describe how important the column is in process mining
+          example: Low
+        id:
+          type: integer
+          description: The asset id of the column in TIBCO Cloud Metadata.
+    PreviewStatus:
+      type: object
+      properties:
+        Organisation:
+          type: string
+          description: The orgId which is the subscription id in CIC.
+        JobName:
+          type: string
+          description: The spark job name
+        DatasetID:
+          type: string
+          description: The dataset id.
+        Message:
+          type: string
+          description: The Message describing the process mining status.
+        Level:
+          type: string
+          description: The log level
+          example: INFO
+        Progression:
+          type: integer
+          description: The progress of preview. It's a number from 0 to 100. 0 means error. 100 means the preview process is completed.
+        TimeStamp:
+          type: integer
+          description: The timestamp of the status.
+    CheckExist:
+      type: object
+      properties:
+        Dataset_Id:
+          type: string
+          description: The dataset id
+        Dataset_Name:
+          type: string
+          description: The dataset name
+      required:
+        - "Dataset_Id"
+    CheckExistResult:
+      type: object
+      properties:
+        exist:
+          type: boolean
+          description: It's true is the dataset of the name is found, otherwise return false. 
+    DatasetUpdated:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The status returned from Redis server
+        datasetId:
+          type: string
+          description: The dataset id.
+        
+tags:
+  - name: Catalog

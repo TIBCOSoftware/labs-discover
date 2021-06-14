@@ -1,0 +1,43 @@
+<div>
+  <div class="hint">Select the attribute type for each column in your dataset. For each column, the first row value is
+    displayed in the ‘Value preview’ column.
+  </div>
+  <div class="hint">
+    <span class="warning"></span>
+    <div class="warning-msg">At least one column must be attribute type <span>‘Timestamp’</span> in order to continue.
+    </div>
+  </div>
+  <div class="preview-table" *ngIf="previewData ; else loading">
+    <p-table [value]="schema" dataKey="field">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="key">Column name
+            <p-sortIcon field="key"></p-sortIcon>
+          </th>
+          <th>Value preview</th>
+          <th>Attribute type</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-column let-i="rowIndex" >
+        <tr >
+          <td>
+            {{column.key}}
+          </td>
+          <td>
+            {{previewData[0][column.key]}}
+          </td>
+          <td>
+            <uxpl-select-input class="dropdown" [options]="datatypeOptions" [value]="column.type" max-height="165px" [yPosition]="getPosition(i)"
+                               (uxplSelection)="onSelectDatatype($event, column)"></uxpl-select-input>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+  <ng-template #loading>
+    <div class="loading-indicator">
+      <uxpl-spinner style="height: 150px; min-width: 150px; max-width: 150px;" appearance="light"
+                    message="preview file..."></uxpl-spinner>
+    </div>
+  </ng-template>
+</div>

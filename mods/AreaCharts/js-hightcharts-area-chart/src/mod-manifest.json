@@ -1,0 +1,40 @@
+{
+    "apiVersion": "1.0",
+    "version": "1.0",
+    "name": "HighCharts Area chart",
+    "id": "js-highcharts-area-chart",
+    "icon": "icon.svg",
+    "externalResources": ["https://code.highcharts.com"],
+    "properties": [
+    ],
+    "dataViewDefinition": {
+        "colorAxis": {
+            "mode": "dual",
+            "dropTarget": {
+                "icon": "Color",
+                "description": "Color by {0}"
+            }
+        },
+        "axes": [
+            {
+                "name": "X",
+                "mode": "categorical",
+                "placement": "bottom",
+                "dropTarget": {
+                    "icon": "XAxis3D",
+                    "description": "Use {0} on the mod's X-axis"
+                }
+            },
+            {
+                "name": "Y",
+                "mode": "continuous",
+                "placement": "left"
+            }
+        ]
+    },
+    "files": [
+        "index.html",
+        "main.css",
+        "main.js"
+    ]
+}

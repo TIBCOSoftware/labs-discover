@@ -1,0 +1,589 @@
+{
+  "id": "1",
+  "name": "DiscoverImprovement",
+  "label": "Discover improvement",
+  "isCase": true,
+  "applicationId": "3556",
+  "applicationName": "Discover improvement",
+  "applicationInternalName": "DiscoverImprovement",
+  "applicationVersion": 19,
+  "attributes": [
+    {
+      "name": "state",
+      "label": "State",
+      "type": "Text",
+      "isState": true
+    },
+    {
+      "name": "ImprovementID",
+      "label": "Improvement ID",
+      "type": "Text",
+      "isIdentifier": true,
+      "isMandatory": true
+    },
+    {
+      "name": "ShortDescription",
+      "label": "Short Description",
+      "type": "Text"
+    },
+    {
+      "name": "LongDescription",
+      "label": "Long Description",
+      "type": "Text",
+      "displayPreferences": {
+        "multiLine": true
+      }
+    },
+    {
+      "name": "Context",
+      "label": "Context",
+      "type": "18",
+      "isStructuredType": true
+    },
+    {
+      "name": "Decision",
+      "label": "Decision",
+      "type": "Text"
+    },
+    {
+      "name": "DataSourceName",
+      "label": "Data Source Name",
+      "type": "Text"
+    },
+    {
+      "name": "CommentsHistory",
+      "label": "Comments History",
+      "type": "Text",
+      "isArray": true
+    },
+    {
+      "name": "DataSourceId",
+      "label": "Data Source Id",
+      "type": "Text"
+    }
+  ],
+  "summaryAttributes": [
+    {
+      "name": "state",
+      "label": "State",
+      "type": "Text",
+      "isState": true
+    },
+    {
+      "name": "ImprovementID",
+      "label": "Improvement ID",
+      "type": "Text",
+      "isIdentifier": true,
+      "isMandatory": true
+    },
+    {
+      "name": "ShortDescription",
+      "label": "Short Description",
+      "type": "Text"
+    },
+    {
+      "name": "DataSourceName",
+      "label": "Data Source Name",
+      "type": "Text"
+    }
+  ],
+  "states": [
+    {
+      "id": "6",
+      "label": "Created",
+      "value": "Created"
+    },
+    {
+      "id": "8",
+      "label": "Investigation",
+      "value": "Investigation"
+    },
+    {
+      "id": "9",
+      "label": "Escalated",
+      "value": "Escalated"
+    },
+    {
+      "id": "14",
+      "label": "Already Exists",
+      "value": "Already Exists"
+    },
+    {
+      "id": "13",
+      "label": "Under consideration",
+      "value": "Under consideration"
+    },
+    {
+      "id": "33",
+      "label": "Implementation",
+      "value": "Implementation"
+    },
+    {
+      "id": "16",
+      "label": "Implemented",
+      "value": "Implemented"
+    },
+    {
+      "id": "28",
+      "label": "Rejected",
+      "value": "Rejected"
+    },
+    {
+      "id": "27",
+      "label": "Cancelled",
+      "value": "Cancelled"
+    },
+    {
+      "id": "29",
+      "label": "Resolved",
+      "value": "Resolved",
+      "isTerminal": true
+    }
+  ],
+  "jsonSchema": {
+    "type": "object",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {
+      "Context": {
+        "type": "object",
+        "properties": {
+          "ContextType": {
+            "type": "string",
+            "maxLength": 7,
+            "title": "Context Type",
+            "enum": [
+              "Variant",
+              "Case"
+            ]
+          },
+          "ContextID": {
+            "type": "string",
+            "maxLength": 5000,
+            "title": "Context ID"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "Commenttext": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment text"
+          }
+        }
+      }
+    },
+    "properties": {
+      "state": {
+        "type": "string",
+        "title": "State",
+        "enum": [
+          "Created",
+          "Investigation",
+          "Escalated",
+          "Already Exists",
+          "Under consideration",
+          "Implementation",
+          "Implemented",
+          "Rejected",
+          "Cancelled",
+          "Resolved"
+        ]
+      },
+      "ImprovementID": {
+        "type": "string",
+        "maxLength": 19,
+        "title": "Improvement ID"
+      },
+      "ShortDescription": {
+        "type": "string",
+        "maxLength": 50,
+        "title": "Short Description"
+      },
+      "LongDescription": {
+        "type": "string",
+        "maxLength": 500,
+        "title": "Long Description"
+      },
+      "Context": {
+        "type": "object",
+        "title": "Context",
+        "$ref": "#/definitions/Context"
+      },
+      "Decision": {
+        "type": "string",
+        "maxLength": 20,
+        "title": "Decision",
+        "enum": [
+          "Under Consideration",
+          "Start implementation",
+          "Already Exists",
+          "Rejected"
+        ]
+      },
+      "DataSourceName": {
+        "type": "string",
+        "maxLength": 50,
+        "title": "Data Source Name"
+      },
+      "CommentsHistory": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "title": "Comments History"
+      },
+      "DataSourceId": {
+        "type": "string",
+        "maxLength": 50,
+        "title": "Data Source Id"
+      }
+    }
+  },
+  "creators": [
+    {
+      "id": "16781",
+      "name": "Create Improvement",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "definitions": {
+          "Context": {
+            "type": "object",
+            "properties": {
+              "ContextType": {
+                "type": "string",
+                "maxLength": 7,
+                "title": "Context Type",
+                "enum": [
+                  "Variant",
+                  "Case"
+                ]
+              },
+              "ContextID": {
+                "type": "string",
+                "maxLength": 5000,
+                "title": "Context ID"
+              }
+            }
+          },
+          "DiscoverImprovement": {
+            "type": "object",
+            "properties": {
+              "ShortDescription": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Short Description"
+              },
+              "LongDescription": {
+                "type": "string",
+                "maxLength": 500,
+                "title": "Long Description"
+              },
+              "Context": {
+                "type": "object",
+                "title": "Context",
+                "$ref": "#/definitions/Context"
+              },
+              "DataSourceName": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Data Source Name"
+              },
+              "DataSourceId": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Data Source Id"
+              },
+              "CommentsHistory": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 50
+                },
+                "title": "Comments History"
+              }
+            }
+          }
+        },
+        "properties": {
+          "DiscoverImprovement": {
+            "type": "object",
+            "title": "Discover improvement",
+            "$ref": "#/definitions/DiscoverImprovement"
+          }
+        }
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "16787",
+      "name": "Cancel",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "17826",
+      "name": "Confirm implemented",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "16783",
+      "name": "Escalate",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "16782",
+      "name": "Qualify",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "definitions": {
+          "DiscoverImprovement": {
+            "type": "object",
+            "properties": {
+              "Decision": {
+                "type": "string",
+                "maxLength": 20,
+                "title": "Decision",
+                "enum": [
+                  "Under Consideration",
+                  "Start implementation",
+                  "Already Exists",
+                  "Rejected"
+                ]
+              }
+            },
+            "required": [
+              "Decision"
+            ]
+          }
+        },
+        "properties": {
+          "DiscoverImprovement": {
+            "type": "object",
+            "title": "Discover improvement",
+            "$ref": "#/definitions/DiscoverImprovement"
+          },
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        },
+        "required": [
+          "DiscoverImprovement"
+        ]
+      }
+    },
+    {
+      "id": "17825",
+      "name": "Reopen",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "16786",
+      "name": "Resolve",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "16788",
+      "name": "Send back",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "16784",
+      "name": "Send to Investigation",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "properties": {
+          "Comment": {
+            "type": "string",
+            "maxLength": 50,
+            "title": "Comment"
+          }
+        }
+      }
+    },
+    {
+      "id": "17632",
+      "name": "$Update All Data",
+      "jsonSchema": {
+        "type": "object",
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "definitions": {
+          "Context": {
+            "type": "object",
+            "properties": {
+              "ContextType": {
+                "type": "string",
+                "maxLength": 7,
+                "title": "Context Type",
+                "enum": [
+                  "Variant",
+                  "Case"
+                ]
+              },
+              "ContextID": {
+                "type": "string",
+                "maxLength": 5000,
+                "title": "Context ID"
+              }
+            }
+          },
+          "DiscoverImprovement": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string",
+                "title": "State",
+                "enum": [
+                  "Created",
+                  "Investigation",
+                  "Escalated",
+                  "Already Exists",
+                  "Under consideration",
+                  "Implementation",
+                  "Implemented",
+                  "Rejected",
+                  "Cancelled",
+                  "Resolved"
+                ]
+              },
+              "ShortDescription": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Short Description"
+              },
+              "LongDescription": {
+                "type": "string",
+                "maxLength": 500,
+                "title": "Long Description"
+              },
+              "Context": {
+                "type": "object",
+                "title": "Context",
+                "$ref": "#/definitions/Context"
+              },
+              "Decision": {
+                "type": "string",
+                "maxLength": 20,
+                "title": "Decision",
+                "enum": [
+                  "Under Consideration",
+                  "Start implementation",
+                  "Already Exists",
+                  "Rejected"
+                ]
+              },
+              "DataSourceName": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Data Source Name"
+              },
+              "CommentsHistory": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "maxLength": 50
+                },
+                "title": "Comments History"
+              },
+              "DataSourceId": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Data Source Id"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "Comment": {
+            "type": "object",
+            "properties": {
+              "Commenttext": {
+                "type": "string",
+                "maxLength": 50,
+                "title": "Comment text"
+              }
+            }
+          }
+        },
+        "properties": {
+          "DiscoverImprovement": {
+            "type": "object",
+            "title": "Discover improvement",
+            "$ref": "#/definitions/DiscoverImprovement"
+          }
+        },
+        "required": [
+          "DiscoverImprovement"
+        ]
+      }
+    }
+  ]
+}
