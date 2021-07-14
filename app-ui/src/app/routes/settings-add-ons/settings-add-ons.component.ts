@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DiscoverConfiguration } from 'src/app/models/configuration';
+import { DiscoverConfiguration } from 'src/app/models_ui/configuration';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 import { cloneDeep, isEqual } from 'lodash-es';
 import {MatDialog} from "@angular/material/dialog";

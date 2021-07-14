@@ -52,3 +52,8 @@ router-outlet + * {
   font-size: 12px;
   height: 14px;
 }
+
+.headerBack {
+  background-color: #0E4F9E !important;
+  height: 40px;
+}

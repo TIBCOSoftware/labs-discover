@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {AnalyticTemplateUI} from '../../models/analyticTemplate';
-import {TButton} from '../../models/buttons';
+import {AnalyticTemplateUI} from '../../models_ui/analyticTemplate';
+import {TButton} from '../../models_ui/buttons';
 
 @Component({
   selector: 'analytic-card',

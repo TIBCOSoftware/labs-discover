@@ -1,18 +1,6 @@
 <div class="analytics-dashboard-top-level">
   <div class="analytics-wrapper"> <!-- [hidden]="!fullSpotfireConfig.hasAnalytics" -->
     <uxpl-object-header [config]="objHeaderConfig" (back)="goProcessAnalysis()" (editDetail)="editTemplate()">
-      <!--
-      <uxpl-button slot="navigation-content" style="width: 100px" type='secondary' (clicked)="check()" [disabled]="disableCheckUncheckButtons()">
-        Check
-      </uxpl-button>
-      <uxpl-button slot="navigation-content" style="width: 100px" type='secondary' (clicked)="uncheck()" [disabled]="disableCheckUncheckButtons()">
-        Uncheck
-      </uxpl-button>
-      -->
-      <!-- TODO: Test this functionality
-      <uxpl-button slot="navigation-content" style="margin-right: 20px" type='secondary' (clicked)="openConnectedPage()" >
-        Open Page in New Window
-      </uxpl-button> -->
       <uxpl-button slot="navigation-content" style="width: 160px" icon="assets/images/svg/plus.svg"
                    (clicked)="showCreateCaseMenu()" [disabled]="disableInvestigation()">
         Investigation
@@ -23,17 +11,19 @@
                             (createInvestigation)="createInv($event)"></create-case-menu>
         </uxpl-popup>
       </uxpl-button>
-      <uxpl-button slot="navigation-content" id="#refresh" type="no-border"
+      <uxpl-button slot="navigation-content" id="#refresh" type="no-border" (click)="loadAnalytic()"
                    icon="assets/images/svg/pl-icon-refresh.svg">
         Refresh
       </uxpl-button>
     </uxpl-object-header>
     <div class="analytics-dashboard-wrapper" *ngIf="spotfireDXP">
-      <div class="analytics-dashboard-left-nav" >
-        <uxpl-left-nav-multi #leftNav [tabs]="leftNavTabs" (selected)="handleClick($event)" collapse></uxpl-left-nav-multi>
+      <div class="analytics-dashboard-left-nav">
+        <uxpl-left-nav-multi #leftNav [tabs]="leftNavTabs" (selected)="handleClick($event)"
+                             collapse></uxpl-left-nav-multi>
       </div>
-      <div class="analytics-dashboard-analytics">
-        <div style="width: 100%; height: 100%;">
+      <div class="analytics-dashboard-analytics" #analysisContainer>
+        <div style="width: 100%; height: 100%; position: relative;">
+          <!-- <pre>{{filterIds | json}}</pre> -->
           <spotfire-viewer id='mySFViewer' #analysis
                            [url]="spotfireServer"
                            [path]="spotfireDXP"
@@ -43,7 +33,8 @@
                            (document)="setDocument($event)"
                            (markingEvent)="marking($event)"
                            [customization]="setSpotfireConfiguration()"
-          >
+                           [linkedReportIds]="[FILTER_DIV]">
+            <!--                           [linkedReportIds]="filterIds">-->
           </spotfire-viewer>
         </div>
       </div>
@@ -57,11 +48,27 @@
         <img width="204" [src]="noDataIconLocation">
       </div>
       <div class="no-data-available"><br></div>
-      <div class="no-data-available" style="font-weight: bold">No process selected.<br></div>
+      <div class="no-data-available" style="font-weight: bold">No process selected<br></div>
       <div class="no-data-available"><br></div>
-      <div class="no-data-available"> Select <span class="no-data-available-click" (click)="selectAnalytic()">a process analysis</span>
-        to get started.
+      <div class="no-data-available">To get started, select <span class="no-data-available-click"
+                                                                  (click)="selectAnalytic()">a process analysis</span>
       </div>
     </div>
   </div>
+
+  <div *ngIf="spotfireDXP" [hidden]="!showFilterButton" class="filter-toggle"
+       [ngClass]="{'collapsed': !showFilterPanel}"
+       (click)="toggleFilterPanel($event)" (mouseenter)="hoverFilterButton(true)"
+       (mouseleave)="hoverFilterButton(false)">
+    <uxpl-icon class="filter-icon" icon="pl-icon-filter" width="24px" height="24px"
+               [color]="getFilterButtonColor()"></uxpl-icon>
+  </div>
+
+  <sf-filter-panel #spotfireFilterPanel class="filter-panel" *ngIf="spotfireDXP"
+                   [hidden]="!showFilterPanel" [filterIds]="filterIds" [filterConfig]="filterConfig"
+                   (enableSFPointerEvents)="enableSFPointerEvents($event)" (openFilterPage)="openFPage($event)"
+                   [width]="filterPanelSize.x" [height]="filterPanelSize.y" [top]="filterPanelTop"
+                   [left]="filterPanelLeft">
+  </sf-filter-panel>
+
 </div>

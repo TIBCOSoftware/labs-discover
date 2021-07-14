@@ -1,48 +1,66 @@
 <div class="template-editor-wrapper">
   <uxpl-object-header [config]="objHeaderConfig" (back)="goTemplates()">
-    <uxpl-button *ngIf="isMode('edit')" slot="navigation-content" type="no-border" (clicked)="goTemplates()">Discard changes</uxpl-button>
-    <uxpl-button *ngIf="isMode('create')" slot="navigation-content" type="no-border" (clicked)="goTemplates()">Cancel</uxpl-button>
-    <uxpl-button slot="navigation-content" type="secondary" [hidden]="hide('prev')" (clicked)="changeTab(-1)">Back</uxpl-button>
-    <uxpl-button slot="navigation-content" type="primary" [hidden]="hide('next')" [disabled]="handleDisableNextButton()" (clicked)="changeTab(1)">Next</uxpl-button>
-    <uxpl-button slot="navigation-content" type="primary" [hidden]="hide('create')" (clicked)="handleCreateUpdateClicked()">Create</uxpl-button>
-    <uxpl-button slot="navigation-content" type="primary"  [hidden]="hide('save')" (clicked)="handleCreateUpdateClicked()">Save</uxpl-button>
+    <uxpl-button *ngIf="isMode('edit')" slot="navigation-content" type="no-border" (clicked)="goTemplates()">Discard
+      changes
+    </uxpl-button>
+    <uxpl-button *ngIf="isMode('create')" slot="navigation-content" type="no-border" (clicked)="goTemplates()">Cancel
+    </uxpl-button>
+    <uxpl-button slot="navigation-content" type="secondary" [hidden]="hide('prev')" (clicked)="changeTab(-1)">Back
+    </uxpl-button>
+    <uxpl-button slot="navigation-content" type="primary" [hidden]="hide('next')" [disabled]="handleDisableNextButton()"
+                 (clicked)="changeTab(1)">Next
+    </uxpl-button>
+    <uxpl-button slot="navigation-content" type="primary" [hidden]="hide('create')"
+                 (clicked)="handleCreateUpdateClicked()">Create
+    </uxpl-button>
+    <uxpl-button slot="navigation-content" type="primary" [hidden]="hide('save')"
+                 (clicked)="handleCreateUpdateClicked()">Save
+    </uxpl-button>
   </uxpl-object-header>
   <div *ngIf="request" class="stepper">
     <uxpl-stepper [config]="config" (stepClickedIdx)="handleStepClick($event)" [hideNumbers]="mode !== 'create'">
-      <div *ngIf="display('basic-info')" style="display: flex; flex-direction: column;" slot="basic-info">
+      <div *ngIf="display('basic-info')" slot="basic-info" class="stepper-item">
         <template-basic-info [template]="request.template"
                              [isNewTemplate]="isMode('create')"
-                             [doAdvancedTab]="doAdvanced"
-                             [baseTemplate]="baseTemplate"
-                             (doAdvancedE)="handleAdvanced($event)"
+                             [baseTemplateId]="baseTemplateId"
                              (status)="handleStatus($event)"
                              (updateTemplate)="updateTemplate($event)">
         </template-basic-info>
       </div>
-      <div *ngIf="display('analytics')" style="display: flex; flex-direction: column" slot="analytics">
+      <div *ngIf="display('analytics')" slot="analytics" class="stepper-item">
         <template-analytics [initialLocation]="request.template.spotfireLocation"
                             [newLocation]="selectedAnalytics"
                             [analyticsChoice]="analyticsOption"
                             [isNewTemplate]="isMode('create')"
+                            [doAdvancedTab]="doAdvanced"
+                            (doAdvancedE)="handleAdvanced($event)"
                             (status)="handleStatus($event)"
                             (updateAnalytics)="updateAnalytics($event)">
         </template-analytics>
       </div>
-      <div *ngIf="display('analytics-menu-configuration')" style="display: flex; flex-direction: column" slot="analytics-menu-configuration">
+      <div *ngIf="display('analytics-menu-configuration')" slot="analytics-menu-configuration" class="stepper-item">
         <template-analytics-menu-configuration [menuConfig]="request.template.menuConfig"
                                                [pageOptions]="pageOptions"
                                                (status)="handleStatus($event)"
-                                               (previewMenuEE)="previewMenu = $event">
+                                               (previewMenuEE)="previewMenu = $event"
+                                               (updateConfig)="request.template.menuConfig = $event">
         </template-analytics-menu-configuration>
       </div>
-      <div *ngIf="display('additional-options')" style="display: flex; flex-direction: column" slot="additional-options">
+      <div *ngIf="display('analytics-filter-panel')" slot="analytics-filter-panel" class="stepper-item">
+        <template-analytics-filters [filterConfig]="request.template.filters"
+                                    [pageOptions]="pageOptions"
+                                    (status)="handleStatus($event)"
+                                    (previewFilterMenuEE)="previewFilterMenu = $event"
+                                    (updateConfig)="request.template.filters = $event"></template-analytics-filters>
+      </div>
+      <div *ngIf="display('additional-options')" slot="additional-options" class="stepper-item">
         <template-advanced [template]="request.template"
                            [markingOptions]="markingOptions"
                            [dataOptions]="dataOptions"
-                           (status)="handleStatus($event)" >
+                           (status)="handleStatus($event)">
         </template-advanced>
       </div>
-      <div *ngIf="display('confirmation')" style="display: flex; flex-direction: column" slot="confirmation">
+      <div *ngIf="display('confirmation')" slot="confirmation" class="stepper-item">
         <template-confirmation [template]="request.template"
                                [analyticsChoice]="analyticsOption"
                                [selectedAnalytics]="selectedAnalytics"
@@ -51,11 +69,23 @@
       </div>
     </uxpl-stepper>
     <template-analytic-preview *ngIf="request.template"
+                               [isFilterPreview]="false"
                                class="analytic-preview"
                                [hidden]="!display('analytics-menu-configuration')"
                                [location]="getPreviewLocation()"
                                [previewParameters]="request.template.previewParameters"
                                [previewMenu]="previewMenu"
+                               (pageOptions)="handlePageOptions($event)"
+                               (markingOptions)="handleMarkingOptions($event)"
+                               (dataOptions)="handleDataOptions($event)">
+    </template-analytic-preview>
+    <template-analytic-preview *ngIf="request.template"
+                               [isFilterPreview]="true"
+                               class="analytic-preview"
+                               [hidden]="!display('analytics-filter-panel')"
+                               [location]="getPreviewLocation()"
+                               [previewParameters]="request.template.previewParameters"
+                               [previewMenu]="previewFilterMenu"
                                (pageOptions)="handlePageOptions($event)"
                                (markingOptions)="handleMarkingOptions($event)"
                                (dataOptions)="handleDataOptions($event)">

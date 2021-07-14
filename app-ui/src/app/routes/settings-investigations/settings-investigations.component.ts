@@ -1,14 +1,15 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, DoCheck, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MessageTopicService, TcCoreCommonFunctions } from "@tibco-tcstk/tc-core-lib";
 import { CaseAttribute, CaseCreatorsList, CaseInfo, CaseType, CaseTypesList, CaseTypeState, LiveAppsService, TcCaseProcessesService } from '@tibco-tcstk/tc-liveapps-lib';
+import { UxplPopup } from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import _, { cloneDeep, isEqual } from 'lodash-es';
 import { Observable, of } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
 import { CaseStateEditComponent } from 'src/app/components/case-state-edit/case-state-edit.component';
-import { CaseConfig, CaseField, CaseStateConfig, DiscoverConfiguration } from 'src/app/models/configuration';
+import { CaseConfig, CaseField, CaseStateConfig, DiscoverConfiguration } from 'src/app/models_ui/configuration';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 
 
@@ -17,7 +18,7 @@ import { ConfigurationService } from 'src/app/service/configuration.service';
   templateUrl: './settings-investigations.component.html',
   styleUrls: ['./settings-investigations.component.scss']
 })
-export class SettingsInvestigationsComponent implements OnInit {
+export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public availableApps = [];
   public availableCreators = [];
@@ -96,6 +97,14 @@ export class SettingsInvestigationsComponent implements OnInit {
   public showDeleteConfirm: boolean = false;
   public newMenuIndex: number;
 
+  public showEditTableField = false;
+  public fieldInEdit;
+  public fieldsArrayInEdit: CaseField[];
+  @ViewChild('editPopup', {static: true}) editPopup: ElementRef<UxplPopup>;
+  @ViewChild('settingsMain', {static: true}) settingsMain: ElementRef;
+  public editPopupX;
+  public editPopupY;
+
   public stateDialogRef: MatDialogRef<CaseStateEditComponent, any>;
 
   readonly metaFields = [
@@ -125,6 +134,8 @@ export class SettingsInvestigationsComponent implements OnInit {
 
   public loading: boolean = false;
 
+  public unsavedChange = false;
+
   constructor(
     protected location: Location,
     protected dialog: MatDialog,
@@ -132,6 +143,12 @@ export class SettingsInvestigationsComponent implements OnInit {
     protected liveappsService: LiveAppsService,
     protected caseProcessesService: TcCaseProcessesService,
     protected messageService: MessageTopicService) { }
+
+  ngDoCheck(): void {
+    if (!this.loading) {
+      this.unsavedChange = this.checkNewChanges();
+    }
+  }
 
   private constructAllFields(caseType: CaseType) {
 
@@ -937,6 +954,50 @@ export class SettingsInvestigationsComponent implements OnInit {
     // const deletedField = this.allFieldsMap[event.field];
     this.tableAvailableFields.push(deletedField);
     this.assembleTableAvailableOption();
+  }
+
+  public editTableField(event, fieldsArray) {
+    if (this.showEditTableField) {
+      this.cancelEditTableField();
+    }
+
+    setTimeout(() => {
+      const index = event.index;
+      const selectedField = fieldsArray[index];
+
+      this.fieldInEdit = selectedField;
+      this.fieldsArrayInEdit = fieldsArray;
+
+      const clickEvent = event.event;
+      
+      const target = clickEvent.target;
+      const button = target.parentNode;
+      const domRect = button.getBoundingClientRect();
+
+      const settingsRect = this.settingsMain.nativeElement.getBoundingClientRect();
+
+      this.editPopupY = domRect.y - settingsRect.y ;
+      this.editPopupX = domRect.x - settingsRect.x;
+      this.showEditTableField = true;  
+      this.editPopup.nativeElement.show = true;
+    }, 0);
+  }
+
+  public cancelEditTableField() {
+    this.showEditTableField = false;
+    this.editPopup.nativeElement.show = false;
+  }
+
+  /**
+   * Save the field label edit
+   * @param event {label, field} 
+   */
+  public saveEditTableField(event) {
+    const field = this.fieldsArrayInEdit.find(ele => ele.field == event.field);
+    if (field) {
+      field.label = event.label;
+    }
+    this.cancelEditTableField();
   }
 
   public tableFieldDropped(event) {

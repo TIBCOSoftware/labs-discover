@@ -14,8 +14,6 @@ servers:
     description: The remote api servers
   - url: https://discover.labs.tibcocloud.com
     description: The production api server
-  - url: /catalog
-    description: The local api server
 security:
   - bearerAuth: []
 tags:
@@ -34,13 +32,16 @@ paths:
         - Catalog
       description: Get all linked dataset from the tcmd discover app
       summary: Get All Datasets of Discover Application
+      operationId: getAllDatasets
       responses:
         '200':
           description: Returns all the datasets that associated with the TIBCO CLOUD Discover web application.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DatasetArray'
+                type: array
+                items:
+                  $ref:  "#/components/schemas/DatasetListItem"
         '400':
           description: Bad request. The auth token is missing
         '401':
@@ -51,6 +52,7 @@ paths:
         - Catalog
       description: Get the dataset details by a given dataset id.
       summary: Get dataset details.
+      operationId: getDataset
       parameters:
         - name: id
           description: dataset id
@@ -64,7 +66,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DatasetDetail'
+                $ref: '#/components/schemas/Dataset'
         '400':
           description: Bad request. The auth token is missing
         '401':
@@ -76,6 +78,7 @@ paths:
         - Catalog
       description: Delete dataset of given id.
       summary: Delete dataset.
+      operationId: deleteDataset
       parameters:
         - name: id
           description: dataset id
@@ -90,11 +93,14 @@ paths:
           description: Bad request. The auth token is missing
         '401':
           description: Unauthorized. The auth token is not valid.
+        '409':
+          description: The dataset can not be deleted because of associated analysis.
     put:
       tags:
         - Catalog
       description: Update dataset.
       summary: Update dataset after it is created
+      operationId: updateDataset
       parameters:
         - name: id
           description: dataset id
@@ -106,7 +112,7 @@ paths:
         content:
           "application/json":
             schema:
-              $ref: '#/components/schemas/DatasetDetail'
+              $ref: '#/components/schemas/Dataset'
       responses:
         '200':
           description: Returns the dataset id.
@@ -118,12 +124,15 @@ paths:
           description: Bad request. The auth token is missing or the dataset id in payload is different with the id in path parameter
         '401':
           description: Unauthorized. The auth token is not valid.
+        '409':
+          description: The dataset with the same name is already exist.
   /catalog/dataset/exist:
     post:
       tags:
         - Catalog
       description: Check whether the dataset is existing with name and id. If id is present in payload then check whether there is a dataset with the same name of different dataset id other than the specified one.
       summary: Check whether the dataset is existing with name and id. 
+      operationId: IsSameNameDatasetExist
       requestBody:
         description: The name and id
         content:
@@ -147,11 +156,12 @@ paths:
         - Catalog
       description: Create a new dataset
       summary: Create a new dataset
+      operationId: createDataset
       requestBody:
         content:
           "application/json":
             schema:
-              $ref: '#/components/schemas/DatasetDetail'
+              $ref: '#/components/schemas/Dataset'
       responses:
         '200':
           description: Returns the dataset id.
@@ -171,6 +181,7 @@ paths:
         - Catalog
       description: The api for process mining backend to send the real time status to dataset.
       summary: Save dataset preview status
+      operationId: saveStatus
       requestBody:
         content:
           "application/json":
@@ -195,6 +206,7 @@ paths:
         - Catalog
       description: The api for process mining backend to send the real time status to dataset.
       summary: Save dataset preview status
+      operationId: getStatus
       parameters:
         - name: id
           description: dataset id
@@ -215,6 +227,152 @@ paths:
           description: Unauthorized. The auth token is not valid.
         '404':
           description: The dataset of the id is not found.
+  /catalog/dataset/preview:
+    post:
+      tags:
+        - Catalog
+      description: Save dataset and trigger the data preview asynchronously. 
+      summary: Save dataset and start preview
+      operationId: saveDatasetAndStartPreview
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/Dataset'
+      responses:
+        '200':
+          description: Returns the dataset id and redis update status.
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/DatasetUpdated'
+        '400':
+          description: Bad request. The auth token is missing or data source of dataset is missing.
+        '401':
+          description: Unauthorized. The auth token is not valid.
+  /catalog/preview/{id}:
+    post:
+      tags:
+        - Catalog
+      description: Rerun the preview process for the existing dataset.
+      summary: Rerun preview.
+      operationId: refreshPreview
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: The request of refresh preview is received.
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: Dataset not found.
+  /catalog/files:
+    get:
+      tags:
+        - Catalog
+      description: Rerun the unmanaged csv files in s3 bucket.
+      summary: Get unmanaged csv files.
+      operationId: getUnmanagedCsvFiles
+      responses:
+        '400':
+          description: Bad request. The auth token is missing.
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '200':
+          description: Dataset not found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CsvFile"
+  /catalog/files/{filename}:
+    delete:
+      tags:
+        - Catalog
+      description: Delete the csv file from S3 bucket. See https://discover.labs.tibcocloud.com/backswagger#/Files%20Operations/deleteRouteSegment
+      summary: Delete the csv file from S3 bucket.
+      parameters:
+        - name: filename
+          description: The csv file name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Bad request. The auth token is missing.
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '409':
+          description: Conflict. The csv file is used by dataset.
+        '406':
+          description: Delete file on backend fails. 
+        '204':
+          description: The deleting file resquest is accepted.
+  /catalog/files/preview/{filename}:
+    get:
+      tags:
+        - Catalog
+      description: Get the preview data of the unmanaged csv file.
+      summary: Get the preview data of the unmanaged csv file.
+      operationId: getUnmanagedCsvData
+      parameters:
+        - name: filename
+          description: The csv file name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the csv file preview data in string.
+          content:
+            "application/json":
+              schema:
+                type: array
+                items: 
+                  type: string
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: The csv file is not found.
+  /catalog/tdv/data/{id}:
+    get:
+      tags:
+        - Catalog
+      description: Get the preview data of managed csv file using the dataset id.
+      summary: Get the preview data of the managed csv file.
+      operationId: getManagedCsvData
+      parameters:
+        - name: id
+          description: The dataset id.
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the csv file preview data in JSON.
+          content:
+            "application/json":
+              schema:
+                type: array
+                items: 
+                  type: object
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: The dataset is not found.
   /repository/analysis:
     get:
       description: Get all analysis.
@@ -522,7 +680,7 @@ components:
       scheme: bearer
       bearerFormat: CIC oauth token
   schemas:
-    Dataset:
+    DatasetListItem:
       type: object
       properties:
         datasetid:
@@ -547,11 +705,14 @@ components:
         lastPreviewDate:
           type: integer
           description: The datetime of last data preview. 
-    DatasetArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/Dataset'
-    DatasetDetail:
+        type:
+          type: string
+          description: The type of the dataset.
+          example: csv
+        message:
+          type: string
+          description: The error message.
+    Dataset:
       type: object
       properties:
         Dataset_Id:
@@ -591,48 +752,54 @@ components:
           type: object
           description: The latest preview status received from process minning
           $ref: '#/components/schemas/PreviewStatus'
+        TdvView:
+          type: object
+          description: The tdv entry of dataset if it is created from a tdv view.
+          $ref:  "#/components/schemas/PublishedViews"
+        CsvFile:
+          type: object
+          description: The csv file object if it is create from an unmanaged csv file
+          $ref:  "#/components/schemas/RedisFileInfo"
+        type:
+          type: string
+          description: The type of dataset
+          example: csv
+        csvMethod:
+          type: string
+          description: The method of csv file is set.
+          example: file
+        deleted:
+          type: boolean
+          description: Whether the dataset is marked as deleted.
     DatasetSource:
       type: object
       properties:
+        DatasourceType:
+          type: string
+          description: The data source type
+          example: File-Delimited
         Encoding:
           type: string
           description: The charset encoding of the data source file
-          example: utf-8
+          example: UTF-8
         FileEscapeChar:
           type: string
           description: The escape char of the data source file
+        FileHeaders:
+          type: boolean
+          description: Whether the data source csv file has column headers
         FileName:
           type: string
           description: The file name of the data source csv file.
+        FilePath:
+          type: string
+          description: The S3 url of data source file
         FileQuoteChar:
           type: string
           description: The quote char of the data source file
         FileSeparator:
           type: string
           description: The separator char to parse the data source file.
-        FileHeaders:
-          type: boolean
-          description: Whether the data source csv file has column headers
-        MainAssetId:
-          type: integer
-          description: The preferred asset id in TIBCO Cloud Metadata
-        FilePath:
-          type: string
-          description: The S3 url of data source file
-        DatasourceType:
-          type: string
-          description: The data source type
-          example: File-Delimited
-        System:
-          type: string
-          description: The value to distinguish the application that dataset belongs to
-          example: '10000'
-        InstanceId:
-          type: integer
-          description: The id of the TIBCO Cloud Metadata instance
-        Infrastructure:
-          type: integer
-          description: The infrastructure id in TIBCO Cloud Metadata.
       required:
         - Encoding
     Schema:
@@ -710,6 +877,76 @@ components:
         datasetId:
           type: string
           description: The dataset id.
+    PublishedViews:
+      required:
+        - Annotation
+        - CreationTime
+        - DatasetName
+        - DatasetPath
+        - ModificationTime
+      type: object
+      properties:
+        DatasetName:
+          type: string
+        Annotation:
+          type: string
+        DatasetPath:
+          type: string
+        CreationTime:
+          type: integer
+        ModificationTime:
+          type: integer
+    RedisFileInfo:
+      required:
+        - ContentType
+        - Encoding
+        - EscapeChar
+        - FileLocation
+        - FileSize
+        - LastModified
+        - OriginalEncoding
+        - OriginalFilename
+        - OriginalNewLine
+        - QuoteChar
+        - Separator
+        - newline
+      type: object
+      description: The copy of the backend redisFileInfo model. See https://discover.labs.tibcocloud.com/backswagger#/Files%20Operations/getRouteFileV2
+      properties:
+        ContentType:
+          type: string
+        LastModified:
+          type: string
+        OriginalFilename:
+          type: string
+        OriginalEncoding:
+          type: string
+        FileSize:
+          type: string
+        newline:
+          type: string
+        EscapeChar:
+          type: string
+        QuoteChar:
+          type: string
+        Separator:
+          type: string
+        Encoding:
+          type: string
+        OriginalNewLine:
+          type: string
+        FileLocation:
+          type: string
+    CsvFile:
+      type: object
+      description: The csv file info returned from backend and whether it is used by dataset.
+      properties:
+        redisFileInfo:
+          $ref: "#/components/schemas/RedisFileInfo"
+        beingUsed:
+          type: boolean
+          description: Whether it is used by any dataset.
+
     Analysis:
       type: object
       properties:

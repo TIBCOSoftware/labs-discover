@@ -22,10 +22,13 @@
   width: 204px;
 }
 
-.reserved-message {
-  color: red;
+.go-dataset-click {
+  color: #3873DD;
   font-family: "Source Sans Pro";
-  font-size: 18px;
+  font-weight: bold;
   letter-spacing: 0.96px;
   line-height: 22px;
+  text-align: center;
+  letter: normal;
+  cursor: pointer;
 }

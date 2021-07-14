@@ -1,17 +1,17 @@
-import { Location } from '@angular/common';
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { MessageTopicService, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
-import { cloneDeep, isEqual } from 'lodash-es';
-import { Dataset, DatasetListItem, DatasetSchema, DatasetWizard } from 'src/app/models/dataset';
-import { DatasetService } from 'src/app/service/dataset.service';
-import { notifyUser } from '../../../functions/message';
-import { NewAnalysisStepStatus } from '../../../models/discover';
-import { ConfigurationService } from '../../../service/configuration.service';
-import { CsvService } from '../../../service/csv.service';
-import { DiscoverBackendService } from '../../../service/discover-backend.service';
-import { TDVService } from '../../../service/tdv.service';
+import {Location} from '@angular/common';
+import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {Router} from '@angular/router';
+import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
+import {cloneDeep, isEqual} from 'lodash-es';
+import {Dataset, DatasetListItem, DatasetSchema, DatasetWizard} from 'src/app/models_ui/dataset';
+import {DatasetService} from 'src/app/service/dataset.service';
+import {notifyUser} from '../../../functions/message';
+import {NewAnalysisStepStatus} from '../../../models_ui/discover';
+import {ConfigurationService} from '../../../service/configuration.service';
+import {CsvService} from '../../../service/csv.service';
+import {DiscoverBackendService} from '../../../service/discover-backend.service';
+import {TDVService} from '../../../service/tdv.service';
 
 @Component({
   templateUrl: './wizard.component.html',
@@ -19,28 +19,31 @@ import { TDVService } from '../../../service/tdv.service';
 })
 export class NewDatasetWizardComponent implements OnInit {
 
-  public dataset: Dataset;
-  // the backup dataset before editing. In datasource it's needed to get the preview data.
-  public backupDataset: Dataset;
-  public datasetWizard: DatasetWizard;
-  public previewData: any[];
-  public previewColumns: any[];
-  public file: File;
-
-  public config: any;
-
-  private statuses: NewAnalysisStepStatus[];
-  public saveEnabled = false;
-
-  public progress: any = {};
-  public showResult: boolean = false;
-
-  public success = true;
-  public errorMsg;
-
   @Output() datasetSaved: EventEmitter<any> = new EventEmitter();
 
-  public successImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/svg/success-image.svg');
+  successImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/svg/success-image.svg');
+  errorImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/svg/error-image.svg');
+
+  dataset: Dataset;
+  // the backup dataset before editing. In datasource it's needed to get the preview data.
+  backupDataset: Dataset;
+  datasetWizard: DatasetWizard;
+  previewData: any[];
+  previewColumns: any[];
+  file: File;
+
+  config: any;
+  saveEnabled = false;
+
+  progress: any = {};
+  showResult = false;
+
+  success = true;
+  errorMsg;
+
+  isNewDataSet: boolean;
+
+  private statuses: NewAnalysisStepStatus[];
 
   constructor(
     protected configService: ConfigurationService,
@@ -59,8 +62,12 @@ export class NewDatasetWizardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isNewDataSet = true;
+    if (this.data.dataset) {
+      this.isNewDataSet = false
+    }
     this.messageService.sendMessage('integratedHelp', 'discover/process-analysis/wizard');
-    if (this.data.dataset){
+    if (this.data.dataset) {
       this.initFromListItem(this.data.dataset);
     } else {
       this.initializeForm();
@@ -85,7 +92,11 @@ export class NewDatasetWizardComponent implements OnInit {
     });
   }
 
-  private getStepperConfiguration = ():void => {
+  private getStepperConfiguration = (): void => {
+    let last = 'Confirmation'
+    if(!this.isNewDataSet){
+      last = 'Summary'
+    }
     const stepConfig = {
       steps: [
         {
@@ -117,7 +128,7 @@ export class NewDatasetWizardComponent implements OnInit {
         {
           slot: 'dataset-confirmation',
           name: '6',
-          label: 'Confirmation'
+          label: last
         }
       ],
       currentStepIdx: 0
@@ -126,8 +137,12 @@ export class NewDatasetWizardComponent implements OnInit {
       // make all steps available
       stepConfig.steps.forEach(step => step.available = true);
     }
-    this.config = { ...stepConfig };
+    this.config = {...stepConfig};
     this.initStatuses();
+    if (this.data.dataset?.datasetid) {
+      // make all steps complete
+      this.statuses.forEach(status => status.completed = true);
+    }
   }
 
   public stopEdit($event) {
@@ -138,21 +153,34 @@ export class NewDatasetWizardComponent implements OnInit {
       if (start) {
         this.config.steps[i].available = false;
       } else {
-        start = this.config.steps[i].slot == name;
+        start = this.config.steps[i].slot === name;
       }
       i++;
     }
+
+    start = false;
+    i = 0;
+    while (i < this.statuses.length) {
+      if (start) {
+        this.statuses[i].completed = false;
+      } else {
+        start = this.statuses[i].step === name;
+      }
+      i++;
+    }
+
+    // disable the "Save" button and force the user to go through all steps
     // this.saveEnabled = false;
   }
 
   private initStatuses = (): void => {
     this.statuses = [
-      { step: 'dataset-basic-info'  , completed: false },
-      { step: 'dataset-datasource'  , completed: false },
-      { step: 'dataset-parse'       , completed: false },
-      { step: 'dataset-attributes'  , completed: false },
-      { step: 'dataset-dates'       , completed: false },
-      { step: 'dataset-confirmation', completed: false }
+      {step: 'dataset-basic-info', completed: false},
+      {step: 'dataset-datasource', completed: false},
+      {step: 'dataset-parse', completed: false},
+      {step: 'dataset-attributes', completed: false},
+      {step: 'dataset-dates', completed: false},
+      {step: 'dataset-confirmation', completed: false}
     ];
   }
 
@@ -177,7 +205,7 @@ export class NewDatasetWizardComponent implements OnInit {
     // 2. edit dataset and schema changes
     // 3. edit dataset and upload a new file
     // 4. change the data source
-    if (this.file || 
+    if (this.file ||
       (this.backupDataset && !isEqual(this.dataset.schema, this.backupDataset.schema)) ||
       !this.dataset.createdDate ||
       this.datasetWizard.dataSourceChanged) {
@@ -185,7 +213,7 @@ export class NewDatasetWizardComponent implements OnInit {
     }
 
     this.progress = {
-      message1: 'Your dataset will take a few minutes to be created. ',
+      message1: this.dataset.Dataset_Id ? 'Your dataset will take a few minutes to be updated.' : 'Your dataset will take a few minutes to be created.',
       message2: 'You can stick around and wait or come back later to see it in the Datasets table.',
       percentage: 0,
       enabled: !onlyEditDataset
@@ -201,14 +229,14 @@ export class NewDatasetWizardComponent implements OnInit {
       this.datasetService.uploadFileAndSaveDatasetAndPreview(this.dataset, this.progress, this.file).subscribe(resp => {
         const dataset = resp;
 
-        if (dataset.previewStatus.Progression == 100) {
+        if (dataset.previewStatus.Progression === 100) {
           this.success = true;
           this.progress.status = 'Success';
           this.progress.percentage = 100;
         } else {
           this.success = false;
           this.progress.status = 'Error';
-          if (dataset.previewStatus.Level == 'ERROR' && dataset.previewStatus.Message) {
+          if (dataset.previewStatus.Level === 'ERROR' && dataset.previewStatus.Message) {
             this.errorMsg = dataset.previewStatus.Message
           }
         }
@@ -225,27 +253,27 @@ export class NewDatasetWizardComponent implements OnInit {
           this.datasetSaved.emit();
           this.dialogRef.close();
         }, 2000);
-  
+
       });
     }
   }
 
-  private initializeForm = (dataset: Dataset | undefined = undefined):void => {
+  private initializeForm = (dataset: Dataset | undefined = undefined): void => {
     if (dataset) {
       this.dataset = dataset;
     } else {
       this.dataset =
-      {
-        Dataset_Source: {
-          DatasourceType: 'File-Delimited',
-          Encoding: 'UTF-8',
-          FileEscapeChar: '\\',
-          FileHeaders: 'true',
-          FileQuoteChar: '"',
-          FileSeparator: ','
-        },
-        schema: []
-      } as Dataset;
+        {
+          Dataset_Source: {
+            DatasourceType: 'File-Delimited',
+            Encoding: 'UTF-8',
+            FileEscapeChar: '\\',
+            FileHeaders: 'true',
+            FileQuoteChar: '"',
+            FileSeparator: ','
+          },
+          schema: []
+        } as Dataset;
     }
 
     this.datasetWizard = {
@@ -274,13 +302,13 @@ export class NewDatasetWizardComponent implements OnInit {
 
   public hide = (element: string): boolean => {
     if (element === 'prev') {
-      return this.config.currentStepIdx == 0;
+      return this.config.currentStepIdx === 0;
     }
     if (element === 'next') {
       return this.config.currentStepIdx === 5;
     }
     if (element === 'finish') {
-      return this.config.currentStepIdx != 5;
+      return this.config.currentStepIdx !== 5;
     }
     if (element === 'save') {
       return false;
@@ -319,6 +347,10 @@ export class NewDatasetWizardComponent implements OnInit {
     this.saveEnabled = (this.dataset != null && !this.dataset.Dataset_Id) || this.file != null || !isEqual(this.dataset, this.backupDataset);
   }
 
+  public allStepCompleted() {
+    return this.statuses.filter(status => !status.completed).length === 0;
+  }
+
   public handleDisableNextButton = (): boolean => {
     return !this.statuses.filter(status => status.step === this.config.steps[this.config.currentStepIdx].slot)[0].completed;
   }
@@ -332,7 +364,7 @@ export class NewDatasetWizardComponent implements OnInit {
   }
 
   public handlePreviewData = (event): void => {
-    if (event){
+    if (event) {
       // clear the old data before setting the new data.
       this.resetPreviewData(undefined);
 
@@ -340,17 +372,17 @@ export class NewDatasetWizardComponent implements OnInit {
         try {
           const data = JSON.parse(event.jsonData);
           this.previewData = data;
-        } catch(e) {
+        } catch (e) {
           console.error('Parse data from json string failed');
         }
       } else if (event.jsonDataArray) {
         try {
           const data = [];
-          for(let i = 0; i < event.jsonDataArray.length; i++) {
-            data.push(JSON.parse(event.jsonDataArray[i]));
+          for (const jd of event.jsonDataArray) {
+            data.push(JSON.parse(jd));
           }
           this.previewData = data;
-        } catch(error) {
+        } catch (error) {
           console.error('Parse data from json string failed');
         }
       } else if (event.previewData) {
@@ -358,11 +390,11 @@ export class NewDatasetWizardComponent implements OnInit {
       } else if (event.preview) {
         this.previewData = this.calculateData(event.columns, event.preview);
       }
-      
+
       this.datasetWizard.numberRowsForPreview = this.previewData.length;
       this.previewColumns = this.calculateColumns(event.columns);
 
-      if (this.previewColumns.length != this.dataset.schema.length) {
+      if (this.previewColumns.length !== this.dataset.schema.length) {
         console.warn('The columns parsed from file are not same as the schema in dataset.');
       }
 
@@ -371,7 +403,7 @@ export class NewDatasetWizardComponent implements OnInit {
         this.dataset.schema = this.calculateDatesetColumns(event.columns);
       }
 
-      if (event.columnSeparator){
+      if (event.columnSeparator) {
         this.dataset.Dataset_Source.FileSeparator = event.columnSeparator;
       }
       // this.newDataset.columns = this.assembelColumns();

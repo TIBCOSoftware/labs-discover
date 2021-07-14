@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {ObjectHeaderConfig} from '@tibco-tcstk/tc-web-components/dist/types/models/objectHeaderConfig';
-import {AnalyticTemplateUI} from '../../models/analyticTemplate';
+import {AnalyticTemplateUI} from '../../models_ui/analyticTemplate';
 import {interval, of, Subject} from 'rxjs';
 import {debounce, debounceTime} from 'rxjs/operators';
 import {Router} from '@angular/router';

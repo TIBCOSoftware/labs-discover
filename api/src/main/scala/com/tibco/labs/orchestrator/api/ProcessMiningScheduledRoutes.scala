@@ -107,7 +107,7 @@ class ProcessMiningScheduledRoutes(processMiningScheduledRegistry: ActorRef[Proc
                                                                }
                                                            ],
                                                      "Dataset_Source": {
-                                                       "Source": "/services/databases/org_01dxjp1rpa35bzcv1kvem9ffyk/datasets/CallCenter"
+                                                       "Source": "/services/databases/org_01xxxxxxxxxxxxxxxxxxxxxxxx/datasets/CallCenter"
                                                      },
                                                      "Filter": [
                                                        {
@@ -139,7 +139,7 @@ class ProcessMiningScheduledRoutes(processMiningScheduledRegistry: ActorRef[Proc
                                                        "Scheduledstart": "",
                                                        "Starttime": "Start Date"
                                                      },
-                                                     "Organization": "01dxjp1rpa35bzcv1kvem9ffyk",
+                                                     "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx",
                                                      "Schedule": {
                                                        "Schedule": "every5min",
                                                        "isSchedule": "false"

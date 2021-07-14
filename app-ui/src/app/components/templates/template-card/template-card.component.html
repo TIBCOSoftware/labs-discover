@@ -14,7 +14,7 @@
     </div>
     <div class="bottom-header">
       <div class="t-type-label">
-        {{cardConfig?.type}} TEMPLATE
+        {{cardConfig?.type?.replace(' ', '-')}} TEMPLATE
       </div>
       <div class="button-bar">
         <div *ngIf="isSelected" class="is-selected">

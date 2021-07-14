@@ -1,7 +1,8 @@
 # Information
 # Main Spark Docker file code: https://github.com/apache/spark/blob/master/resource-managers/kubernetes/docker/src/main/dockerfiles/spark/Dockerfile
 
-ARG SPARK_IMAGE=gcr.io/spark-operator/spark:v3.1.1-hadoop3
+#ARG SPARK_IMAGE=gcr.io/spark-operator/spark:v3.1.1-hadoop3
+ARG SPARK_IMAGE=public.ecr.aws/tibcolabs/labs-discover-spark/spark:v3.1.2
 FROM ${SPARK_IMAGE}
 
 ARG VERSION

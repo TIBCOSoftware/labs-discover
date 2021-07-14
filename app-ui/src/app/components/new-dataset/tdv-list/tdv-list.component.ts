@@ -1,9 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
-import { PublishedViews } from '../../../models/backend';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { PublishedViews } from '../../../models_ui/backend';
 import { getRelativeTime } from '../../../functions/analysis';
-import { TcCoreCommonFunctions } from "@tibco-tcstk/tc-core-lib";
-import { Location } from "@angular/common";
-import { Event } from "@angular/router";
+import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'tdv-list',

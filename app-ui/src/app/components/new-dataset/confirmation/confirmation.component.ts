@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Dataset } from '../../../models/dataset';
-import { NewAnalysisStepStatus } from '../../../models/discover';
+import { Dataset } from '../../../models_ui/dataset';
+import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 
 @Component({
   selector: 'dataset-confirmation',
   templateUrl: './confirmation.component.html',
-  styleUrls: ['./confirmation.component.css']
+  styleUrls: ['./confirmation.component.scss']
 })
 export class NewDatasetConfirmationComponent implements OnInit {
 

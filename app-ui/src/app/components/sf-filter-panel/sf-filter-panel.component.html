@@ -1,0 +1,32 @@
+<div>
+    <resizable-draggable class="filter-panel" #sfFilterContainer
+        [width]="width" [height]="height" [top]="top" [left]="left"
+        [minWidth]="minFilterPanelSize.x" [minHeight]="minFilterPanelSize.y"
+        (enableSFPointerEvents)="enableSpotfirePointerEvents($event)"
+        >
+        <div class="resizble-draggable-content filter-panel-content">
+            <div class="top-header" (mousedown)="startDrag($event)">
+                <div class="header-left">
+                    <uxpl-icon height="24px" width="24px" icon="pl-icon-drag"></uxpl-icon>
+                    <uxpl-icon height="24px" width="24px" icon="pl-icon-filter"></uxpl-icon>
+                    <div class="header-title">filter</div>
+                </div>
+                <div class="collapse-handler" (click)="toggleContentExpanded()">
+                    <uxpl-icon *ngIf="contentExpanded" height="24px" width="24px" icon="pl-icon-collapse-vertical"></uxpl-icon>
+                    <uxpl-icon *ngIf="!contentExpanded" height="24px" width="24px" icon="pl-icon-expand-vertical"></uxpl-icon>
+                </div>
+            </div>
+            <div class="bottom-content">
+                <div class="left-navi">
+                    <uxpl-left-nav-multi #leftNav [tabs]="leftNavTabs" (selected)="handleMenuClick($event)" collapse></uxpl-left-nav-multi>
+                </div>
+                <div class="spotfire-view" #sfView>
+                  <div id='FILTERDIV' class="sf-iframe-div"></div>
+                  <!--
+                  <div *ngFor="let filterId of filterIds" class="sf-iframe-div"
+                        [id]="filterId" [hidden]="filterId!==activeTab"></div> -->
+                </div>
+            </div>
+        </div>
+    </resizable-draggable>
+</div>

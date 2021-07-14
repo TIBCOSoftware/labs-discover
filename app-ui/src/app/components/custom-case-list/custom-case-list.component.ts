@@ -1,23 +1,22 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CaseConfig, CaseEvent} from "../../models/configuration";
-import {bType, CIDState, TButton} from "../../models/buttons";
+import {CaseConfig, CaseEvent} from '../../models_ui/configuration';
+import {bType, CIDState, TButton} from '../../models_ui/buttons';
 import {
   CaseAction,
   CaseCreatorSelectionContext, CaseInfo,
   CaseType,
-  FormConfig, LiveAppsConfig, LiveAppsCreatorDialogComponent,
+  FormConfig, LiveAppsCreatorDialogComponent,
   LiveAppsService,
-  TcCaseDataService,
-  TcCaseProcessesService
-} from "@tibco-tcstk/tc-liveapps-lib";
-import {MatDialog} from "@angular/material/dialog";
-import {ActivatedRoute, Router} from "@angular/router";
-import {MessageTopicService, TcCoreCommonFunctions} from "@tibco-tcstk/tc-core-lib";
-import {LaWrapperService} from "../../service/la-wrapper.service";
-import {CaseService} from "../../service/custom-case.service";
-import {CustomFormDefs} from "@tibco-tcstk/tc-forms-lib";
-import {delay, retryWhen, take} from "rxjs/operators";
-import {ActionDialogComponent} from "../action-dialog/action-dialog.component";
+  TcCaseDataService
+} from '@tibco-tcstk/tc-liveapps-lib';
+import {MatDialog} from '@angular/material/dialog';
+import {ActivatedRoute, Router} from '@angular/router';
+import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
+import {LaWrapperService} from '../../service/la-wrapper.service';
+import {CaseService} from '../../service/custom-case.service';
+import {CustomFormDefs} from '@tibco-tcstk/tc-forms-lib';
+import {delay, retryWhen, take} from 'rxjs/operators';
+import {ActionDialogComponent} from '../action-dialog/action-dialog.component';
 import {Location} from '@angular/common';
 import {ConfigurationService} from 'src/app/service/configuration.service';
 import {notifyUser} from '../../functions/message';
@@ -34,12 +33,11 @@ export class CustomCaseListComponent implements OnInit {
   @Output() caseEvent: EventEmitter<CaseEvent> = new EventEmitter<CaseEvent>();
 
   public sandboxId: number;
-  //public appId: string;
   public application: CaseType;
   public formConfig: FormConfig;
   public customFormDefs: CustomFormDefs;
-  public legacyCreators: boolean = false;
-  public formsFramework: string = 'material-design';
+  public legacyCreators = false;
+  public formsFramework = 'material-design';
   public caseRefs: string[];
   public selectedCaseRefs: string[];
   public tableLoading = false;
@@ -86,7 +84,7 @@ export class CustomCaseListComponent implements OnInit {
       )
       .subscribe(applicationList => {
         for (const cType of applicationList.casetypes) {
-          if (cType.applicationId == this.cConfig.appId) {
+          if (cType.applicationId === this.cConfig.appId) {
             this.application = cType;
           }
         }
@@ -113,12 +111,12 @@ export class CustomCaseListComponent implements OnInit {
   handleTBut(tBut: TButton) {
     switch (tBut.type) {
       case 'OTHER':
-        if (tBut.id == 'refresh') {
+        if (tBut.id === 'refresh') {
           this.refreshCases();
         }
         break;
       case 'CREATE':
-        if (tBut.id == this.NEW_CASE) {
+        if (tBut.id === this.NEW_CASE) {
           this.createNew();
         }
         break;
@@ -126,7 +124,7 @@ export class CustomCaseListComponent implements OnInit {
         this.multipleActions(tBut);
         break;
       case 'ACTION':
-        if (this.selectedCaseRefs && this.selectedCaseRefs.length == 1) {
+        if (this.selectedCaseRefs && this.selectedCaseRefs.length === 1) {
           this.oneCommonAction(tBut.caseAction, this.selectedCaseRefs[0]);
         }
         break;
@@ -151,7 +149,7 @@ export class CustomCaseListComponent implements OnInit {
         for (const sRef of this.selectedCaseRefs) {
           let refFound = false;
           for (const cRef of this.caseRefs) {
-            if (cRef == sRef) {
+            if (cRef === sRef) {
               refFound = true;
             }
           }
@@ -170,7 +168,7 @@ export class CustomCaseListComponent implements OnInit {
   // Method for one action
   public oneCommonAction(action: CaseAction, caseReference: string) {
     const processID = action.id;
-    if (processID != '') {
+    if (processID !== '') {
       if (!action.noData) {
         const dialogRef = this.dialog.open(ActionDialogComponent, {
           width: '70%',
@@ -233,11 +231,11 @@ export class CustomCaseListComponent implements OnInit {
         panelClass: 'tcs-style-dialog',
         data
       });
-      dialogRefMA.afterClosed().subscribe((data) => {
-        if (data) {
-          if (data.result == 'OK') {
-            if (data.action.label) {
-              this.messageService.sendMessage('news-banner.topic.message', data.action.label + ' Successful...');
+      dialogRefMA.afterClosed().subscribe((myData) => {
+        if (myData) {
+          if (myData.result === 'OK') {
+            if (myData.action.label) {
+              this.messageService.sendMessage('news-banner.topic.message', myData.action.label + ' Successful...');
               resolve(undefined);
             }
           }
@@ -326,7 +324,7 @@ export class CustomCaseListComponent implements OnInit {
     (async () => {
 
       // TODO: Get the Multi Action Component in.
-      //await this.multipleActionsCommon(data, MultipleActionDialogComponent);
+      // await this.multipleActionsCommon(data, MultipleActionDialogComponent);
       this.refreshCasesAfterSubmit();
     })();
   }

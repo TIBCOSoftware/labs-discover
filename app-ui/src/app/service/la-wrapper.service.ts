@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {bType, CIDState, TButton} from '../models/buttons';
+import {bType, CIDState, TButton} from '../models_ui/buttons';
 import {CaseAction, TcCaseProcessesService} from '@tibco-tcstk/tc-liveapps-lib';
 import { ConfigurationService } from './configuration.service';
 

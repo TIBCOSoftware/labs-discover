@@ -5,20 +5,20 @@
         <div class="drag-icon">
           <uxpl-icon height="24px" width="24px" icon="pl-icon-drag"></uxpl-icon>
         </div>
-        <uxpl-icon class="menu-icon" height="24px" width="24px" icon="{{node.icon}}" [ngClass]="{ 'hide-drag-label' : !node.enabled}"></uxpl-icon>
+        <uxpl-icon *ngIf='allowIcons' class="menu-icon" height="24px" width="24px" icon="{{node.icon}}" [ngClass]="{ 'hide-drag-label' : !node.enabled}"></uxpl-icon>
         <div class="drag-label" [ngClass]="{ 'hide-drag-label' : !node.enabled, 'default-label': node.isDefault}">{{node.label}} <span *ngIf="node.isDefault">(Default)</span></div>
       </div>
       <div  class="right-drag-section">
         <!--<uxpl-icon *ngIf="node.isDefault" class="right-drag-button defIcon" height="20px" width="20px" icon="pl-icon-checkmark"
                    ></uxpl-icon>-->
         <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-edit"
-                   (click)="toggleEditMenuPopup(node, $event)"></uxpl-icon>
+                   (click)="toggleEditMenuPopup(node, $event)"  matTooltip="edit" matTooltipClass="tTip"></uxpl-icon>
         <uxpl-icon *ngIf="node.enabled" class="right-drag-button" height="20px" width="20px" icon="pl-icon-show"
-                   (click)="toggleVisible(node)"></uxpl-icon>
+                   (click)="toggleVisible(node)" matTooltip="disable" matTooltipClass="tTip"></uxpl-icon>
         <uxpl-icon *ngIf="!node.enabled" class="right-drag-button" height="20px" width="20px" icon="pl-icon-hide"
-                   (click)="toggleVisible(node)"></uxpl-icon>
+                   (click)="toggleVisible(node)" matTooltip="enable" matTooltipClass="tTip"></uxpl-icon>
         <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-remove"
-                   (click)="deleteMenuItem(node)"></uxpl-icon>
+                   (click)="deleteMenuItem(node)" matTooltip="delete" matTooltipClass="tTip"></uxpl-icon>
       </div>
     </div>
     <div class="node-children" cdkDropList [cdkDropListData]="node.child" [id]="node.uiId"
@@ -41,8 +41,8 @@
 
 <div id="popup-host" [ngStyle]="{ 'top': popupY , 'left': popupX}" class="popup-wrapper">
   <uxpl-popup #popup id="popup" slot="popup" x-position="after" y-position="below" content-id="my-edit-popup" max-width="350px"
-              max-height="450px" >
-    <template-edit-menu-popup id="my-edit-popup" [menuNodeItem]="currentEditNode" style="width: 350px;" [analyticTabs]="analyticTabs"
+              [maxHeight]="POPUP_HEIGHT + 'px'" >
+    <template-edit-menu-popup id="my-edit-popup" [menuNodeItem]="currentEditNode" style="width: 350px;" [analyticTabs]="analyticTabs" [allowIcons]="allowIcons"
                               (menuItem)="updateItem($event)"></template-edit-menu-popup>
   </uxpl-popup>
 </div>

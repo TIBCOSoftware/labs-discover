@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {FileUploadService} from '../../service/file-upload.service';
-import {Upload} from '../../models/fileUpload';
-import {BytesPipe} from "@tibco-tcstk/tc-core-lib";
+import {Upload} from '../../models_ui/fileUpload';
+import {BytesPipe} from '@tibco-tcstk/tc-core-lib';
 
 @Component({
   selector: 'upload-status',
@@ -36,7 +36,7 @@ export class UploadStatusComponent implements OnInit {
     })
     if (uploads.length >= 1) {
       if (uploads.length === 1) {
-        //return 'Uploading ' + uploads[0].name;
+        // return 'Uploading ' + uploads[0].name;
         return 'Uploading ' + this.bytesPipe.transform(uploads[0].uploaded) + ' of ' + this.bytesPipe.transform(uploads[0].fileSize);
       } else if (uploads.length > 1) {
         return 'Uploading ' + uploads.length + ' files...';

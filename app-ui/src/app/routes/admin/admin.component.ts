@@ -19,7 +19,7 @@ export class AdminComponent implements OnInit, AfterViewInit  {
   ngOnInit() {
     const adminMenu = this.configService.appConfig.config.adminMenu;
     this.leftNavTabs = adminMenu.map((element: ConfigurationMenuEntry) => {
-      let newEntry = {
+      const newEntry = {
         id: element.entry.toLowerCase().split(' ').join('-'),
         label: element.entry,
         icon: TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, element.icon),
@@ -27,8 +27,8 @@ export class AdminComponent implements OnInit, AfterViewInit  {
       };
 
       if (element.options){
-        let newChildren = element.options.map((child: string) => {
-          let newChild = {
+        const newChildren = element.options.map((child: string) => {
+          const newChild = {
             id: newEntry.id + '-' + child.toLowerCase().split(' ').join('-'),
             label: child,
           };

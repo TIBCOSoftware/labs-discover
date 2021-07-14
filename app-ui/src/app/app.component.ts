@@ -1,26 +1,23 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {GeneralConfig, NavBarConfig, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {Title} from '@angular/platform-browser';
-import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {ConfigurationService} from './service/configuration.service';
-import {TcAppDefinitionService} from '@tibco-tcstk/tc-liveapps-lib';
 import {OauthService} from './service/oauth.service';
 import {Location} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {Cloudstarter, CSDescriptor} from './models/discover';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  public disableTimeout = false;
-  public isLogin = false;
-
-  public navBarConfg: NavBarConfig;
-  public logoUrl: string;
+export class AppComponent implements OnInit, AfterViewInit {
+  disableTimeout = false;
+  isLogin = false;
+  afterInit = false;
+  navBarConfg: NavBarConfig;
+  logoUrl: string;
 
   constructor(private location: Location, private http: HttpClient, private titleService: Title, private router: Router, private configService: ConfigurationService, protected oauthService: OauthService) {
     router.events.subscribe(evt => {
@@ -35,6 +32,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.afterInit = false;
     this.logoUrl = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/images/svg/tibco-cloud.svg');
     if (this.oauthService.isCloud()) {
       this.disableTimeout = false;
@@ -105,6 +103,12 @@ export class AppComponent implements OnInit {
 
   get config(): GeneralConfig {
     return this.configService?.config?.discover?.general;
+  }
+
+  ngAfterViewInit(): void {
+    window.setTimeout( () => {
+      this.afterInit = true;
+    },100)
   }
 
 }

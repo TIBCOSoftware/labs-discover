@@ -2,32 +2,7 @@
   "side-bar": {
     "label": "How can we help?",
     "section": [
-      {
-        "type": "video",
-        "name": "Getting started with Process Discovery",
-        "label": "Introduction to process discovery",
-        "title": "Getting started",
-        "item": [
-          {
-            "type": "video",
-            "name": "name of the video",
-            "label": "Process discovery 101",
-            "title": "title 2",
-            "url": "assets/help/videos/video.mp4",
-            "default": "true",
-            "time-lines": [
-              {
-                "time": "0:32",
-                "hint": "Login"
-              },
-              {
-                "time": "0:32",
-                "hint": "Login"
-              }
-            ]
-          }
-        ]
-      },
+
       {
         "type": "inline",
         "name": "Tell_Me_About",

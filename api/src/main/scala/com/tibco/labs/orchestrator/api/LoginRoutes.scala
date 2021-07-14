@@ -78,7 +78,7 @@ class LoginRoutes(loginRegistry: ActorRef[LoginRegistry.Command])(implicit val s
     requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[LoginCredentials]),
       examples = Array(new ExampleObject(value =
         """{
-          "credentials": "slslslslslsl"
+          "credentials": "CIC~azertyuiopqldlcnc"
     }"""))
     ))),
     responses = Array(

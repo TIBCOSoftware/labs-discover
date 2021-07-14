@@ -1,6 +1,6 @@
-import {AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {NavMenu} from '@tibco-tcstk/tc-web-components/dist/types/models/leftNav';
-import {SpotfireDocument, SpotfireFiltering, SpotfireFilterSetting, SpotfireViewerComponent} from '@tibco/spotfire-wrapper';
+import {SpotfireDocument, SpotfireFilter, SpotfireFilterSetting, SpotfireViewerComponent} from '@tibco/spotfire-wrapper';
 import {map} from 'rxjs/operators';
 import {ConfigurationService} from 'src/app/service/configuration.service';
 import {DiscoverBackendService} from 'src/app/service/discover-backend.service';
@@ -8,10 +8,10 @@ import {DatasetService} from 'src/app/service/dataset.service';
 import {OauthService} from 'src/app/service/oauth.service';
 import {getSFLink} from '../../../functions/templates';
 import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
-// import { Map, StartStop, TypeValue } from '../../../models/analysis';
+// import { Map, StartStop, TypeValue } from '../../../models_ui/analysis';
 import {encodeColumnName, START_NAME, STOP_NAME} from '../../../functions/analysis';
-import { Mapping, TypeValue } from 'src/app/models_generated/models';
-import { StartStop } from 'src/app/models/analysis';
+import { Mapping, TypeValue } from 'src/app/model/models';
+import { StartStop } from 'src/app/models_ui/analysis';
 
 // TODO: Use these interfaces till nicolas de roche has changed his component
 export interface MySpotfireFilter {
@@ -52,6 +52,7 @@ export class DataPreviewComponent implements OnInit {
   public showMapping = false;
   public showTopSection = true;
   public previewDXPLocation: string;
+  private previewDataTable: string;
 
   constructor(
     protected dataserService: DatasetService,
@@ -63,6 +64,8 @@ export class DataPreviewComponent implements OnInit {
 
   ngOnInit(): void {
     this.previewDXPLocation = this.configService.config?.discover?.analyticsSF?.previewDXPLocation;
+    this.previewDataTable = this.configService.config?.discover?.analyticsSF?.previewDataTableName;
+    console.log('this.previewDataTable: ', this.previewDataTable)
     this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
 
     this.leftNavTabs = [
@@ -93,16 +96,55 @@ export class DataPreviewComponent implements OnInit {
     // Mapping has been updated in the left panel
     if (this.document) {
       // const normalizedMap = this.analysisData.Map
+      const colMappObj = {};
       for (const key of Object.keys(this.mapping)) {
         if (this.mapping[key]) {
           if (typeof (this.mapping[key]) === 'string') {
-            this.mapping[key] = encodeColumnName(this.mapping[key]);
+            colMappObj[key] = encodeColumnName(this.mapping[key]);
+            // this.mapping[key] = encodeColumnName(this.mapping[key]);
           }
         }
       }
       this.document.setDocumentProperty('DatasetId', this.selectedDataset);
-      this.document.setDocumentProperty('ColumnMapping', JSON.stringify(this.mapping));
+      this.document.setDocumentProperty('ColumnMapping', JSON.stringify(colMappObj));
       this.document.setDocumentProperty('Token', this.oService.token);
+      if(this.filters && this.filters.length > 0){
+        const ssAct: StartStop = {
+          startActivities : this.filters.find (v => v.category ===  'ActivitiesStart')?.values,
+          stopActivities: this.filters.find (v => v.category ===  'ActivitiesEnd')?.values,
+        }
+        this.document.setDocumentProperty('StartStopActivities', JSON.stringify(ssAct));
+        const filterColumns: SpotfireFilter[] = [];
+        this.filters.forEach( f => {
+          if(f.name.indexOf(':') > -1) {
+            const fType = f.name.split(':')
+            if (fType.length > 1) {
+              let fSettings: SpotfireFilterSetting;
+              if (f.category === 'values') {
+                fSettings = new SpotfireFilterSetting({
+                  includeEmpty: f.includeEmpty,
+                  values: f.values
+                })
+              }
+              if (f.category === 'range' && f.values.length > 1) {
+                fSettings = new SpotfireFilterSetting({
+                  includeEmpty: f.includeEmpty,
+                  lowValue: f.values[0],
+                  highValue: f.values[1]
+                })
+              }
+              filterColumns.push(new SpotfireFilter(
+                {
+                  filteringSchemeName: fType[0],
+                  dataTableName: this.previewDataTable,
+                  dataColumnName: fType[1],
+                  filterSettings: fSettings
+                }))
+            }
+          }
+        })
+        this.document.getFiltering().setFilters(filterColumns)
+      }
     }
   }
 
@@ -131,8 +173,8 @@ export class DataPreviewComponent implements OnInit {
                 const startFilterObject: TypeValue = {
                   name: START_NAME,
                   description: 'Activities that indicate the start of a variant',
-                  type: 'ActivitiesStart',
-                  value: startStop.startActivities,
+                  category: 'ActivitiesStart',
+                  values: startStop.startActivities,
                   includeEmpty: false
                 }
                 this.upsertFilter(startFilterObject);
@@ -141,8 +183,8 @@ export class DataPreviewComponent implements OnInit {
                 const stopFilterObject: TypeValue = {
                   name: STOP_NAME,
                   description: 'Activities that indicate the end of a variant',
-                  type: 'ActivitiesEnd',
-                  value: startStop.stopActivities,
+                  category: 'ActivitiesEnd',
+                  values: startStop.stopActivities,
                   includeEmpty: false
                 }
                 this.upsertFilter(stopFilterObject);
@@ -165,8 +207,8 @@ export class DataPreviewComponent implements OnInit {
             const caseFilterObject: TypeValue = {
               name: filter.filteringSchemeName + ':' + sfFilter.dataColumnName,
               description: 'Filter',
-              type: sfSet.values ? 'values' : 'range',
-              value: sfSet.values ? sfSet.values : [sfSet.lowValue, sfSet.highValue],
+              category: sfSet.values ? 'values' : 'range',
+              values: sfSet.values ? sfSet.values : [sfSet.lowValue, sfSet.highValue],
               includeEmpty: sfSet.includeEmpty
             }
             this.upsertFilter(caseFilterObject);
@@ -191,4 +233,5 @@ export class DataPreviewComponent implements OnInit {
       this.filters.push(filterObject);
     }
   }
+
 }

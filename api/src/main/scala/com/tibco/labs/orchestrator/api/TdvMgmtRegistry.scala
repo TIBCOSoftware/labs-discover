@@ -42,6 +42,8 @@ object TdvMgmtRegistry {
 
   final case class copyUnManagedLinkTdvMgmtRegistry(config: UnManageDataSetCopy, replyTo: ActorRef[ActionPerformedCopyUnManaged]) extends Command
 
+  final case class checkTdvMgmtRegistry(replyTo: ActorRef[ActionPerformedCheck]) extends Command
+
 
 
   // response
@@ -62,12 +64,18 @@ object TdvMgmtRegistry {
 
   final case class ActionPerformedGetData(Data: String, code: Int)
 
+  final case class ActionPerformedCheck(Data: String, code: Int)
+
   final case class ActionPerformedCopyUnManaged(message: String, code: Int, DatasetId: String)
 
   def apply(): Behavior[Command] = registry4()
 
   private def registry4(): Behavior[Command] = {
     Behaviors.receiveMessage {
+      case checkTdvMgmtRegistry(replyTo) =>
+        log.info("checkTdvMgmtRegistry")
+        replyTo ! tdvJobs().check()
+        Behaviors.same
       case updateDatasourceTdvMgmtRegistry(config, replyTo) =>
         log.info("updateDatasourceTdvMgmtRegistry called")
         replyTo ! tdvJobs().update(config)
@@ -117,14 +125,18 @@ object TdvMgmtRegistry {
   }
 
   case class tdvJobs() {
+
+    def check(): ActionPerformedCheck = {
+      val job: (String, Int) = new TibcoDataVirtualization().checkTdv()
+      ActionPerformedCheck(job._1, job._2)
+    }
+
     def create(tdvConf: tdvJob): ActionPerformedTDVCreate = {
-      log.info("call TDV 1")
       val job: (String, Int, String, String, String, String, String) = new TibcoDataVirtualization().createCsvDataSource(tdvConf)
       ActionPerformedTDVCreate(job._1, job._2, job._3, job._4, job._5, job._6, job._7)
     }
 
     def copyUnManaged(tdvConf: UnManageDataSetCopy): ActionPerformedCopyUnManaged = {
-      log.info("call TDV 1")
       val job: (String, Int, String) = new TibcoDataVirtualization().copyUnManaged(tdvConf)
       ActionPerformedCopyUnManaged(job._1, job._2, job._3)
     }

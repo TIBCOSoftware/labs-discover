@@ -23,13 +23,29 @@
       </tr>
       <tr class="detail-row">
         <td class="header-location">
+          <div class="item-header">Template icon</div>
+        </td>
+        <td>
+          <div class="icon-container" *ngIf="template?.icon && !template.icon.startsWith('CUSTOM-ICON-CODE:')"><img
+            height=32 width=32 src="{{template?.icon}}" onerror="this.style.display='none'"></div>
+          <div class="icon-container" *ngIf="template?.icon && template.icon.startsWith('CUSTOM-ICON-CODE:')">
+            <div class="icon-outer">
+              <uxpl-icon class="card-icon" icon="{{template?.icon.substring(17)}}" width="30px"
+                         height="30px"></uxpl-icon>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
           <div class="item-header">Analytics menu</div>
         </td>
         <td>
           <ul>
             <li class="menu-item" *ngFor="let mItem of template.menuConfig">{{mItem.label}} <b *ngIf="mItem.isDefault">(Default)</b>
               <ul>
-                <li class="menu-item child-item" *ngFor="let cItem of mItem.child">{{cItem.label}} <b *ngIf="cItem.isDefault">(Default)</b></li>
+                <li class="menu-item child-item" *ngFor="let cItem of mItem.child">{{cItem.label}} <b
+                  *ngIf="cItem.isDefault">(Default)</b></li>
               </ul>
             </li>
           </ul>
@@ -39,7 +55,7 @@
   </div>
   <div class="middle-divider"></div>
   <div class="technical-specs">
-    <div class="spec-title">Technical specs</div>
+    <div class="spec-title">Analysis file</div>
     <table class="detail-table">
       <tr class="detail-row">
         <td class="header-location">
@@ -51,19 +67,20 @@
       </tr>
       <tr class="detail-row">
         <td class="header-location">
-          <div class="item-header">DXP Location</div>
+          <div class="item-header">File location</div>
         </td>
         <td>
           <div *ngIf='!isNewTemplate' class="item-detail-dxp">
             <a target="_blank" href="">{{template.spotfireLocation}}</a>
-            <uxpl-icon class='open-sf-icon' height="18px" width="18px" icon="pl-icon-new-tab-window" (click)="openSFReport()"></uxpl-icon>
+            <uxpl-icon class='open-sf-icon' height="18px" width="18px" icon="pl-icon-new-tab-window"
+                       (click)="openSFReport()"></uxpl-icon>
           </div>
           <div *ngIf="isNewTemplate" class="item-detail">{{template.spotfireLocation}}</div>
         </td>
       </tr>
       <tr class="detail-row">
         <td class="header-location">
-          <div class="item-header">DXP Name</div>
+          <div class="item-header">File name</div>
         </td>
         <td>
           <div class="item-detail">{{getName()}}</div>
@@ -74,7 +91,6 @@
       <div class="copy-dxp-switch">
         <div class="copy-dxp-label">A copy of the DXP will be made:</div>
       </div>
-
       <table class="detail-table">
         <tr class="detail-row">
           <td class="header-location">
@@ -86,5 +102,44 @@
         </tr>
       </table>
     </div>
+    <div class="spec-title" style="margin-top: 15px" *ngIf="template.filters && template.filters.length > 0">Filters
+      panel
+    </div>
+    <table class="detail-table" *ngIf="template.filters && template.filters.length > 0">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Filters menu</div>
+        </td>
+        <td>
+          <ul>
+            <li class="menu-item" *ngFor="let fItem of template.filters">{{fItem.label}} <b *ngIf="fItem.isDefault">(Default)</b>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <div class="spec-title" style="margin-top: 15px">Creating investigations</div>
+    <table class="detail-table">
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Cases selector</div>
+        </td>
+        <td>
+          <div class="item-detail">{{template.marking.casesSelector}} <span style="color: grey; font-size: 14px"
+                                                                            [innerText]="'<Marking Name>.<Table Name>.<Column Name>'"></span>
+          </div>
+        </td>
+      </tr>
+      <tr class="detail-row">
+        <td class="header-location">
+          <div class="item-header">Variant selector</div>
+        </td>
+        <td>
+          <div class="item-detail">{{template.marking.variantSelector}} <span style="color: grey; font-size: 14px"
+                                                                              [innerText]="'<Marking Name>.<Table Name>.<Column Name>'"></span>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>

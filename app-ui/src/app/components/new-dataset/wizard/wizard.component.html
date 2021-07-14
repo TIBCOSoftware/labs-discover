@@ -1,8 +1,8 @@
 <div class="fixActionRow">
-  <h1 *ngIf="!data.dataset" mat-dialog-title>Add a dataset</h1>
-  <h1 *ngIf="data.dataset" mat-dialog-title>Modify dataset</h1>
+  <h1 *ngIf="isNewDataSet" mat-dialog-title>Add a dataset</h1>
+  <h1 *ngIf="!isNewDataSet" mat-dialog-title>Edit {{dataset.Dataset_Name}}</h1>
   <div mat-dialog-content class="dialog-content">
-    <uxpl-stepper [config]="config" (stepClickedIdx)="handleStepClick($event)">
+    <uxpl-stepper [config]="config" (stepClickedIdx)="handleStepClick($event)"  [hideNumbers]="!isNewDataSet">
       <div *ngIf="display('dataset-basic-info')" style="display: flex; flex-direction: column" slot="dataset-basic-info">
         <dataset-basic-info [data]="dataset" (status)="handleStatus($event)" (enableSave)="handleSaveStatus($event)"></dataset-basic-info>
       </div>
@@ -30,7 +30,7 @@
       <uxpl-button [disabled]="handleDisablePrevButton() || progress.enabled" [hidden]="hide('prev')" type="secondary" (clicked)="changeTab(-1);">Previous</uxpl-button>
       <uxpl-button [disabled]="handleDisableNextButton() || progress.enabled" [hidden]="hide('next')" (clicked)="changeTab(1);">Next</uxpl-button>
       <uxpl-button *ngIf="!data.dataset" [hidden]="hide('finish')" (clicked)="createUpdateDateset();" [disabled]="!saveEnabled || progress.enabled">Finish</uxpl-button>
-      <uxpl-button *ngIf="data.dataset" [hidden]="hide('save')" [disabled]="handleDisableNextButton() || !saveEnabled || progress.enabled" (clicked)="createUpdateDateset();">Save</uxpl-button>
+      <uxpl-button *ngIf="data.dataset" [hidden]="hide('save')" [disabled]="!allStepCompleted() || !saveEnabled || progress.enabled" (clicked)="createUpdateDateset();">Save</uxpl-button>
     </div>
     <div mat-dialog-actions *ngIf="showResult">
       <uxpl-button type="secondary" (clicked)="goToDatasets()">Go to Datasets</uxpl-button>
@@ -45,14 +45,16 @@
   <div *ngIf="showResult" class="modal-backdrop">
     <div class="overlay-container">
       <div>
-        <img width="208" height="160" [src]="successImage">
+        <img *ngIf="success" width="208" height="160" [src]="successImage">
+        <img *ngIf="!success" width="211" height="203" [src]="errorImage">
       </div>
       <div *ngIf="success">
         <div class="result-text">Success!</div>
-        <div class="result-msg">Your dataset has successfully been added. You can now create a new analysis using this dataset or manage it from the Datasets tab.</div>
+        <div class="result-msg" *ngIf="!dataset.Dataset_Id">Your dataset has successfully been added. You can now create a new analysis using this dataset or manage it from the Datasets tab.</div>
+        <div class="result-msg" *ngIf="dataset.Dataset_Id">Your dataset has successfully been updated. You can now create a new analysis using this dataset or manage it from the Datasets tab.</div>
       </div>
       <div *ngIf="!success">
-        <div class="result-text error">Error!</div>
+        <div class="result-text error">Oops, something went wrong!</div>
         <div class="result-msg">{{errorMsg}}</div>
       </div>
     </div>

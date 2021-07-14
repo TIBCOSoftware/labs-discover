@@ -58,7 +58,7 @@
   </div>
   <div class="middle-divider"></div>
   <div class="analysis-right">
-    <div class="spec-title" *ngIf="data.mappings" (dblclick)="showSource = !showSource;">Mappings</div>
+    <div class="spec-title" *ngIf="data.mappings">Mappings</div>
     <table class="detail-table" *ngIf="data.mappings">
       <tr class="detail-row">
         <td class="header-location">
@@ -151,11 +151,11 @@
     <table class="detail-table">
       <tr class="detail-row" *ngFor="let filter of data.filters | activities:':'">
         <td class="header-location">
-          <div class="item-header">{{filter.Name}}</div>
+          <div class="item-header">{{filter.name}}</div>
         </td>
         <td>
           <div class="item-detail">{{
-            createReadableArrayString(filter.Value, 50)}}</div>
+            createReadableArrayString(filter.values, 50)}}</div>
         </td>
       </tr>
     </table>

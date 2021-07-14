@@ -3,12 +3,12 @@
   <div>
     <div>Choose how you want to add a data source.</div>
     <div>
-      <uxpl-toggle-text [selected]="data.type" [options]="dataSourceOptions" (uxplSelectionChanged)="changeDataSourceMethod($event)"></uxpl-toggle-text>
+      <uxpl-toggle-text [selected]="wizard.dataSourceType" [options]="dataSourceOptions" (uxplSelectionChanged)="changeDataSourceMethod($event)"></uxpl-toggle-text>
     </div>
   </div>
 
   <div style="margin-top: 16px;">
-    <div *ngIf="data.type=='csv'">
+    <div *ngIf="wizard.dataSourceType=='csv'">
       <div *ngIf="files ; else loadingData">
         <div *ngIf="files.length==0">
           <div>
@@ -20,7 +20,7 @@
         
         </div>
         <div *ngIf="files.length>0">
-          <csv-list [files]="files" [dataset]="data" [file]="file" (fileSelected)="selectCsvFile($event)" [csvError]="csvError" (uploadFile)="onUploadFile($event)" ></csv-list>
+          <csv-list [files]="files" [dataset]="data" [file]="file" (fileSelected)="selectCsvFile($event)" [csvError]="csvError" (uploadFile)="onUploadFile($event)" (updateFiles)="refreshFiles($event)"></csv-list>
         </div>
       </div>
       <ng-template #loadingData>
@@ -31,7 +31,7 @@
       </ng-template>
     </div>
 
-    <div *ngIf="data.type=='tdv'">
+    <div *ngIf="wizard.dataSourceType=='tdv'">
       <div>
         <tdv-list [tdvs]="tdvViews" [selectedTdv]="data?.TdvView" (tdvSelected)="selectTdvView($event)" (refreshTdvs)="refreshTdvs()"></tdv-list>
       </div>

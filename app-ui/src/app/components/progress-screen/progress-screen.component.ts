@@ -14,6 +14,8 @@ export class ProgressScreenComponent implements OnInit {
   @Input() percentage: number;
   @Input() status: string;
 
+  @Input() showImageLeft = false;
+
   public robotAnimationLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/mp4/loading-animation-robot.mp4');
   public robotAnimationGifLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/gif/robot-animation.gif');
 

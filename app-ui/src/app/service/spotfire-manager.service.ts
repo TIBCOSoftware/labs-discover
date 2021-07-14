@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {SFLibObjects, SFLibraryObject, SFCopyRequest} from '../models/spotfireManagement';
+import {SFLibObjects, SFLibraryObject, SFCopyRequest} from '../models_ui/spotfireManagement';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {OauthService} from './oauth.service';
 import {notifyUser} from '../functions/message';

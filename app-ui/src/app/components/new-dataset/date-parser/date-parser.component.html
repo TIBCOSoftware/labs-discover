@@ -1,7 +1,7 @@
 <!--div> {{dates.columns}}</div-->
 <div style="display: inline-block; width: 100%;">
   <div *ngIf="loadedData ; else loadingData" class="hint">
-    <span>Input the date time format(s) of your data source to validate each column. For example, the date time format D.M.Y hh:mm corresponds to 23.8.20 8:06.</span>
+    <span>Select a time format to validate the timestamp column in the database. </span>
   </div>
   <ng-template #loadingData>
     <div class="loading-indicator">
@@ -55,14 +55,14 @@
   <div class="table-footer-row">
     <div *ngIf="validRowsCount !== -1 ; else nocheck">
       <span class="valid-rows-check"></span>
-      <span>Date time format validated OK against {{validRowsCount}} rows. </span>
+      <span>The date time format is valid for the first {{validRowsCount}} rows. </span>
       <span *ngIf="this.loadedData[loadedData?.length - 1] == undefined">Scroll down to validate more.</span>
     </div>
     <ng-template #nocheck>
       <div>&nbsp;</div>
     </ng-template>
     <div class="footer-end" *ngIf="this.loadedData && this.loadedData.length > 0">
-      <div *ngIf="this.loadedData[loadedData?.length - 1] !== undefined ; else loadingRowsCounter">ALL rows loaded</div>
+      <div *ngIf="this.loadedData[loadedData?.length - 1] !== undefined ; else loadingRowsCounter">All rows loaded</div>
       <ng-template #loadingRowsCounter>
         <div>{{loadedData?.length - 1}} rows loaded</div>
       </ng-template>

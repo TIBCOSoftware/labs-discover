@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 import { cloneDeep, isEqual } from 'lodash-es';
-import { DiscoverConfiguration } from 'src/app/models/configuration';
+import { DiscoverConfiguration } from 'src/app/models_ui/configuration';
 import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
 
 @Component({

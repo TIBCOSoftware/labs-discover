@@ -1,9 +1,12 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Mapping} from 'src/app/models_generated/mapping';
-import {MapDef, MappingUI} from 'src/app/models/analysis';
-import {NewAnalysisStepStatus} from 'src/app/models/discover';
-import {StringSimilarityService} from 'src/app/service/string-similarity.service';
+import {Mapping} from 'src/app/model/mapping';
+import {MapDef, MappingUI} from 'src/app/models_ui/analysis';
+import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
+import {AutoMappingService} from 'src/app/service/auto-mapping.service';
 import {DatasetService} from '../../../service/dataset.service';
+import {AutoMapResult} from '../../../models_ui/configuration';
+import {TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
+import {Location} from '@angular/common';
 
 type Options = { label: string, value: string }[];
 
@@ -16,14 +19,16 @@ type Options = { label: string, value: string }[];
 export class MapPanelComponent implements OnInit, OnChanges {
 
   constructor(
-    private ssService: StringSimilarityService,
+    private location: Location,
+    private autoMapService: AutoMappingService,
     private datasetService: DatasetService
   ) {
   }
 
-  @Input() data: Mapping;
+  @Input() mapping: Mapping;
   @Input() availableColumns: string[];
   @Input() datasetId: string;
+  @Input() doAutoMap: boolean;
   @Output() status: EventEmitter<NewAnalysisStepStatus> = new EventEmitter();
 
   requiredMappings: MappingUI = {
@@ -51,18 +56,19 @@ export class MapPanelComponent implements OnInit, OnChanges {
 
   CUT_LENGTH = 16;
 
+  autoMapResults = {}
+  bulbLocation: string;
+
   ngOnInit() {
     this.findMappings();
-    this.findLockedMappings();
-    if (Object.keys(this.data).length === 0) {
-      this.autoMap();
-    }
+    // this.findLockedMappings();
+    this.bulbLocation = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/images/settings/tcs-spotfire-icon.svg');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.availableColumns?.currentValue) {
       this.findMappings();
-      this.findLockedMappings();
+      // this.findLockedMappings();
       this.updateStatus();
     }
   }
@@ -77,30 +83,31 @@ export class MapPanelComponent implements OnInit, OnChanges {
 
   private calculateOptionHelper = (field: string, optionSelector: Options): Options => {
     if (optionSelector) {
-      const values = Object.values(this.data);
+      const values = Object.values(this.mapping);
       const options = optionSelector.filter(column => {
-        return !values.includes(column.value) || this.data[field]?.includes(column.value);
+        return !values.includes(column.value) || this.mapping[field]?.includes(column.value);
       });
       return options.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()))
     }
   }
 
   public handleSelection = (event, field): void => {
-    this.data[field] = event.detail?.value;
+    this.mapping[field] = event.detail?.value;
     this.setAutoMapped(field, false);
     this.updateStatus();
   }
 
   public handleOtherAttributes = (event): void => {
-    this.data.otherAttributes = event.detail.checked;
+    this.mapping.otherAttributes = event.detail.checked;
     this.updateStatus();
   }
 
-  private updateStatus = (): void => {
-    const status = this.data.caseId !== undefined && this.data.activity !== undefined && this.data.startTime !== undefined;
+  public updateStatus = (): void => {
+    const status = this.mapping.caseId !== undefined && this.mapping.activity !== undefined && this.mapping.startTime !== undefined;
     const stepStatus = {
       step: 'map',
-      completed: status
+      completed: status,
+      isAutoMapped: this.isAnythingAutoMapped()
     } as NewAnalysisStepStatus;
     this.status.emit(stepStatus);
   }
@@ -111,7 +118,7 @@ export class MapPanelComponent implements OnInit, OnChanges {
       this.requiredMappings.mappings.forEach(rMap => {
         if(column) {
           if (rMap.lockFieldName === column.toLowerCase()) {
-            this.data[rMap.fieldName] = column;
+            this.mapping[rMap.fieldName] = column;
             rMap.isLocked = true;
           }
         }
@@ -119,7 +126,7 @@ export class MapPanelComponent implements OnInit, OnChanges {
       this.optionalMappings.mappings.forEach(oMap => {
         if(column) {
           if (oMap.lockFieldName === column.toLowerCase()) {
-            this.data[oMap.fieldName] = column;
+            this.mapping[oMap.fieldName] = column;
             oMap.isLocked = true;
           }
         }
@@ -129,21 +136,47 @@ export class MapPanelComponent implements OnInit, OnChanges {
 
   public autoMap = (): void => {
     const availableColumns = [...this.availableColumns];
-    MapDef.PROP_NAMES.forEach(field => this.setAutoMap(field, availableColumns));
+    const autoMapping = this.autoMapService.autoMapAll(MapDef.PROP_NAMES, availableColumns);
+    MapDef.PROP_NAMES.forEach(field => this.setAutoMap(field, autoMapping[field]))
     const availableTimeColumns = [...this.availableTimeColumns];
-    MapDef.PROP_NAMES_TIME.forEach( field => this.setAutoMap(field, availableTimeColumns));
+    const autoMappingTime = this.autoMapService.autoMapAll(MapDef.PROP_NAMES_TIME, availableTimeColumns);
+    let timeMapped = false;
+    MapDef.PROP_NAMES_TIME.forEach(field => {
+      if(autoMappingTime[field]){
+        timeMapped = true;
+      }
+      this.setAutoMap(field, autoMappingTime[field])
+    })
+    // Special case if there is only one time field
+    if(availableTimeColumns.length === 1 && !timeMapped){
+      this.mapping.startTime = availableTimeColumns[0];
+      // tslint:disable-next-line:no-string-literal
+      this.autoMapResults['startTime'] = {message: 'Automapped) Only option for start time...'};
+      this.setAutoMapped('startTime', true);
+    }
+
+
     this.updateStatus();
   }
 
-  private setAutoMap(field,availableColumns ){
+  private setAutoMap(field:string, aMapResult:AutoMapResult ){
     if(!this.isFieldLocked(field)) {
-      const mappedTimeColumn = this.ssService.autoMap(field, availableColumns);
-      if (mappedTimeColumn) {
-        this.data[field] = mappedTimeColumn;
+      if (aMapResult) {
+        this.mapping[field] = aMapResult.columnName;
+        this.autoMapResults[field] = aMapResult;
+        const percent = Math.round(this.autoMapResults[field].likelihood * 100)
+        this.autoMapResults[field].message = 'Automapped) Likelihood: ' +  percent  + '% Occurrences: ' + this.autoMapResults[field].occurrences;
         this.setAutoMapped(field, true);
-        availableColumns.splice(availableColumns.indexOf(mappedTimeColumn), 1)
       }
     }
+  }
+
+  public getAutoMapToolTip(field) {
+    const re = '';
+    if(this.autoMapResults[field]){
+      return this.autoMapResults[field].message;
+    }
+    return re;
   }
 
   private isFieldLocked(field){
@@ -174,6 +207,9 @@ export class MapPanelComponent implements OnInit, OnChanges {
     })
   }
 
+  private isAnythingAutoMapped(){
+    return this.requiredMappings.mappings.concat(this.optionalMappings.mappings).filter( v => v.isAutomapped).length > 0
+  }
 
   findMappings() {
     if (this.datasetId) {
@@ -191,6 +227,9 @@ export class MapPanelComponent implements OnInit, OnChanges {
           this.availableNonTimeColumns.push(v.key);
           return {label: v.key, value: v.key}
         })
+        if (this.doAutoMap) {
+          this.autoMap();
+        }
       })
     }
   }

@@ -24,7 +24,7 @@
             <uxpl-form-field id="#appTitle" fieldId="appTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Subtitle" type="text" valid required="true" [value]="discover.landingPage.subtitle" (uxplChanged)="handleUpdate($event, 'landingPage', 'subtitle')"></uxpl-form-field>
         </div>
         <div class="settings-subcategory">
-          <h3>Capabilities description</h3>
+          <h3>Capabilities</h3>
           <div>
             <p-table [value]="discover.landingPage.highlights" styleClass="custom-table-css">
               <ng-template pTemplate="header">
@@ -65,8 +65,10 @@
       <h2>Advanced <span class="advanced" (click)="showAdvanced = true">>></span></h2>
       <div *ngIf="showAdvanced" class="settings-subcategory">
         <h3 (dblclick)="showSFServer = true">Spotfire</h3>
-        <uxpl-form-field *ngIf="showSFServer" id="#appTitle" fieldId="appTitle" style="margin-top: 5px; margin-bottom: 5px;" label="Alternative Spotfire Server (leave blank to use TIBCO Cloud Spotfire)" type="text" valid [value]="discover.analyticsSF?.customServer" (uxplChanged)="handleUpdate($event, 'advanced', 'customServer')"></uxpl-form-field>
-        <uxpl-form-field id="#appTitle" fieldId="appTitle" style="margin-top: 25px; margin-bottom: 5px;" label="Spofire Preview DXP Location" type="text" valid [value]="discover.analyticsSF?.previewDXPLocation" (uxplChanged)="handleUpdate($event, 'advanced', 'previewDXPLocation')"></uxpl-form-field>
+        <uxpl-form-field *ngIf="showSFServer" id="#sfServer" fieldId="sfServer" style="margin-top: 5px; margin-bottom: 5px;" label="Alternative Spotfire Server (leave blank to use TIBCO Cloud Spotfire)" type="text" valid [value]="discover.analyticsSF?.customServer" (uxplChanged)="handleUpdate($event, 'advanced', 'customServer')"></uxpl-form-field>
+        <uxpl-form-field id="#previewDXP" fieldId="previewDXP" style="margin-top: 25px; margin-bottom: 5px;" label="Spotfire DXP used for preview" type="text" valid [value]="discover.analyticsSF?.previewDXPLocation" (uxplChanged)="handleUpdate($event, 'advanced', 'previewDXPLocation')"></uxpl-form-field>
+        <uxpl-form-field id="#dataTablePreviewDXP" fieldId="dataTablePreviewDXP" style="margin-top: 25px; margin-bottom: 5px;" label="Data table used in preview DXP" type="text" valid [value]="discover.analyticsSF?.previewDataTableName" (uxplChanged)="handleUpdate($event, 'advanced', 'previewDataTableName')"></uxpl-form-field>
+        <uxpl-form-field id="#userFolder" fieldId="userFolder" style="margin-top: 25px; margin-bottom: 5px;" label="Spotfire folder for user DXP's (used to store the template DXPs)" type="text" valid [value]="discover.analyticsSF?.customUserDXPFolder" (uxplChanged)="handleUpdate($event, 'advanced', 'customUserDXPFolder')"></uxpl-form-field>
       </div>
     </div>
   </div>

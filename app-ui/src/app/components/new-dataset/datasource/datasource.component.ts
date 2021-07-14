@@ -3,12 +3,12 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
 import { concatMap } from 'rxjs/operators';
-import { PublishedViews } from 'src/app/models/backend';
+import { PublishedViews } from 'src/app/models_ui/backend';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
 import { DiscoverBackendService } from 'src/app/service/discover-backend.service';
-import { Dataset, DatasetDataSource, DatasetWizard, RedisFileInfo } from '../../../models/dataset';
-import { NewAnalysisStepStatus } from '../../../models/discover';
+import { CsvFile, Dataset, DatasetDataSource, DatasetWizard } from '../../../models_ui/dataset';
+import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 import { ConfigurationService } from '../../../service/configuration.service';
 
 @Component({
@@ -33,7 +33,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
 
   public dataSource: DatasetDataSource;
 
-  public isError: boolean = false;
+  public isError = false;
   public csvError: string;
   public errorDescription: string;
   public orgId: string;
@@ -43,10 +43,10 @@ export class NewDatasetDatasourceComponent implements OnInit {
     {label: 'Select from TDV', value: 'tdv'}
   ];
   public tdvViews: PublishedViews[];
-  public files: RedisFileInfo[];
+  public files: CsvFile[];
 
   constructor(
-    protected configService: ConfigurationService, 
+    protected configService: ConfigurationService,
     protected documentsService: TcDocumentService,
     protected csvService: CsvService,
     protected datasetService: DatasetService,
@@ -55,7 +55,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.data.type = this.data.type ? this.data.type : this.dataSourceOptions[0].value;
+    this.wizard.dataSourceType = this.data.type ? this.data.type : this.dataSourceOptions[0].value;
 
     this.getListDataOfType();
 
@@ -80,21 +80,27 @@ export class NewDatasetDatasourceComponent implements OnInit {
     });
   }
 
+  public refreshFiles(event) {
+    this.getCsvFiles();
+  }
+
   public refreshTdvs() {
     this.getUnmanagedTdvView();
   }
 
   public onUploadFile = (file: File): void => {
     this.isError = false;
+    this.data.type = this.wizard.dataSourceType;
+    this.data.csvMethod = 'upload';
     this.stopStepperNaviIfNeeded();
     this.preview(file);
     this.uploadedFile.emit(file);
-    
+
   }
 
   /**
    * The only reason to parse the csv file and do preview here is to validate the column names.
-   * @param file 
+   * @param file
    */
   public preview = (file: File): void => {
     this.dataSource.FileName = file.name;
@@ -102,18 +108,18 @@ export class NewDatasetDatasourceComponent implements OnInit {
   }
 
   public refreshPreview = (file: File): void => {
-    // todo: 
+    // todo:
     // this.loadingStatus = 'preview'
     const response = this.csvService.refreshPreview(file, this.wizard.numberRowsForPreview).subscribe(
       element => {
         // this.loadingStatus = undefined;
         this.handlePreviewData.emit(element);
         const columns = this.validateColumnHeader(element.columns);
-        
+
         if (columns.length > 0) {
           this.isError = true;
           // this.csvError = "The column header of " + (columns.length == 1 ? '' : 's') + " " + columns.join(' , ') + " can't contain the following characters: ,;{}()=.+";
-          this.csvError = "Column headers can’t be blank or contain the following characters: ,;{}()=.+";
+          this.csvError = 'Column headers can’t be blank or contain the following characters: ,;{}()=.+';
         }
         this.updateStatus();
       }
@@ -122,7 +128,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
 
   /**
    * Check if the column names are legal for tdv
-   * @param columns 
+   * @param columns
    * @returns invalid columns names. If it's empty array, then all the columns are valid
    */
   private validateColumnHeader(columns: string[]): string[] {
@@ -136,7 +142,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
   }
 
   public updateStatus = (): void => {
-    const status = !this.isError && ((this.data.type == 'csv' && (this.dataSource.FileName != null || this.data.CsvFile != null)) || (this.data.type == 'tdv' && this.data.TdvView != null));
+    const status = !this.isError && ((this.data.type === 'csv' && (this.dataSource.FileName != null || this.data.CsvFile != null)) || (this.data.type === 'tdv' && this.data.TdvView != null));
     const stepStatus = {
       step: 'dataset-datasource',
       completed: status
@@ -147,20 +153,21 @@ export class NewDatasetDatasourceComponent implements OnInit {
 
   public changeDataSourceMethod(event) {
     const value = event.detail.value;
-    this.data.type = value;
+    // this.data.type = value;
+    this.wizard.dataSourceType = value;
 
-    if (value == 'tdv') {
-      this.data.csvMethod = 'tdv';
-    }
+    // if (value == 'tdv') {
+    //   this.data.csvMethod = 'tdv';
+    // }
 
     this.getListDataOfType();
     this.updateStatus();
   }
 
   private getListDataOfType() {
-    if (this.data.type == 'csv') {
+    if (this.wizard.dataSourceType === 'csv') {
       this.getCsvFiles();
-    } else if (this.data.type == 'tdv') {
+    } else if (this.wizard.dataSourceType === 'tdv') {
       this.getUnmanagedTdvView();
     }
   }
@@ -168,6 +175,8 @@ export class NewDatasetDatasourceComponent implements OnInit {
   public selectTdvView(event) {
     this.stopStepperNaviIfNeeded();
     this.data.TdvView = event;
+    this.data.type = this.wizard.dataSourceType;
+    this.data.csvMethod = 'tdv';
     this.updateStatus();
     this.resetPreview.emit();
   }
@@ -175,6 +184,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
   public selectCsvFile(event) {
     this.stopStepperNaviIfNeeded();
     this.data.CsvFile = event;
+    this.data.type = this.wizard.dataSourceType;
     this.updateStatus();
     this.resetPreview.emit();
   }
@@ -183,6 +193,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
     if (this.data.Dataset_Id) {
       // select data source when edit
       this.wizard.dataSourceChanged = true;
+      this.wizard.attributesUnpredicted = true;
       this.stopEdit.emit('dataset-datasource');
     }
   }

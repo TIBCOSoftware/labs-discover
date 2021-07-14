@@ -1,10 +1,9 @@
 <div>
-  <div class="hint">Select the attribute type for each column in your dataset. For each column, the first row value is
-    displayed in the ‘Value preview’ column.
+  <div class="hint">Set the attribute types for your database columns. The ‘Value preview’ column displays the values for the first row in the database.
   </div>
   <div class="hint">
     <span class="warning"></span>
-    <div class="warning-msg">At least one column must be attribute type <span>‘Timestamp’</span> in order to continue.
+    <div class="warning-msg">At least one column must have the <span>‘Timestamp’</span> attribute.
     </div>
   </div>
   <div class="preview-table" *ngIf="previewData ; else loading">

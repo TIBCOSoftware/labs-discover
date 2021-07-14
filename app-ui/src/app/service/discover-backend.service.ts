@@ -2,8 +2,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ActionPerformed4, ActionPerformedLoginValidate, ActionPerformedPreview, ActionPerformedTDVCreate, ActionPerformedUpdate, PreviewConfigFile, PublishedTdvDataset, PublishedViews, Schema, TdvJob, UploadFileResponse } from '../models/backend';
-import { DatasetDataSource } from '../models/dataset';
+import { ActionPerformed4, ActionPerformedLoginValidate, ActionPerformedPreview, ActionPerformedTDVCreate, ActionPerformedUpdate, PreviewConfigFile, PublishedTdvDataset, PublishedViews, Schema, TdvJob, UploadFileResponse } from '../models_ui/backend';
+import { DatasetDataSource } from '../models_ui/dataset';
 import { OauthService } from './oauth.service';
 import { ParsingService } from './parsing.service';
 
@@ -28,12 +28,12 @@ export class DiscoverBackendService {
   }
 
   /**
-   * Upload file to the Discover backend storage which is S3 now. 
+   * Upload file to the Discover backend storage which is S3 now.
    * Ref: https://discover.labs.tibcocloud.com/swagger#/Files%20Operations/postRouteFile
    * @param orgId The organization id.
    * @param file The File instance of the file.
    * @param fileName The file name.
-   * @returns 
+   * @returns
    */
   public uploadFile(orgId: string, file: File, dataSource: DatasetDataSource): Observable<UploadFileResponse> {
     const url = `/files/${orgId.toLowerCase()}`;
@@ -134,7 +134,7 @@ export class DiscoverBackendService {
       })
     );
   }
-  
+
   public deletePreview(jobId: string): Observable<ActionPerformedPreview> {
     const url = `/preview/${jobId}`;
     return this.callApi(url, 'delete').pipe(
@@ -164,7 +164,7 @@ export class DiscoverBackendService {
   }
 
   public getPreviewFromSpark = (dsname: string, orgId: string): Observable<any> => {
-    const url = `/tdv/data/${orgId}/${dsname}`; // 01dxjp1rpa35bzcv1kvem9ffyk/CallCenter
+    const url = `/tdv/data/${orgId}/${dsname}`;
     return this.callApi(url, 'get').pipe(
       map((response: any) => {
         return response.Data;
@@ -173,7 +173,7 @@ export class DiscoverBackendService {
   }
 
   public getColumnsFromSpark = (dsname: string, orgId: string): Observable<any> => {
-    const url = `/tdv/metadata/${orgId}/${dsname}`; // 01dxjp1rpa35bzcv1kvem9ffyk/CallCenter
+    const url = `/tdv/metadata/${orgId}/${dsname}`;
     return this.callApi(url, 'get').pipe(
       map((response: any) => {
         return response.tdv.schema;

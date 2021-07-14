@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import _ from 'lodash';
 
 @Component({
@@ -41,10 +41,11 @@ export class CaseStateEditComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<CaseStateEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
-    this.stateImageNames.forEach(name => {
+    this.stateImageNames.forEach(name => {
       this.stateImagePaths.push(['assets/images/states/', name, '.svg'].join(''));
     });
 
@@ -52,7 +53,7 @@ export class CaseStateEditComponent implements OnInit {
       this.caseStateConfig = this.data.caseStateConfig;
       if (this.caseStateConfig.color) {
         const colorValue = this.caseStateConfig.color.toUpperCase();
-        if (!this.stateColors.find(c => c == colorValue)) {
+        if (!this.stateColors.find(c => c === colorValue)) {
           this.color = this.otherColor;
           this.customColor = colorValue;
         } else {
@@ -78,7 +79,7 @@ export class CaseStateEditComponent implements OnInit {
       icon: this.icon,
       color: this.color
     }
-    if (this.color == this.otherColor) {
+    if (this.color === this.otherColor) {
       values.color = this.customColor;
     }
     if (values.color) {
@@ -95,7 +96,7 @@ export class CaseStateEditComponent implements OnInit {
   changeColor(event) {
     const value = event.detail.value;
     if (value) {
-      if (this.stateColors.find(c => c==value)) {
+      if (this.stateColors.find(c => c === value)) {
         this.color = value;
       } else {
         this.color = this.otherColor;
@@ -103,7 +104,7 @@ export class CaseStateEditComponent implements OnInit {
       }
     }
 
-    if (this.color == this.otherColor && this.customColor && !this.colorRegex.test(this.customColor)) {
+    if (this.color === this.otherColor && this.customColor && !this.colorRegex.test(this.customColor)) {
       this.formError = true;
     } else {
       this.formError = false;
@@ -112,7 +113,7 @@ export class CaseStateEditComponent implements OnInit {
 
   handleDisableSaveBtn() {
     const values = this.getEditedValues();
-    return this.formError || !values.color || (values.color == this.caseStateConfig.color && values.icon == this.caseStateConfig.icon);
+    return this.formError || !values.color || (values.color === this.caseStateConfig.color && values.icon === this.caseStateConfig.icon);
   }
-  
+
 }

@@ -43,6 +43,9 @@ export class DiscoverComponent implements AfterViewInit {
             } else {
               this.analysisID = val.url.slice(val.url.lastIndexOf('/') + 1);
             }
+            if(this.analysisID === 'analytics'){
+              this.analysisID = '';
+            }
           });
         } else {
           this.hideAnalytics = true;

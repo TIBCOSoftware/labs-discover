@@ -28,5 +28,14 @@
   font-weight: 600;
   letter-spacing: 0;
   line-height: 24px;
-  margin-bottom: 30px;
+  margin-bottom: 18px;
+}
+
+.basic-text {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-bottom: 8px;
 }

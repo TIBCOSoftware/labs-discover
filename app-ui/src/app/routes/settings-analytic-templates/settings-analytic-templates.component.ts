@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {DiscoverConfiguration} from '../../models/configuration';
+import {DiscoverConfiguration} from '../../models_ui/configuration';
 import {ConfigurationService} from '../../service/configuration.service';
 import { cloneDeep, isEqual } from 'lodash-es';
 import {MessageTopicService, TcGeneralConfigService, TcGeneralLandingPageConfigService} from '@tibco-tcstk/tc-core-lib';

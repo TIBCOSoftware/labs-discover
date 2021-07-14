@@ -1,21 +1,23 @@
-<ng-template #mapping let-mappings="mappings" let-required="required">
+<ng-template #mappingT let-mappings="mappings" let-required="required">
   <div class="map-column">
     <div *ngFor="let map of mappings  let i = index">
       <div *ngIf="!map.isLocked" class="mapping">
         <div class="mapping-label">{{map.fieldDescription}}<span *ngIf="required" style="color: red;">*</span>:</div>
         <uxpl-select-input class="map-field" [id]="map.fieldName" allow-clear="true" max-height="165px"
                            [yPosition]="getPosition(i)"
-                           allow-input [value]="data[map.fieldName]"
+                           allow-input [value]="mapping[map.fieldName]"
                            [options]="calculateOption(map.fieldName, map.type)"
                            (uxplSelection)="handleSelection($event, map.fieldName)" required></uxpl-select-input>
         <div *ngIf="!map.isAutomapped" class="empty-icon map-icon"></div>
-        <uxpl-icon *ngIf="map.isAutomapped" icon="pl-icon-checkmark" height="18px" width="18px" class="map-icon"
-                   matTooltip="This field was automapped" matTooltipClass="tTip"></uxpl-icon>
+        <div class="icon-container" *ngIf="map.isAutomapped" matTooltip="{{getAutoMapToolTip(map.fieldName)}}"
+             matTooltipClass="tTip">
+          <uxpl-icon icon="ic-automap-lightbulb" height="18px" width="18px" class="map-icon" class='bulb'></uxpl-icon>
+          <!--<img class='bulb' height=18 width=18 src="{{bulbLocation}}" onerror="this.style.display='none'">--></div>
       </div>
       <div *ngIf="map.isLocked" class="mapping">
         <div class="mapping-label">{{map.fieldDescription}}<span *ngIf="required" style="color: red;">*</span>:</div>
-        <div class="locked-mapping" [matTooltip]="getCutToolTip(data[map.fieldName])"
-             matTooltipClass="tTip">{{getCut(data[map.fieldName])}}</div>
+        <div class="locked-mapping" [matTooltip]="getCutToolTip(mapping[map.fieldName])"
+             matTooltipClass="tTip">{{getCut(mapping[map.fieldName])}}</div>
         <uxpl-icon icon="pl-icon-password" height="18px" width="18px" class="map-icon"
                    matTooltip="This mapping is locked, see the contextual help for more details..."
                    matTooltipClass="tTip"></uxpl-icon>
@@ -28,12 +30,18 @@
   <div class="map-section">
     Required fields <span style="color: red;">*</span>
   </div>
-  <ng-container *ngTemplateOutlet="mapping,context:{mappings:requiredMappings.mappings, required: false}"></ng-container>
+  <ng-container
+    *ngTemplateOutlet="mappingT,context:{mappings:requiredMappings.mappings, required: false}"></ng-container>
   <div class="map-section margintop">
     Optional fields
   </div>
-  <ng-container *ngTemplateOutlet="mapping,context:{mappings:optionalMappings.mappings, required: false}"></ng-container>
-  <uxpl-switch-input style='margin-top: 5px' [checked]="data.otherAttributes"
-                     (uxplChange)="handleOtherAttributes($event)">Include all attributes
+  <ng-container
+    *ngTemplateOutlet="mappingT,context:{mappings:optionalMappings.mappings, required: false}"></ng-container>
+  <uxpl-switch-input style='margin-top: 5px' [checked]="mapping.otherAttributes"
+                     (uxplChange)="handleOtherAttributes($event)"><div class="all-att">Include all attributes<span>
+    <uxpl-icon icon="pl-icon-info" height="18px" width="18px" class="all-att-icon"
+               matTooltip="This setting includes all of the attributes from the data in the analysis report. The attributes become available for filtering and other actions. "
+               matTooltipClass="tTip"></uxpl-icon></span></div>
   </uxpl-switch-input>
+  <!--<pre> {{mapping | json}}</pre>-->
 </div>

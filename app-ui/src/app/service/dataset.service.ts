@@ -3,8 +3,8 @@ import { Injectable } from '@angular/core';
 import { parse } from 'papaparse';
 import { forkJoin, Observable, of } from 'rxjs';
 import { concatMap, delay, filter, map, repeatWhen, take } from 'rxjs/operators';
-import { ActionPerformedLoginValidate, Schema, UploadFileResponse } from '../models/backend';
-import { Dataset, DatasetListItem, DatasetListItemArray } from '../models/dataset';
+import { ActionPerformedLoginValidate, Schema, UploadFileResponse } from '../models_ui/backend';
+import { Dataset, DatasetListItem, DatasetListItemArray } from '../models_ui/dataset';
 import { DiscoverBackendService } from './discover-backend.service';
 import { OauthService } from './oauth.service';
 
@@ -54,7 +54,7 @@ export class DatasetService {
   public updateDataset(dataset: Dataset): Observable<any> {
     const url = `/dataset/${dataset.Dataset_Id}`;
     return this.callApi(url, 'put', dataset);
-    
+
   }
 
   public getDataset(id: string): Observable<Dataset> {
@@ -141,6 +141,11 @@ export class DatasetService {
     return this.callApi(url, 'get');
   }
 
+  public deleteCsvFile(filename: string): Observable<any> {
+    const url = `/files/${filename}`;
+    return this.callApi(url, 'delete');
+  }
+
   public getCsvFilePreview(filename: string): Observable<any> {
     const url = `/files/preview/${filename}`;
     return this.callApi(url, 'get');
@@ -178,7 +183,8 @@ export class DatasetService {
         if (resp.uploadFileResponse) {
           dataset.Dataset_Source.FilePath = resp.uploadFileResponse.file;
         }
-        progress.status = "Creating data virtualization. Please don't close browser or refresh page";
+        const action = dataset.Dataset_Id ? 'Updating' : 'Creating';
+        progress.status = `${action} data virtualization. Please don't close browser or refresh page`;
         progress.percentage += 10;
         return this.saveDatasetAndPreview(dataset);
       })

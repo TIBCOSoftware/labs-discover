@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { concatMap, map } from 'rxjs/operators';
-import { Schema } from 'src/app/models/backend';
+import { Schema } from 'src/app/models_ui/backend';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
 import { DiscoverBackendService } from 'src/app/service/discover-backend.service';
-import { Dataset, DatasetDataSource, DatasetWizard } from '../../../models/dataset';
-import { NewAnalysisStepStatus } from '../../../models/discover';
+import { Dataset, DatasetDataSource, DatasetWizard } from '../../../models_ui/dataset';
+import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 
 @Component({
   selector: 'dataset-parse',
@@ -31,7 +31,7 @@ export class NewDatasetParseComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if ((!this.previewData || this.previewData.length == 0)) {
+    if ((!this.previewData || this.previewData.length === 0)) {
       this.datasetService.pullPreviewData(this.data).subscribe(data => {
         if(data.columns) {
           this.handlePreviewData.emit(data);

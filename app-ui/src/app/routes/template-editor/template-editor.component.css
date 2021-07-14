@@ -18,3 +18,9 @@
   height: calc(100vh - 293px);
   /*border: 1px solid #73AD21;*/
 }
+
+
+.stepper-item{
+  display: flex;
+  flex-direction: column;
+}

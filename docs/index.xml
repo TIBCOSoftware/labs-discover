@@ -13,6 +13,41 @@
     
     
     <item>
+      <title>Blog: July 2021 release</title>
+      <link>https://tibcosoftware.github.io/labs-discover/blog/2021/07/14/july-2021-release/</link>
+      <pubDate>Wed, 14 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/blog/2021/07/14/july-2021-release/</guid>
+      <description>
+        
+        
+        &lt;p&gt;What’s new in the July 2021 release Project Discover™ ?&lt;/p&gt;
+&lt;p&gt;This minor release contains:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Filter Feature&lt;/b&gt; Adds advanced Filter features to all Analysis. Filter overlay can be configured to be shown side by side with the process mining results.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Advanced Auto-Mapper&lt;/b&gt; reworked Auto-Mapper Features, to improve Data preparation when importing new Event Data.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Auto-Mapper Setting&lt;/b&gt; new Options in Auto-Mapper Setting.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Spotfire Template&lt;/b&gt; new advanced Spotfire Configurations Settings.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;b&gt;Security Updates&lt;/b&gt; 3rd Party Component updates because of Security Issues.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;with the next release we move to Angular 12, also to gain some more performance advantages.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Blog: June 2021 release</title>
       <link>https://tibcosoftware.github.io/labs-discover/blog/2021/06/14/june-2021-release/</link>
       <pubDate>Mon, 14 Jun 2021 00:00:00 +0000</pubDate>

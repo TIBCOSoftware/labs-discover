@@ -1,6 +1,6 @@
 import {Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import { get } from 'lodash-es';
-import { Analysis } from 'src/app/models_generated/models';
+import { Analysis } from 'src/app/model/models';
 import {DatePipe} from '@angular/common';
 import {getRelativeTime} from '../../functions/analysis';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
@@ -37,6 +37,8 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   paToDeleteName = '';
 
   latestMouseEvent:MouseEvent;
+
+  readonly MAX_TOOLTIP_LENGTH = 250;
 
   ngOnInit() {
 
@@ -88,6 +90,9 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
       if (cellData.trim() === 'Not ready') {
         if (data.metadata.message) {
           re = data.metadata.message;
+          if(re.length > this.MAX_TOOLTIP_LENGTH){
+            re = re.substr(0, this.MAX_TOOLTIP_LENGTH) + '... (see details for full error message)';
+          }
         }
       }
     }

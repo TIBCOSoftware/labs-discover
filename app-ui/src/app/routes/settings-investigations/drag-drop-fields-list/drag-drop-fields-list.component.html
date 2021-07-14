@@ -1,5 +1,5 @@
 <div>
-  <div id="{{listId}}" cdkDropList class="menu-list" cdkOverlayOrigin
+  <div id="{{listId}}" cdkDropList class="menu-list"
   (cdkDropListDropped)="tableFieldsDrop($event)" 
   [cdkDropListConnectedTo]="cdkDropListConnectedTo" 
   [cdkDropListData]="fieldList"
@@ -10,7 +10,10 @@
         <div class="title">{{tf[labelAttr]}}</div>
       </div>
       <div class="action-btn">
-        <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-remove" (click)="deleteTableField(i)"></uxpl-icon>
+        <div style="display: flex;">
+          <uxpl-icon class="right-drag-button" height="20px" width="20px" icon="pl-icon-edit" (click)="editTableField($event, i)"></uxpl-icon>
+          <uxpl-icon class="right-drag-button" style="margin-left: 4px;" height="20px" width="20px" icon="pl-icon-remove" (click)="deleteTableField(i)"></uxpl-icon>
+        </div>
       </div>
       <div class="placeholder" *cdkDragPlaceholder></div>
       <div class="menu-item preview {{previewClass}}" *cdkDragPreview>

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import { MConfig } from '../../../models/analyticTemplate';
+import {MConfig, StepStatus} from '../../../models_ui/analyticTemplate';
 import { createMConfig } from '../../../functions/templates';
-import { Template } from 'src/app/models_generated/models';
+import { Template } from 'src/app/model/models';
 
 @Component({
   selector: 'template-advanced',
@@ -14,7 +14,7 @@ export class TemplateAdvancedComponent implements OnInit {
 
   @Input() markingOptions: string[];
   @Input() dataOptions: any;
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Output() status: EventEmitter<StepStatus> = new EventEmitter<StepStatus>();
 
   public showAdvanced = false;
   public casesMConfig: MConfig;

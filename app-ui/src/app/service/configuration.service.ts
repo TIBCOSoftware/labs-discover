@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Configuration, DiscoverConfiguration, ResetAction } from '../models/configuration';
+import { Configuration, DiscoverConfiguration, ResetAction } from '../models_ui/configuration';
 import { HttpResponse } from '@angular/common/http';
 import { ApiResponseText, Group, TcAppDefinitionService, TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
 import { async, from, Observable, of } from 'rxjs';

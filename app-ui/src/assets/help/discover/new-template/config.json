@@ -16,6 +16,42 @@
             "url": "assets/help/application/Templates-Create-Basic-Infos.html",
             "content": "",
             "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Analytics ...",
+            "label": "Analytics",
+            "title": "Analytics",
+            "url": "assets/help/application/Templates-Create-Analytics.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Menu configuration ...",
+            "label": "Menu configuration",
+            "title": "Menu configuration",
+            "url": "assets/help/application/Templates-Create-Menu.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Additional options ...",
+            "label": "Additional options",
+            "title": "Additional options",
+            "url": "assets/help/application/Templates-Create-Additional-Options.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "Confirmation ...",
+            "label": "Confirmation",
+            "title": "Confirmation",
+            "url": "assets/help/application/Templates-Create-Confirmation.html",
+            "content": "",
+            "default": "true"
           }
           
 

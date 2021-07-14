@@ -3,8 +3,9 @@ import { VisualisationService } from 'src/app/api/visualisation.service';
 import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { Location } from '@angular/common';
 import { checkIfTemplateNameExists, TEMPLATE_EXISTS_MESSAGE } from '../../../functions/templates';
-import { Template } from 'src/app/models_generated/models';
+import { Template } from 'src/app/model/models';
 import { cloneDeep } from 'lodash-es';
+import {StepStatus} from '../../../models_ui/analyticTemplate';
 
 @Component({
   selector: 'template-basic-info',
@@ -14,13 +15,13 @@ import { cloneDeep } from 'lodash-es';
 export class TemplateBasicInfoComponent implements OnInit {
 
   @Input() template: Template;
-  @Input() doAdvancedTab: boolean;
+  /*@Input() doAdvancedTab: boolean;*/
   @Input() isNewTemplate: boolean;
-  @Input() baseTemplate: number;
+  @Input() baseTemplateId: string;
 
-  @Output() doAdvancedE: EventEmitter<boolean> = new EventEmitter<boolean>();
+  /*@Output() doAdvancedE: EventEmitter<boolean> = new EventEmitter<boolean>();*/
   @Output() updateTemplate: EventEmitter<Template> = new EventEmitter<Template>();
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Output() status: EventEmitter<StepStatus> = new EventEmitter<StepStatus>();
 
   public templateLabels: { label: string, value: string }[];
 
@@ -58,7 +59,7 @@ export class TemplateBasicInfoComponent implements OnInit {
         this.templates = templates;
         this.templateLabels = templates.map(template => ({label: template.name, value: String(template.id)})).sort((a, b) => (a.label > b.label) ? 1 : -1);
         if (this.template.name === undefined){
-          this.handleTemplateSelection({detail: {value: this.baseTemplate}});
+          this.handleTemplateSelection({detail: {value: this.baseTemplateId}});
         }
       }
     );
@@ -73,7 +74,7 @@ export class TemplateBasicInfoComponent implements OnInit {
   }
 
   public handleTemplateSelection = (event: any): void => {
-    const template = this.templates.filter(temp => temp.id === event.detail.value)[0];
+    const template = this.templates.filter(temp => temp.id + '' === event.detail.value + '')[0];
     if (template?.id && template) {
       this.template = cloneDeep(template);
       this.template.type = 'User defined';
@@ -84,11 +85,12 @@ export class TemplateBasicInfoComponent implements OnInit {
     }
   }
 
+  /*
   public toggleAdvanced = (event): void => {
     this.doAdvancedTab = event.detail.checked;
     this.doAdvancedE.emit(this.doAdvancedTab);
     this.updateStatus();
-  }
+  }*/
 
   public selectCardIcon(icon) {
     this.template.icon = icon;
@@ -107,7 +109,7 @@ export class TemplateBasicInfoComponent implements OnInit {
         this.nameHint = '';
       }
       const status = valid;
-      const stepStatus = {
+      const stepStatus: StepStatus = {
         step: 'basic-info',
         completed: status
       };

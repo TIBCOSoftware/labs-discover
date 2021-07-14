@@ -1,7 +1,7 @@
 import { Service } from "typedi";
 import { DatasetSourceTdv, FilesOperationsApi, PreviewConfigFile, SparkPreviewJobApi, TdvJob, TibcoDataVirtualizationApi } from '../backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
-import { Dataset, DatasetDetail, PreviewStatus } from "../models/datasets.model";
+import { DatasetListItem, Dataset, DatasetUpdated, PreviewStatus } from "../models/datasets.model";
 import { AnalysisService } from './analysis.service';
 
 @Service()
@@ -18,7 +18,7 @@ export class DatasetService {
   ) {
   }
 
-  public createDataset = async (token: string, dataset: DatasetDetail): Promise<any> => {
+  public createDataset = async (token: string, dataset: Dataset): Promise<DatasetUpdated> => {
     const now = new Date().getTime();
     dataset.createdDate = now;
     dataset.updatedDate = now;
@@ -29,15 +29,15 @@ export class DatasetService {
     }
   }
 
-  public getDataset = async (token: string, id: string): Promise<DatasetDetail> => {
+  public getDataset = async (token: string, id: string): Promise<Dataset> => {
     const dataset = await this.cache.get(token, this.DB_NAME, id);
-    return JSON.parse(dataset) as DatasetDetail;
+    return JSON.parse(dataset) as Dataset;
   }
 
-  public getDatasets = async (token: string): Promise<Dataset[]> => {
+  public getDatasets = async (token: string): Promise<DatasetListItem[]> => {
     let datasets = await this.cache.search(token, this.DB_NAME, '*');
     return datasets.map(el => {
-      return JSON.parse(el) as DatasetDetail;
+      return JSON.parse(el) as Dataset;
     })
     .sort((a, b) => a.createdDate && b.createdDate ? a.createdDate - b.createdDate : -1)
     .filter(dataset => !dataset.deleted)
@@ -46,12 +46,14 @@ export class DatasetService {
         datasetid: datasetDetail.Dataset_Id,
         name: datasetDetail.Dataset_Name,
         fileName: datasetDetail.Dataset_Source?.FileName,
+        filePath: datasetDetail.Dataset_Source?.FilePath,
         description: datasetDetail.Dataset_Description,
         createdDate: datasetDetail.createdDate,
         status: datasetDetail.status || undefined,
         lastPreviewDate: datasetDetail.lastPreviewDate || undefined,
-        type: datasetDetail.type
-      } as Dataset;
+        type: datasetDetail.type,
+        message: datasetDetail.previewStatus?.Message || undefined
+      } as DatasetListItem;
     });
   }
 
@@ -59,7 +61,7 @@ export class DatasetService {
     return this.cache.delete(token, this.DB_NAME, id);
   }
 
-  public updateDataset = async (token: string, id: string, dataset: DatasetDetail): Promise<any> => {
+  public updateDataset = async (token: string, id: string, dataset: Dataset): Promise<DatasetUpdated> => {
     const now = new Date().getTime();
     dataset.updatedDate = now;
     const result = await this.cache.set(token, this.DB_NAME, id, JSON.stringify(dataset));
@@ -85,7 +87,7 @@ export class DatasetService {
     return cannotDeleteAnalysis.length > 0;
   }
   
-  public cleanDataset = async(token: string, dataset: DatasetDetail): Promise<any> => {
+  public cleanDataset = async(token: string, dataset: Dataset): Promise<any> => {
     const orgId = await this.cache.getSubscriptionName(token);
     if (orgId) {
       this._alwaysResolvePromise(this.tdvService.deleteJobTdvRoute(orgId, dataset.Dataset_Id));
@@ -118,10 +120,10 @@ export class DatasetService {
       error => Promise.resolve({ok: false, error}));
   }
 
-  public saveDatasetAndPreviewData = async(token: string, dataset: DatasetDetail): Promise<any> => {
-    if (!dataset || !dataset.Dataset_Source) {
-      return null;
-    }
+  public saveDatasetAndPreviewData = async(token: string, dataset: Dataset): Promise<DatasetUpdated> => {
+    // if (!dataset || !dataset.Dataset_Source) {
+    //   return null;
+    // }
 
     const orgId = await this.cache.getSubscriptionName(token);
 
@@ -152,12 +154,7 @@ export class DatasetService {
       if (dataset.Dataset_Id) {
         tdvJob.DatasetID = dataset.Dataset_Id;
         const updateTdvResp = await this.tdvService.putJobTdvRoute(tdvJob);
-        this.saveStatus(token, dataset.Dataset_Id, {
-          DatasetID: dataset.Dataset_Id,
-          Organisation: orgId,
-          Progression: 30,
-          Message: 'Update data virtualization...'
-        } as PreviewStatus);
+        
         // publishedView = updateTdvResp.body.resource;
       } else {
         const createTdvResp = await this.tdvService.postJobTdvRoute(tdvJob);
@@ -172,14 +169,29 @@ export class DatasetService {
       dataset.PublishedView = publishedView;
     }
 
-    this.saveDatasetAndPreview(token, orgId, dataset);
+    await this.saveStatus(token, dataset.Dataset_Id, {
+      DatasetID: dataset.Dataset_Id,
+      Organisation: orgId,
+      Progression: 40,
+      Message: 'Update dataset...'
+    } as PreviewStatus);
 
-    return {
-      datasetId: datasetId
+    let datasetUpdated: DatasetUpdated;
+    if (dataset.createdDate) {
+      datasetUpdated = await this.updateDataset(token, dataset.Dataset_Id, dataset);
+    } else {
+      datasetUpdated = await this.createDataset(token, dataset);
     }
+
+    // sleep 2 sec to show the progress change
+    await this.sleep(2000);
+
+    this.runPreview(token, dataset, orgId);
+
+    return datasetUpdated;
   }
 
-  public runPreview = async(token: string, dataset: DatasetDetail, orgId: string = ''): Promise<any> => {
+  public runPreview = async(token: string, dataset: Dataset, orgId: string = ''): Promise<any> => {
     if (!orgId) {
       orgId = await this.cache.getSubscriptionName(token);
     }
@@ -225,7 +237,14 @@ export class DatasetService {
     await this.previewApi.deleteJobPrevRoute(previewJobId);
   }
 
-  public saveDatasetAndPreview = async(token: string, orgId: string, dataset: DatasetDetail): Promise<any> => {
+  /**
+   * 
+   * @param token 
+   * @param orgId 
+   * @param dataset 
+   * @deprecated
+   */
+  public saveDatasetAndPreview = async(token: string, orgId: string, dataset: Dataset): Promise<any> => {
     if (dataset.createdDate) {
       await this.updateDataset(token, dataset.Dataset_Id, dataset);
     } else {
@@ -241,6 +260,12 @@ export class DatasetService {
 
     await this.runPreview(token, dataset, orgId);
   }
+
+  private sleep = async (ms: number): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  } 
 
 
 }

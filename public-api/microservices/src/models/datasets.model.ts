@@ -1,15 +1,16 @@
 import { ListBucket, PublishedViews, RedisFileInfo } from "../backend/api";
 
-export interface Dataset {
+export interface DatasetListItem {
   datasetid: string;
   name: string;
   fileName?: string;
+  filePath?: string;
   description?: string;
   createdDate: number;
   status?: string;
   lastPreviewDate?: number;
   type: string;
-
+  message?: string;
 }
 
 export interface DatasetSchema {
@@ -20,11 +21,11 @@ export interface DatasetSchema {
   type: string;
 }
 
-export interface DatasetDetail {
+export interface Dataset {
   Dataset_Description: string;
   Dataset_Id: string;
   Dataset_Name: string;
-  Dataset_Source?: DatasetSource;
+  Dataset_Source: DatasetSource;
   schema?: DatasetSchema[];
   createdDate?: number;
   updatedDate?: number;
@@ -53,11 +54,20 @@ export interface DatasetSource {
 }
 
 export interface PreviewStatus {
-  Organisation: string,
-  JobName: string,
-  DatasetID : string,
-  Message?: string,
-  Level: string,
-  Progression: number,
+  Organisation: string;
+  JobName: string;
+  DatasetID : string;
+  Message?: string;
+  Level: string;
+  Progression: number;
   TimeStamp: number
+}
+
+export interface DatasetUpdated {
+  status: string;
+  datasetId: string;
+}
+export interface CsvFile {
+  redisFileInfo: RedisFileInfo;
+  beingUsed: boolean;
 }

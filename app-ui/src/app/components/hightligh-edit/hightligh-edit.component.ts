@@ -53,8 +53,8 @@ export class HightlighEditComponent implements OnInit {
           }
         }
       },
-      error => { 
-        console.log('error'); 
+      error => {
+        console.log('error');
       }
     );
   }

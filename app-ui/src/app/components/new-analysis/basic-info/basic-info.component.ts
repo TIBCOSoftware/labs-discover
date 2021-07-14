@@ -1,7 +1,7 @@
 import {Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges} from '@angular/core';
 import {map} from 'rxjs/operators';
 import {RepositoryService} from 'src/app/api/repository.service';
-import {NewAnalysisStepStatus} from 'src/app/models/discover';
+import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
 
 @Component({
   selector: 'basic-info',
@@ -72,6 +72,11 @@ export class BasicInfoComponent implements OnInit, OnChanges {
       step: 'basic-info',
       completed: status
     } as NewAnalysisStepStatus;
-    this.status.emit(stepStatus);
+    // FIX for "Expression has changed after it was checked" (https://blog.angular-university.io/angular-debugging/)
+    // Only send status update in the next JavaScript Cycle
+    window.setTimeout(() => {
+      this.status.emit(stepStatus);
+    })
+
   }
 }

@@ -3,8 +3,8 @@ import { SelectItem } from 'primeng/api';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
 import { ParsingService } from 'src/app/service/parsing.service';
-import { Dataset, DatasetDataSource, DatasetSchema, DatasetWizard } from '../../../models/dataset';
-import { NewAnalysisStepStatus } from '../../../models/discover';
+import { Dataset, DatasetDataSource, DatasetSchema, DatasetWizard } from '../../../models_ui/dataset';
+import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 @Component({
   selector: 'dataset-attributes',
   templateUrl: './attributes.component.html',
@@ -42,7 +42,7 @@ export class NewDatasetAttributesComponent implements OnInit {
     });
 
     if (this.previewData) {
-      if (!this.data.createdDate || this.wizard.dataSourceChanged) {
+      if ((!this.data.createdDate && !this.isTimestampSelected()) || this.wizard.attributesUnpredicted) {
         this.predictSchemaType();
       }
     } else {
@@ -56,6 +56,10 @@ export class NewDatasetAttributesComponent implements OnInit {
     }
 
     this.updateStatus();
+  }
+
+  private isTimestampSelected() {
+    return this.schema.filter(schema => schema.type == 'timestamp').length > 0;
   }
 
   private predictSchemaType() {
@@ -113,6 +117,10 @@ export class NewDatasetAttributesComponent implements OnInit {
     } as NewAnalysisStepStatus;
 
     this.status.emit(stepStatus);
+
+    if (this.valid) {
+      this.wizard.attributesUnpredicted = false;
+    }
   }
 
   private validateDatatype(): boolean {

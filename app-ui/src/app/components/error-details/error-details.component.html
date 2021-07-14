@@ -1,0 +1,8 @@
+<div class="error-container">
+  <div class="line-numbers" *ngIf="numberOfLines && numberOfLines > 0">
+    <div class="line-number" *ngFor="let item of [].constructor(numberOfLines); let i = index">{{i + 1}}</div>
+  </div>
+  <div #eMessage class="error-message" [innerHTML]="errorMessageHTML" id="emContent">
+  </div>
+</div>
+

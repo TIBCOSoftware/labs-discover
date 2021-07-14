@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import {AnalyticTemplateUI} from '../../models/analyticTemplate';
+import {AnalyticTemplateUI} from '../../models_ui/analyticTemplate';
 import { RepositoryService } from 'src/app/api/repository.service';
-import { Analysis } from 'src/app/models_generated/analysis';
+import { Analysis } from 'src/app/model/analysis';
 import { VisualisationService } from 'src/app/api/visualisation.service';
+import {compareTemplates} from '../../functions/templates';
 
 @Component({
   selector: 'template-select',
@@ -37,7 +38,8 @@ export class TemplateSelectComponent implements OnInit {
 
   public refresh = (): void => {
     this.visualisationService.getTemplates().subscribe( (aTemplates) => {
-      const template$ = this.templates = aTemplates;
+      this.templates = aTemplates.sort(compareTemplates);
+      const template$ = this.templates;
       const analysis$ = this.repositoryService.getAnalysisDetails(this.route.snapshot.paramMap.get('name'));
       forkJoin([template$, analysis$]).subscribe(async results => {
         /*

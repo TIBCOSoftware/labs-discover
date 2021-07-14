@@ -209,6 +209,8 @@ object main extends App {
   // writing
 
   DataFrameUtils.updateAnalysisJDBC("events", df_eventsFinalDB)
+  // events in binary
+  DataFrameUtils.updateAnalysisBinaryJDBC("events_binary", df_eventsFinalDB)
   // Attributes in binary
   DataFrameUtils.updateAnalysisBinaryJDBC("attributes_binary", df_attrib_bin)
   sendBottleToTheSea(s"$analysisId","info","Event Table Saved",60, organisation)

@@ -1,0 +1,7 @@
+<div class="edit-field">
+  <uxpl-text-input label="Label" [value]="label" (changed)="setFieldLabel($event)"></uxpl-text-input>
+  <div>
+    <uxpl-button type="no-border" (clicked)="discardChanges()">Discard change</uxpl-button>
+    <uxpl-button type="primary" (clicked)="saveField()">Save</uxpl-button>
+  </div>
+</div>

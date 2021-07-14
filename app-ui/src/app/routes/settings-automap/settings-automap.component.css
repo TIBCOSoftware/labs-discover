@@ -1,0 +1,74 @@
+.settings-main {
+  margin-right: 24px;
+  min-width: 900px;
+}
+
+.ss-settings {
+  margin: 10px 5px 10px 0px;
+  padding: 20px 10px;
+  border: 1px solid #e7e7e7;
+  border-radius: 15px;
+  background-color: #f4f4f4 !important;
+  height: 70%;
+}
+
+.ss-inner {
+  position: relative;
+  margin-left: 10px;
+}
+
+.right-button {
+  position: absolute;
+  margin-right: 5px;
+  right: 2%;
+}
+
+.settings-container {
+  overflow: visible;
+  width: 100%;
+}
+
+.settings-main {
+  margin-right: 24px;
+}
+
+.capability-line {
+  display:flex;
+}
+
+.capability-line-icon {
+  flex: 1 1 0%;
+  margin-right: 15px;
+}
+
+.capability-line-title {
+  flex: 2 1 0%;
+  margin-right: 15px;
+}
+
+.capability-line-description {
+  flex: 3 1 0%;
+}
+
+.settings-subcategory {
+  margin-left: 24px;
+}
+
+.settings-main {
+  margin-right: 24px;
+}
+
+.settings-line {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.setting-background-image {
+  width: 500px;
+}
+
+.advanced:hover {
+  cursor: pointer;
+  color: #0e4f9e;
+}

@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {NewInvestigation} from '../../../models/discover';
-import {AnalyticsMenuConfigUI} from '../../../models/configuration';
+import {NewInvestigation} from '../../../models_ui/discover';
+import {AnalyticsMenuConfigUI} from '../../../models_ui/configuration';
 
 @Component({
   selector: 'template-edit-menu-popup',
@@ -12,6 +12,8 @@ export class TemplateEditMenuPopupComponent implements OnInit, OnChanges {
   @Input() menuNodeItem: AnalyticsMenuConfigUI;
 
   @Input() analyticTabs: string[];
+
+  @Input() allowIcons: boolean;
 
   @Output() menuItem: EventEmitter<AnalyticsMenuConfigUI> = new EventEmitter();
 

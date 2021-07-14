@@ -5,8 +5,8 @@
 
 
 name="labs-discover-spark-runner"
-registry="tibcosoftware"
-version="3.1.1"
+registry="public.ecr.aws/tibcolabs"
+version="3.1.2"
 
 docker build \
     --build-arg VCS_REF=$(git rev-parse --short HEAD) \

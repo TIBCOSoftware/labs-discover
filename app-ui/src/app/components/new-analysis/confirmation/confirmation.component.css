@@ -65,11 +65,13 @@ uxpl-form-field {
   line-height: 24px;
   /*max-width: 200px;*/
   word-break: break-word;
+  margin-left: 5px;
 }
 
 .detail-table {
   border-collapse: separate;
   border-spacing: 0 18px;
+  margin-left: 30px;
 }
 
 .detail-row {

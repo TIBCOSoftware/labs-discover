@@ -1,0 +1,9 @@
+<div #box class="resizable-draggable" 
+    [style.width.px]="width" 
+    [style.height.px]="height" 
+    [style.transform]="'translate3d('+ left + 'px,' + top + 'px,' + '0px)'"
+    [class.active]="status === 1 || status === 2"
+>
+    <ng-content select=".resizble-draggable-content"></ng-content>
+    <div *ngIf="showResizeHandler" class="resize-handler" (mousedown)="setStatus($event, 1)"></div>
+</div>

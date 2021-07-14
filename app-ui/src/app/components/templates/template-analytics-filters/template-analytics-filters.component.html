@@ -1,0 +1,34 @@
+<div class="analytics-filter-container">
+  <div class="left-section">
+    <div class="drag-drop-header">
+      <div class="header-label">Filters panel menu items</div>
+      <div class="add-button">
+        <div class="add-button-wrapper" (click)="add($event)">
+          <uxpl-icon height="20px" width="20px" icon="pl-icon-add-circle"></uxpl-icon>
+          <div class="add-label">Add</div>
+        </div>
+        <div class="popup-wrapper" [ngStyle]="{ 'top': popupY , 'left': popupX}">
+          <uxpl-popup #popup id="popup" slot="popup" x-position="after" content-id="my-new-popup" max-width="350px"
+                      max-height="245px">
+            <template-edit-menu-popup id="my-new-popup" [menuNodeItem]="newNode" style="width: 350px;" [allowIcons]="false"
+                                      [analyticTabs]="pageOptions"
+                                      (menuItem)="addMenuItem($event)"></template-edit-menu-popup>
+          </uxpl-popup>
+        </div>
+      </div>
+    </div>
+    <template-analytics-menu-dragdrop #dragdrop class="drag-drop" [menuNodesIN]="filterConfig" [allowNesting]="false" [allowIcons]="false"
+                                      [analyticTabs]="pageOptions" (update)="receiveFilterUpdate($event)"
+                                      (popupOpens)="closeAddPopup()"></template-analytics-menu-dragdrop>
+    <div class="drag-drop-footer">
+      <div class="reset-all-button" (click)="clearAll()">Remove all</div>
+      <div class="reset-all-button" (click)="reset()">Reset</div>
+    </div>
+  </div>
+  <div class="middle-divider"></div>
+  <div class="right-section">
+    <!-- The spotfire report is plotted here from template editor (using css position fixed) -->
+    <!-- <pre style="width: 100%"> {{filterConfig | json}}</pre> -->
+  </div>
+</div>
+

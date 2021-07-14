@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 import { DatasetService } from '../../../service/dataset.service';
-import {AnalyticTemplateUI} from '../../../models/analyticTemplate';
-import {CardMode} from '../../../models/configuration';
+import {AnalyticTemplateUI} from '../../../models_ui/analyticTemplate';
+import {CardMode} from '../../../models_ui/configuration';
 @Component({
   selector: 'list-templates',
   templateUrl: './list-templates.component.html',

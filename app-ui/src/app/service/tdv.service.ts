@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
-import { DataVirtualizationSite, DataVirtualizationTable, DataVirtualizationDatabase, DataVirtualizationColumn, TDVConfig } from '../models/tdv';
+import { DataVirtualizationSite, DataVirtualizationTable, DataVirtualizationDatabase, DataVirtualizationColumn, TDVConfig } from '../models_ui/tdv';
 
 @Injectable({
   providedIn: 'root'

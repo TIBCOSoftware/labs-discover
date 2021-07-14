@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DiscoverConfiguration } from 'src/app/models/configuration';
+import { DiscoverConfiguration } from 'src/app/models_ui/configuration';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { MessageTopicService } from '@tibco-tcstk/tc-core-lib';
@@ -23,7 +23,7 @@ export class SettingsPlatformDatetimeFormatComponent implements OnInit {
     autoScrollEditorIntoView: true,
     highlightActiveLine: true
   };
-  
+
   constructor(
     protected configService: ConfigurationService,
     protected messageService: MessageTopicService

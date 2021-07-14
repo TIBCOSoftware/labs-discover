@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Datasource } from '../models/discover';
+import { Datasource } from '../models_ui/discover';
 
 @Injectable({
   providedIn: 'root'

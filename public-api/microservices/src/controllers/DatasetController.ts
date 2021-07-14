@@ -1,10 +1,9 @@
-import axios from 'axios';
 import { Response } from 'koa';
 import { Body, Delete, Get, HeaderParam, JsonController, Param, Post, Put, Res } from 'routing-controllers';
 import { Service } from 'typedi';
-import { ActionPerformedPreview, DatasetSourceTdv, FilesOperationsApi, ListBucket, LoginApi, LoginCredentials, RedisContent, RedisFileInfo, TdvJob, TibcoDataVirtualizationApi } from '../backend/api';
+import { FilesOperationsApi, LoginApi, LoginCredentials, RedisFileInfo, TibcoDataVirtualizationApi } from '../backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
-import { Dataset, DatasetDetail, PreviewStatus } from '../models/datasets.model';
+import { CsvFile, Dataset, DatasetListItem, DatasetUpdated, PreviewStatus } from '../models/datasets.model';
 import { AnalysisService } from '../services/analysis.service';
 import { DatasetService } from '../services/dataset.service';
 
@@ -54,7 +53,7 @@ export class DatasetController {
   }
 
   @Get('/datasets')
-  async getAllDatasets(@HeaderParam("authorization")token: string, @Res() response: Response): Promise<Dataset[] | Response> {
+  async getAllDatasets(@HeaderParam("authorization")token: string, @Res() response: Response): Promise<DatasetListItem[] | Response> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -65,7 +64,7 @@ export class DatasetController {
   }
 
   @Get("/dataset/:id")
-  async getDataset(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | DatasetDetail> {
+  async getDataset(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | Dataset> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -77,8 +76,8 @@ export class DatasetController {
       return response;
     }
     // don't return preview status in detail
-    datasetDetail.previewStatus = undefined;
-    delete datasetDetail.previewStatus;
+    // datasetDetail.previewStatus = undefined;
+    // delete datasetDetail.previewStatus;
     return datasetDetail;
   }
 
@@ -101,7 +100,7 @@ export class DatasetController {
   }
 
   @Post("/dataset")
-  async createDataset(@HeaderParam("Authorization") token: string, @Res() response: Response, @Body() body: DatasetDetail): Promise<any> {
+  async createDataset(@HeaderParam("Authorization") token: string, @Res() response: Response, @Body() body: Dataset): Promise<Response | DatasetUpdated> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -122,7 +121,7 @@ export class DatasetController {
   }
 
   @Post("/dataset/preview")
-  async saveDatasetAndPreview(@HeaderParam("Authorization") token: string, @Res() response: Response, @Body() body: DatasetDetail): Promise<any> {
+  async saveDatasetAndPreview(@HeaderParam("Authorization") token: string, @Res() response: Response, @Body() body: Dataset): Promise<Response | DatasetUpdated> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -140,7 +139,7 @@ export class DatasetController {
   }
 
   @Post("/preview/:id")
-  async refreshPreview(@HeaderParam("Authorization") token: string, @Res() response: Response, @Param("id")id: string): Promise<any> {
+  async refreshPreview(@HeaderParam("Authorization") token: string, @Res() response: Response, @Param("id")id: string): Promise<Response> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -160,7 +159,7 @@ export class DatasetController {
   }
 
   @Put("/dataset/:id")
-  async updateDataset(@HeaderParam("Authorization") token: string, @Param("id")id: string, @Res() response: Response, @Body() body: DatasetDetail): Promise<any> {
+  async updateDataset(@HeaderParam("Authorization") token: string, @Param("id")id: string, @Res() response: Response, @Body() body: Dataset): Promise<Response | DatasetUpdated> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -270,7 +269,7 @@ export class DatasetController {
   }
 
   @Get('/files')
-  async getCsvFiles(@HeaderParam("authorization")token: string, @Res() response: Response): Promise<Response | RedisFileInfo[]> {
+  async getCsvFiles(@HeaderParam("authorization")token: string, @Res() response: Response): Promise<Response | CsvFile[]> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -281,7 +280,62 @@ export class DatasetController {
     const orgId = await this.cache.getClient(oauthToken);
 
     const resp = await this.fileApi.getRouteFileV2(orgId);
-    return resp.body.list;
+    const datasets = await this.datasetService.getDatasets(oauthToken);
+
+    const files: any = {};
+    for (const dataset of datasets) {
+      if (dataset.filePath) {
+        files[dataset.filePath] = 1;
+      }
+    }
+
+    const existFiles: RedisFileInfo[] = resp.body.list;
+    const csvFiles: CsvFile[] = existFiles.map(file => {
+      return {
+        redisFileInfo: file,
+        beingUsed: files[file.FileLocation] === 1
+      } as CsvFile
+    });
+    
+    return csvFiles;
+  }
+
+  @Delete('/files/:filename')
+  async deleteCsvFile(@HeaderParam("authorization")token: string, @Param("filename")filename: string, @Res() response: Response): Promise<Response> {
+    const check = await this.preflightCheck(token, response);
+
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getClient(oauthToken);
+
+    const datasets = await this.datasetService.getDatasets(oauthToken);
+
+    const files: any = {};
+    let beingUsed = false;
+    for (const dataset of datasets) {
+      if (dataset.fileName && dataset.fileName == filename) {
+        beingUsed = true;
+        break;
+      }
+    }
+
+    if (beingUsed) {
+      response.status = 409;
+      return response;
+    }
+
+    try {
+      await this.fileApi.deleteRouteSegment(orgId, filename);
+    } catch(error) {
+      response.status = 406;
+      return response;
+    }
+
+    response.status = 204;
+    return response;
   }
 
   @Get('/files/preview/:filename')
@@ -295,8 +349,34 @@ export class DatasetController {
     const oauthToken = this.getToken(token);
     const orgId = await this.cache.getClient(oauthToken);
 
-    const resp = await this.fileApi.getPreviewRoute(orgId, filename);
-    return resp.body.data;
+    try {
+      const resp = await this.fileApi.getPreviewRoute(orgId, filename);
+      return resp.body.data;
+    } catch(error) {
+      response.status = error.statusCode;
+      return response;
+    }
+  }
+
+  @Get('/tdv/data/:id')
+  async getTdvData(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | string> {
+    const check = await this.preflightCheck(token, response);
+
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getClient(oauthToken);
+
+    try {
+      const resp = await this.tdvApi.getDataJobTdvRoute(orgId, id);
+      return resp.body.Data;
+    } catch(error) {
+      response.status = error.statusCode;
+      return response;
+    }
+    
   }
 
 }

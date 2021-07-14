@@ -1,14 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { ConfigurationService } from 'src/app/service/configuration.service';
-import { MessageTopicService, TcGeneralConfigService, TcGeneralLandingPageConfigService } from '@tibco-tcstk/tc-core-lib';
-import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
-import { cloneDeep, set, isEqual } from 'lodash-es';
-import { SettingsService } from '../../service/settings.service';
-import { MatDialog } from '@angular/material/dialog';
-import { WelcomePreviewComponent } from 'src/app/components/welcome-preview/welcome-preview.component';
-import { HightlighEditComponent } from 'src/app/components/hightligh-edit/hightligh-edit.component';
-import { HttpEventType } from '@angular/common/http';
-import { DiscoverConfiguration } from 'src/app/models/configuration';
+import {Component, OnInit} from '@angular/core';
+import {ConfigurationService} from 'src/app/service/configuration.service';
+import {MessageTopicService, TcGeneralConfigService} from '@tibco-tcstk/tc-core-lib';
+import {TcDocumentService} from '@tibco-tcstk/tc-liveapps-lib';
+import {cloneDeep, set, isEqual} from 'lodash-es';
+import {MatDialog} from '@angular/material/dialog';
+import {WelcomePreviewComponent} from 'src/app/components/welcome-preview/welcome-preview.component';
+import {HightlighEditComponent} from 'src/app/components/hightligh-edit/hightligh-edit.component';
+import {HttpEventType} from '@angular/common/http';
+import {DiscoverConfiguration} from 'src/app/models_ui/configuration';
 
 @Component({
   selector: 'settings-branding',
@@ -25,11 +24,10 @@ export class SettingsBrandingComponent implements OnInit {
   constructor(
     protected configService: ConfigurationService,
     protected generalConfigService: TcGeneralConfigService,
-    protected landingPageConfigService: TcGeneralLandingPageConfigService,
-    protected settingsService: SettingsService,
     protected dialog: MatDialog,
     protected messageService: MessageTopicService,
-    protected documentService: TcDocumentService) { }
+    protected documentService: TcDocumentService) {
+  }
 
   ngOnInit(): void {
     this.showAdvanced = false;
@@ -37,17 +35,21 @@ export class SettingsBrandingComponent implements OnInit {
   }
 
   public handleUpdate = (event, object: string, path?: string) => {
-    if (object === 'general'){
+    if (object === 'general') {
       this.discover.general.applicationTitle = event.detail.value;
     }
 
-    if (object === 'landingPage'){
+    if (object === 'landingPage') {
       set(this.discover.landingPage, path, event.detail.value);
     }
 
-    if (object === 'advanced'){
-      if(!this.discover.analyticsSF){
-        this.discover.analyticsSF = {previewDXPLocation: ''};
+    if (object === 'advanced') {
+      if (!this.discover.analyticsSF) {
+        this.discover.analyticsSF = {
+          previewDXPLocation: '',
+          previewDataTableName: '',
+          customUserDXPFolder: ''
+        };
       }
       set(this.discover.analyticsSF, path, event.detail.value);
     }

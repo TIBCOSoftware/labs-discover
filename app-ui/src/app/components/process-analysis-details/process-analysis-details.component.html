@@ -37,7 +37,14 @@
       </tr>
       <tr class="cell-row">
         <td class="cell-header-main">ID</td>
-        <td class="cont-detail">{{processAnalysis.id}}</td>
+        <td class="cont-detail">
+          <div class="detail-cell">
+            <div [matTooltip]="processAnalysis.id" matTooltipClass="tTip">{{getShortMessage(processAnalysis.id)}} </div>
+            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
+                       matTooltip="copy id to clipboard" matTooltipClass="tTip"
+                       (click)="copyToClipBoard('Id', processAnalysis.id)"></uxpl-icon>
+          </div>
+        </td>
         <td class="cont-space"></td>
         <td class="cell-header-main">Department</td>
         <td class="cont-detail">{{processAnalysis.data.mappings.resourceGroup}}</td>
@@ -46,8 +53,20 @@
         <td class="cont-detail">{{processAnalysis.data.mappings.scheduledEnd}}</td>
       </tr>
       <tr class="cell-row">
-        <td class="cell-header-main"></td>
-        <td class="cont-detail"></td>
+        <td class="cell-header-main" *ngIf="processAnalysis.metadata.message">Error</td>
+        <td class="cont-detail" *ngIf="processAnalysis.metadata.message">
+          <div class="detail-cell">{{getShortMessage(processAnalysis.metadata.message)}}
+            <uxpl-icon *ngIf="!showError" class="error-icon" height="18px" width="18px" icon="pl-icon-caret-down"
+                       matTooltip="show error details" matTooltipClass="tTip" (click)="showError = true;"></uxpl-icon>
+            <uxpl-icon *ngIf="showError" class="error-icon" height="18px" width="18px" icon="pl-icon-caret-up"
+                       matTooltip="hide error details" matTooltipClass="tTip" (click)="showError = false"></uxpl-icon>
+            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
+                       matTooltip="copy error to clipboard" matTooltipClass="tTip"
+                       (click)="copyToClipBoard('Error',this.processAnalysis.metadata.message)"></uxpl-icon>
+          </div>
+        </td>
+        <td class="cell-header-main" *ngIf="!processAnalysis.metadata.message"></td>
+        <td class="cont-detail" *ngIf="!processAnalysis.metadata.message"></td>
         <td class="cont-space"></td>
         <td class="cell-header-main">Requester</td>
         <td class="cont-detail">{{processAnalysis.data.mappings.requester}}</td>
@@ -56,5 +75,21 @@
         <td class="cont-detail">{{processAnalysis.data.mappings.otherAttributes}}</td>
       </tr>
     </table>
+    <div *ngIf="showError" class="error-container">
+      <img height=75 width=75 src="{{errorIcon}}" onerror="this.style.display='none'">
+      <div class="error-details-pane">
+        <h3>Error Details:</h3>
+        <error-details [errorMessage]="processAnalysis.metadata.message"></error-details>
+      </div>
+    </div>
+    <!-- <pre>{{progress | json}}</pre> -->
+    <!-- <pre>{{processAnalysis | json}}</pre> -->
+    <progress-screen *ngIf="progress" [message1]="progress?.message" [showImageLeft]="true"
+                     [percentage]="progress?.percentage" [status]="progress?.status"></progress-screen>
+    <progress-screen *ngIf="progressSet && !progress" [message1]="'Process mining'" [showImageLeft]="true"
+                     [percentage]="100" [status]="'Process mining done...'"></progress-screen>
   </mat-card-content>
 </mat-card>
+
+
+

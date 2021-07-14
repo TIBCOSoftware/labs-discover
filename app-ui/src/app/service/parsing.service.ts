@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
 import { ConfigurationService } from './configuration.service';
-import { DateParseRecord, DateParsingResult } from '../models/parsing';
+import { DateParseRecord, DateParsingResult } from '../models_ui/parsing';
 
 
 @Injectable({
@@ -108,8 +108,8 @@ export class ParsingService {
 
   /**
    * Validate a single string to the predefined date/time format.
-   * @param value 
-   * @returns 
+   * @param value
+   * @returns
    */
   public validateDateAgainstDateFormats(value: string): boolean {
     let valid = false;

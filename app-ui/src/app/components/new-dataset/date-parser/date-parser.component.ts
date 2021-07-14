@@ -1,17 +1,16 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { SelectOption } from '@tibco-tcstk/tc-web-components/dist/types/models/selectInputConfig';
-import { format } from 'crypto-js';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Dataset, DatasetDataSource, DatasetSchema, DatasetWizard } from 'src/app/models/dataset';
-import { NewAnalysisStepStatus } from 'src/app/models/discover';
-import { DateParseRecord, DateParsingResult } from 'src/app/models/parsing';
-import { ConfigurationService } from 'src/app/service/configuration.service';
-import { CsvNgpDataSource } from 'src/app/service/csv-ngp-datasource';
-import { DatasetService } from 'src/app/service/dataset.service';
-import { ParsingService } from 'src/app/service/parsing.service';
-import { cloneDeep } from 'lodash-es';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {SelectOption} from '@tibco-tcstk/tc-web-components/dist/types/models/selectInputConfig';
+import {Table} from 'primeng/table';
+import {Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {Dataset, DatasetDataSource, DatasetSchema, DatasetWizard} from 'src/app/models_ui/dataset';
+import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
+import {DateParseRecord, DateParsingResult} from 'src/app/models_ui/parsing';
+import {ConfigurationService} from 'src/app/service/configuration.service';
+import {CsvNgpDataSource} from 'src/app/service/csv-ngp-datasource';
+import {DatasetService} from 'src/app/service/dataset.service';
+import {ParsingService} from 'src/app/service/parsing.service';
+import {cloneDeep} from 'lodash-es';
 
 @Component({
   selector: 'dataset-date-parser',
@@ -19,7 +18,7 @@ import { cloneDeep } from 'lodash-es';
   styleUrls: ['./date-parser.component.scss', '../../process-analysis-table/process-analysis-table.component.scss']
 })
 export class NewDatesetDateParserComponent implements OnChanges, OnInit {
-  
+
   @Input() data: Dataset;
   @Input() wizard: DatasetWizard;
   @Input() csvFile: File;
@@ -27,16 +26,16 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   @Output() status: EventEmitter<NewAnalysisStepStatus> = new EventEmitter();
   @Output() handlePreviewData: EventEmitter<any> = new EventEmitter<any>();
 
-  @ViewChild('dt', { static: false }) table: Table;
+  @ViewChild('dt', {static: false}) table: Table;
 
   public validating = false;
   public columns: string[];
   public dateOptions: string[][];
-  public dateFields: {name: string, index: number}[];
+  public dateFields: { name: string, index: number }[];
   public possFormats: string[][];
   public dataSource: CsvNgpDataSource;
   public loadedData: any[];
-  public rows: number = 100;
+  public rows = 100;
   public formatChanged: Subject<any> = new Subject<any>();
   public parsingResult: DateParsingResult[];
   public bestPartialMatches: DateParseRecord[][];
@@ -50,24 +49,24 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   public validRowsCount = -1;  // -1 means not all column has format and cannot count
 
   constructor(
-    protected parsingService: ParsingService, 
+    protected parsingService: ParsingService,
     protected datasetService: DatasetService,
-    protected configService: ConfigurationService) { }
+    protected configService: ConfigurationService) {
+  }
 
   ngOnInit(): void {
-    // this.refreshData();
-
     this.formatChanged
       .pipe(debounceTime(500), distinctUntilChanged())
       .subscribe(model => {
-        const format = model.format;
+        const myFormat = model.format;
         const dfIndex = model.dfIndex;
-        this.dateOptions[dfIndex] = [format];
-        this.getDatesetColumn(dfIndex).format = format;
+        this.dateOptions[dfIndex] = [myFormat];
+        this.getDatesetColumn(dfIndex).format = myFormat;
         this.emitStepStatus();
         this.countValidRows();
       });
   }
+
   public isBadRow(rowIndex) {
     // todo
     // if (this.bestPartialMatches) {
@@ -84,13 +83,13 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   public clickDateFormat(event: Event) {
     setTimeout(() => {
       // @ts-ignore
-      const ul  = event.target.shadowRoot.querySelector('.uxpl-options-menu');
+      const ul = event.target.shadowRoot.querySelector('.uxpl-options-menu');
       if (ul) {
         ul.style.position = 'fixed';
         ul.style.width = '360px';
       }
     }, 100);
-    
+
   }
 
   public calcInvalidColumns() {
@@ -124,9 +123,11 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   public isNewFormat(): boolean {
     // let noformat = false;
     for (let i = 0; i < this.dateFields.length; i++) {
-      let format = this.getDatesetColumn(i).format;
-      if (format && this.parsingResult[i] && this.parsingResult[i].formats) {
-        let idx = this.parsingResult[i].formats.findIndex((fmt: DateParseRecord) => { return fmt.format === format});
+      const myFormat = this.getDatesetColumn(i).format;
+      if (myFormat && this.parsingResult[i] && this.parsingResult[i].formats) {
+        const idx = this.parsingResult[i].formats.findIndex((fmt: DateParseRecord) => {
+          return fmt.format === myFormat
+        });
         if (idx < 0) {
           return true;
         }
@@ -137,7 +138,7 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   }
 
   public handleDateFormatUpdate = (event, dfIndex: number) => {
-    const format = event.detail.value && event.detail.value.length > 0 ? event.detail.value : undefined;
+    const format = event.detail && event.detail.value && event.detail.value.length > 0 ? event.detail.value : undefined;
     this.formatChanged.next({
       format,
       dfIndex
@@ -148,18 +149,18 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
     this.validRowsCount = 0;
     if (this.loadedData && this.loadedData.length > 0 && this.isAllDateFormatSet()) {
       let count = 0;
-      for (let i = 0; i < this.loadedData.length; i++) {
-        if (this.loadedData[i]) {
+      for (const dl of this.loadedData) {
+        if (dl) {
           let valid = true;
-          for (let j = 0; j < this.dateFields.length; j ++) {
-            let schema: DatasetSchema = this.getDatesetColumn(j);
-            if (!schema.format || !this.parsingService.validateSingleDate(this.loadedData[i][schema.key], schema.format) ) {
+          for (let j = 0; j < this.dateFields.length; j++) {
+            const schema: DatasetSchema = this.getDatesetColumn(j);
+            if (!schema.format || !this.parsingService.validateSingleDate(dl[schema.key], schema.format)) {
               valid = false;
               break;
             }
           }
           if (valid) {
-            count ++;
+            count++;
           }
         }
       }
@@ -177,9 +178,9 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
     if (this.dataSource) {
       this.dataSource.disconnect();
     }
-    
-    
-    if (this.csvFile && this.data.csvMethod == 'upload') {
+
+
+    if (this.csvFile && this.data.csvMethod === 'upload') {
       // CSV parsing
       // const config = this.getCsvConfig();
       const config = {
@@ -218,14 +219,14 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
               } else {
                 newFmts = this.getPossibleDataFormats(newRows);
               }
-  
+
               this.possFormats.forEach((pf, index) => {
                 pf = pf.filter(fmt => {
                   return newFmts[index].includes(fmt);
                 });
               });
             }
-  
+
             this.emitStepStatus();
             this.countValidRows();
           }
@@ -238,13 +239,13 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
           this.refreshDataWithAvailablePreview();
         } else {
           this.datasetService.pullPreviewData(this.data).subscribe(data => {
-            if(data.columns) {
+            if (data.columns) {
               this.handlePreviewData.emit(data);
             }
           });
         }
       }, 0);
-      
+
     }
   }
 
@@ -263,8 +264,8 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
 
   private isAllDateFormatSet(): boolean {
     let allSet = true;
-    for (let i = 0; i < this.dateFields.length; i++) {
-      if (this.schema[this.dateFields[i].index].format === 'None') {
+    for (const df of this.dateFields) {
+      if (!this.schema[df.index].format || this.schema[df.index].format === 'None') {
         allSet = false;
         break;
       }
@@ -288,10 +289,10 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
 
       this.dateFields = [];
       this.schema.forEach((column, index) => {
-        if (column.type == 'timestamp') {
+        if (column.type === 'timestamp') {
           this.dateFields.push({
             name: column.key,
-            index: index
+            index
           });
         }
       });
@@ -311,8 +312,8 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   }
 
   validate() {
-      this.validating = true;
-      this.refreshData();
+    this.validating = true;
+    this.refreshData();
   }
 
   reset() {
@@ -326,7 +327,7 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   }
 
   selectBestMatch(res: DateParseRecord, dfIndex: number) {
-    this.handleDateFormatUpdate({ detail: { value: res.format }}, dfIndex);
+    this.handleDateFormatUpdate({detail: {value: res.format}}, dfIndex);
     this.calcInvalidColumns();
   }
 
@@ -336,30 +337,36 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   }
 
   private getPossibleDataFormats(data, dateOptions?: string[][]): string[][] {
-    let possibleMatches = [];
+    const possibleMatches = [];
 
     this.dateFields.forEach((df, dfIndex) => {
-      let targetData: string[][] = [];
-      
+      const targetData: string[][] = [];
+
       data.forEach(row => {
-        let rowData: string[] = [];
+        const rowData: string[] = [];
         rowData.push(row[df.name]);
         targetData.push(rowData);
       });
 
       // data = targetData;
       this.parsingResult[dfIndex] = this.parsingService.predictDateFormat(targetData, dateOptions ? dateOptions[dfIndex] : undefined, this.parsingResult[dfIndex]);
-      let possMatches: string[] = [];
-      this.parsingResult[dfIndex].formats.filter(rec => { return rec.badRows.length <= 0 }).forEach(match => {
+      const possMatches: string[] = [];
+      this.parsingResult[dfIndex].formats.filter(rec => {
+        return rec.badRows.length <= 0
+      }).forEach(match => {
         possMatches.push(match.format);
       });
       if (possMatches.length < 1) {
         // no format matches all the row data, so need to assign best match
-        let partialMatches = this.parsingResult[dfIndex].formats.filter(mtch => { return mtch.matches > 0 });
+        const partialMatches = this.parsingResult[dfIndex].formats.filter(mtch => {
+          return mtch.matches > 0
+        });
         // sort by highest number matches
-        partialMatches.sort(function (a, b) { return b.matches - a.matches;});
+        partialMatches.sort((a, b) => {
+          return b.matches - a.matches;
+        });
         this.bestPartialMatches[dfIndex] = partialMatches;
-        let partialFormats = [];
+        const partialFormats = [];
         this.bestPartialMatches[dfIndex].forEach(pm => partialFormats.push(pm.format));
         this.partialFormats[dfIndex] = partialFormats;
         if (this.partialFormats[dfIndex].length > 0) {
@@ -381,7 +388,7 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   }
 
   public getOptions(index: number) {
-    let options: SelectOption[] = [];
+    const options: SelectOption[] = [];
     if (this.possFormats && this.possFormats[index] && this.possFormats[index].length > 0) {
       this.possFormats[index].forEach((fmt: string) => {
         options.push(
@@ -408,21 +415,21 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   }
 
   public isDateField(col: string) {
-    return this.dateFields.filter(f => {
-      f.name == col
-    }).length > 0;
+    return this.dateFields.filter(f =>
+      f.name === col
+    ).length > 0;
   }
 
   private getDatesetColumnByName(col: string): DatasetSchema {
     let index = -1;
-    for (let i = 0; i < this.dateFields.length; i++) {
-      if (this.dateFields[i].name === col) {
-        index = this.dateFields[i].index;
+    for (const df of this.dateFields) {
+      if (df.name === col) {
+        index = df.index;
         break;
       }
     }
 
-    if (index != -1) {
+    if (index !== -1) {
       return this.schema[index];
     }
   }
@@ -430,9 +437,9 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   public dateClass(date: string, col: string, dfIndex: number): string {
     const column = this.getDatesetColumnByName(col);
     if (column) {
-      
+
       if ((!this.dateOptions[dfIndex] || this.dateOptions[dfIndex].length <= 0) && (!this.possFormats || !this.possFormats[dfIndex] || this.possFormats[dfIndex].length <= 0))
-      // when no detected date but partial matches detected. Use the best date for marking.
+        // when no detected date but partial matches detected. Use the best date for marking.
       {
         if (this.partialFormats && this.partialFormats[dfIndex] && this.partialFormats[dfIndex].length > 0) {
           if (this.parsingService.validateSingleDate(date, this.partialFormats[dfIndex][0])) {
@@ -452,14 +459,14 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
       } else if (!this.possFormats || !this.possFormats[dfIndex] || this.possFormats[dfIndex].length <= 0) {
         return undefined;
       } else if (this.possFormats[dfIndex].length === 1) {
-        return this.parsingService.validateSingleDate(date, this.possFormats[dfIndex][0]) ? 'valid': 'invalid';
+        return this.parsingService.validateSingleDate(date, this.possFormats[dfIndex][0]) ? 'valid' : 'invalid';
       } else {
         return 'indeterminate'
       }
     } else {
       return 'notdate'
     }
-    
+
   }
 
 }

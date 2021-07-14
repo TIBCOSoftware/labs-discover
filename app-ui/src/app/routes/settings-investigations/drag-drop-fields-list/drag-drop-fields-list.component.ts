@@ -15,6 +15,7 @@ export class DragDropFieldsListComponent implements OnInit {
   @Input() labelAttr: string;
   @Output() listItemDropped: EventEmitter<any> = new EventEmitter();
   @Output() deleteField: EventEmitter<any> = new EventEmitter();
+  @Output() editField: EventEmitter<any> = new EventEmitter();
   @Output() clickListItem: EventEmitter<any> = new EventEmitter();
 
   ngOnInit(): void {
@@ -41,6 +42,13 @@ export class DragDropFieldsListComponent implements OnInit {
   deleteTableField(index: number) {
     // const deletedFields = this.fieldList.splice(index, 1);
     this.deleteField.emit(index);
+  }
+
+  editTableField(event, index: number) {
+    this.editField.emit({
+      event,
+      index
+    });
   }
 
   clickMenuItem(index) {

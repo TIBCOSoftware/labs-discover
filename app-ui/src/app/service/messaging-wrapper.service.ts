@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {EFTLService, MessagingAttribute} from "@tibco-tcstk/tc-messaging-lib";
-import {TCM_Message_discover_actions} from '../models/discover';
+import {TCM_Message_discover_actions} from '../models_ui/discover';
 import {ConfigurationService} from "./configuration.service";
 import {MessageQueueService, MessageTopicService} from "@tibco-tcstk/tc-core-lib";
 import {DatasourceService} from "./datasource.service";

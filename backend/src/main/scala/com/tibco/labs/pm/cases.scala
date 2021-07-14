@@ -20,36 +20,36 @@ object cases {
     var df_cases_f = spark.emptyDataFrame
 Try {
   import spark.implicits._
-  println(s"###########  Creating Variants ##########")
+  println(s"###########  Creating variants ##########")
 
   println(s"###########  Ordering Cases Dataframe ##########")
-  //val df_cases_ordered = df_events.repartition(100,$"CASE_ID").sortWithinPartitions("ACTIVITY_START_TIMESTAMP", asc("row_id"))
+  //val df_cases_ordered = df_events.repartition(100,$"case_id").sortWithinPartitions("activity_start_timestamp", asc("row_id"))
   println(s"###########  creating Cases Dataframe ##########")
   val _Start = System.nanoTime()
-  val df_cases = df_events.repartition(100, $"CASE_ID").withColumn("VARIANT", collect_list("ACTIVITY_ID")
-    .over(Window.partitionBy("CASE_ID")
-      .orderBy($"ACTIVITY_START_TIMESTAMP".asc, $"row_id".asc)))
-    .groupBy("CASE_ID")
-    .agg(min("ACTIVITY_START_TIMESTAMP").as("CASE_START_TIMESTAMP"),
-      max("ACTIVITY_START_TIMESTAMP").as("CASE_END_TIMESTAMP"),
-      sum("DURATION_SEC").as("total_case_duration"),
-      count("ACTIVITY_ID").as("activities_per_case"),
+  val df_cases = df_events.repartition(100, $"case_id").withColumn("variant", collect_list("activity_id")
+    .over(Window.partitionBy("case_id")
+      .orderBy($"activity_start_timestamp".asc, $"row_id".asc)))
+    .groupBy("case_id")
+    .agg(min("activity_start_timestamp").as("case_start_timestamp"),
+      max("activity_start_timestamp").as("case_end_timestamp"),
+      sum("duration_sec").as("total_case_duration"),
+      count("activity_id").as("activities_per_case"),
 //      last("CASES_EXTRA_ATTRIBUTES").as("CASES_EXTRA_ATTRIBUTES"),
-      max("VARIANT").as("VARIANTS_CASES"))
+      max("variant").as("variants_cases"))
   val _End = System.nanoTime()
   val time = (_End - _Start) / 1000000
   println(s"time for agg  : $time ms")
   println(s"########### Cast ##########")
-  val df_cases_0 = df_cases.withColumn("tmpVariants", concat_ws(",", $"VARIANTS_CASES")).drop("VARIANTS_CASES").withColumnRenamed("tmpVariants", "VARIANTS_CASES")
+  val df_cases_0 = df_cases.withColumn("tmpVariants", concat_ws(",", $"variants_cases")).drop("variants_cases").withColumnRenamed("tmpVariants", "variants_cases")
   println(s"########### join  ##########")
-  df_cases_f = broadcast(df_cases_0.as("cases")).join(df_variants.as("variants"), $"cases.VARIANTS_CASES" === $"variants.variant")
-  df_cases_f = df_cases_f.withColumn("ANALYSIS_ID", lit(analysisId)) //.withColumn("idPK",sha2(concat_ws("||",col("VARIANT_ID"),col("ANALYSIS_ID")),256))
-  //val df_cases_finale_2 = df_cases_finale_1.withColumn("idPK", sha2(concat_ws("||", col("VARIANT_ID"), col("ANALYSIS_ID"), col("CASE_ID"), col("CASE_START_TIMESTAMP")), 256))
+  df_cases_f = broadcast(df_cases_0.as("cases")).join(df_variants.as("variants"), $"cases.variants_cases" === $"variants.variant")
+  df_cases_f = df_cases_f.withColumn("analysis_id", lit(analysisId)) //.withColumn("idPK",sha2(concat_ws("||",col("VARIANT_ID"),col("analysis_id")),256))
+  //val df_cases_finale_2 = df_cases_finale_1.withColumn("idPK", sha2(concat_ws("||", col("VARIANT_ID"), col("analysis_id"), col("case_id"), col("case_start_timestamp")), 256))
 
 
-  df_cases_f = df_cases_f.withColumn("tmpStart", col("CASE_START_TIMESTAMP").cast("timestamp")).drop("CASE_START_TIMESTAMP").withColumnRenamed("tmpStart", "CASE_START_TIMESTAMP")
+  df_cases_f = df_cases_f.withColumn("tmpStart", col("case_start_timestamp").cast("timestamp")).drop("case_start_timestamp").withColumnRenamed("tmpStart", "case_start_timestamp")
 
-  df_cases_f = df_cases_f.withColumn("tmpEnd", col("CASE_END_TIMESTAMP").cast("timestamp")).drop("CASE_END_TIMESTAMP").withColumnRenamed("tmpEnd", "CASE_END_TIMESTAMP")
+  df_cases_f = df_cases_f.withColumn("tmpEnd", col("case_end_timestamp").cast("timestamp")).drop("case_end_timestamp").withColumnRenamed("tmpEnd", "case_end_timestamp")
 
   df_cases_f = df_cases_f.withColumn("total_case_duration", when($"total_case_duration"=== "NULL", 0).otherwise($"total_case_duration"))
   df_cases_f = df_cases_f.withColumn("total_case_duration", when($"total_case_duration".isNull, 0).otherwise($"total_case_duration"))
@@ -121,7 +121,7 @@ Try {
     "total_case_duration",
     "activities_per_case",
 //    "CASES_EXTRA_ATTRIBUTES",
-    "ANALYSIS_ID",
+    "analysis_id",
     "bucketedDuration",
     "bucketedDuration_label")
 

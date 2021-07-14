@@ -5,7 +5,7 @@ import { MessageTopicService } from '@tibco-tcstk/tc-core-lib';
 import { ApiResponseText, TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
 import { from, of } from 'rxjs';
 import { delay, map, mergeMap } from 'rxjs/operators';
-import { ResetAction } from 'src/app/models/configuration';
+import { ResetAction } from 'src/app/models_ui/configuration';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 
 @Component({
@@ -38,7 +38,7 @@ export class ResetComponent implements OnInit {
       map(response => {
         if (response.analytics || response instanceof ApiResponseText || (response instanceof HttpResponse && response.type === 4)){
           this.actions[idx].done = true;
-          idx++;  
+          idx++;
         }
       })
     ).subscribe({

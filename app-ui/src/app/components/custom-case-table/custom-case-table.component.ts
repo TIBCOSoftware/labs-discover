@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CurrencyPipe, DatePipe} from '@angular/common';
-import {CaseConfig, CaseEvent, CaseField} from '../../models/configuration';
+import {CaseConfig, CaseEvent, CaseField} from '../../models_ui/configuration';
 import {CaseInfo} from '@tibco-tcstk/tc-liveapps-lib';
 import {FilterUtils} from 'primeng/utils';
 import {CaseService} from '../../service/custom-case.service';

@@ -2,8 +2,9 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import {TemplateAnalyticsMenuDragdropComponent} from '../template-analytics-menu-dragdrop/template-analytics-menu-dragdrop.component';
 import {cloneDeep} from 'lodash-es';
-import {getNewID, stripDisabledMenuItems} from '../../../functions/templates';
-import { TemplateMenuConfig } from 'src/app/models_generated/models';
+import {clearAllNodeFromDefault, getNewID, stripDisabledMenuItems} from '../../../functions/templates';
+import {TemplateMenuConfig} from 'src/app/model/models';
+import {StepStatus} from '../../../models_ui/analyticTemplate';
 
 @Component({
   selector: 'template-analytics-menu-configuration',
@@ -15,17 +16,18 @@ export class TemplateAnalyticsMenuConfigurationComponent implements OnInit {
   @Input() menuConfig: TemplateMenuConfig[];
   @Input() pageOptions: string[];
   @Output() previewMenuEE: EventEmitter<TemplateMenuConfig[]> = new EventEmitter<TemplateMenuConfig[]>();
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Output() status: EventEmitter<StepStatus> = new EventEmitter<StepStatus>();
+  @Output() updateConfig: EventEmitter<TemplateMenuConfig[]> = new EventEmitter<TemplateMenuConfig[]>();
 
   @ViewChild('popup', {static: true}) popup: ElementRef<UxplPopup>;
   @ViewChild('dragdrop', {static: true}) dragdrop: TemplateAnalyticsMenuDragdropComponent;
 
-  public originalMenuNodes: TemplateMenuConfig[];
-  public previewMenu: TemplateMenuConfig[];
-  public newNode: TemplateMenuConfig;
+  originalMenuNodes: TemplateMenuConfig[];
+  previewMenu: TemplateMenuConfig[];
+  newNode: TemplateMenuConfig;
 
-  public popupX = '0';
-  public popupY = '0';
+  popupX = '0';
+  popupY = '0';
 
   constructor() {
   }
@@ -42,6 +44,9 @@ export class TemplateAnalyticsMenuConfigurationComponent implements OnInit {
 
   addMenuItem(newMenuItem: TemplateMenuConfig): void {
     if (!(newMenuItem.label === '')) {
+      if(newMenuItem.isDefault){
+        clearAllNodeFromDefault(this.menuConfig)
+      }
       if (this.menuConfig) {
         this.menuConfig.push(newMenuItem);
       } else {
@@ -59,6 +64,7 @@ export class TemplateAnalyticsMenuConfigurationComponent implements OnInit {
     this.dragdrop.reloadMenu();
     this.previewMenu = cloneDeep(stripDisabledMenuItems(this.menuConfig));
     this.previewMenuEE.emit(this.previewMenu);
+    this.updateConfig.emit(this.menuConfig);
     this.updateStatus();
   }
 
@@ -66,6 +72,7 @@ export class TemplateAnalyticsMenuConfigurationComponent implements OnInit {
     this.menuConfig = menu;
     this.previewMenu = cloneDeep(stripDisabledMenuItems(this.menuConfig));
     this.previewMenuEE.emit(this.previewMenu);
+    this.updateConfig.emit(this.menuConfig);
     this.updateStatus();
   }
 
@@ -110,7 +117,7 @@ export class TemplateAnalyticsMenuConfigurationComponent implements OnInit {
           }
         })
       })
-      if(doAdd) {
+      if (doAdd) {
         if (this.menuConfig) {
           this.menuConfig.push(newNode);
         } else {

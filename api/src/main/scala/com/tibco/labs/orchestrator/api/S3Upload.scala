@@ -156,6 +156,7 @@ class S3Upload {
     import akka.stream.alpakka.csv.scaladsl.{CsvFormatting, CsvQuotingStyle}
 
     val BOM: Array[Byte] = Array(0xEF.toByte, 0xBB.toByte, 0xBF.toByte)
+    val ByteOrderMark = ByteString.apply(0xEF.toByte, 0xBB.toByte, 0xBF.toByte)
     val maximumLineLength: Int = 10 * 1024
     //kubectl logs  spark-pm-997291-driver --namespace spark-operator
     // kubectl describe sparkapplications spark-pm-997291 --namespace spark-operator
@@ -171,9 +172,18 @@ class S3Upload {
       case Failure(exception) => log.error("Fail to load charset")
       case Success(value) => log.info("Charset found successfull")
     }
+    var firstLine = true
     val result: Future[MultipartUploadResult] =
       body
+        /*
+        .via(Framing.delimiter(ByteString(forms("newline").getBytes()(0)), 1024, allowTruncation = true))
+        .map { bs =>
+          val bs2 = if (firstLine && bs.startsWith(ByteOrderMark) && forms("encoding").equalsIgnoreCase("utf8")) bs.drop(3) else bs
+          if (firstLine) firstLine = false
+          bs2
+        }
         .via(TextFlow.transcoding(Charset.forName(forms("encoding")), StandardCharsets.UTF_8))
+        */
         .via(CsvParsing.lineScanner(
           forms("separator").getBytes()(0),
           forms("quoteChar").getBytes()(0),

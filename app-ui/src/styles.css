@@ -200,3 +200,7 @@ uxpl-left-nav-multi {
   line-height: 18px;
   text-align: center;
 }
+
+.elink {
+  color: #1774E5 !important;
+}

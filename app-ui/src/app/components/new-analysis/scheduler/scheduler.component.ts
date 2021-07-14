@@ -6,18 +6,22 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./scheduler.component.css']
 })
 export class SchedulerComponent implements OnInit {
+
+  constructor() { }
   public runValue = 'only once';
   public runOptions = ['only once', 'recurring'].map(element => { return {label: element, value: element}; })
 
   public repeatingDayValue = 'every 1 day';
   public repeatingTimeValue = 'every 25 minutes';
-  public columnSeparator; 
+  public columnSeparator;
   public customColumnSeparator;
 
-  public showRepeatingOptions: boolean = false;
-  public showRepeatingValueOptions: boolean = false;
+  public showRepeatingOptions = false;
+  public showRepeatingValueOptions = false;
 
-  constructor() { }
+  public selectedTime = 'PM'
+
+  public unitSelection = 'minutes';
 
   ngOnInit(): void {
   }
@@ -33,7 +37,7 @@ export class SchedulerComponent implements OnInit {
 
   public showRepeatingOptionsMenu = (): void => {
     this.showRepeatingOptions = !this.showRepeatingOptions;
-    this.showRepeatingValueOptions = false; 
+    this.showRepeatingValueOptions = false;
   }
 
   public showRepeatingValueOptionsMenu = (): void => {
@@ -48,8 +52,6 @@ export class SchedulerComponent implements OnInit {
   public showRepeatingLine = (): boolean => {
     return this.runValue === 'recurring';
   }
-
-  public selectedTime = 'PM'
   public myButton = (field: string): string => {
     if (this.selectedTime === field) {
       return 'primary';
@@ -57,8 +59,6 @@ export class SchedulerComponent implements OnInit {
       return 'secundary';
     }
   }
-
-  public unitSelection = 'minutes';
   public typeUnitButton = (unit: string): string => {
     if (this.unitSelection === unit) {
       return 'primary';

@@ -7,7 +7,7 @@
       <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
     </div>
     <div class="data-title">
-      <uxpl-button (clicked)="newDatasetDialog()">Create</uxpl-button>
+      <uxpl-button (clicked)="newDatasetDialog()" icon="assets/images/svg/plus.svg" >Dataset</uxpl-button>
       <uxpl-button type="secondary" icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refresh()" width="100">
         Refresh
       </uxpl-button>
@@ -51,10 +51,9 @@
   <div id="popup-host" [ngStyle]="{ 'top': popupY , 'left': popupX}" class="popup-wrapper" style="position: absolute;">
     <uxpl-popup #deletePopup id="deletepopup" slot="popup" x-position="after" y-position="above"
       content-id="delete-action-confirm" max-width="328px" [maxHeight]="maxDeletePopupHeight">
-      <action-confirm *ngIf="datasetOnAction" id="delete-action-confirm" confirmQuestion="Are you sure you want to delete dataset '{{datasetOnAction.name}}'? It can't be undone." doable="true" type="delete" rejectMessage="You can not delete dataset" 
+      <action-confirm *ngIf="datasetOnAction" id="delete-action-confirm" confirmQuestion="Are you sure you want to delete dataset '{{datasetOnAction.name}}'? It can't be undone." doable="true" type="delete" rejectMessage="You can not delete dataset"
         yesBtnLabel="Yes, delete it" noBtnLabel="No" (actionConfirmed)=handleDeleteConfirmation($event) [shown]="showDeleteConfirm"></action-confirm>
     </uxpl-popup>
-    
   </div>
   <ng-template #nodata>
     <div class="center">

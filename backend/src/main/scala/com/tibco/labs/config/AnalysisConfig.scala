@@ -17,8 +17,9 @@ case class datasetSource(
 case class Filter(
                    description: Option[String],
                    name: Option[String],
-                   filterType: Option[String],
-                   value: Option[String]
+                   category: Option[String],
+                   values: Option[List[String]],
+                   includeEmpty: Option[Boolean]
                  )
 case class Mapping(
                     activity: Option[String],

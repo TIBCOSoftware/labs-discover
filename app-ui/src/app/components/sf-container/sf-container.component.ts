@@ -1,13 +1,12 @@
-import {Component, Input, EventEmitter, Output, OnChanges, SimpleChanges, ViewChild, OnInit} from "@angular/core";
-import {trigger, style, animate, transition} from "@angular/animations";
-import {SpotfireConfig, SpotfireWrapperComponent} from "@tibco-tcstk/tc-spotfire-lib";
-import {SpotfireCustomization, SpotfireDocument} from "@tibco/spotfire-wrapper";
+import {Component, Input, EventEmitter, Output, OnChanges, SimpleChanges, ViewChild, OnInit} from '@angular/core'
+import {SpotfireWrapperComponent} from '@tibco-tcstk/tc-spotfire-lib';
+import {SpotfireDocument} from '@tibco/spotfire-wrapper';
 
 @Component({
-  selector: "sfcontainer",
+  selector: 'sfcontainer',
   templateUrl: './sf-container.component.html',
 })
-export class SfContainerComponent implements OnInit,OnChanges{
+export class SfContainerComponent implements OnInit, OnChanges {
 
   @ViewChild(SpotfireWrapperComponent, {static: true}) spotfireWrapperComponent: SpotfireWrapperComponent;
 
@@ -45,24 +44,24 @@ export class SfContainerComponent implements OnInit,OnChanges{
 
   public SFDocument: SpotfireDocument;
 
-  marking(event){
-    console.log('Marking: ' , event);
+  marking(event) {
+    console.log('Marking: ', event);
     this.outputMarking = event;
     this.markingEvent.emit(this.outputMarking);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('CHANGES: ' , changes);
+    console.log('CHANGES: ', changes);
   }
 
-  public setPage(page){
+  public setPage(page) {
     console.log('Opening Page: ' + page);
     this.spotfireWrapperComponent.openPage(page);
   }
 
-  public setProp(name:string, value:any) {
+  public setProp(name: string, value: any) {
     this.SFDocument.getDocumentProperties$().subscribe(s => console.log('SF Properties Before Set: ', s));
-    console.log('Setting Spotfire Property Name: ' + name + ' value: ' ,value);
+    console.log('Setting Spotfire Property Name: ' + name + ' value: ', value);
     this.SFDocument.setDocumentProperty(name, value);
     this.SFDocument.getDocumentProperties$().subscribe(s => console.log('SF Properties After Set: ', s));
   }
@@ -75,7 +74,6 @@ export class SfContainerComponent implements OnInit,OnChanges{
     // this.SFDocument.getDocumentProperty$('AnalysisId').subscribe(w => console.log('SF Property: ', w));
     // this.SFDocument.getDocumentProperties$().subscribe(s => console.log('SF Properties: ', s));
   }
-
 
 
 }

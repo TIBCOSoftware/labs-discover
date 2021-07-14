@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {MessageQueueService} from '@tibco-tcstk/tc-core-lib';
 import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
-import {TButton} from '../../models/buttons';
+import {TButton} from '../../models_ui/buttons';
 import {ActivatedRoute} from '@angular/router';
 
 @Component({
@@ -63,7 +63,7 @@ export class ActionButtonBarComponent implements OnInit, OnChanges {
                 let i = this.buttons.length;
                 while (i--) {
                     if (this.buttons[i]) {
-                        if (this.buttons[i].label == admBut) {
+                        if (this.buttons[i].label === admBut) {
                             this.adminButtons.push(this.buttons[i]);
                             this.buttons.splice(i, 1);
                         }
@@ -74,12 +74,12 @@ export class ActionButtonBarComponent implements OnInit, OnChanges {
                 this.showAdminButtons = true;
             }
             for (const but of this.buttons) {
-                if (but.type == 'MULTIPLE') {
+                if (but.type === 'MULTIPLE') {
                     // but.addition = ' *';
                     // but.addition = '';
                 }
                 for (const special of this.preferredButtons) {
-                    if (but.label == special) {
+                    if (but.label === special) {
                         this.buttons = this.moveToStart(but, this.buttons);
                     }
                 }

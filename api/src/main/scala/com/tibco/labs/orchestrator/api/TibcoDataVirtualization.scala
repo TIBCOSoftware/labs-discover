@@ -63,11 +63,48 @@ class TibcoDataVirtualization() {
   val uriExecuteQuery = s"${schemeTdv}://${tdvHostName}:${tdvPort}/rest/execute/v1/actions/query/invoke"
   val uriFolders = s"${schemeTdv}://${tdvHostName}:${tdvPort}/rest/folder/v1"
   val uriVirtualSchemas = s"${schemeTdv}://${tdvHostName}:${tdvPort}/rest/schema/v1/virtual"
+  val uriRestSession = s"${schemeTdv}://${tdvHostName}:${tdvPort}/rest/session"
   val className: String = this.getClass.getName
   val log: Logger = LoggerFactory.getLogger(className)
   var tdvAuthCookie: immutable.Seq[CookieWithMeta] = immutable.Seq.empty[CookieWithMeta]
   log.info(s"Entering ${className}")
 
+  def checkTdv() : (String, Int) = {
+    val sttpBackend: SttpBackend[Identity, capabilities.WebSockets] = OkHttpSyncBackend()
+
+    log.info("Connecting to TDV....")
+
+
+    val requestSession = basicRequest
+      .auth.basic(tdvUsername, tdvPassword)
+      .contentType("application/json")
+      .get(uri"$uriRestSession")
+
+    var requestSessionResponse: Identity[Response[Either[String, String]]] = null
+
+    Try {
+      requestSessionResponse = requestSession.send(sttpBackend)
+    } match {
+      case Failure(exception) => exception match {
+        case re: ReadException => {
+          log.error(s"ReadException : ${re.toString}")
+          return (s"ReadException : ${re.toString}", 500)
+        }
+        case ce: ConnectException => {
+          log.error(s"ConnectException : ${ce.toString}")
+          return (s"ConnectException : ${ce.toString}", 500)
+        }
+        case _ => {
+          log.error(s"Unknown exception")
+          return (s"Unknown exception...good luck", 500)
+        }
+      }
+      case Success(value) => {
+        log.info("Request success")
+        return (s"TDV is Well Alive, be nice !", 0)
+      }
+    }
+  }
 
   def createCsvDataSource(tdvConf: tdvJob): (String, Int, String, String, String, String, String) = {
 

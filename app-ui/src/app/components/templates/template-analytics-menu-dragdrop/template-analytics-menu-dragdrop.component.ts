@@ -1,9 +1,9 @@
 import {Component, ElementRef, Inject, Input, OnChanges, OnInit, ViewChild, ViewEncapsulation, SimpleChanges, Output, EventEmitter} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
-import {DropInfo} from '../../../models/dragDropMenuItems';
-import {AnalyticsMenuConfigUI} from '../../../models/configuration';
+import {DropInfo} from '../../../models_ui/dragDropMenuItems';
+import {AnalyticsMenuConfigUI} from '../../../models_ui/configuration';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
-import {getNewID} from '../../../functions/templates';
+import {clearAllNodeFromDefault, getNewID} from '../../../functions/templates';
 import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
 import {Level, notifyUser} from '../../../functions/message';
 import {
@@ -42,6 +42,8 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
 
   @Input() menuNodesIN: AnalyticsMenuConfigUI[];
   @Input() analyticTabs: string[];
+  @Input() allowNesting: boolean;
+  @Input() allowIcons: boolean;
 
   @Output() popupOpens: EventEmitter<void> = new EventEmitter<void>();
   @Output() update: EventEmitter<AnalyticsMenuConfigUI[]> = new EventEmitter<AnalyticsMenuConfigUI[]>();
@@ -63,7 +65,6 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
   BLINK_SPEED_MS = 90;
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('Changes: ', changes);
     if (changes?.menuNodesIN?.currentValue) {
       this.reloadMenu();
       // this.update.emit(this.menuNodes);
@@ -73,6 +74,16 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
 
   ngOnInit(): void {
     this.reloadMenu();
+    if(this.allowNesting  === undefined){
+      this.allowNesting = true;
+    }
+    if(this.allowIcons  === undefined){
+      this.allowIcons = true;
+
+    }
+    if(!this.allowIcons){
+      this.POPUP_HEIGHT = 245;
+    }
   }
 
   public reloadMenu() {
@@ -145,10 +156,10 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
     const newContainer = targetListId !== 'main' ? this.nodeLookup[targetListId].child : this.menuNodesIN;
     if (targetListId === 'main' || !(draggedItem.child && draggedItem.child.length > 0)) {
       const i = oldItemContainer.findIndex(c => c.uiId === draggedItemId);
-      oldItemContainer.splice(i, 1);
       switch (this.dropActionTodo.action) {
         case 'before':
         case 'after':
+          oldItemContainer.splice(i, 1);
           const targetIndex = newContainer.findIndex(c => c.uiId === this.dropActionTodo.targetId);
           if (this.dropActionTodo.action === 'before') {
             newContainer.splice(targetIndex, 0, draggedItem);
@@ -157,10 +168,15 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
           }
           break;
         case 'inside':
-          if (!this.nodeLookup[this.dropActionTodo.targetId].child) {
-            this.nodeLookup[this.dropActionTodo.targetId].child = [];
+          if(this.allowNesting) {
+            oldItemContainer.splice(i, 1);
+            if (!this.nodeLookup[this.dropActionTodo.targetId].child) {
+              this.nodeLookup[this.dropActionTodo.targetId].child = [];
+            }
+            this.nodeLookup[this.dropActionTodo.targetId].child.push(draggedItem)
+          } else {
+            notifyUser('WARNING', 'You can\'t create sub menus...', this.msService);
           }
-          this.nodeLookup[this.dropActionTodo.targetId].child.push(draggedItem)
           break;
       }
       this.document.getElementById('node-' + draggedItemId).classList.add('demo');
@@ -273,18 +289,9 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
     this.popup.nativeElement.show = false;
   }
 
-  clearAllNodeFromDefault(data) {
-    for (const node of data) {
-      node.isDefault = false;
-      if (node.child && node.child.length && typeof node.child === 'object') {
-        this.clearAllNodeFromDefault(node.child);
-      }
-    }
-  }
-
   updateItem(node: AnalyticsMenuConfigUI) {
     if (node.isDefault) {
-      this.clearAllNodeFromDefault(this.menuNodesIN);
+      clearAllNodeFromDefault(this.menuNodesIN);
       // Bring it back to true (after setting all to false)
       node.isDefault = true;
     }

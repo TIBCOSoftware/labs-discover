@@ -74,6 +74,9 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
 
   def getTDVPubDSDetailsUnManagedJob(orgid: String, dsName: String): Future[ActionPerformedDetailsAssetsUnManaged] =
     tdvMgmtRegistry.ask(getUnManagedDatasetsDetailsMgmtRegistry(orgid, dsName, _))
+
+  def getTDVHealthJob(): Future[ActionPerformedCheck] =
+    tdvMgmtRegistry.ask(checkTdvMgmtRegistry)
   //#all-routes
   //#users-get-post
   //#users-get-delete
@@ -90,7 +93,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
       getDatasetsDetailsRoute ~
       getDatasetsAllManagedRoute ~
       getDatasetsAllUnManagedRoute ~
-        getDatasetsDetailsUnManagedRoute
+        getDatasetsDetailsUnManagedRoute ~ getTdvHealthCheckRoute
 
 
   @POST
@@ -108,13 +111,13 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
                                                                "Encoding": "UTF-8",
                                                                "EscapeChar": "\\",
                                                                "FileName": "CallcenterExample.csv",
-                                                               "FilePath": "s3a://discover-cic/01dxjp1rpa35bzcv1kvem9ffyk/CallcenterExample.csv",
+                                                               "FilePath": "s3a://discover-cic/01xxxxxxxxxxxxxxxxxxxxxxxx/CallcenterExample.csv",
                                                                "QuoteChar": "\"",
                                                                "CommentsChar": "#",
                                                                "Separator": ",",
                                                                "Headers": "true"
                                                            },
-                                                       "Organization": "01dxjp1rpa35bzcv1kvem9ffyk"
+                                                       "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx"
                                                        }"""
       ))))),
     responses = Array(
@@ -165,13 +168,13 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
                                                                "Encoding": "UTF-8",
                                                                "EscapeChar": "\\",
                                                                "FileName": "CallcenterExample.csv",
-                                                               "FilePath": "s3a://discover-cic/01dxjp1rpa35bzcv1kvem9ffyk/CallcenterExample.csv",
+                                                               "FilePath": "s3a://discover-cic/01xxxxxxxxxxxxxxxxxxxxxxxx/CallcenterExample.csv",
                                                                "QuoteChar": "\"",
                                                                "CommentsChar": "#",
                                                                "Separator": ",",
                                                                "Headers": "true"
                                                            },
-                                                       "Organization": "01dxjp1rpa35bzcv1kvem9ffyk"
+                                                       "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx"
                                                        }"""
       ))))),
     responses = Array(
@@ -568,6 +571,41 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
               complete((StatusCodes.OK, performed))
             } else {
               complete((StatusCodes.BadGateway, performed))
+            }
+
+            //delete-onsuccess
+          }
+          //}
+          //#delete-sparkapp
+        }
+      }
+    }
+  }
+
+  @GET
+  @Path("/health")
+  //@QueryParam("dataViewName") dataViewName: String
+  //@QueryParam("publishedDataViewName")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  @Operation(summary = "Get alive from TDV", description = "Get alive from TDV", tags = Array("Tibco DataVirtualization"),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "response",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedCheck])))),
+      new ApiResponse(responseCode = "500", description = "Internal server error",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedCheck]))))
+    )
+  )
+  def getTdvHealthCheckRoute: Route = {
+    cors() {
+      path("tdv" / "health" ) {
+        get {
+          //parameters("dataview", "publishedview") { (dataview, publishedview) =>
+          //#delete-sparkapp
+          onSuccess(getTDVHealthJob()) { performed =>
+            if (performed.code == 0) {
+              complete((StatusCodes.OK, performed))
+            } else {
+              complete((StatusCodes.InternalServerError, performed))
             }
 
             //delete-onsuccess

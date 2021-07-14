@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Upload} from '../models/fileUpload';
+import {Upload} from '../models_ui/fileUpload';
 import {TcAppDefinitionService, TcDocumentService} from '@tibco-tcstk/tc-liveapps-lib';
 import {HttpEventType} from '@angular/common/http';
 import { concatMap, map, mapTo } from 'rxjs/operators';
@@ -81,12 +81,12 @@ export class FileUploadService {
 
   /**
    * Upload file synchrously without adding the it to uploads status array.
-   * @param type 
-   * @param folderName 
-   * @param file 
-   * @param name 
-   * @param description 
-   * @param replace 
+   * @param type
+   * @param folderName
+   * @param file
+   * @param name
+   * @param description
+   * @param replace
    */
   public syncUploadFile(type: string , folderName: string, file: File, name: string, description: string, replace: boolean): Observable<any> {
     if (replace){

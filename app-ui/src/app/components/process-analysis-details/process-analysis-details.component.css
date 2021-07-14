@@ -38,3 +38,51 @@
 .cell-row{
   /*border-bottom: 1px solid #757575;*/
 }
+
+.detail-cell {
+  display: flex;
+  flex-direction: row;
+}
+
+.error-icon {
+  color: #1774E5;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.ace-error {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border: 1px solid #CAD3DF;
+  border-radius: 4px;
+  /*background-color: #FAFAFA;*/
+}
+
+.myEditor {
+  padding: 12px !important;
+  background-color: #fafafa;
+  color: #59677b;
+}
+
+.myEditor .ace_gutter {
+  background: green;
+  color: #BEBEBE
+}
+
+.error-container {
+  margin-top: 15px;
+  margin-left: 50px;
+  margin-right: 80px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.error-details-pane {
+  margin-left: 30px;
+  margin-right: 80px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}

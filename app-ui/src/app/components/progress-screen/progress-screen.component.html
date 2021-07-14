@@ -1,18 +1,21 @@
-
 <div class="discover-progress">
-  <div class="image">
+  <div class="image" *ngIf="!showImageLeft">
     <!-- <video width="480" height="270" autoplay loop>
       <source [src]="robotAnimationLocation" type="video/mp4" />
       <img width="200" [src]="progressImageLocation">
     </video> -->
     <img width="300" [src]="robotAnimationGifLocation">
-    
+
+  </div>
+  <div class="imageLeft" *ngIf="showImageLeft">
+    <img width="150" [src]="robotAnimationGifLocation">
   </div>
   <div class="message-top">
     <div *ngIf="message1" class="message">{{message1}}</div>
     <div *ngIf="message2" class="message">{{message2}}</div>
   </div>
   <p-progressBar class="discover-progressbar" [value]="percentage" [showValue]="false" mode="determinate"></p-progressBar>
-  <div class="status">progress: {{percentage}}%</div>
+  <div class="status" *ngIf="percentage">progress: {{percentage}}%</div>
+  <div class="status" *ngIf="!percentage">progress: 0%</div>
   <div class="status">{{status}}</div>
 </div>

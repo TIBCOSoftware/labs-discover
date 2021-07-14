@@ -29,6 +29,7 @@ object events {
     var df_events = spark.emptyDataFrame
     var df_attributes_binary = spark.emptyDataFrame
     Try {
+      //spark.sql("set spark.sql.legacy.timeParserPolicy=CORRECTED")
       import spark.implicits._
       println(s"###########  Processing df_events EventLogs ##########")
       println(s"Normalizing Columns Name")
@@ -37,19 +38,23 @@ object events {
       //val NormalizationRegexColName = """[+._, ()]+"""
       //val replacingColumns = _columns.map(NormalizationRegexColName.r.replaceAllIn(_, "_"))
       //val df2: DataFrame = replacingColumns.zip(_columns).foldLeft(df) { (tempdf, name) => tempdf.withColumnRenamed(name._2, name._1) }
-      val df2: DataFrame = df.toDF(normalizer(df.columns):_*)
+      val dftmp: DataFrame = df.toDF(normalizer(df.columns): _*)
 
+
+      val prefixColsInternal = "input_"
+      val renamedColumns = dftmp.columns.map(c => dftmp(c).as(s"$prefixColsInternal$c"))
+      val df2 = dftmp.select(renamedColumns: _*)
 
 
       //required in all case
-      val defaultCols = scala.collection.immutable.Map(columnCaseId -> "CASE_ID", columnCaseStart -> "ACTIVITY_START_TIMESTAMP", columnActivityId -> "ACTIVITY_ID")
+      val defaultCols = scala.collection.immutable.Map(s"$prefixColsInternal$columnCaseId" -> "case_id", s"$prefixColsInternal$columnCaseStart" -> "activity_start_timestamp", s"$prefixColsInternal$columnActivityId" -> "activity_id")
       //optionals
-      val optionScheduleStart: Option[(String, String)] = if (columnScheduleStart != "") Some(columnScheduleStart -> "scheduled_start") else None
-      val optionScheduleEnd: Option[(String, String)] = if (columnScheduleEnd != "") Some(columnScheduleEnd -> "scheduled_end") else None
-      val optionResourceID: Option[(String, String)] = if (columnResourceId != "") Some(columnResourceId -> "RESOURCE_ID") else None
-      val optionActivityEnd: Option[(String, String)] = if (columnCaseEnd != "") Some(columnCaseEnd -> "ACTIVITY_END_TIMESTAMP") else None
-      val optionResourceGroup: Option[(String, String)] = if (columnResourceGroup != "") Some(columnResourceGroup -> "resource_group") else None
-      val optionRequester: Option[(String, String)] = if (columnRequester != "") Some(columnRequester -> "requester") else None
+      val optionScheduleStart: Option[(String, String)] = if (columnScheduleStart != "") Some(s"$prefixColsInternal$columnScheduleStart" -> "scheduled_start") else None
+      val optionScheduleEnd: Option[(String, String)] = if (columnScheduleEnd != "") Some(s"$prefixColsInternal$columnScheduleEnd" -> "scheduled_end") else None
+      val optionResourceID: Option[(String, String)] = if (columnResourceId != "") Some(s"$prefixColsInternal$columnResourceId" -> "resource_id") else None
+      val optionActivityEnd: Option[(String, String)] = if (columnCaseEnd != "") Some(s"$prefixColsInternal$columnCaseEnd" -> "activity_end_timestamp") else None
+      val optionResourceGroup: Option[(String, String)] = if (columnResourceGroup != "") Some(s"$prefixColsInternal$columnResourceGroup" -> "resource_group") else None
+      val optionRequester: Option[(String, String)] = if (columnRequester != "") Some(s"$prefixColsInternal$columnRequester" -> "requester") else None
 
 
       val lookupTmp: Map[String, String] = defaultCols ++ optionRequester ++ optionScheduleStart ++ optionScheduleEnd ++ optionResourceID ++ optionActivityEnd ++ optionResourceGroup
@@ -61,7 +66,8 @@ object events {
       val columnsFinalTmp: ListBuffer[String] = new ListBuffer[String]()
       lookup.foreach((key) => columnsFinalTmp += key._2)
 
-      val columnsFinal: Seq[String] = columnsFinalTmp.toSeq ++ columnNamesToKeep
+      val newColNamesToKeep = columnNamesToKeep.map(prefixColsInternal + _)
+      val columnsFinal: Seq[String] = columnsFinalTmp.toSeq ++ newColNamesToKeep
 
       println(s"Renamed schema : " + columnsFinal)
       //to be deleted
@@ -80,51 +86,50 @@ object events {
       df_events = df_events.select(columnsToKeep: _*)
 
       println(s"Casting CASE ID as String")
-      df_events = df_events.withColumn("CtmpID", col("CASE_ID").cast("string")).drop("CASE_ID").withColumnRenamed("CtmpID", "CASE_ID")
+      df_events = df_events.withColumn("CtmpID", col("case_id").cast("string")).drop("case_id").withColumnRenamed("CtmpID", "case_id")
 
-      println(s"Casting ACTIVITY_START_TIMESTAMP to TimeStampType")
-      df_events = df_events.withColumn("tmpStartTime", date_format(to_timestamp(col("ACTIVITY_START_TIMESTAMP"), timeStampMap(columnCaseStart)), isoDatePattern).cast(TimestampType))
-        .drop(col("ACTIVITY_START_TIMESTAMP"))
-        .withColumnRenamed("tmpStartTime", "ACTIVITY_START_TIMESTAMP")
-      val start_ts: Column = date_format(to_timestamp(col("ACTIVITY_START_TIMESTAMP"), timeStampMap(columnCaseStart)), isoDatePattern).cast(TimestampType)
+      println(s"Casting activity_start_timestamp to TimeStampType")
+      df_events = df_events.withColumn("tmpStartTime", date_format(to_timestamp(col("activity_start_timestamp"), timeStampMap(columnCaseStart)), isoDatePattern).cast(TimestampType))
+        .drop(col("activity_start_timestamp"))
+        .withColumnRenamed("tmpStartTime", "activity_start_timestamp")
+      val start_ts: Column = date_format(to_timestamp(col("activity_start_timestamp"), timeStampMap(columnCaseStart)), isoDatePattern).cast(TimestampType)
       println(s"Build Windowspsec")
-      val windowSpec = Window.partitionBy(col("CASE_ID")).orderBy(start_ts)
+      val windowSpec = Window.partitionBy(col("case_id")).orderBy(start_ts)
 
       // count null values
 
-      val countCaseNull: Long = df_events.filter(col("CASE_ID").isNull || col("CASE_ID") === "").count()
-      val countStartNull: Long = df_events.filter(col("ACTIVITY_START_TIMESTAMP").isNull || col("ACTIVITY_START_TIMESTAMP") === "").count()
-      val countActivitiesNull: Long = df_events.filter(col("ACTIVITY_ID").isNull || col("ACTIVITY_ID") === "").count()
+      val countCaseNull: Long = df_events.filter(col("case_id").isNull || col("case_id") === "").count()
+      val countStartNull: Long = df_events.filter(col("activity_start_timestamp").isNull || col("activity_start_timestamp") === "").count()
+      val countActivitiesNull: Long = df_events.filter(col("activity_id").isNull || col("activity_id") === "").count()
 
-      sendBottleToTheSea(analysisId,"info", s"""{"nullCases": $countCaseNull, "nullStarts": $countStartNull, "nullActivities": $countActivitiesNull}""", 18,organisation)
+      sendBottleToTheSea(analysisId, "info", s"""{"nullCases": $countCaseNull, "nullStarts": $countStartNull, "nullActivities": $countActivitiesNull}""", 18, organisation)
       val rowsCount = df_events.rdd.count()
       // filtering out null/empty values on case_id, activity, and start
-     df_events =  df_events
-       .filter(col("CASE_ID").isNotNull || col("CASE_ID") =!= "")
-       .filter(col("ACTIVITY_START_TIMESTAMP").isNotNull || col("ACTIVITY_START_TIMESTAMP") =!= "")
-       .filter(col("ACTIVITY_ID").isNotNull || col("ACTIVITY_ID") =!= "")
+      df_events = df_events
+        .filter(col("case_id").isNotNull || col("case_id") =!= "")
+        .filter(col("activity_start_timestamp").isNotNull || col("activity_start_timestamp") =!= "")
+        .filter(col("activity_id").isNotNull || col("activity_id") =!= "")
 
       val rowsCountAfter = df_events.rdd.count()
       println(s"""{"nullCases": $countCaseNull, "nullStarts": $countStartNull, "nullActivities": $countActivitiesNull}, "totalRowsBefore": $rowsCount, "totalRowsBefore": $rowsCountAfter""")
 
 
       println(s"Sorting and partionning the table")
-      df_events = df_events.orderBy(asc("ACTIVITY_START_TIMESTAMP")).repartition(col("CASE_ID"))
+      df_events = df_events.orderBy(asc("activity_start_timestamp")).repartition(col("case_id"))
 
       println(s"Adding Application ID column")
-      df_events = df_events.withColumn("ANALYSIS_ID", lit(analysisId))
+      df_events = df_events.withColumn("analysis_id", lit(analysisId))
 
 
       println(s"Calculating Row IDs")
-      df_events = spark.createDataFrame(df_events.sort(asc("ACTIVITY_START_TIMESTAMP")).rdd.zipWithUniqueId().map {
+      df_events = spark.createDataFrame(df_events.sort(asc("activity_start_timestamp")).rdd.zipWithUniqueId().map {
         case (rowline, index) => Row.fromSeq(rowline.toSeq :+ index + 1)
       }, StructType(df_events.schema.fields :+ StructField("row_id", LongType, nullable = false))
       )
 
 
-
       println("Saving attributes for later")
-      val columnNamesToKeepAttr = Seq("row_id", "ANALYSIS_ID") ++ columnNamesToKeep
+      val columnNamesToKeepAttr = Seq("row_id", "analysis_id") ++ newColNamesToKeep
       println("Attributes cols table for binary support : " + columnNamesToKeepAttr)
       df_attributes_binary = df_events.select(columnNamesToKeepAttr.head, columnNamesToKeepAttr.tail: _*)
       df_attributes_binary.printSchema()
@@ -144,26 +149,26 @@ object events {
       //df_events.printSchema()
 
       println(s"Dropping extra Columns")
-      df_events = df_events.select(df_events.columns.filter(colName => !columnNamesToKeep.contains(colName)).map(colName => new Column(colName)): _*)
+      df_events = df_events.select(df_events.columns.filter(colName => !newColNamesToKeep.contains(colName)).map(colName => new Column(colName)): _*)
 
       //var end_ts: Column = null
       if (columnCaseEnd.equalsIgnoreCase("")) {
-        println(s"Auto calculating missing ACTIVITY_END_TIMESTAMP")
-        df_events = df_events.withColumn("ACTIVITY_END_TIMESTAMP", lead(start_ts, 1) over windowSpec)
+        println(s"Auto calculating missing activity_end_timestamp")
+        df_events = df_events.withColumn("activity_end_timestamp", lead(start_ts, 1) over windowSpec)
       } else {
-        println(s"Casting ACTIVITY_END_TIMESTAMP as Timestamp, using " + timeStampMap(columnCaseEnd))
-        df_events = df_events.withColumn("tmpEndTime", date_format(to_timestamp(col("ACTIVITY_END_TIMESTAMP"), timeStampMap(columnCaseEnd)), isoDatePattern).cast(TimestampType))
-          .drop(col("ACTIVITY_END_TIMESTAMP"))
-          .withColumnRenamed("tmpEndTime", "ACTIVITY_END_TIMESTAMP")
-        //end_ts = date_format(to_timestamp(col("ACTIVITY_END_TIMESTAMP"), timeStampMap(columnCaseEnd)), isoDatePattern).cast(TimestampType)
+        println(s"Casting activity_end_timestamp as Timestamp, using " + timeStampMap(columnCaseEnd))
+        df_events = df_events.withColumn("tmpEndTime", date_format(to_timestamp(col("activity_end_timestamp"), timeStampMap(columnCaseEnd)), isoDatePattern).cast(TimestampType))
+          .drop(col("activity_end_timestamp"))
+          .withColumnRenamed("tmpEndTime", "activity_end_timestamp")
+        //end_ts = date_format(to_timestamp(col("activity_end_timestamp"), timeStampMap(columnCaseEnd)), isoDatePattern).cast(TimestampType)
       }
 
-      val end_ts = date_format(col("ACTIVITY_END_TIMESTAMP"), isoDatePattern).cast(TimestampType)
+      val end_ts = date_format(col("activity_end_timestamp"), isoDatePattern).cast(TimestampType)
       //schedule start
       if (columnScheduleStart.equalsIgnoreCase("")) {
         //send it back to the stone age
-        println(s"Creating scheduled_start as ACTIVITY_START_TIMESTAMP")
-        df_events = df_events.withColumn("tmp_scheduled_start", col("ACTIVITY_START_TIMESTAMP"))
+        println(s"Creating scheduled_start as activity_start_timestamp")
+        df_events = df_events.withColumn("tmp_scheduled_start", col("activity_start_timestamp"))
           .drop(col("scheduled_start"))
           .withColumnRenamed("tmp_scheduled_start", "scheduled_start")
       } else {
@@ -177,8 +182,8 @@ object events {
       //schedule end
 
       if (columnScheduleEnd.equalsIgnoreCase("")) {
-        println(s"Creating scheduled_start as ACTIVITY_END_TIMESTAMP")
-        df_events = df_events.withColumn("tmp_scheduled_end", col("ACTIVITY_END_TIMESTAMP"))
+        println(s"Creating scheduled_start as activity_end_timestamp")
+        df_events = df_events.withColumn("tmp_scheduled_end", col("activity_end_timestamp"))
           .drop(col("scheduled_end"))
           .withColumnRenamed("tmp_scheduled_end", "scheduled_end")
 
@@ -192,8 +197,8 @@ object events {
       if (columnResourceId.equalsIgnoreCase("")) {
         println(s"Auto calculating missing RESOURCE_ID")
         df_events = df_events.withColumn("tmpRss", lit("unknown"))
-          .drop(col("RESOURCE_ID"))
-          .withColumnRenamed("tmpRss", "RESOURCE_ID")
+          .drop(col("resource_id"))
+          .withColumnRenamed("tmpRss", "resource_id")
       }
 
       if (columnResourceGroup.equalsIgnoreCase("")) {
@@ -211,27 +216,27 @@ object events {
       }
 
       println(s"Replacing null values if any by unknown, in Resource ID, resource_group, requester")
-      val naMapper = Map("RESOURCE_ID" -> "system", "requester" -> "system", "resource_group" -> "system")
+      val naMapper = Map("resource_id" -> "system", "requester" -> "system", "resource_group" -> "system")
       df_events = df_events.na.fill(naMapper)
 
       println(s"Calculating...")
-      df_events = df_events.withColumn("DURATION_DAYS", datediff(end_ts, start_ts))
-        .withColumn("DURATION_SEC", end_ts.cast("double") - start_ts.cast("double"))
-        .withColumn("NEXT_ACTIVITY_ID", lead(col("ACTIVITY_ID"), 1) over windowSpec)
-        .withColumn("NEXT_RESOURCE_ID", lead(col("RESOURCE_ID"), 1) over windowSpec)
+      df_events = df_events.withColumn("duration_days", datediff(end_ts, start_ts))
+        .withColumn("duration_sec", end_ts.cast("double") - start_ts.cast("double"))
+        .withColumn("next_activity_id", lead(col("activity_id"), 1) over windowSpec)
+        .withColumn("next_resource_id", lead(col("resource_id"), 1) over windowSpec)
         .withColumn("next_resource_group", lead(col("resource_group"), 1) over windowSpec)
-        //.withColumn("PREV_RESOURCE_ID", lag(col("RESOURCE_ID"), 1) over windowSpec)
-        //.withColumn("EDGE", when(col("NEXT_ACTIVITY_ID").isNotNull, concat_ws("->", col("ACTIVITY_ID"), col("NEXT_ACTIVITY_ID"))).otherwise(null))
-        .withColumn("PREV_ACTIVITY_ID", lag(col("ACTIVITY_ID"), 1) over windowSpec)
-        .withColumn("REPEAT_SELF_LOOP_FLAG", when(col("NEXT_ACTIVITY_ID") === col("ACTIVITY_ID") && col("NEXT_RESOURCE_ID") === col("RESOURCE_ID"), 1).otherwise(0))
-        .withColumn("REDO_SELF_LOOP_FLAG", when(col("NEXT_ACTIVITY_ID") === col("ACTIVITY_ID") && col("NEXT_RESOURCE_ID") =!= col("RESOURCE_ID"), 1).otherwise(0))
-        .withColumn("START_FLAG", when(col("PREV_ACTIVITY_ID").isNull, 1).otherwise(0))
-        .withColumn("END_FLAG", when(col("NEXT_ACTIVITY_ID").isNull, 1).otherwise(0))
+        //.withColumn("PREV_RESOURCE_ID", lag(col("resource_id"), 1) over windowSpec)
+        //.withColumn("EDGE", when(col("next_activity_id").isNotNull, concat_ws("->", col("activity_id"), col("next_activity_id"))).otherwise(null))
+        .withColumn("prev_activity_id", lag(col("activity_id"), 1) over windowSpec)
+        .withColumn("repeat_self_loop_flag", when(col("next_activity_id") === col("activity_id") && col("next_resource_id") === col("resource_id"), 1).otherwise(0))
+        .withColumn("redo_self_loop_flag", when(col("next_activity_id") === col("activity_id") && col("next_resource_id") =!= col("resource_id"), 1).otherwise(0))
+        .withColumn("start_flag", when(col("prev_activity_id").isNull, 1).otherwise(0))
+        .withColumn("end_flag", when(col("next_activity_id").isNull, 1).otherwise(0))
 
 
-      //df_events = df_events.withColumn("row_id", row_number().over(Window.orderBy(desc("CASE_ID"))))
+      //df_events = df_events.withColumn("row_id", row_number().over(Window.orderBy(desc("case_id"))))
       // row id
-   /*   df_events = spark.createDataFrame(df_events.sort(asc("ACTIVITY_START_TIMESTAMP")).rdd.zipWithUniqueId().map {
+      /*   df_events = spark.createDataFrame(df_events.sort(asc("activity_start_timestamp")).rdd.zipWithUniqueId().map {
         case (rowline, index) => Row.fromSeq(rowline.toSeq :+ index + 1)
       }, StructType(df_events.schema.fields :+ StructField("row_id", LongType, nullable = false))
       )*/
@@ -263,29 +268,29 @@ CREATE TABLE IF NOT EXISTS events
 )
  */
       val finalColumnsOrderedName: Array[String] = Array(
-        "CASE_ID",
-        "ACTIVITY_ID",
-        "ACTIVITY_START_TIMESTAMP",
-        "ACTIVITY_END_TIMESTAMP",
-        "RESOURCE_ID",
+        "case_id",
+        "activity_id",
+        "activity_start_timestamp",
+        "activity_end_timestamp",
+        "resource_id",
         "resource_group",
         "requester",
         "scheduled_start",
         "scheduled_end",
         //"CASES_EXTRA_ATTRIBUTES",
-        "DURATION_DAYS",
-        "DURATION_SEC",
-        "NEXT_ACTIVITY_ID",
-        "NEXT_RESOURCE_ID",
+        "duration_days",
+        "duration_sec",
+        "next_activity_id",
+        "next_resource_id",
         "next_resource_group",
         //        "PREV_RESOURCE_ID",
         //        "EDGE",
-        "PREV_ACTIVITY_ID",
-        "REPEAT_SELF_LOOP_FLAG",
-        "REDO_SELF_LOOP_FLAG",
-        "START_FLAG",
-        "END_FLAG",
-        "ANALYSIS_ID",
+        "prev_activity_id",
+        "repeat_self_loop_flag",
+        "redo_self_loop_flag",
+        "start_flag",
+        "end_flag",
+        "analysis_id",
         "row_id")
 
       //val currentCols = df_events.columns
@@ -303,10 +308,19 @@ CREATE TABLE IF NOT EXISTS events
 
     } match {
       case Success(_) => tFEvents(df_events, df_attributes_binary)
-      case Failure(e) => println("Error in events : " + e.getMessage)
-        //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
-        sendBottleToTheSea(s"$analysisId","error",e.getMessage,0, organisation)
-        tFEvents(spark.emptyDataFrame, spark.emptyDataFrame)
+      case Failure(exception) => exception.getCause.getMessage match {
+        case parse if parse.matches(".*DateTimeFormatter.*") => {
+          println("Error in events for time parsing : " + parse)
+          sendBottleToTheSea(s"$analysisId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html or send an email to our Pattern Master nmarzin@tibco.com", 0, organisation)
+          tFEvents(spark.emptyDataFrame,spark.emptyDataFrame)
+        }
+        case x => {
+          println("Error in events : " + x)
+          //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
+          sendBottleToTheSea(s"$analysisId", "error", s"Undefined error yet, ${x}", 0, organisation)
+          tFEvents(spark.emptyDataFrame,spark.emptyDataFrame)
+        }
+      }
     }
   }
 
@@ -321,25 +335,25 @@ CREATE TABLE IF NOT EXISTS events
       }
 
       val finalColumnsOrderedName: Array[String] = Array(
-        "CASE_ID",
-        "ACTIVITY_ID",
-        "ACTIVITY_START_TIMESTAMP",
-        "ACTIVITY_END_TIMESTAMP",
-        "RESOURCE_ID",
+        "case_id",
+        "activity_id",
+        "activity_start_timestamp",
+        "activity_end_timestamp",
+        "resource_id",
         "resource_group",
         "requester",
         "scheduled_start",
         "scheduled_end",
-        "DURATION_DAYS",
-        "DURATION_SEC",
-        "NEXT_ACTIVITY_ID",
-        "NEXT_RESOURCE_ID",
+        "duration_days",
+        "duration_sec",
+        "next_activity_id",
+        "next_resource_id",
         "next_resource_group",
-        "REPEAT_SELF_LOOP_FLAG",
-        "REDO_SELF_LOOP_FLAG",
-        "START_FLAG",
-        "END_FLAG",
-        "ANALYSIS_ID",
+        "repeat_self_loop_flag",
+        "redo_self_loop_flag",
+        "start_flag",
+        "end_flag",
+        "analysis_id",
         "row_id")
 
 
@@ -361,30 +375,30 @@ CREATE TABLE IF NOT EXISTS events
     Try {
 
       df_eventsF = dfEvents
-        .withColumn("temp_duration", col("DURATION_SEC").cast(LongType))
-        .drop("DURATION_SEC")
-        .withColumnRenamed("temp_duration","DURATION_SEC")
+        .withColumn("temp_duration", col("duration_sec").cast(LongType))
+        .drop("duration_sec")
+        .withColumnRenamed("temp_duration", "duration_sec")
 
       val finalColumnsOrderedName: Array[String] = Array(
-        "CASE_ID",
-        "ACTIVITY_ID",
-        "ACTIVITY_START_TIMESTAMP",
-        "ACTIVITY_END_TIMESTAMP",
-        "RESOURCE_ID",
+        "case_id",
+        "activity_id",
+        "activity_start_timestamp",
+        "activity_end_timestamp",
+        "resource_id",
         "resource_group",
         "requester",
         "scheduled_start",
         "scheduled_end",
-        "DURATION_DAYS",
-        "DURATION_SEC",
-        "NEXT_ACTIVITY_ID",
-        "NEXT_RESOURCE_ID",
+        "duration_days",
+        "duration_sec",
+        "next_activity_id",
+        "next_resource_id",
         "next_resource_group",
-        "REPEAT_SELF_LOOP_FLAG",
-        "REDO_SELF_LOOP_FLAG",
-        "START_FLAG",
-        "END_FLAG",
-        "ANALYSIS_ID",
+        "repeat_self_loop_flag",
+        "redo_self_loop_flag",
+        "start_flag",
+        "end_flag",
+        "analysis_id",
         "row_id")
 
 
@@ -397,7 +411,6 @@ CREATE TABLE IF NOT EXISTS events
         sendBottleToTheSea(s"$analysisId","error",e.getMessage,0, organisation)
         spark.emptyDataFrame
     }
-
   }
 
   private def joinByColumn(colName: String, sourceDf: DataFrame, destDf: DataFrame): DataFrame = {

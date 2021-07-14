@@ -44,18 +44,24 @@
                           ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
             </th>
             <th class="top-row-empty"></th>
+            <th class="top-row-empty"></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-file>
-          <tr class="rowhover" id="toHightlight" [ngClass]="{selected: selectedFile?.OriginalFilename==file.OriginalFilename}">
-            <td class="no-padding data-row hovereffect firstCol"><div [innerHTML]="file.OriginalFilename | highlight: searchTerm : 'Multi-Match'"></div></td>
-            <td class="no-padding data-row hovereffect"><div>{{file.FileSize | csvFilesize}}</div></td>
-            <td class="no-padding data-row hovereffect"><div>{{file.LastModified | csvFiletime}}</div></td>
+          <tr class="rowhover" id="toHightlight" [ngClass]="{selected: selectedFile?.OriginalFilename==file.redisFileInfo.OriginalFilename}">
+            <td class="no-padding data-row hovereffect firstCol"><div [innerHTML]="file.redisFileInfo.OriginalFilename | highlight: searchTerm : 'Multi-Match'"></div></td>
+            <td class="no-padding data-row hovereffect"><div>{{file.redisFileInfo.FileSize | csvFilesize}}</div></td>
+            <td class="no-padding data-row hovereffect"><div>{{file.redisFileInfo.LastModified | csvFiletime}}</div></td>
             <td class="no-padding lastCol">
-              <uxpl-button type="secondary" *ngIf="dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.OriginalFilename" height="24px" width="68px" (clicked)="selectFile(file)">select</uxpl-button>
-              <div *ngIf="dataset.csvMethod=='file' && selectedFile?.OriginalFilename==file.OriginalFilename" class="selected-col">
+              <uxpl-button type="secondary" *ngIf="dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.redisFileInfo.OriginalFilename" height="24px" width="68px" (clicked)="selectFile(file)">select</uxpl-button>
+              <div *ngIf="dataset.csvMethod=='file' && selectedFile?.OriginalFilename==file.redisFileInfo.OriginalFilename" class="selected-col">
                 <uxpl-icon class="inline-ele" icon="pl-icon-checkmark" width="14px" height="14px"></uxpl-icon>
                 <div class="selected inline-ele">selected</div>
+              </div>
+            </td>
+            <td class="no-padding lastCol" style="width: 50px;">
+              <div *ngIf="(dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.redisFileInfo.OriginalFilename) && file.beingUsed==false" (click)="deleteFile(file, $event)" class="clickable">
+                <uxpl-icon class="inline-ele" icon="pl-icon-delete" width="24px" height="24px"></uxpl-icon>
               </div>
             </td>
           </tr>
@@ -72,5 +78,11 @@
       <span class="title">Selected data: </span>{{dataset.Dataset_Source.FileName}}<span class="new-upload">(uploaded)</span>
     </div>
   </div>
-  
+  <div id="popup-host" [style.top.px]="popupY" class="popup-wrapper" style="position: absolute; left: calc(80vw - 400px);">
+    <uxpl-popup #deletePopup id="deletepopup" slot="popup" x-position="after" y-position="above"
+      content-id="delete-action-confirm" max-width="328px" max-height="200px">
+      <action-confirm *ngIf="fileOnAction" id="delete-action-confirm" confirmQuestion="Are you sure you want to delete file '{{fileOnAction.redisFileInfo.OriginalFilename}}'? It can't be undone." doable="true" type="delete" rejectMessage="You can not delete file" 
+        yesBtnLabel="Yes, delete it" noBtnLabel="No" (actionConfirmed)=handleDeleteConfirmation($event) [shown]="showDeleteConfirm"></action-confirm>
+    </uxpl-popup>
+  </div>
 </div>

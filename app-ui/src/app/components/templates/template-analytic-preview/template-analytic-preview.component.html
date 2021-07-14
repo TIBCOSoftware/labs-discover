@@ -1,18 +1,48 @@
 <div class="analytic-preview-container">
-  <div class="analytic-preview-header">Analytics preview</div>
-  <div class="analytic-preview">
-    <div class="analytics-preview-left-nav">
-      <uxpl-left-nav-multi class="left-nav" collapse [tabs]="previewMenu" (selected)="handleClick($event)"></uxpl-left-nav-multi>
+  <div *ngIf="!isFilterPreview">
+    <div class="analytic-preview-header">Preview</div>
+    <div class="filter-panel">
+      <div class="filter-panel-content">
+        <div class="bottom-content full-bottom">
+          <ng-container *ngTemplateOutlet="sfPreview"></ng-container>
+        </div>
+      </div>
     </div>
-    <div style="width: 100%; height: 100%;">
-      <spotfire-viewer *ngIf="location" #analysis
-                       [url]="spotfireServer"
-                       [path]="location"
-                       [parameters]="analysisParameters"
-                       [markingOn]="markingOn"
-                       version="10.10"
-                       (document)="setDocument($event)">
-      </spotfire-viewer>
+  </div>
+  <div *ngIf="isFilterPreview">
+    <div class="analytic-preview-header">Filters panel preview</div>
+    <div class="filter-panel">
+      <div class="filter-panel-content">
+        <div class="top-header">
+          <div class="header-left">
+            <uxpl-icon height="24px" width="24px" icon="pl-icon-drag" class="drag-handler"></uxpl-icon>
+            <uxpl-icon height="24px" width="24px" icon="pl-icon-filter"></uxpl-icon>
+            <div>filter</div>
+          </div>
+          <div>
+          </div>
+        </div>
+        <div class="bottom-content">
+          <ng-container *ngTemplateOutlet="sfPreview"></ng-container>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<ng-template #sfPreview>
+  <div class="analytics-preview-left-nav">
+    <uxpl-left-nav-multi class="left-nav" collapse [tabs]="previewMenu" #leftNav
+                         (selected)="handleClick($event)"></uxpl-left-nav-multi>
+  </div>
+  <div style="width: 100%; height: 100%;">
+    <spotfire-viewer *ngIf="location" #analysis
+                     [url]="spotfireServer"
+                     [path]="location"
+                     [parameters]="analysisParameters"
+                     [markingOn]="markingOn"
+                     version="10.10"
+                     (document)="setDocument($event)">
+    </spotfire-viewer>
+  </div>
+</ng-template>

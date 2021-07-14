@@ -7,7 +7,8 @@ import {DatePipe, Location} from '@angular/common';
 import {NoFormComponent} from '../../components/forms/no-form/no-form.component';
 import {RepositoryService} from 'src/app/api/repository.service';
 import {Observable} from 'rxjs';
-import {Analysis} from 'src/app/models_generated/analysis';
+import {Analysis} from 'src/app/model/analysis';
+import {notifyUser} from '../../functions/message';
 
 @Component({
   selector: 'app-process-analysis',
@@ -20,19 +21,19 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
 
   cases: any[] = [];
   search = '';
-  loading = false;
+  loading = true;
 
   noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
 
   statusMap: { [key: string]: any } = {};
 
   constructor(
-    protected router: Router,
-    protected messageService: MessageTopicService,
-    protected dialog: MatDialog,
-    protected datePipe: DatePipe,
-    protected location: Location,
-    protected repositoryService: RepositoryService
+    private router: Router,
+    private messageService: MessageTopicService,
+    private dialog: MatDialog,
+    private datePipe: DatePipe,
+    private location: Location,
+    private repositoryService: RepositoryService
   ) {
   }
 
@@ -66,10 +67,9 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
   private startPollingStatus() {
     this.stopPollingStatus();
 
-    for (let i = 0; i < this.cases.length; i++) {
-      const analysis = this.cases[i];
+    for (const analysis of this.cases) {
       const analysisId = analysis.id;
-      if (analysis.metadata && analysis.metadata.state == 'Process mining') {
+      if (analysis.metadata && analysis.metadata.state === 'Process mining') {
         const progress = {
           message: 'Process mining',
           stop: false
@@ -96,19 +96,19 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
     return this.repositoryService.repositoryAnalysisIdStatusGet(analysisId).pipe(
       repeatWhen(obs => obs.pipe(delay(2000))),
       filter(data => {
-        if (data.progression != 0) {
+        if (data.progression !== 0) {
           progress.percentage = data.progression;
           progress.status = data.message;
         }
         // stop polling status once the progression is 0 or 100
-        return progress.stop == true || (data.progression == 0 || data.progression == 100)
+        return progress.stop === true || (data.progression === 0 || data.progression === 100)
       }),
       take(1)
     ).pipe(
       concatMap(resp => {
         return this.repositoryService.getAnalysisDetails(analysisId).pipe(
           repeatWhen(obs => obs.pipe(delay(1000))),
-          filter(data => (progress.stop == true || data.metadata.state != 'Process mining')),
+          filter(data => (progress.stop === true || data.metadata.state !== 'Process mining')),
           take(1)
         );
       })
@@ -179,7 +179,7 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
           this.refresh();
           this.messageService.sendMessage('news-banner.topic.message', event.name + ' successful...');
         },
-        err => this.messageService.sendMessage('news-banner.topic.message', event.name + ' error...')
+        err => notifyUser('ERROR', event.name + ' error...', this.messageService)
       );
     }
   }

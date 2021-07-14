@@ -221,6 +221,10 @@
       {
           "entry": "Investigations",
           "icon": "assets/images/settings/tcs-liveapps-sm-icon.svg"
+      },
+      {
+        "entry": "Automap",
+        "icon": "assets/images/settings/tcs-spotfire-icon.svg"
       }
     ]
 

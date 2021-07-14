@@ -7,6 +7,7 @@ lazy val akkaHttpVersion = "10.2.4"
 lazy val akkaVersion = "2.6.14"
 lazy val akkaManagementVersion = "1.0.9"
 lazy val postgresVersion = "42.2.16"
+lazy val alpakkaVersion = "3.0.1"
 
 // make version compatible with docker for publishing
 ThisBuild / dynverSeparator := "-"
@@ -63,10 +64,10 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-xml" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-caching" % akkaHttpVersion,
     "de.heikoseeberger" %% "akka-http-circe" % "1.31.0",
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "2.0.2",
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % alpakkaVersion,
     "ch.qos.logback" % "logback-classic" % "1.2.3",
-    "com.lightbend.akka" %% "akka-stream-alpakka-csv" % "2.0.2",
-    "com.lightbend.akka" %% "akka-stream-alpakka-text" % "2.0.2",
+    "com.lightbend.akka" %% "akka-stream-alpakka-csv" % alpakkaVersion,
+    "com.lightbend.akka" %% "akka-stream-alpakka-text" % alpakkaVersion,
     //"com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % akkaManagementVersion,
     //"com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion,
     //"com.lightbend.akka.management" %% "akka-management-cluster-http" % akkaManagementVersion,

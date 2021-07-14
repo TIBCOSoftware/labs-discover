@@ -28,7 +28,7 @@
               <uxpl-select-day type='week' mode='multiple'></uxpl-select-day>
             </div>
           </uxpl-radio>
-          
+
           <uxpl-radio value="month" class="align-radio">
             <div style="display:flex; flex-direction: column;">
               every month on
@@ -41,13 +41,13 @@
           <uxpl-button type="primary">Apply</uxpl-button>
         </div>
       </div>
-      </uxpl-popup> 
+      </uxpl-popup>
     </a>&nbsp;
     <a (click)='showRepeatingValueOptionsMenu()' style="display: flex; flex-direction: column; ">
       {{repeatingTimeValue}}
-      <uxpl-popup [show]="showRepeatingValueOptions" id="popup" slot="popup" x-position="after" content-id="my-popup-content" max-width="400px" max-height="180px">
+      <uxpl-popup [show]="showRepeatingValueOptions" id="popup" slot="popup" x-position="after" content-id="my-second-popup-content" max-width="400px" max-height="180px">
         <!-- note my-popup-content passed to uxpl-popup as content-id to allow popup to ignore click events on the content -->
-        <div id="my-popup-content" style="display:flex; flex-direction: column; justify-content: flex-end; overflow: auto; padding: 20px; width: 100%;">
+        <div id="my-second-popup-content" style="display:flex; flex-direction: column; justify-content: flex-end; overflow: auto; padding: 20px; width: 100%;">
           <uxpl-radio-group [value]="columnSeparator" (uxplChanged)="setColumnSeparator($event)">
             <uxpl-radio value="time">
               <div style="display:contents">
@@ -68,7 +68,7 @@
             </uxpl-radio>
             <uxpl-radio value="month" mode='multiple'>
               <div style="display:contents">
-                Every hour, 
+                Every hour,
                 <uxpl-form-field slot="content" type="number" valid consise [value]="customColumnSeparator" style="max-width: 50px;"></uxpl-form-field>
                 minutes after the hour
               </div>

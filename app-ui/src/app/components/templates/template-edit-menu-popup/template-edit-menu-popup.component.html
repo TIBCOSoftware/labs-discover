@@ -3,13 +3,13 @@
                    (uxplChanged)="updateValue($event, 'label');"></uxpl-form-field>
   <uxpl-select-input *ngIf="analyticTabLabels" label="Analytic tab to use" [value]="menuId" [options]="analyticTabLabels" style="margin-top: 24px"
                      (uxplSelection)="updateValue($event, 'id');"></uxpl-select-input>
-  <uxpl-checkbox class='default-checkbox' [checked]="menuNodeItem?.isDefault" (clicked)="checkDefault($event)">Is default page</uxpl-checkbox>
-  <div class="icon-select">
+  <uxpl-checkbox class='default-checkbox' [checked]="menuNodeItem?.isDefault" (clicked)="checkDefault($event)">Set as default page</uxpl-checkbox>
+  <div class="icon-select" *ngIf="allowIcons">
     <div *ngIf="!menuNodeItem?.icon" class="icon-label">No Icon</div>
     <div *ngIf="menuNodeItem?.icon" class="icon-label">Icon</div>
     <uxpl-icon *ngIf="menuNodeItem?.icon" class="menu-icon" height="20px" width="20px" icon="{{menuNodeItem?.icon}}"></uxpl-icon>
   </div>
-  <div class="icon-selector">
+  <div class="icon-selector" *ngIf="allowIcons">
       <icon-grid [icon]="menuNodeItem.icon" [iconGrid]="iconGrid" [iconColor]="iconColor" (selectedIcon)="selectIcon($event)"></icon-grid>
   </div>
   <div class="edit-menu-bottom-button-bar">

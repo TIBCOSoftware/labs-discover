@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {getSFLink} from '../../../functions/templates';
-import {AnalyticTemplateUI} from 'src/app/models/analyticTemplate';
+import {AnalyticTemplateUI, StepStatus} from 'src/app/models_ui/analyticTemplate';
 import {ConfigurationService} from '../../../service/configuration.service';
 import {VisualisationService} from 'src/app/api/visualisation.service';
 import {map} from 'rxjs/operators';
-import {Visualisation} from 'src/app/models_generated/visualisation';
+import {Visualisation} from 'src/app/model/visualisation';
 import {stripOrgFolder} from '../../../functions/analysis';
 
 
@@ -18,17 +18,20 @@ export class TemplateAnalyticsComponent implements OnInit {
   @Input() initialLocation: string;
   @Input() newLocation: string;
   @Input() isNewTemplate: boolean;
-  @Input() analyticsChoice: 'COPY' | 'EXISTING' | 'CUSTOM';
+  @Input() analyticsChoice: 'COPY' | 'EXISTING' | 'CUSTOM' | 'CURRENT';
+  @Input() doAdvancedTab: boolean;
+
+  @Output() doAdvancedE: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() updateAnalytics: EventEmitter<any> = new EventEmitter<any>();
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
+  @Output() status: EventEmitter<StepStatus> = new EventEmitter<StepStatus>();
 
   stripOrgF = stripOrgFolder;
+  availableDXPs = [];
+  nameHint: string;
+  originalDXP: Visualisation;
+  showSFLink = false;
 
   private existingDXPs: Visualisation[];
-
-  public availableDXPs = [];
-  public nameHint: string;
-  public originalDXP: Visualisation;
 
   constructor(
     private visualisationService: VisualisationService,
@@ -40,12 +43,10 @@ export class TemplateAnalyticsComponent implements OnInit {
     if (!this.newLocation) {
       if (this.analyticsChoice === 'COPY') {
         this.newLocation = this.initialLocation + '_user_defined';
-
       } else if (this.analyticsChoice === 'CUSTOM') {
         this.newLocation = this.initialLocation;
       }
     }
-
     (async () => {
       await this.loadExistingDXPs();
       this.dxpRadioChange({event: {detail: {value: 'COPY'}}});
@@ -64,7 +65,7 @@ export class TemplateAnalyticsComponent implements OnInit {
   private loadExistingDXPs = async () => {
     this.availableDXPs = [];
     this.existingDXPs = [];
-    this.visualisationService.getItems().pipe(
+    this.visualisationService.getItems('dxp').pipe(
       map((items: Visualisation[]) => {
         this.existingDXPs = items.filter(item => item.ItemType === 'spotfire.dxp');
         this.originalDXP = this.existingDXPs.filter(item => item.Path === this.initialLocation)[0];
@@ -97,15 +98,40 @@ export class TemplateAnalyticsComponent implements OnInit {
   }
 
   public dxpRadioChange = (event) => {
-    if (event?.detail?.value === 'EXISTING' || event?.detail?.value === 'CUSTOM' || event?.detail?.value === 'COPY') {
-      this.analyticsChoice = event?.detail?.value;
-      if (this.analyticsChoice === 'EXISTING' || this.analyticsChoice === 'CUSTOM') {
-        this.updateAnalytics.emit({option: this.analyticsChoice, analytics: this.newLocation});
-      }
-      if (this.analyticsChoice === 'COPY') {
-        this.updateAnalytics.emit({option: this.analyticsChoice, analytics: this.newLocation, folderId: this.originalDXP?.ParentId, id: this.originalDXP?.Id});
+    if(event?.detail?.value) {
+      const ev = event?.detail?.value;
+      if (ev === 'EXISTING' || ev === 'CUSTOM' || ev === 'COPY' || ev === 'CURRENT') {
+        this.analyticsChoice = ev;
+        this.showSFLink = true;
+        if (this.analyticsChoice === 'CURRENT') {
+          this.updateAnalytics.emit({option: this.analyticsChoice});
+          this.updateStatus(true);
+        }
+        if (this.analyticsChoice === 'EXISTING' || this.analyticsChoice === 'CUSTOM') {
+          this.updateAnalytics.emit({option: this.analyticsChoice, analytics: this.newLocation});
+          this.updateStatus(this.newLocation !== '');
+        }
+        if (this.analyticsChoice === 'COPY') {
+          // Add the target folder to the newLocation
+          if(this.configService.config?.discover?.analyticsSF?.customUserDXPFolder) {
+            const folder = this.configService.config?.discover?.analyticsSF?.customUserDXPFolder;
+            if(this.newLocation.lastIndexOf('/') > -1) {
+              this.newLocation = folder + this.newLocation.substring(this.newLocation.lastIndexOf('/'), this.newLocation.length);
+            } else {
+              this.newLocation = folder + '/' + this.newLocation;
+            }
+
+          }
+          this.updateAnalytics.emit({option: this.analyticsChoice, analytics: this.newLocation, folderId: this.originalDXP?.ParentId, id: this.originalDXP?.Id});
+          this.showSFLink = false;
+          this.updateStatus(this.isCopyValid());
+        }
       }
     }
+  }
+
+  private isCopyValid() {
+    return false;
   }
 
   public setName = (event) => {
@@ -118,6 +144,9 @@ export class TemplateAnalyticsComponent implements OnInit {
   }
 
   private isDXPNameValid(newName: string) {
+    if(!this.existingDXPs || this.existingDXPs.length === 0){
+      return false;
+    }
     const prefixPath = this.newLocation.substring(0, this.newLocation.lastIndexOf('/') + 1);
     const valid = this.existingDXPs.filter(temp => {
       return newName === '' || temp.Path === prefixPath + newName;
@@ -132,9 +161,13 @@ export class TemplateAnalyticsComponent implements OnInit {
   }
 
   public setSelectDXP = (event) => {
-    this.newLocation = event?.detail?.value;
-    this.updateAnalytics.emit({option: 'EXISTING', analytics: this.newLocation});
-    this.updateStatus(true);
+    if(event?.detail?.value) {
+      this.newLocation = event?.detail?.value;
+      this.updateAnalytics.emit({option: 'EXISTING', analytics: this.newLocation});
+      this.updateStatus(true);
+    } else {
+      this.updateStatus(false);
+    }
   }
 
   public setCustomDXP = (event) => {
@@ -150,8 +183,6 @@ export class TemplateAnalyticsComponent implements OnInit {
     return this.nameHint && this.nameHint !== '';
   }
 
-
-
   public getFolder = (location: string): string => {
     const partialPath = stripOrgFolder(location);
     return partialPath.slice(0, partialPath.lastIndexOf('/'));
@@ -166,11 +197,16 @@ export class TemplateAnalyticsComponent implements OnInit {
     window.open(getSFLink(this.configService.config?.discover?.analyticsSF) + '/spotfire/wp/analysis?file=' + this.newLocation);
   }
 
+  public toggleAdvanced = (event): void => {
+    this.doAdvancedTab = event.detail.checked;
+    this.doAdvancedE.emit(this.doAdvancedTab);
+    // this.updateStatus();
+  }
+
   private updateStatus = (valid: boolean): void => {
-    const status = valid;
     const stepStatus = {
       step: 'analytics',
-      completed: status
+      completed: valid
     };
     this.status.emit(stepStatus);
   }

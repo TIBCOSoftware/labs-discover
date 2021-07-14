@@ -1,0 +1,80 @@
+{
+  "side-bar": {
+    "label": "How can we help?",
+    "section": [
+      
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Admin ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is Admin about?",
+            "label": "What is Admin about?",
+            "title": "What is Admin about?",
+            "url": "assets/help/application/Admin-About.html",
+            "content": "",
+            "default": "true"
+          }
+
+        ]
+      },
+      {
+        "type": "inline",
+        "name": "Tell_Me_About",
+        "label": "Tell me more about Automap ...",
+        "title": "Tell me about ...",
+        "item": [
+          {
+            "type": "inline",
+            "name": "What is Auto mapping about ?",
+            "label": "What is Auto mapping about ?",
+            "title": "What is Auto mapping about ?",
+            "url": "assets/help/application/Admin-Automap-What-Is-it.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "How does Auto mapping work?",
+            "label": "How does Auto mapping work?",
+            "title": "How does Auto mapping work?",
+            "url": "assets/help/application/Admin-Automap-How-Does-Automap-Work.html",
+            "content": "",
+            "default": "true"
+          },
+          {
+            "type": "inline",
+            "name": "How do I configure Auto mapping?",
+            "label": "How do I configure Auto mapping?",
+            "title": "How do I configure Auto mapping?",
+            "url": "assets/help/application/Admin-Automap-How-Do-I-Configure.html",
+            "content": "",
+            "default": "true"
+          }        ]
+      },
+      {
+        "type": "external",
+        "name": "External_Link",
+        "title": "External link",
+        "icon": "url of the icon",
+        "item": [
+
+          {
+            "type": "external",
+            "label": "Legal Notices",
+            "additional-text": "View the list of legal notices",
+            "name": "Legal Notices",
+            "title": "Legal Notices",
+            "url": "https://tibcosoftware.github.io/TIBCO-LABS/about/#bsd-3-clause-license",
+            "icon": "assets/help/images/person_48px.svg",
+            "content": "",
+            "mono": "true"
+          }
+        ]
+      }
+    ]
+  }
+}

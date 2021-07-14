@@ -1,0 +1,77 @@
+
+.filter-panel {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0; pointer-events: none;
+
+    &.resize {
+      border-style: dashed;
+    }
+
+    .filter-panel-content {
+        border-radius: 0 0 3px 3px;
+        background-color: #FFFFFF;
+        box-shadow: 0 -2px 2px 0 rgba(0,0,0,0.1);
+        border: 1px solid #C8D4E8;
+        height: 100%;
+        width: 100%;
+        // disable the text select by user
+        user-select: none;
+        .top-header {
+            display: flex;
+            height: 68px;
+            box-shadow: 0 -2px 2px 0 rgb(0 0 0 / 10%);
+            padding-top: 26px;
+            border: 1px solid #C8D4E8;
+            justify-content: space-between;
+            .header-left {
+              display: flex;
+            }
+            .collapse-handler {
+              padding-right: 10px;
+              &:hover {
+                cursor: pointer;
+              }
+            }
+            &:hover {
+              cursor: all-scroll;
+            }
+        }
+        .bottom-content {
+          display: flex;
+          height: calc(100% - 68px);
+          .left-navi {
+            height: 100%;
+          }
+          .spotfire-view {
+            height: 100%;
+            width: 100%;
+
+            .sf-iframe-div {
+              height: 100%;
+              width: 100%;
+            }
+          }
+        }
+    }
+
+
+  }
+.filterReport {
+  width: 100%;
+  height: 100%;
+  /*position: fixed;
+  bottom: 200px;
+  right: 500px;*/
+  opacity: 0.5;
+  border: 2px solid blue;
+
+}
+
+.filterReport:hover {
+  opacity: 1;
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.4);
+  /*border-radius: 100%;*/
+}

@@ -21,11 +21,11 @@ object variants {
     Try {
       import spark.implicits._
 
-      val df_variants = df_events.withColumn("VARIANT", collect_list("ACTIVITY_ID").over(Window.partitionBy("CASE_ID").orderBy($"ACTIVITY_START_TIMESTAMP".asc, $"row_id".asc)))
-        .groupBy("CASE_ID")
-        .agg(max("VARIANT").as("VARIANT"))
-        .groupBy("VARIANT")
-        .agg(count("VARIANT").as("Frequency"))
+      val df_variants = df_events.withColumn("variant", collect_list("activity_id").over(Window.partitionBy("case_id").orderBy($"ACTIVITY_START_TIMESTAMP".asc, $"row_id".asc)))
+        .groupBy("case_id")
+        .agg(max("variant").as("variant"))
+        .groupBy("variant")
+        .agg(count("variant").as("Frequency"))
         .orderBy(col("Frequency").desc)
 
       println(s"###########  Creating Variants ID ##########")
@@ -36,16 +36,16 @@ object variants {
       //snSession.sqlContext.setConf("spark.sql.shuffle.partitions", "1")
       df_variants_final = spark.createDataFrame(df_variants.sort(desc("Frequency")).rdd.zipWithUniqueId().map {
         case (rowline, index) => Row.fromSeq(rowline.toSeq :+ index + 1)
-      }, StructType(df_variants.schema.fields :+ StructField("VARIANT_ID", LongType, nullable = false))
+      }, StructType(df_variants.schema.fields :+ StructField("variant_id", LongType, nullable = false))
       )
 
 
       df_variants.unpersist()
       // Array type to formated string
-      df_variants_final = df_variants_final.as[(Array[String], Long, Long)].map { case (variants, count, id) => (variants.mkString(","), count, id) }.toDF("VARIANT", "Frequency", "VARIANT_ID")
+      df_variants_final = df_variants_final.as[(Array[String], Long, Long)].map { case (variants, count, id) => (variants.mkString(","), count, id) }.toDF("variant", "Frequency", "variant_id")
       //Occurences over total of number of Activity grouped by Cases
 
-      df_variants_final = df_variants_final.groupBy("VARIANT", "VARIANT_ID").agg(sum("Frequency") as "Frequency").withColumn("Occurences_percent", (col("Frequency") / sum("Frequency").over()) * 100)
+      df_variants_final = df_variants_final.groupBy("variant", "variant_id").agg(sum("Frequency") as "Frequency").withColumn("Occurences_percent", (col("Frequency") / sum("Frequency").over()) * 100)
       println(s"Aggregation for Variants done")
       df_variants_final = df_variants_final.withColumn("ANALYSIS_ID", lit(analysisId))
 

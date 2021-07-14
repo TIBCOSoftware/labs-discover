@@ -1,11 +1,11 @@
 import {Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges} from '@angular/core';
-import {NewAnalysisStepStatus} from 'src/app/models/discover';
-import {AnalysisData} from 'src/app/models_generated/analysisData';
+import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
+import {AnalysisData} from 'src/app/model/analysisData';
 import {START_NAME, STOP_NAME} from '../../../functions/analysis';
 import {createReadableArrayString} from '../../../functions/templates';
 import {DatasetService} from '../../../service/dataset.service';
 import {Observable} from 'rxjs';
-import {Dataset} from '../../../models/dataset';
+import {Dataset} from '../../../models_ui/dataset';
 
 @Component({
   selector: 'confirmation',
@@ -64,13 +64,13 @@ export class ConfirmationComponent implements OnInit, OnChanges {
   public parseStartStop() {
     if (this.data?.filters && this.data.filters.length > 0) {
       const startA = this.data.filters.find(val => val.name === START_NAME);
-      if (startA && startA.value && startA.value.length > 0) {
-        this.startActivities = startA?.value;
+      if (startA && startA.values && startA.values.length > 0) {
+        this.startActivities = startA?.values;
         this.hasStart = true;
       }
       const stopA = this.data.filters.find(val => val.name === STOP_NAME);
-      if (stopA && stopA.value && stopA.value.length > 0) {
-        this.stopActivities = stopA?.value;
+      if (stopA && stopA.values && stopA.values.length > 0) {
+        this.stopActivities = stopA?.values;
         this.hasStop = true;
       }
       this.hasFilter = this.data.filters.filter(v => v.name !== START_NAME && v.name !== STOP_NAME).length > 0;

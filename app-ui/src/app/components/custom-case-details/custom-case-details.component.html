@@ -4,7 +4,7 @@
       <div>
         <!--<mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}} ({{caseDetail.untaggedCasedataObj.state}})</mat-card-title>-->
         <mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}}</mat-card-title>
-        <mat-card-subtitle (click)="showTheSource()">{{cConfig.customTitle}}</mat-card-subtitle>  <!--USE THIS TO SHOW THE SOURCE-->
+        <mat-card-subtitle>{{cConfig.customTitle}}</mat-card-subtitle>  <!--USE THIS TO SHOW THE SOURCE-->
         <!--<mat-card-subtitle>{{cConfig.customTitle}}</mat-card-subtitle>-->
       </div>
       <div *ngIf="cConfig.showMilestones">

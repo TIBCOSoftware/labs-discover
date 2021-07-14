@@ -29,13 +29,13 @@ export class WelcomePreviewComponent implements OnInit {
     });
     this.landingPage.actionButton = [
       new ActionButtonConfig().deserialize({
-        "text": "Get started", 
-        "route": this.landingPage.homeRoute
+        text: 'Get started',
+        route: this.landingPage.homeRoute
       }
       )
     ];
 
-    
+
   }
 
 }

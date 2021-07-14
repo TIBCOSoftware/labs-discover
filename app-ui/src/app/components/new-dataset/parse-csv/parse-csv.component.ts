@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Dataset, DatasetDataSource, DatasetWizard } from 'src/app/models/dataset';
+import { Dataset, DatasetDataSource, DatasetWizard } from 'src/app/models_ui/dataset';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
 import { ParsingService } from 'src/app/service/parsing.service';
@@ -19,7 +19,7 @@ export class DatasetParseCsvComponent implements OnInit {
   public encodingOptions;
 
   public columnSeparator: string;
-  public customColumnSeparator: string = '';
+  public customColumnSeparator = '';
 
   public dataSource: DatasetDataSource;
 
@@ -50,8 +50,8 @@ export class DatasetParseCsvComponent implements OnInit {
   public clickedRefresh = (): void => {
 
     /**
-     * Confirmed with Florent. The form of editing parsing option only shows if a csv file is uploaded when create/update dataset. 
-     * Even for a dataset created by uploading a csv file, when edit it, since in web UI that file handler is not there, so I cannot 
+     * Confirmed with Florent. The form of editing parsing option only shows if a csv file is uploaded when create/update dataset.
+     * Even for a dataset created by uploading a csv file, when edit it, since in web UI that file handler is not there, so I cannot
      * let the user to change csv parsing options and refresh
      */
 
@@ -67,7 +67,7 @@ export class DatasetParseCsvComponent implements OnInit {
         skipEmptyLines: true,
         download: true
       };
-  
+
       this.csvService.refreshPreview(this.file, lines, config).subscribe(parseResult => {
         this.handlePreviewData.emit(parseResult);
       });

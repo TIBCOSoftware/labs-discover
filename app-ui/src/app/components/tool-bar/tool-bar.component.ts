@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {MessageTopicService, RouteAction} from '@tibco-tcstk/tc-core-lib';
-import {TButton} from '../../models/buttons';
+import {TButton} from '../../models_ui/buttons';
 
 @Component({
   selector: 'tool-bar',
@@ -28,7 +28,7 @@ export class ToolBarComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.showCreateNew = false;
-    if (this.createNewText != null && this.createNewText != '') {
+    if (this.createNewText != null && this.createNewText !== '') {
       this.newTB = {
         id: this.createNewText,
         label: this.createNewText,
@@ -44,7 +44,7 @@ export class ToolBarComponent implements OnInit, OnChanges {
     };
   }
   ngOnChanges(changes: SimpleChanges) {
-    if (this.notificationText != null && this.notificationText != '') {
+    if (this.notificationText != null && this.notificationText !== '') {
       this.showNotification = true;
     } else {
       this.showNotification = false;

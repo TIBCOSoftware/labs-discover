@@ -1,0 +1,40 @@
+.error-container {
+  box-sizing: border-box;
+  border: 1px solid #CAD3DF;
+  border-radius: 4px;
+  background-color: #FAFAFA;
+  display: flex;
+  flex-direction: row;
+}
+
+.line-numbers {
+  border-radius: 3px 0 0 3px;
+  background-color: #EEEEEE;
+  width: 52px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.line-number {
+  color: #BBC2CB;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 20px;
+  text-align: right;
+  margin-right: 16px;
+}
+
+.error-message {
+  color: #3d4d65;
+  /*color: #1774E5;*/
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 20px;
+  padding: 12px 22px 12px 8px;
+}
+
+.elink {
+  color: #1774E5 !important;
+}

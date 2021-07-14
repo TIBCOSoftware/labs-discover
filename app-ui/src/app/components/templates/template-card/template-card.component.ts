@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {AnalyticTemplateUI} from '../../../models/analyticTemplate';
-import {TButton} from '../../../models/buttons';
-import {CardMode} from '../../../models/configuration';
+import {AnalyticTemplateUI} from '../../../models_ui/analyticTemplate';
+import {TButton} from '../../../models_ui/buttons';
+import {CardMode} from '../../../models_ui/configuration';
 
 @Component({
   selector: 'template-card',

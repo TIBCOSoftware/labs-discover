@@ -7,11 +7,11 @@
 
 .template-info {
   padding-left: 25px;
-  width: 45%;
+  width: 40%;
 }
 
 .technical-specs {
-  width: 45%;
+  width: 50%;
 }
 
 .item-header {
@@ -21,11 +21,12 @@
   font-weight: 600;
   letter-spacing: 0;
   line-height: 21px;
+  min-width: 110px;
 }
 
 .header-location {
   vertical-align: top;
-  width: 110px;
+  width: 120px;
 }
 
 .item-detail {
@@ -54,7 +55,7 @@
 
 .detail-table {
   border-collapse: separate;
-  border-spacing: 0 18px;
+  border-spacing: 0px 8px;
 }
 
 .detail-row {

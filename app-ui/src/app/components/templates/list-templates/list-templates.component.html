@@ -4,7 +4,7 @@
       <div class="filter-type">
         <div class="filter-type-label">Filter by type:</div>
         <div *ngFor="let fil of filterTypes; let i = index" [ngClass]="{'filter-enabled': filterEnabled[i]}"
-             class="filter-item" (click)="filterSelected(i)">{{fil}}
+             class="filter-item" (click)="filterSelected(i)">{{fil.replace(' ', '-')}}
         </div>
       </div>
       <div class="search-container">

@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {getSFLink} from '../../../functions/templates';
 import {ConfigurationService} from '../../../service/configuration.service';
 import {VisualisationService} from 'src/app/api/visualisation.service';
-import { Template } from 'src/app/models_generated/models';
+import { Template } from 'src/app/model/models';
 import {stripOrgFolder} from '../../../functions/analysis';
 
 @Component({

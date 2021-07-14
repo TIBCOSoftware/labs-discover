@@ -33,13 +33,24 @@
 
 .dxp-radio {
   margin-top: 7px;
+  margin-bottom: 50px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+}
+
+.recommended {
+  color: #727272;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-style: italic;
+  letter-spacing: 0;
+  line-height: 21px;
+  margin-left:0.25em;
 }
 
 .radio-item {
-  margin-top: 20px;
-  margin-bottom: 35px;
+  /*margin-top: 20px;*/
+  margin-bottom: 5px;
   margin-right: 35px;
 }
 
@@ -61,12 +72,11 @@
 }
 
 .item-header {
-  color: #212121;
+  color: #727272;
   font-family: "Source Sans Pro";
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
   letter-spacing: 0;
-  line-height: 21px;
+  line-height: 17px;
   min-width: 110px;
 }
 
@@ -85,7 +95,7 @@
 }
 
 .item-detail-dxp {
-  color: #727272;
+  color: #212121;
   font-family: "Source Sans Pro";
   font-size: 13px;
   letter-spacing: 0;
@@ -107,4 +117,50 @@
 .open-sf-icon:hover {
   cursor: pointer;
   color: #005bcb;
+}
+
+.spec-sub-title {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.advanced {
+  margin-top: 40px;
+}
+
+.section-title {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.basic-text {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-top: 8px;
+}
+
+.advanced-switch {
+  display: flex;
+  flex-direction: row;
+  margin-top: 8px;
+}
+
+.advanced-label{
+  margin-top: 6px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
 }

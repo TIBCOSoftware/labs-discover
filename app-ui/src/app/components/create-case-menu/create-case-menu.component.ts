@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
-import {NewInvestigation} from '../../models/discover';
+import {NewInvestigation} from '../../models_ui/discover';
 import {UxplSelectInput} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-select-input/uxpl-select-input';
-import {CaseConfig} from '../../models/configuration';
+import {CaseConfig} from '../../models_ui/configuration';
 import {createReadableArrayString} from '../../functions/templates';
 
 @Component({

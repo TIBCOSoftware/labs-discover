@@ -62,31 +62,6 @@
             "default": "true"
           }
         ]},
-        {
-          "type": "inline",
-          "name": "Common mistakes",
-          "label": "Common mistakes",
-          "title": "Common mistakes ",
-          "item": [
-            {
-              "type": "inline",
-              "name": "Reserved column names",
-              "label": "Reserved column names",
-              "title": "Reserved column names",
-              "url": "assets/help/application/Process-Analysis-Problems-Column-Names.html",
-              "content": "",
-              "default": "true"
-            },
-            {
-              "type": "inline",
-              "name": "Locked Mappings",
-              "label": "Locked Mappings",
-              "title": "Locked Mappings",
-              "url": "assets/help/application/Process-Analysis-Problems-Locked-Mappings.html",
-              "content": "",
-              "default": "true"
-            }
-          ]},
           {
         "type": "external",
         "name": "External_Link",

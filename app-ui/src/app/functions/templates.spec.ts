@@ -1,6 +1,6 @@
-import {AnalyticsMenuConfigUI} from '../models/configuration';
+import {AnalyticsMenuConfigUI} from '../models_ui/configuration';
 import {stripDisabledMenuItems, stripUiIdFromTemplate} from './templates';
-import {AnalyticTemplateUI} from '../models/analyticTemplate';
+import {AnalyticTemplateUI} from '../models_ui/analyticTemplate';
 
 let simpleMenu: AnalyticsMenuConfigUI[];
 let simpleTopDisabled: AnalyticsMenuConfigUI[];

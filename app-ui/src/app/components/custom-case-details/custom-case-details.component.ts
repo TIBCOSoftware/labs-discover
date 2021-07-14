@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CaseConfig, CaseEvent, CaseField} from '../../models/configuration';
+import {CaseConfig, CaseEvent, CaseField} from '../../models_ui/configuration';
 import {CaseInfo, TcAppDefinitionService} from '@tibco-tcstk/tc-liveapps-lib';
 import _ from 'lodash';
 
@@ -38,7 +38,7 @@ export class CustomCaseDetailsComponent implements OnInit {
 
   getFieldValue(fieldV, format?) {
     let re = this.getField(fieldV);
-    if (format == 'ARRAY') {
+    if (format === 'ARRAY') {
       let newRe = '';
       if (Symbol.iterator in Object(re)) {
         for (const val of re) {
@@ -64,7 +64,7 @@ export class CustomCaseDetailsComponent implements OnInit {
 
   getToolTip(fieldV, format?) {
     let re = this.getField(fieldV);
-    if (format == 'ARRAY') {
+    if (format === 'ARRAY') {
       let newRe = '';
       if (Symbol.iterator in Object(re)) {
         for (const val of re) {

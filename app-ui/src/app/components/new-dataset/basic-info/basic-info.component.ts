@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { concatMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { DatasetService } from 'src/app/service/dataset.service';
-import { Dataset } from '../../../models/dataset';
-import { NewAnalysisStepStatus } from '../../../models/discover';
+import { Dataset } from '../../../models_ui/dataset';
+import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 @Component({
   selector: 'dataset-basic-info',
   templateUrl: './basic-info.component.html',
@@ -16,7 +16,7 @@ export class NewDatasetBasicInfoComponent implements OnInit {
   @Output() status: EventEmitter<NewAnalysisStepStatus> = new EventEmitter<NewAnalysisStepStatus>();
   @Output() enableSave: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  nameError: boolean = false;
+  nameError = false;
 
   public nameChanged: Subject<any> = new Subject<any>();
 
@@ -36,7 +36,7 @@ export class NewDatasetBasicInfoComponent implements OnInit {
           return this.datasetService.isExist(value, datasetId);
         })
       ).subscribe(re => {
-        if (re && re.exist == true) {
+        if (re && re.exist === true) {
           this.nameError = true;
         } else {
           this.nameError = false;
@@ -51,7 +51,7 @@ export class NewDatasetBasicInfoComponent implements OnInit {
     this.data[fieldName] = value;
     this.updateStatus();
 
-    if (fieldName == 'Dataset_Name' && value && value.trim() != '') {
+    if (fieldName === 'Dataset_Name' && value && value.trim() !== '') {
       this.nameChanged.next({
         value,
         datasetId: this.data.Dataset_Id

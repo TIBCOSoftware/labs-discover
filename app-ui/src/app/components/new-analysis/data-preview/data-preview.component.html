@@ -10,13 +10,13 @@
                  matTooltipClass="tTip"
                  (click)="showMapping = !showMapping;"></uxpl-icon>
     </div>
-    <map-panel *ngIf="showMapping" class='map-panel' [data]="mapping" [datasetId]="selectedDataset" [availableColumns]="availableColumns" advanceMode="false"
-               (status)="updateStatus($event)"
+    <map-panel *ngIf="showMapping" class='map-panel' [mapping]="mapping" [datasetId]="selectedDataset" [availableColumns]="availableColumns" advanceMode="false"
+               (status)="updateStatus($event)" [doAutoMap]="false"
     ></map-panel>
     <uxpl-left-nav-multi [hidden]="showMapping"  #leftNav [tabs]="leftNavTabs" (selected)="handleClick($event)" (collapsed)="showTopSection = !$event.detail" collapse></uxpl-left-nav-multi>
   </div>
   <div class='spotfire-viewer-container'>
-    <!--<div (click)="extractSpotfireFilterData()">Filter</div>-->
+    <!-- <div (click)="extractSpotfireFilterData()">Filter</div>-->
     <spotfire-viewer #analysis
                      style="height: 100%;"
                      [url]="spotfireServer"

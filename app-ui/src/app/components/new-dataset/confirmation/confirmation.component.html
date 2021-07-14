@@ -1,21 +1,22 @@
 <div>
-  <uxpl-form-field id="#label" readonly [value]="data.Dataset_Name" fieldId="label" style="margin-top: 5px; margin-bottom: 5px;" label="Label" type="text" valid required="true"></uxpl-form-field>
-  <uxpl-form-field id="#description" readonly [value]="data.Dataset_Description" fieldId="description" style="margin-top: 5px; margin-bottom: 5px;" label="Description" type="text" valid required="true"></uxpl-form-field>
-  <uxpl-form-field *ngIf="data.Dataset_Source.FileName" id="#name" readonly [value]="data.Dataset_Source.FileName" fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="File name" type="text" valid required="true"></uxpl-form-field>
-
-  <!-- <div>
-    <div class="map-row">
-      <uxpl-form-field class="map-field" id="#name" [value]="data.mapping.caseId" readonly fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the case Id?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#name" readonly [value]="data.mapping.activity" fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the activity?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#name" readonly [value]="data.mapping.resource" fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the resource?" type="text" valid required="true"></uxpl-form-field>
-    </div>
-    <div class="map-row">
-      <uxpl-form-field class="map-field" id="#name" readonly [value]="data.mapping.start" fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the start time?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#name" readonly [value]="data.mapping.end" fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="Which field represents the end time?" type="text" valid required="true"></uxpl-form-field>
-      <uxpl-form-field class="map-field map-field-margin" id="#name" readonly [value]="data.mapping.other" fieldId="name" style="margin-top: 5px; margin-bottom: 5px;" label="Include other fields in the analysis?" type="text" valid required="true"></uxpl-form-field>
-    </div>
-    <div class="map-row">
-      <uxpl-form-field class="map-field" id="#name" readonly [value]="data.parse.dateTimeFormat" fieldId="dateTimeFormat" style="margin-top: 5px; margin-bottom: 5px;" label="Datetime format" type="text" valid required="true"></uxpl-form-field>
-    </div>
-  </div> -->
+  <div class="info-row">
+    <div class="label">Name</div>
+    <div class="value">{{data.Dataset_Name}}</div>
+  </div>
+  <div class="info-row">
+    <div class="label">Description</div>
+    <div class="value">{{data.Dataset_Description}}</div>
+  </div>
+  <div class="info-row">
+    <div class="label">Data source type</div>
+    <div *ngIf="data.type=='tdv'" class="value">TDV view</div>
+    <div *ngIf="data.type=='csv' && data.csvMethod=='file'" class="value">Existing CSV file</div>
+    <div *ngIf="data.type=='csv' && data.csvMethod=='upload'" class="value">New CSV file</div>
+  </div>
+  <div class="info-row">
+    <div class="label">Data source</div>
+    <div *ngIf="data.type=='tdv'" class="value">{{data.TdvView.DatasetName}}</div>
+    <div *ngIf="data.type=='csv' && data.csvMethod=='file'" class="value">{{data.CsvFile.OriginalFilename}}</div>
+    <div *ngIf="data.type=='csv' && data.csvMethod=='upload'" class="value">{{data.Dataset_Source.FileName}}</div>
+  </div>
 </div>

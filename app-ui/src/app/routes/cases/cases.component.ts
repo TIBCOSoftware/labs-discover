@@ -5,8 +5,8 @@ import { TcCoreCommonFunctions } from "@tibco-tcstk/tc-core-lib";
 import { CaseInfoList, LiveAppsService } from "@tibco-tcstk/tc-liveapps-lib";
 import { UxplLeftNav } from "@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav";
 import { map } from "rxjs/operators";
-import { CaseConfig, CaseEvent } from "../../models/configuration";
-import { Datasource } from "../../models/discover";
+import { CaseConfig, CaseEvent } from "../../models_ui/configuration";
+import { Datasource } from "../../models_ui/discover";
 import { ConfigurationService } from "../../service/configuration.service";
 import { DatasourceService } from "../../service/datasource.service";
 
@@ -16,26 +16,26 @@ import { DatasourceService } from "../../service/datasource.service";
   styleUrls: ['./cases.component.css']
 })
 export class CasesComponent implements OnInit, AfterViewInit {
-  
+
   public caseConfig: CaseConfig[];
   @ViewChild('leftNav', {static: false}) leftNav: ElementRef<UxplLeftNav>;
-  
+
   public noDataIconLocation: string;
   public hasCaseConfig: boolean;
   public leftNavTabs = [];
   public hideTable = new Array<boolean>();
-  
+
   constructor(protected configService: ConfigurationService,
     protected location: Location,
     protected liveapps: LiveAppsService,
     protected datasource: DatasourceService,
     protected router: Router) {
     }
-    
+
     ngOnInit(): void {
-      
+
       this.caseConfig = this.configService.config.discover.investigations.caseConfig;
-      
+
       this.noDataIconLocation = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
       this.hasCaseConfig = false;
       if (this.caseConfig && this.caseConfig.length > 0) {
@@ -54,7 +54,7 @@ export class CasesComponent implements OnInit, AfterViewInit {
         this.hideTable[0] = false;
       }
     }
-    
+
     handleClick = (event: any): void => {
       // Show table of selected appId
       if (event.detail) {
@@ -67,13 +67,13 @@ export class CasesComponent implements OnInit, AfterViewInit {
         }
       }
     }
-    
+
     ngAfterViewInit(): void {
       if (this.leftNavTabs.length > 0) {
         this.leftNav.nativeElement.setTab(this.leftNavTabs[0]);
       }
     }
-    
+
     caseEventClicked(data: CaseEvent) {
       console.log('Picked up Case Event: ', data);
       if (data.caseFieldEvent.field == 'DataSourceName') {
@@ -106,11 +106,10 @@ export class CasesComponent implements OnInit, AfterViewInit {
                     this.router.navigate(['/discover/analytics']);
                   })
                   ).subscribe();
-                  
+
                 }
               }
             });
           }
         }
       }
-      

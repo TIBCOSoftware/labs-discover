@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { DiscoverConfiguration } from 'src/app/models/configuration';
+import { DiscoverConfiguration } from 'src/app/models_ui/configuration';
 import { ConfigurationService } from 'src/app/service/configuration.service';
 import { cloneDeep, isEqual } from 'lodash-es';
 import {MessageTopicService} from "@tibco-tcstk/tc-core-lib";
@@ -46,11 +46,11 @@ export class SettingsPlatformEnvironmentComponent implements OnInit {
     this.documentService.downloadDocument('orgFolders', this.configService.config.uiAppId + '_assets', this.filename, "", this.configService.config.sandboxId, true).subscribe(
       element => {
         var reader = new FileReader();
-        reader.readAsText(element); 
+        reader.readAsText(element);
         reader.onloadend = (e) => {
           var textdata = reader.result;
           this.environment = textdata === '' ? '{}' : textdata.toString();
-        }    
+        }
       },
       _ => {
         this.environment = '{}';

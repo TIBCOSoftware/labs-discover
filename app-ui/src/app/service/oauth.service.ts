@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { LiveAppsService } from '@tibco-tcstk/tc-liveapps-lib';
 import { AuthInfo, TcCoreConfigService } from '@tibco-tcstk/tc-core-lib';
-import { AuthKeys, TokenResponse } from '../models/oauth';
+import { AuthKeys, TokenResponse } from '../models_ui/oauth';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { APP_BASE_HREF } from '@angular/common';

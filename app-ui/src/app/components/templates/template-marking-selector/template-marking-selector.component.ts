@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {AnalyticTemplateUI, MConfig} from '../../../models/analyticTemplate';
+import {AnalyticTemplateUI, MConfig} from '../../../models_ui/analyticTemplate';
 import {createMConfig, stringifyMConfig} from '../../../functions/templates';
 
 @Component({

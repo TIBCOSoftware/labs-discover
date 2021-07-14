@@ -1,9 +1,9 @@
 
 
 // Version supports for libraries
-val sparkVersion = "3.1.1"
+val sparkVersion = "3.1.2"
 val sttpVersion = "2.2.9"
-val postgresVersion = "42.2.16"
+val postgresVersion = "42.2.20"
 val scalaLoggingVersion = "3.9.2"
 val configVersion = "1.4.0"
 
@@ -89,6 +89,9 @@ lazy val assemblySettings = Seq(
 //https://github.com/pathikrit/better-files
 libraryDependencies += "com.github.pathikrit" % "better-files_2.12" % "3.9.1"
 
+// connection pool
+libraryDependencies += "com.zaxxer" % "HikariCP" % "4.0.3"
+
 val targetDockerJarPath =  "/opt/spark/jars"
 
 // For building the docker image
@@ -108,7 +111,7 @@ lazy val dockerSettings = Seq(
     val artifact: File = assembly.value
     val artifactTargetPath = s"$targetDockerJarPath/$domain-${name.value}.jar"
     new Dockerfile {
-      from(s"public.ecr.aws/tibcolabs/labs-discover-spark-runner:3.1.1")
+      from(s"public.ecr.aws/tibcolabs/labs-discover-spark-runner:3.1.2")
     }.add(artifact, artifactTargetPath)
   }
 )

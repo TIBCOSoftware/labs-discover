@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'csv-upload',
@@ -78,8 +78,8 @@ export class CsvUploadComponent implements OnInit {
 
   private getSubFileType(type: string): string {
     let sep = '/';
-    if (navigator.appVersion.indexOf("Win") != -1) sep = '\\';
-    let pos = type.indexOf(sep);
+    if (navigator.appVersion.indexOf('Win') !== -1) sep = '\\';
+    const pos = type.indexOf(sep);
     if (pos !== -1) {
       type = type.substr(pos + 1);
     }

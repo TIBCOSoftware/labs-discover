@@ -59,8 +59,8 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
       examples = Array(new ExampleObject(value =
         """{
                                                      "Token": "CIC~IloveFoodAndWine",
-                                                     "Organization": "01dxjp1rpa35bzcv1kvem9ffyk",
-                                                     "DatasetId": "12"
+                                                     "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx",
+                                                     "DatasetId": "xxxxxxxx"
                                                    }"""))
     ))),
     responses = Array(

@@ -8,7 +8,7 @@ import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 import { RepositoryService } from 'src/app/api/repository.service';
 import { NewDatasetWizardComponent } from 'src/app/components/new-dataset/wizard/wizard.component';
-import { Dataset, DatasetListItem } from 'src/app/models/dataset';
+import { Dataset, DatasetListItem } from 'src/app/models_ui/dataset';
 import { DiscoverBackendService } from 'src/app/service/discover-backend.service';
 import { getRelativeTime } from '../../functions/analysis';
 import { DatasetService } from '../../service/dataset.service';
@@ -209,7 +209,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
           this.refresh();
         }, error => {
           if (error.status == 409) {
-            // the analysis linked with it is archived. 
+            // the analysis linked with it is archived.
             const mes = {
               type: "ERROR",
               message: "The analysis created from '" + dataset.name + "' is archived"

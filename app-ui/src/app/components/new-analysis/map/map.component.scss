@@ -1,0 +1,115 @@
+.map-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.map-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-field {
+  flex: 1 1 0%;
+}
+
+.map-field-margin {
+  margin-left: 15px;
+}
+
+.advanced-margin {
+  margin-top: 10px;
+  margin-bottom: 5px
+}
+
+.map-section {
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.map-preview-table {
+  overflow: hidden;
+  padding-left: 16px;
+  width: 100%;
+}
+
+.parse-options-csv-date-format {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 0%;
+  align-items: center;
+}
+
+.parse-options-csv-date-element-format {
+  flex-grow: 1;
+}
+
+.parse-options-csv-date-icon-format {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.parse-options-csv-date-icon-format .tooltiptext {
+  visibility: hidden;
+  width: 300px;
+  background-color: rgb(14, 45, 101);
+  color: rgb(255, 255, 255);;
+  text-align: left;
+  padding: 15px;
+  border-radius: 6px;
+  margin: 15px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.parse-options-csv-date-icon-format:hover .tooltiptext {
+  visibility: visible;
+}
+
+.map-preview-container {
+  margin-top: 30px;
+}
+
+.table-element {
+  padding: 1rem 1rem 1rem 0 !important;
+  font-size: 12px;
+}
+
+.auto-map-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: -50px;
+}
+
+.auto-map-details:first-child > td {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.mapping-section {
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.map-left-panel {
+  border-right-color: #DEDEDE;
+  border-right-width: 2px;
+  border-right-style: solid;
+  padding-right: 16px;
+  min-width: 300px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+

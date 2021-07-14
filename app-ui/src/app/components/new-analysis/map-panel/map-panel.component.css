@@ -24,6 +24,19 @@
   cursor: default !important;
 }
 
+.all-att {
+  display: flex;
+  flex-direction: row;
+}
+
+.all-att-icon {
+  margin-left: 4px;
+  /*padding-top: 6px;*/
+  color: #B6B6B6;
+  cursor: help;
+}
+
+
 .map-field {
   /*flex: 1 1 0%;*/
   width: 145px;
@@ -86,4 +99,14 @@ uxpl-select-input::part(optional-label) {
   text-align: right;
   margin-right: 10px;
   min-width: 110px;
+}
+
+.bulb{
+  animation-name: bulbup;
+  animation-duration: 1.5s;
+}
+@keyframes bulbup {
+  0%   {background-color: transparent;}
+  50%  {background: radial-gradient(#FFF, yellow);}
+  100% {background-color: transparent;}
 }

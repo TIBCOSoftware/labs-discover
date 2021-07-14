@@ -19,12 +19,11 @@
   <ng-template pTemplate="body" let-rowData let-i="rowIndex" let-expanded="expanded" let-columns="columns">
     <tr class="rowhover" id="toHightlight">
       <td *ngFor="let col of columns" class="no-padding data-row hovereffect" (click)="dt.toggleRow(rowData, $event)">
-
         <div *ngIf="col.field != 'metadata.state'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div>
         <div *ngIf="col.field == 'metadata.state'">
-          <uxpl-tag *ngIf="obtainData(rowData, col.field) != 'Process mining'" matTooltip="{{getToolTip(col.field, rowData)}}" matTooltipClass="tTip" icon="{{'assets/images/states/' + getValue(rowData,col.field) + '.svg'}}" class="uxpl-tag"
+          <uxpl-tag *ngIf="obtainData(rowData, col.field) !== 'Process mining'" matTooltip="{{getToolTip(col.field, rowData)}}" matTooltipClass="tTip" icon="{{'assets/images/states/' + getValue(rowData,col.field) + '.svg'}}" class="uxpl-tag"
                     color="{{getNgClass(col.field, rowData)}}">{{ obtainData(rowData, col.field)}}</uxpl-tag>
-          <mini-progress-bar *ngIf="obtainData(rowData, col.field) == 'Process mining'" [percentage]="statusMap[rowData.id].percentage" [message]="statusMap[rowData.id].message"></mini-progress-bar>
+          <mini-progress-bar *ngIf="obtainData(rowData, col.field) === 'Process mining'" [percentage]="statusMap[rowData.id]?.percentage" [message]="obtainData(rowData, col.field)"></mini-progress-bar>
         </div>
       </td>
       <td class="no-padding">
@@ -48,7 +47,7 @@
     <tr style="background-color: #FFFFFF">
       <td [attr.colspan]="columns.length + 2">
         <div class="ui-g ui-fluid" style="font-size:16px;padding:20px; ">
-          <process-analysis-details [processAnalysis]="rowData"></process-analysis-details>
+          <process-analysis-details [processAnalysis]="rowData" [progress]="statusMap[rowData.id]"></process-analysis-details>
         </div>
       </td>
     </tr>

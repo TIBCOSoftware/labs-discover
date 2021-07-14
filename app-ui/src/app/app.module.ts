@@ -103,8 +103,8 @@ import { NewDatasetConfirmationComponent } from './components/new-dataset/confir
 import { CaseStateEditComponent } from './components/case-state-edit/case-state-edit.component'
 import { YesnoConfirmationComponent } from './components/yesno-confirmation/yesno-confirmation.component';
 
-import {StringSimilarityService} from './service/string-similarity.service';
-import { SettingsPlatformAutomapComponent } from './routes/settings-platform-automap/settings-platform-automap.component';
+import {AutoMappingService} from './service/auto-mapping.service';
+import { SettingsAutomapComponent } from './routes/settings-automap/settings-automap.component';
 import { AnalyticsTemplatesComponent } from './components/analytics-templates/analytics-templates.component';
 import { AnalyticCardComponent } from './components/analytic-card/analytic-card.component';
 import { SettingsAnalyticTemplatesComponent } from './routes/settings-analytic-templates/settings-analytic-templates.component';
@@ -142,6 +142,11 @@ import { CsvListComponent } from './components/new-dataset/csv-list/csv-list.com
 import { CsvFilesizePipe } from './components/new-dataset/csv-list/csvfilesize.pipe';
 import { CsvFiletimePipe } from './components/new-dataset/csv-list/csvfiletime.pipe';
 import { DragDropFieldsListComponent } from './routes/settings-investigations/drag-drop-fields-list/drag-drop-fields-list.component';
+import { EditFieldComponent } from './routes/settings-investigations/edit-field/edit-field.component';
+import { ResizableDraggableComponent } from './components/resizable-draggable/resizable-draggable.component';
+import { SfFilterPanelComponent } from './components/sf-filter-panel/sf-filter-panel.component';
+import { TemplateAnalyticsFiltersComponent } from './components/templates/template-analytics-filters/template-analytics-filters.component';
+import { ErrorDetailsComponent } from './components/error-details/error-details.component';
 
 /** This is the tc core configuration object
  * To use oauth you must also add the OAuthInterceptor to providers
@@ -235,7 +240,7 @@ const configurationProvider = () => {
     ResetComponent,
     SettingsPlatformDatabaseComponent,
     SettingsPlatformDatetimeFormatComponent,
-    SettingsPlatformAutomapComponent,
+    SettingsAutomapComponent,
     AnalyticsTemplatesComponent,
     AnalyticCardComponent,
     SettingsAnalyticTemplatesComponent,
@@ -269,7 +274,13 @@ const configurationProvider = () => {
     CsvListComponent,
     CsvFilesizePipe,
     CsvFiletimePipe,
-    DragDropFieldsListComponent
+    DragDropFieldsListComponent,
+    ResizableDraggableComponent,
+    SfFilterPanelComponent,
+    TemplateAnalyticsFiltersComponent,
+    DragDropFieldsListComponent,
+    EditFieldComponent,
+    ErrorDetailsComponent
   ],
     imports: [
         AppRoutingModule,
@@ -306,7 +317,7 @@ const configurationProvider = () => {
     },
     AccessGuard,
     OfflineGuard,
-    StringSimilarityService,
+    AutoMappingService,
     {
       provide: APP_BASE_HREF,
       useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
