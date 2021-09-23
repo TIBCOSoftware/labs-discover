@@ -12,7 +12,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Gauge</title>
+    <title>Filter Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" media="all" href="uxpl.min.css" />
     <link rel="stylesheet" type="text/css" media="all" href="main.css" />
@@ -28,8 +28,8 @@
     <div class="filter-panel">
 
         <div class="panel-content">
-            <div id="time-select">
-                Keep cases that were
+            <div id="time-select" class="time-controls is-hidden">
+                <div> Keep cases that were </div>
                 <div class="pl-dropdown" data-pl-dropdown-role="dropdown">
                     <button type="button" class="pl-button pl-button--primary" id="dropdown-button"
                         data-pl-dropdown-role="toggler" aria-haspopup="true" aria-expanded="false">
@@ -60,7 +60,9 @@
                         </ul>
                     </div>
                 </div>
-                between
+
+                <div>between</div>
+                
                 <div class="pl-form-field pl-form-field--text-input date-input">
                     <input type="text" class="pl-form-field__input" placeholder="Placeholder" id="start-timestamp" />
                     <!-- <label class="pl-form-field__label" for="start-timestamp"
@@ -70,7 +72,9 @@
                         Start date
                     </div>
                 </div>
-                and
+                
+                <div>and</div>
+
                 <div class="pl-form-field pl-form-field--text-input date-input">
                     <input type="text" class="pl-form-field__input" placeholder="Placeholder" id="end-timestamp" />
                     <!-- <label class="pl-form-field__label" for="changeME-text-input"
@@ -83,7 +87,8 @@
                 .
             </div>
 
-            <div id="action-buttons">
+            <div id="filter-toggle">
+                <div>Apply filter on </div>
                 <div class="pl-text-toggle">
                     <input class="pl-text-toggle__input" type="radio" id="filter-on-cases" name="text-toggle"
                         checked />
@@ -92,13 +97,15 @@
                     <input class="pl-text-toggle__input" type="radio" id="filter-on-events" name="text-toggle" />
                     <label class="pl-text-toggle__label" for="filter-on-events">Events</label>
                 </div>
+            </div>
 
-                <button id="apply-filter-btn" type="button" class="pl-button pl-button--primary">
-                    Filter
-                </button>
-                <button id="reset-filter-btn" type="button" class="pl-button pl-button--secondary">
-                    Reset
-                </button>
+            <div id="action-buttons">
+                    <button id="apply-filter-btn" type="button" class="pl-button pl-button--primary">
+                        Filter
+                    </button>
+                    <button id="reset-filter-btn" type="button" class="pl-button pl-button--secondary">
+                        Reset
+                    </button>
             </div>
         </div>
 

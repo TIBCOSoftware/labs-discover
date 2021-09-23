@@ -10,16 +10,10 @@ import {TButton} from '../../models_ui/buttons';
 export class ToolBarComponent implements OnInit, OnChanges {
 
   @Input() actionButtons: TButton[];
-
   @Input() notificationText: string;
-
-  @Input() createNewText: string;
-
   @Output() toolBarButtonClicked: EventEmitter<TButton> = new EventEmitter<TButton>();
 
-  public newTB: TButton;
   public refreshTB: TButton;
-  public showCreateNew: boolean;
   public showNotification: boolean;
 
 
@@ -27,22 +21,13 @@ export class ToolBarComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.showCreateNew = false;
-    if (this.createNewText != null && this.createNewText !== '') {
-      this.newTB = {
-        id: this.createNewText,
-        label: this.createNewText,
-        type: 'CREATE'
-      };
-      this.showCreateNew = true;
-    }
-
     this.refreshTB = {
       id: 'refresh',
       label: 'Refresh',
       type: 'OTHER'
     };
   }
+  
   ngOnChanges(changes: SimpleChanges) {
     if (this.notificationText != null && this.notificationText !== '') {
       this.showNotification = true;

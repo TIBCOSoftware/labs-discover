@@ -157,7 +157,7 @@ public class UpdateReference implements CustomProcedure {
         numRowsUpdated = qenv.executeUpdate(query, null);
 
         Date date = Calendar.getInstance().getTime();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         lastUpdated = dateFormat.format(date);
 
     }

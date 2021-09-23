@@ -1,4 +1,4 @@
-import {Component, OnInit, AfterViewInit} from '@angular/core';
+import {Component, OnInit, AfterViewInit, ViewChild} from '@angular/core';
 import {concatMap, delay, filter, map, repeatWhen, take} from 'rxjs/operators';
 import {Router} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
@@ -9,6 +9,8 @@ import {RepositoryService} from 'src/app/api/repository.service';
 import {Observable} from 'rxjs';
 import {Analysis} from 'src/app/model/analysis';
 import {notifyUser} from '../../functions/message';
+import {ProcessAnalysisTableComponent} from '../../components/process-analysis-table/process-analysis-table.component';
+
 
 @Component({
   selector: 'app-process-analysis',
@@ -17,9 +19,11 @@ import {notifyUser} from '../../functions/message';
 })
 export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
 
+  @ViewChild('paTable', {static: false}) paTable: ProcessAnalysisTableComponent;
+
   private REFRESH_DELAY_MS = 1000;
 
-  cases: any[] = [];
+  cases: Analysis[] = [];
   search = '';
   loading = true;
 
@@ -44,29 +48,32 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
     this.refresh();
   }
 
-  public refresh = (): void => {
-    this.loading = true;
-    this.repositoryService.getAnalysis().pipe(
-      map(analysisList => {
-        this.cases = analysisList.filter(el => el.metadata.state !== 'Completed').sort((a, b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0));
-        if (this.cases.length > 0) {
-          // start progress query for those who doesn't have status yet
-          this.startPollingStatus();
+  public refresh (): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.loading = true;
+      this.repositoryService.getAnalysis().pipe(
+        map(analysisList => {
+          this.cases = analysisList.filter(el => el.metadata.state !== 'Completed').sort((a, b) => (a.metadata?.modifiedOn > b.metadata?.modifiedOn) ? -1 : ((b.metadata?.modifiedOn > a.metadata?.modifiedOn) ? 1 : 0));
+          if (this.cases.length > 0) {
+            // start progress query for those who doesn't have status yet
+            this.startPollingStatus();
+          }
+        })
+      ).subscribe(
+        success => {
+          this.loading = false
+          resolve(true);
+        },
+        error => {
+          this.loading = false
+          reject(false);
         }
-      })
-    ).subscribe(
-      success => {
-        this.loading = false
-      },
-      error => {
-        this.loading = false
-      }
-    );
+      );
+    })
   }
 
   private startPollingStatus() {
     this.stopPollingStatus();
-
     for (const analysis of this.cases) {
       const analysisId = analysis.id;
       if (analysis.metadata && analysis.metadata.state === 'Process mining') {
@@ -80,14 +87,14 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
               analysis.metadata = Object.assign({}, resp.metadata);
               analysis.actions = resp.actions;
               progress.stop = true;
-              this.statusMap[analysisId] = null;
+              // this.statusMap[analysis.data.name] = null;
             } else {
               // stopped by setting progress.stop = true
               progress.message = 'Stopped';
             }
           }
         );
-        this.statusMap[analysisId] = progress;
+        this.statusMap[analysis.data.name] = progress;
       }
     }
   }
@@ -140,7 +147,7 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
     this.search = $event.detail.value;
   }
 
-  public handleActionSelected = (event): void => {
+  public handleActionSelected(event) {
     if (event.name === 'Rerun') {
       // Send message to clear SF report
       this.messageService.sendMessage('clear-analytic.topic.message', 'OK');
@@ -175,9 +182,17 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
       });
     } else {
       this.repositoryService.runAnalysisAction(event.analysisId, event.action).subscribe(
-        res => {
-          this.refresh();
+        async (res) => {
           this.messageService.sendMessage('news-banner.topic.message', event.name + ' successful...');
+          await this.refresh();
+          if(event.name === 'Rerun') {
+            if(event.paName){
+              setTimeout(() => {
+                this.paTable.expandRow(event.paName, true);
+              })
+            }
+            //
+          }
         },
         err => notifyUser('ERROR', event.name + ' error...', this.messageService)
       );

@@ -1,13 +1,16 @@
-import {Component, OnInit} from '@angular/core';
-import {ConfigurationService} from 'src/app/service/configuration.service';
-import {MessageTopicService, TcGeneralConfigService} from '@tibco-tcstk/tc-core-lib';
-import {TcDocumentService} from '@tibco-tcstk/tc-liveapps-lib';
-import {cloneDeep, set, isEqual} from 'lodash-es';
-import {MatDialog} from '@angular/material/dialog';
-import {WelcomePreviewComponent} from 'src/app/components/welcome-preview/welcome-preview.component';
-import {HightlighEditComponent} from 'src/app/components/hightligh-edit/hightligh-edit.component';
-import {HttpEventType} from '@angular/common/http';
-import {DiscoverConfiguration} from 'src/app/models_ui/configuration';
+import { Component, OnInit } from '@angular/core';
+import { ConfigurationService } from 'src/app/api/configuration.service';
+import { MessageTopicService } from '@tibco-tcstk/tc-core-lib';
+import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
+import { set } from 'lodash-es';
+import { MatDialog } from '@angular/material/dialog';
+import { WelcomePreviewComponent } from 'src/app/components/welcome-preview/welcome-preview.component';
+import { HightlighEditComponent } from 'src/app/components/hightligh-edit/hightligh-edit.component';
+import { HttpEventType } from '@angular/common/http';
+import { GeneralInformation } from 'src/app/model/generalInformation';
+import { LandingPage } from 'src/app/model/landingPage';
+import { map } from 'rxjs/operators';
+import { Analytics } from 'src/app/model/analytics';
 
 @Component({
   selector: 'settings-branding',
@@ -16,14 +19,20 @@ import {DiscoverConfiguration} from 'src/app/models_ui/configuration';
 })
 export class SettingsBrandingComponent implements OnInit {
 
-  public discover: DiscoverConfiguration;
+  public generalInformation: GeneralInformation;
+  public updatedGeneralInformation: boolean;
 
-  showAdvanced = false;
-  showSFServer = false;
+  public landingPage: LandingPage;
+  public updatedLandingPage: boolean;
+
+  public analytics: Analytics
+  public updatedAnalytics: boolean;
+
+  public showAdvanced: boolean;
+  public showServer: boolean;
 
   constructor(
-    protected configService: ConfigurationService,
-    protected generalConfigService: TcGeneralConfigService,
+    protected configurationService: ConfigurationService,
     protected dialog: MatDialog,
     protected messageService: MessageTopicService,
     protected documentService: TcDocumentService) {
@@ -31,51 +40,74 @@ export class SettingsBrandingComponent implements OnInit {
 
   ngOnInit(): void {
     this.showAdvanced = false;
+    this.showServer = false;
     this.handleReset();
   }
 
   public handleUpdate = (event, object: string, path?: string) => {
     if (object === 'general') {
-      this.discover.general.applicationTitle = event.detail.value;
+      this.generalInformation.applicationTitle = event.detail.value;
+      this.updatedGeneralInformation = true;
     }
 
     if (object === 'landingPage') {
-      set(this.discover.landingPage, path, event.detail.value);
+      set(this.landingPage, path, event.detail.value);
+      this.updatedLandingPage = true;
     }
 
     if (object === 'advanced') {
-      if (!this.discover.analyticsSF) {
-        this.discover.analyticsSF = {
-          previewDXPLocation: '',
-          previewDataTableName: '',
-          customUserDXPFolder: ''
-        };
-      }
-      set(this.discover.analyticsSF, path, event.detail.value);
+      set(this.analytics, path, event.detail.value);
+      this.updatedAnalytics = true;
     }
 
   }
 
-  public handleSave = (): void => {
-    if (!isEqual(this.discover, this.configService.config.discover)) {
-      this.configService.updateDiscoverConfig(this.configService.config.sandboxId, this.configService.config.uiAppId, this.discover, this.discover.id).subscribe(
-        _ => {
-          this.messageService.sendMessage('news-banner.topic.message', 'Settings saved...');
-          this.configService.refresh();
-        }
-      );
+  public handleSave = async (): Promise<void> => {
+    let calls = [];
+    if (this.updatedGeneralInformation){
+      calls.push(this.configurationService.postGeneralConfiguration(this.generalInformation).toPromise());
     }
+    if (this.updatedLandingPage) {
+      calls.push(this.configurationService.postLandingPagesConfiguration(this.landingPage).toPromise());
+    }
+    if (this.updatedAnalytics) {
+      calls.push(this.configurationService.postAnalytics(this.analytics).toPromise());
+    }
+    const results = await Promise.all(calls);
+
+    this.updatedGeneralInformation = false;
+    this.updatedLandingPage = false;
+    this.updatedAnalytics = false;
+
+    this.messageService.sendMessage('news-banner.topic.message', 'Settings saved...');
   }
 
   public handleReset = (): void => {
-    this.discover = cloneDeep(this.configService.config.discover);
+    this.configurationService.getGeneralConfiguration().pipe(
+      map((result: GeneralInformation) => {
+        this.generalInformation = result;
+        this.updatedGeneralInformation = false;
+      })
+    ).subscribe();
+    this.configurationService.getLandingPagesConfiguration().pipe(
+      map((result: LandingPage) => {
+        this.landingPage = result;
+        this.updatedLandingPage = false;
+      })
+    ).subscribe();
+    this.configurationService.getAnalytics().pipe(
+      map((result: Analytics) => {
+        this.analytics = result;
+        this.updatedAnalytics = false;
+      })
+    ).subscribe();
   }
 
   public handlePreview = (): void => {
     const dialogRef = this.dialog.open(WelcomePreviewComponent, {
       width: '100%',
       height: '90%',
-      data: this.discover.landingPage
+      data: this.landingPage
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -86,30 +118,30 @@ export class SettingsBrandingComponent implements OnInit {
     const dialogRef = this.dialog.open(HightlighEditComponent, {
       width: '40%',
       height: '40%',
-      data: {...this.discover.landingPage.highlights[index]}
+      data: {...this.landingPage.highlights[index]}
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.discover.landingPage.highlights[index] = result;
+        this.landingPage.highlights[index] = result;
       }
     });
   }
 
   public handleUpload = (file: File): void => {
-    let uploadProgress = 0;
-    this.documentService.uploadDocument('orgFolders', this.configService.config.uiAppId + '_assets', this.configService.config.sandboxId, file, file.name, 'File uploaded from browser.').subscribe(
-      (response: any) => {
-        if (response.type === HttpEventType.UploadProgress) {
-          uploadProgress = Math.round(100 * response.loaded / response.total);
-          if (uploadProgress === 100) {
-            this.discover.landingPage.backgroundURL = file.name;
-          }
-        }
-      },
-      error => {
-        console.log('error', error);
-      }
-    );
+    // let uploadProgress = 0;
+    // this.documentService.uploadDocument('orgFolders', this.configService.config.uiAppId + '_assets', this.configService.config.sandboxId, file, file.name, 'File uploaded from browser.').subscribe(
+    //   (response: any) => {
+    //     if (response.type === HttpEventType.UploadProgress) {
+    //       uploadProgress = Math.round(100 * response.loaded / response.total);
+    //       if (uploadProgress === 100) {
+    //         this.landingPage.backgroundURL = file.name;
+    //       }
+    //     }
+    //   },
+    //   error => {
+    //     console.log('error', error);
+    //   }
+    // );
   }
 }

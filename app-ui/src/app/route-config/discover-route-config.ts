@@ -12,6 +12,7 @@ import { TemplateManageComponent } from '../routes/template-manage/template-mana
 import { TemplateSelectComponent } from '../routes/template-select/template-select.component';
 import { AdminComponent } from '../routes/admin/admin.component';
 import { TemplateEditorComponent } from '../routes/template-editor/template-editor.component';
+import {FileManageComponent} from "../routes/file-manage/file-manage.component";
 
 export const DISCOVER_ROUTE_CONFIG = [
   {
@@ -38,6 +39,13 @@ export const DISCOVER_ROUTE_CONFIG = [
   {
     path: 'templates',
     component: TemplateManageComponent,
+    canActivate: [
+      AccessGuard
+    ]
+  },
+  {
+    path: 'files',
+    component: FileManageComponent,
     canActivate: [
       AccessGuard
     ]

@@ -1,49 +1,71 @@
 import localVarRequest from 'request';
 
+export * from './actionPerformedActivities';
 export * from './actionPerformedAllManagedDatasets';
+export * from './actionPerformedCheck';
 export * from './actionPerformedCopyUnManaged';
 export * from './actionPerformedDataSchema';
+export * from './actionPerformedDeleteAnalysis';
+export * from './actionPerformedDeleteMetrics';
 export * from './actionPerformedDeleted';
 export * from './actionPerformedDetailsAssets';
 export * from './actionPerformedDetailsAssetsUnManaged';
 export * from './actionPerformedFiles';
 export * from './actionPerformedFilesPreview';
+export * from './actionPerformedFilesUrl';
+export * from './actionPerformedGetAllAnalysis';
 export * from './actionPerformedGetData';
+export * from './actionPerformedGetReference';
 export * from './actionPerformedLoginValidate';
 export * from './actionPerformedPreview';
+export * from './actionPerformedRenderedAnalysisMetrics';
+export * from './actionPerformedRenderedMetrics';
 export * from './actionPerformedSchedules';
 export * from './actionPerformedSparkSingle';
+export * from './actionPerformedStoreMetrics';
 export * from './actionPerformedTDVCreate';
 export * from './actionPerformedUnmanagedPublishedViews';
 export * from './actionPerformedUpdate';
+export * from './activitiesTable';
+export * from './analysisList';
 export * from './datasetSource';
 export * from './datasetSourceTdv';
 export * from './filter';
+export * from './listActivitiesTable';
+export * from './listAnalysisList';
 export * from './listBucket';
 export * from './listFilter';
 export * from './listListBucket';
 export * from './listManagedDatasetsInfo';
+export * from './listProfiles';
 export * from './listPublishedViews';
 export * from './listRedisFileInfo';
 export * from './listSchema';
+export * from './listSchemaPreview';
 export * from './listSchemaTdv';
 export * from './listString';
+export * from './listVariantsTable';
 export * from './loginCredentials';
 export * from './managedDatasetsInfo';
 export * from './mapping';
+export * from './metricsDS';
+export * from './metricsTable';
 export * from './pmConfigLiveApps';
 export * from './previewConfigFile';
+export * from './profiles';
 export * from './publishedViews';
 export * from './redisContent';
 export * from './redisFileInfo';
 export * from './s3Content';
 export * from './schedule';
 export * from './schema';
+export * from './schemaPreview';
 export * from './schemaTdv';
 export * from './tDV';
 export * from './tdvJob';
 export * from './unManageDataSetCopy';
 export * from './unManageDataSetInfoStored';
+export * from './variantsTable';
 
 import * as fs from 'fs';
 
@@ -58,50 +80,72 @@ export interface RequestDetailedFile {
 export type RequestFile = string | Buffer | fs.ReadStream | RequestDetailedFile;
 
 
+import { ActionPerformedActivities } from './actionPerformedActivities';
 import { ActionPerformedAllManagedDatasets } from './actionPerformedAllManagedDatasets';
+import { ActionPerformedCheck } from './actionPerformedCheck';
 import { ActionPerformedCopyUnManaged } from './actionPerformedCopyUnManaged';
 import { ActionPerformedDataSchema } from './actionPerformedDataSchema';
+import { ActionPerformedDeleteAnalysis } from './actionPerformedDeleteAnalysis';
+import { ActionPerformedDeleteMetrics } from './actionPerformedDeleteMetrics';
 import { ActionPerformedDeleted } from './actionPerformedDeleted';
 import { ActionPerformedDetailsAssets } from './actionPerformedDetailsAssets';
 import { ActionPerformedDetailsAssetsUnManaged } from './actionPerformedDetailsAssetsUnManaged';
 import { ActionPerformedFiles } from './actionPerformedFiles';
 import { ActionPerformedFilesPreview } from './actionPerformedFilesPreview';
+import { ActionPerformedFilesUrl } from './actionPerformedFilesUrl';
+import { ActionPerformedGetAllAnalysis } from './actionPerformedGetAllAnalysis';
 import { ActionPerformedGetData } from './actionPerformedGetData';
+import { ActionPerformedGetReference } from './actionPerformedGetReference';
 import { ActionPerformedLoginValidate } from './actionPerformedLoginValidate';
 import { ActionPerformedPreview } from './actionPerformedPreview';
+import { ActionPerformedRenderedAnalysisMetrics } from './actionPerformedRenderedAnalysisMetrics';
+import { ActionPerformedRenderedMetrics } from './actionPerformedRenderedMetrics';
 import { ActionPerformedSchedules } from './actionPerformedSchedules';
 import { ActionPerformedSparkSingle } from './actionPerformedSparkSingle';
+import { ActionPerformedStoreMetrics } from './actionPerformedStoreMetrics';
 import { ActionPerformedTDVCreate } from './actionPerformedTDVCreate';
 import { ActionPerformedUnmanagedPublishedViews } from './actionPerformedUnmanagedPublishedViews';
 import { ActionPerformedUpdate } from './actionPerformedUpdate';
+import { ActivitiesTable } from './activitiesTable';
+import { AnalysisList } from './analysisList';
 import { DatasetSource } from './datasetSource';
 import { DatasetSourceTdv } from './datasetSourceTdv';
 import { Filter } from './filter';
+import { ListActivitiesTable } from './listActivitiesTable';
+import { ListAnalysisList } from './listAnalysisList';
 import { ListBucket } from './listBucket';
 import { ListFilter } from './listFilter';
 import { ListListBucket } from './listListBucket';
 import { ListManagedDatasetsInfo } from './listManagedDatasetsInfo';
+import { ListProfiles } from './listProfiles';
 import { ListPublishedViews } from './listPublishedViews';
 import { ListRedisFileInfo } from './listRedisFileInfo';
 import { ListSchema } from './listSchema';
+import { ListSchemaPreview } from './listSchemaPreview';
 import { ListSchemaTdv } from './listSchemaTdv';
 import { ListString } from './listString';
+import { ListVariantsTable } from './listVariantsTable';
 import { LoginCredentials } from './loginCredentials';
 import { ManagedDatasetsInfo } from './managedDatasetsInfo';
 import { Mapping } from './mapping';
+import { MetricsDS } from './metricsDS';
+import { MetricsTable } from './metricsTable';
 import { PmConfigLiveApps } from './pmConfigLiveApps';
 import { PreviewConfigFile } from './previewConfigFile';
+import { Profiles } from './profiles';
 import { PublishedViews } from './publishedViews';
 import { RedisContent } from './redisContent';
 import { RedisFileInfo } from './redisFileInfo';
 import { S3Content } from './s3Content';
 import { Schedule } from './schedule';
 import { Schema } from './schema';
+import { SchemaPreview } from './schemaPreview';
 import { SchemaTdv } from './schemaTdv';
 import { TDV } from './tDV';
 import { TdvJob } from './tdvJob';
 import { UnManageDataSetCopy } from './unManageDataSetCopy';
 import { UnManageDataSetInfoStored } from './unManageDataSetInfoStored';
+import { VariantsTable } from './variantsTable';
 
 /* tslint:disable:no-unused-variable */
 let primitives = [
@@ -119,50 +163,72 @@ let enumsMap: {[index: string]: any} = {
 }
 
 let typeMap: {[index: string]: any} = {
+    "ActionPerformedActivities": ActionPerformedActivities,
     "ActionPerformedAllManagedDatasets": ActionPerformedAllManagedDatasets,
+    "ActionPerformedCheck": ActionPerformedCheck,
     "ActionPerformedCopyUnManaged": ActionPerformedCopyUnManaged,
     "ActionPerformedDataSchema": ActionPerformedDataSchema,
+    "ActionPerformedDeleteAnalysis": ActionPerformedDeleteAnalysis,
+    "ActionPerformedDeleteMetrics": ActionPerformedDeleteMetrics,
     "ActionPerformedDeleted": ActionPerformedDeleted,
     "ActionPerformedDetailsAssets": ActionPerformedDetailsAssets,
     "ActionPerformedDetailsAssetsUnManaged": ActionPerformedDetailsAssetsUnManaged,
     "ActionPerformedFiles": ActionPerformedFiles,
     "ActionPerformedFilesPreview": ActionPerformedFilesPreview,
+    "ActionPerformedFilesUrl": ActionPerformedFilesUrl,
+    "ActionPerformedGetAllAnalysis": ActionPerformedGetAllAnalysis,
     "ActionPerformedGetData": ActionPerformedGetData,
+    "ActionPerformedGetReference": ActionPerformedGetReference,
     "ActionPerformedLoginValidate": ActionPerformedLoginValidate,
     "ActionPerformedPreview": ActionPerformedPreview,
+    "ActionPerformedRenderedAnalysisMetrics": ActionPerformedRenderedAnalysisMetrics,
+    "ActionPerformedRenderedMetrics": ActionPerformedRenderedMetrics,
     "ActionPerformedSchedules": ActionPerformedSchedules,
     "ActionPerformedSparkSingle": ActionPerformedSparkSingle,
+    "ActionPerformedStoreMetrics": ActionPerformedStoreMetrics,
     "ActionPerformedTDVCreate": ActionPerformedTDVCreate,
     "ActionPerformedUnmanagedPublishedViews": ActionPerformedUnmanagedPublishedViews,
     "ActionPerformedUpdate": ActionPerformedUpdate,
+    "ActivitiesTable": ActivitiesTable,
+    "AnalysisList": AnalysisList,
     "DatasetSource": DatasetSource,
     "DatasetSourceTdv": DatasetSourceTdv,
     "Filter": Filter,
+    "ListActivitiesTable": ListActivitiesTable,
+    "ListAnalysisList": ListAnalysisList,
     "ListBucket": ListBucket,
     "ListFilter": ListFilter,
     "ListListBucket": ListListBucket,
     "ListManagedDatasetsInfo": ListManagedDatasetsInfo,
+    "ListProfiles": ListProfiles,
     "ListPublishedViews": ListPublishedViews,
     "ListRedisFileInfo": ListRedisFileInfo,
     "ListSchema": ListSchema,
+    "ListSchemaPreview": ListSchemaPreview,
     "ListSchemaTdv": ListSchemaTdv,
     "ListString": ListString,
+    "ListVariantsTable": ListVariantsTable,
     "LoginCredentials": LoginCredentials,
     "ManagedDatasetsInfo": ManagedDatasetsInfo,
     "Mapping": Mapping,
+    "MetricsDS": MetricsDS,
+    "MetricsTable": MetricsTable,
     "PmConfigLiveApps": PmConfigLiveApps,
     "PreviewConfigFile": PreviewConfigFile,
+    "Profiles": Profiles,
     "PublishedViews": PublishedViews,
     "RedisContent": RedisContent,
     "RedisFileInfo": RedisFileInfo,
     "S3Content": S3Content,
     "Schedule": Schedule,
     "Schema": Schema,
+    "SchemaPreview": SchemaPreview,
     "SchemaTdv": SchemaTdv,
     "TDV": TDV,
     "TdvJob": TdvJob,
     "UnManageDataSetCopy": UnManageDataSetCopy,
     "UnManageDataSetInfoStored": UnManageDataSetInfoStored,
+    "VariantsTable": VariantsTable,
 }
 
 export class ObjectSerializer {

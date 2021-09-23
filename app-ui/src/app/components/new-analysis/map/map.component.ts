@@ -1,13 +1,6 @@
 import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, OnChanges, SimpleChanges} from '@angular/core';
 import {NewAnalysisStepStatus} from '../../../models_ui/discover';
-import {get} from 'lodash';
-import {DatasetService} from 'src/app/service/dataset.service';
-import {forkJoin} from 'rxjs';
-import {ConfigurationService} from 'src/app/service/configuration.service';
-import {DiscoverBackendService} from 'src/app/service/discover-backend.service';
 import {Mapping} from 'src/app/model/mapping';
-import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
-import {MapPanelComponent} from '../map-panel/map-panel.component';
 import {calculateColumns} from '../../../functions/analysis';
 import {ColumnUI, PreviewUI} from '../../../models_ui/analysis';
 

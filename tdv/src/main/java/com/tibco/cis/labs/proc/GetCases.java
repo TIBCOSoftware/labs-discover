@@ -33,7 +33,10 @@ public class GetCases extends BaseProcedure {
                 "activities_per_case, " +
                 "analysis_id, " +
                 "bucketedDuration, " +
-                "bucketedDuration_label ";
+                "bucketedDuration_label, " +
+                "caseStatus, " +
+                "caseStatusCategory ";
+
     }
 
     @Override
@@ -47,7 +50,9 @@ public class GetCases extends BaseProcedure {
                 new ParameterInfo("activities_per_case", Types.BIGINT, DIRECTION_NONE),
                 new ParameterInfo("analysis_id", Types.VARCHAR, DIRECTION_NONE),
                 new ParameterInfo("bucketedDuration", Types.DOUBLE, DIRECTION_NONE),
-                new ParameterInfo("bucketedDuration_label", Types.VARCHAR, DIRECTION_NONE)
+                new ParameterInfo("bucketedDuration_label", Types.VARCHAR, DIRECTION_NONE),
+                new ParameterInfo("caseStatus", Types.VARCHAR, DIRECTION_NONE),
+                new ParameterInfo("caseStatusCategory", Types.VARCHAR, DIRECTION_NONE)
         };
     }
 }

@@ -2,22 +2,17 @@
   <mat-card-header>
     <div class="header-sections">
       <div>
-        <!--<mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}} ({{caseDetail.untaggedCasedataObj.state}})</mat-card-title>-->
         <mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}}</mat-card-title>
         <mat-card-subtitle>{{cConfig.customTitle}}</mat-card-subtitle>  <!--USE THIS TO SHOW THE SOURCE-->
-        <!--<mat-card-subtitle>{{cConfig.customTitle}}</mat-card-subtitle>-->
       </div>
       <div *ngIf="cConfig.showMilestones">
-        <tcla-live-apps-case-states [small]="true" [hideTitle]="true"
-                                    [sandboxId]="appDefinitionService?.claims?.primaryProductionSandbox?.id"
-                                    [caseRef]="caseDetail?.caseReference"
-                                    [appId]="caseDetail?.metadata?.applicationId"></tcla-live-apps-case-states>
+        <uxpl-milestone-trailer small="true" [config]="milestone"></uxpl-milestone-trailer>
       </div>
     </div>
   </mat-card-header>
   <mat-card-content>
     <table style="width:100%;">
-      <tr class="cell-row" *ngFor="let row of cConfig.detailFields">
+      <tr class="cell-row" *ngFor="let row of transpose">
         <td *ngFor="let field of row" class="case-details-cell">
           <div class="case-details-cell-wrappr" *ngIf="field">
             <div class="cell-header-main">{{field.label}}</div>

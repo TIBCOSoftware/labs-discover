@@ -1,11 +1,15 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {GeneralConfig, NavBarConfig, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {GeneralConfig, MessageTopicService, NavBarConfig, TcCoreCommonFunctions, TibcoCloudNavbarComponent} from '@tibco-tcstk/tc-core-lib';
 import {Title} from '@angular/platform-browser';
 import {NavigationEnd, Router} from '@angular/router';
 import {ConfigurationService} from './service/configuration.service';
 import {OauthService} from './service/oauth.service';
 import {Location} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
+import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
+import {Components} from '@tibco-tcstk/tc-web-components';
+import UxplHelpSideBar = Components.UxplHelpSideBar;
+import { GeneralInformation } from './model/generalInformation';
 
 @Component({
   selector: 'app-root',
@@ -13,17 +17,37 @@ import {HttpClient} from '@angular/common/http';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('helpBar', {static: true}) helpBar: ElementRef<UxplHelpSideBar>;
+
+  @ViewChild('TCNavbar', {static: false}) TCNavbar: TibcoCloudNavbarComponent;
+
   disableTimeout = false;
   isLogin = false;
   afterInit = false;
   navBarConfg: NavBarConfig;
   logoUrl: string;
+  showHelp = false;
+  helpSource: string;
 
-  constructor(private location: Location, private http: HttpClient, private titleService: Title, private router: Router, private configService: ConfigurationService, protected oauthService: OauthService) {
+  constructor(private location: Location,
+              private http: HttpClient,
+              private titleService: Title,
+              private router: Router,
+              private configService: ConfigurationService,
+              public oauthService: OauthService,
+              private messageService: MessageTopicService) {
+    this.messageService.getMessage('help').subscribe(data => {
+      if(data.text && !data.text.startsWith('/')){
+        data.text = '/' + data.text;
+      }
+      this.helpSource = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/help' + data.text + '/config.json');
+    });
     router.events.subscribe(evt => {
       if (evt instanceof NavigationEnd) {
         if (evt?.url.startsWith('/login') || evt?.url.startsWith('/login-oauth')) {
           this.isLogin = true;
+
         } else {
           this.isLogin = false;
         }
@@ -101,14 +125,30 @@ export class AppComponent implements OnInit, AfterViewInit {
     };
   }
 
-  get config(): GeneralConfig {
+  get config(): GeneralInformation {
     return this.configService?.config?.discover?.general;
   }
 
   ngAfterViewInit(): void {
-    window.setTimeout( () => {
+    window.setTimeout(() => {
       this.afterInit = true;
-    },100)
+    }, 100)
+    window.setTimeout(() => {
+      if(this.TCNavbar.navbar) {
+       this.subScribeToHelp()
+      } else {
+        window.setTimeout(() => {
+          this.subScribeToHelp()
+        }, 3000)
+      }
+    }, 300);
+  }
+
+  private subScribeToHelp() {
+    this.TCNavbar.navbar.subscribeEvent('CLICK_ICON_MENU_HELP', (event) => {
+      // toggle help component
+      this.showHelp = !this.showHelp;
+    });
   }
 
 }

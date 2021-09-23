@@ -30,9 +30,16 @@ export class AnalysisService {
     this.cms = new CaseManagerService();
   }
 
-  public getAnalysis = async (token: string): Promise<Analysis[]> => {
+  public getAnalysis = async (token: string, removeCompleted?: boolean): Promise<Analysis[]> => {
     const claims = await this.aes.getClaims(token) as Claims;
-    const cases = await this.searchAnalysis('$' + claims.subscriptionId + '$');
+    let cases = await this.searchAnalysis('$' + claims.subscriptionId + '$');
+
+    if (removeCompleted){
+      cases = cases.filter(el => {
+        const summary = JSON.parse(el.summary);
+        return summary.state != 'Completed'
+      });
+    }
     const resultAnalisys = await this.formatAnalysis(cases);
 
     return resultAnalisys;
@@ -252,8 +259,10 @@ export class AnalysisService {
   public initActions = async (): Promise<void> => {
     const state = await this.cache.get('analysis-status', 'config', 'Added');
     if (state) {
+      logger.debug('Actions are initialized');
       return 
     }
+    logger.debug('Actions are not initilized. Initializing ...');
 
     const commonToken = await this.cache.get('liveapps-common', 'config', 'cictoken');
     const commonSandbox = await this.cache.get('liveapps-common', 'config', 'sandbox')
@@ -274,11 +283,11 @@ export class AnalysisService {
     ];
     const notReady: Actions[] = [
       { label: 'Edit', id: this.getActionId('Edit', types[0].actions as GetTypeResponseItemAction[])},
-      { label: 'Purge', id: this.getActionId('Purge', types[0].actions as GetTypeResponseItemAction[])},
+      { label: 'Delete', id: this.getActionId('Purge', types[0].actions as GetTypeResponseItemAction[])},
       { label: 'Rerun', id: this.getActionId('Rerun', types[0].actions as GetTypeResponseItemAction[])}
     ];
     const archived: Actions[] = [
-      { label: 'Purge', id: this.getActionId('Purge', types[0].actions as GetTypeResponseItemAction[])}
+      { label: 'Delete', id: this.getActionId('Purge', types[0].actions as GetTypeResponseItemAction[])}
     ];
     const purged: Actions[] = [
       { label: 'Force delete', id: this.getActionId('Force delete', types[0].actions as GetTypeResponseItemAction[])}
@@ -293,6 +302,8 @@ export class AnalysisService {
     await this.cache.set('analysis-status', 'config', 'Archived', JSON.stringify(archived));
     await this.cache.set('analysis-status', 'config', 'Purged', JSON.stringify(purged));
     await this.cache.set('analysis-status', 'config', 'Completed', JSON.stringify(completed));
+    logger.debug('Actions are initilized.');
+
     return;
   }
 
@@ -303,7 +314,8 @@ export class AnalysisService {
 
   public getDatasetsDetails = async (token: string, id: string): Promise<any> => {
     const claims = await this.aes.getClaims(token) as any;
-    const datasetsDetails = await this.cache.get(claims.globalSubcriptionId, 'datasets', id);
+    logger.debug('222222 ******** ' + JSON.stringify(claims));
+    const datasetsDetails = await this.cache.get(claims.globalSubscriptionId, 'datasets', id);
     return JSON.parse(datasetsDetails);
   }
 }

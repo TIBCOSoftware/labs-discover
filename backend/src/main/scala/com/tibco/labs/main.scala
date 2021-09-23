@@ -7,10 +7,13 @@
 // scalastyle:off println
 package com.tibco.labs
 
+import com.tibco.labs.utils.DataFrameUtils.{joinByColumn, joinByColumnGen}
+
 import java.io.File
 import com.tibco.labs.utils.Status._
 import io.circe.optics.JsonPath.root
 import org.apache.commons.io.FileUtils
+import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
@@ -31,24 +34,24 @@ object main extends App {
   private val NPARAMS = 2
 
 
-  println("##### JOB START ####")
+  logger.info("##### JOB START ####")
 
-  println(s"driver   =      $jdbcDriver")
-  println(s"url      =      $jdbcUrl")
-  println(s"username =      $jdbcUsername")
-  println(s"password =      *************")
+  logger.info(s"driver   =      $jdbcDriver")
+  logger.info(s"url      =      $jdbcUrl")
+  logger.info(s"username =      $jdbcUsername")
+  logger.info(s"password =      *************")
 
- // println(s"REST[GET] Config from TCI : ${_tciEndPoint}")
+ // logger.info(s"REST[GET] Config from TCI : ${_tciEndPoint}")
 
   parseArgs(args)
 
 
-  println(spark.version)
-  println("##### input params ####")
-  println(s"$analysisId")
-  println(s"$configFileForPM")
+  logger.info(spark.version)
+  logger.info("##### input params ####")
+  logger.info(s"$analysisId")
+  logger.info(s"$configFileForPM")
 
-  println(s"###########  Retrieve and Parse Analysis Config ##########")
+  logger.info(s"###########  Retrieve and Parse Analysis Config ##########")
 
   //val getCaseEndpoint = s"${_tciEndPoint}$analysisId"
 
@@ -56,7 +59,7 @@ object main extends App {
   // Get Config and files
   //jsonConfig RetrieveCaseConfig(getCaseEndpoint, getSharedFileSystem, uuid, authResponse)
   val confJ = jsonConfig.RetrieveCaseConfig(configFileForPM)
-  println(s"###########  Init vars ##########")
+  logger.info(s"###########  Init vars ##########")
   //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Load Analysis Config",12, databaseName, LocalDateTime.now().toString)
   jsonConfig.InitialiseVars(confJ)
 
@@ -69,30 +72,30 @@ object main extends App {
     }*/
 
   if (_colsExtraToKeep.equals("false")) {
-    println(s"Extra Attributes is null..")
+    logger.info(s"Extra Attributes is null..")
     columnNamesToKeep = Seq[String]()
   } else {
-    println(s"Extra Attributes filled")
+    logger.info(s"Extra Attributes filled")
     //columnNamesToKeep = _colsExtraToKeep.split(",").toSeq
-    println(s"columnsNamesToKeep : " + columnNamesToKeep)
+    logger.info(s"columnsNamesToKeep : " + columnNamesToKeep)
   }
 
   // Mapping outPut
-  println(s"Mapping CASE_ID to " + columnCaseId)
-  println(s"Mapping ACTIVITY_START_TIMESTAMP to " + columnCaseStart)
-  println(s"Mapping ACTIVITY_END_TIMESTAMP to " + columnCaseEnd)
-  println(s"Mapping ACTIVITY_ID to " + columnActivityId)
-  println(s"Mapping RESOURCE_ID to " + columnResourceId)
-  println(s"Mapping analysis_id to " + analysisId)
-  println(s"Mapping FILTERED LIST to " + columnNamesToKeep)
-  println(s"Mapping Requester to " + columnRequester)
-  println(s"Mapping Resource Group LIST to " + columnResourceGroup)
-  println(s"Mapping Schedule start to " + columnScheduleStart)
-  println(s"Mapping Schedule end to " + columnScheduleStart)
+  logger.info(s"Mapping CASE_ID to " + columnCaseId)
+  logger.info(s"Mapping ACTIVITY_START_TIMESTAMP to " + columnCaseStart)
+  logger.info(s"Mapping ACTIVITY_END_TIMESTAMP to " + columnCaseEnd)
+  logger.info(s"Mapping ACTIVITY_ID to " + columnActivityId)
+  logger.info(s"Mapping RESOURCE_ID to " + columnResourceId)
+  logger.info(s"Mapping analysis_id to " + analysisId)
+  logger.info(s"Mapping FILTERED LIST to " + columnNamesToKeep)
+  logger.info(s"Mapping Requester to " + columnRequester)
+  logger.info(s"Mapping Resource Group LIST to " + columnResourceGroup)
+  logger.info(s"Mapping Schedule start to " + columnScheduleStart)
+  logger.info(s"Mapping Schedule end to " + columnScheduleStart)
 
 
 
-  println(s"###########  Load Data source as DataFrame ##########")
+  logger.info(s"###########  Load Data source as DataFrame ##########")
 
 
   var tmpDataFrame = spark.emptyDataFrame
@@ -102,10 +105,10 @@ object main extends App {
   import com.tibco.labs.utils.DataFrameUtils
 
   Try {
-      println(s"Loading TDV table input into a dataframe")
+      logger.info(s"Loading TDV table input into a dataframe")
       dateFormatString = tdvDateTimeFormat
       val url = "jdbc:compositesw:dbapi@" + tdvSiteEndpoint + "?domain=" + tdvDomain + "&dataSource=" + tdvDatabase
-      println(s"tdv uri $url")
+      logger.info(s"tdv uri $url")
       //var tdvOption = Map[String, String]()
       var tdvOption: Map[String, String] =
         Map(
@@ -123,8 +126,8 @@ object main extends App {
     val Msg = s"Load Datasource"
     sendBottleToTheSea(s"$analysisId","info",Msg,15, organisation)
   } match {
-    case Success(value) => println("So far...so Good " + value)
-    case Failure(exception) => println(s"Error ${exception.getMessage}")
+    case Success(value) => logger.info("So far...so Good " + value)
+    case Failure(exception) => logger.error(s"Error ${exception.getMessage}")
       val errMsg = s"Error: Loading from TDV : ${exception.getMessage}"
       sendBottleToTheSea(s"$analysisId","error",errMsg,0, organisation)
   }
@@ -138,7 +141,6 @@ object main extends App {
   val df_events = events.eventsDF
   sendBottleToTheSea(s"$analysisId","info","Generate Events table first pass",20, organisation)
 
-
   if (df_events.take(1).isEmpty) {
     //sendTCMMessage(s"$analysisId",s"$caseRef","error","Error DF Events is empty : ", 0, databaseName, LocalDateTime.now().toString)
     val errMsg = s"Error DF Events is empty"
@@ -147,11 +149,11 @@ object main extends App {
   val df_attrib_bin = events.attributesDF
   sendBottleToTheSea(s"$analysisId","info","Generate Attributes Table",24, organisation)
 
+  val df_events_casefilter = events.eventsCasesFiltered
   // generate activities
   import com.tibco.labs.pm.activities._
 
   val df_act = transformActivities(df_events)
-  //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Generate Activities table",36, databaseName, LocalDateTime.now().toString)
   sendBottleToTheSea(s"$analysisId","info","Generate Activities table",30, organisation)
 
 
@@ -162,52 +164,62 @@ object main extends App {
 
   //val df_eventsFinal = FinalizeEvents(df_events.drop("cases_extra_attributes"), df_act)
 
+  // generate cases table
 
+  import com.tibco.labs.pm.cases._
+
+  val df_cases = transformCases(df_eventsFinal, df_events_casefilter)
+  sendBottleToTheSea(s"$analysisId","info","Generate Cases table",40, organisation)
 
   // generate variants table
 
   import com.tibco.labs.pm.variants._
 
-  val df_variants: DataFrame = transformVariants(df_eventsFinal)
+  var df_variants: DataFrame = transformVariants(df_eventsFinal)
 
   sendBottleToTheSea(s"$analysisId","info","Generate Variants table",42, organisation)
 
-  //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Generate Variants table",42, databaseName, LocalDateTime.now().toString)
-
   import com.tibco.labs.pm.variants_status._
 
-  val df_var_status: DataFrame = transformVariantsStatus(df_variants)
+  var df_var_status: DataFrame = transformVariantsStatus(df_variants)
   sendBottleToTheSea(s"$analysisId","info","Generate Compliance table",48, organisation)
 
-  //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Generate Compliance table",48, databaseName, LocalDateTime.now().toString)
+
+  // Filter second pass on df_events
+  logger.info("############ filter events second pass")
+  val df_eventsFinal2 = joinByColumnGen("case_id", df_cases, df_eventsFinal, "inner")
+  sendBottleToTheSea(s"$analysisId","info","filter events second pass",50, organisation)
+
+  logger.info("############ filter variants second pass")
+
+  df_variants = transformVariants(df_eventsFinal2)
+  df_var_status = transformVariantsStatus(df_variants)
 
   // generate cases table
 
-  import com.tibco.labs.pm.cases._
+  val df_casesFinal = enrichCaseTable(df_cases, df_variants, df_act)
+  sendBottleToTheSea(s"$analysisId","info","Enrich Cases table",54, organisation)
 
-  val df_cases = transformCases(df_eventsFinal, df_variants)
-  sendBottleToTheSea(s"$analysisId","info","Generate Cases table",54, organisation)
 
-  //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Generate Cases table",54, databaseName, LocalDateTime.now().toString)
+  // cast Duration_SEC to LongType
+  val df_eventsFinalDB = FinalizeEventsForDB(df_eventsFinal2)
+  sendBottleToTheSea(s"$analysisId","info","Polish Events table Second pass",58, organisation)
 
   // generate metrics table
 
-  // import com.tibco.labs.pm.metrics._
+  import com.tibco.labs.pm.metrics._
 
-  // getAnalysisMetrics(df_cases, df_events, spark)
-  // cast Duration_SEC to LongType
-  val df_eventsFinalDB = FinalizeEventsForDB(df_eventsFinal)
-  sendBottleToTheSea(s"$analysisId","info","Polish Events table Second pass",58, organisation)
-
+  val df_metricsFinal = AnalysisMetrics(df_casesFinal, df_eventsFinalDB, spark)
 
   /*  Seq(df_eventsFinalDB,df_attrib_bin, df_act , df_attrib , df_variants , df_cases , df_var_status).foldLeft(()) {
       case (u, df) => printDFSchema(df)
     }*/
-  Seq(df_eventsFinalDB,df_attrib_bin, df_act , df_variants , df_cases , df_var_status).foldLeft(()) {
-    case (u, df) => printDFSchema(df)
+  logger.info("######### table structures #######@")
+  Seq(df_eventsFinalDB,df_attrib_bin, df_act , df_variants ,df_cases, df_casesFinal , df_var_status, df_metricsFinal).foldLeft(()) {
+    case (u, df) =>  logger.info(printDFSchema(df))
   }
   // writing
-
+  logger.info("######### writing tables #######@")
   DataFrameUtils.updateAnalysisJDBC("events", df_eventsFinalDB)
   // events in binary
   DataFrameUtils.updateAnalysisBinaryJDBC("events_binary", df_eventsFinalDB)
@@ -220,15 +232,17 @@ object main extends App {
   //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Write Attributes table",78, databaseName, LocalDateTime.now().toString)
   DataFrameUtils.updateAnalysisJDBC("variants", df_variants)
   sendBottleToTheSea(s"$analysisId","info","Variant Table Saved",80, organisation)
-  DataFrameUtils.updateAnalysisJDBC("cases", df_cases)
+  DataFrameUtils.updateAnalysisJDBC("cases", df_casesFinal)
   sendBottleToTheSea(s"$analysisId","info","Cases Table Saved",85, organisation)
   DataFrameUtils.updateAnalysisJDBC("variants_status", df_var_status)
   sendBottleToTheSea(s"$analysisId","info","Variant Status Table Saved",90, organisation)
+  //DataFrameUtils.updateAnalysisJDBC("metrics", df_metricsFinal)
+  //sendBottleToTheSea(s"$analysisId","info","Metrics Table Saved",95, organisation)
   //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Write Compliance table",95, databaseName, LocalDateTime.now().toString)
 
   // cleaning
 
-    println(s"###########  cleaning file ##########")
+    logger.info(s"###########  cleaning file ##########")
 
     val cleanedFile = FileUtils.deleteQuietly(new File(configFileForPM))
     val jobFilePath = new File(configFileForPM).getParent
@@ -238,14 +252,14 @@ object main extends App {
     val jobFile = FileUtils.deleteQuietly(new File(s"$jobFilePath/${meta_name}.yaml"))
 
     if (!cleanedFile) {
-      println(s"###########  Error while removing file ##########")
+      logger.info(s"###########  Error while removing file ##########")
       //sendTCMMessage(s"$analysisId",s"$caseRef","error","Error deleting file : " + configFileForPM, 0, databaseName, LocalDateTime.now().toString)
       sendBottleToTheSea(s"$analysisId","error","Error deleting file : " + configFileForPM,0, organisation)
       //throw new Exception("Error deleting file : " + configFileForPM)
     }
 
   if (!jobFile) {
-    println(s"###########  Error while removing file ##########")
+    logger.info(s"###########  Error while removing file ##########")
     sendBottleToTheSea(s"$analysisId","error","Error deleting file : " + jobFile,0, organisation)
 
     //sendTCMMessage(s"$analysisId",s"$caseRef","error","Error deleting file : " + jobFile, 0, databaseName, LocalDateTime.now().toString)
@@ -259,7 +273,7 @@ object main extends App {
   sendBottleToTheSea(s"$analysisId","info","Thanks for your patience",100, organisation)
   Thread.sleep(2000)
   spark.stop()
-  println("...Bye Bye...")
+  logger.info("...Bye Bye...")
   sys.exit(0)
 
 
@@ -279,11 +293,11 @@ object main extends App {
         "\n" +
         "Database Target Name - (string) where the output of this job is being stored...\n" +
         "AnalysisID - (string) the AnalysisID to be processed\n"
-    println(usage)
+    logger.info(usage)
   }
 
-  private def printDFSchema(df: DataFrame) = {
-    df.printSchema()
+  private def printDFSchema(df: DataFrame): String = {
+   df.schema.treeString
   }
 
 }

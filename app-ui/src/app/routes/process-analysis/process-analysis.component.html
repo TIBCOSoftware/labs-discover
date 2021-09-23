@@ -21,7 +21,7 @@
   </div>
   <div class="process-analysis-wrapper" *ngIf="loading || cases.length>0">
     <div class="process-analysis-container">
-      <process-analysis-table [processAnalyses]="cases" [searchTerm]="search" [statusMap]="statusMap"
+      <process-analysis-table #paTable [processAnalyses]="cases" [searchTerm]="search" [statusMap]="statusMap"
                               [loading]="loading" (openAnalysis)="openAnalytics($event)"
                               (caseActionSelect)="handleActionSelected($event)"
                               (forceRefresh)="refresh()"></process-analysis-table>

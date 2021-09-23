@@ -2,7 +2,7 @@ package com.tibco.labs.orchestrator.node.cluster
 
 import com.github.swagger.akka.SwaggerHttpService
 import com.github.swagger.akka.model._
-import com.tibco.labs.orchestrator.api.{FilesRoutes, LoginRoutes, PreviewFileRoutes, ProcessMiningRoutes, ProcessMiningScheduledRoutes, TdvMgmtRoutes}
+import com.tibco.labs.orchestrator.api.{FilesRoutes, LoginRoutes, MetricsRoutes, MinerRoutes, PreviewFileRoutes, ProcessMiningRoutes, ProcessMiningScheduledRoutes, TdvMgmtRoutes}
 import io.swagger.annotations.BasicAuthDefinition
 import io.swagger.v3.oas.models.ExternalDocumentation
 import io.swagger.v3.oas.models.security.{SecurityRequirement, SecurityScheme}
@@ -31,7 +31,9 @@ object SwaggerDocService extends SwaggerHttpService {
     classOf[ProcessMiningScheduledRoutes],
     classOf[TdvMgmtRoutes],
     classOf[PreviewFileRoutes],
-    classOf[LoginRoutes]
+    classOf[LoginRoutes],
+    classOf[MetricsRoutes],
+    classOf[MinerRoutes]
   )
   override val host = "discover.labs.tibcocloud.com"
   override val info: Info = Info(
@@ -45,7 +47,7 @@ object SwaggerDocService extends SwaggerHttpService {
   override val schemes = List("https")
   override val externalDocs: Option[ExternalDocumentation] = Some(new ExternalDocumentation().description("Find out more on TIBCO Discover").url("http://acme.com/docs"))
   //override val security: List[SecurityRequirement] = List(new SecurityRequirement("http", "basic"))
-  override val securitySchemes: Map[String, SecurityScheme] = Map("basic" -> basicAuth)
+  override val securitySchemes: Map[String, SecurityScheme] = Map("basic" -> basicAuth, "bearer" -> bearerTokenScheme)
 
   override val unwantedDefinitions = Seq("Function1", "Function1RequestContextFutureRouteResult")
 }

@@ -1,8 +1,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Project Discover™ – Overview</title>
+    <title>Project Discover – Overview</title>
     <link>https://tibcosoftware.github.io/labs-discover/docs/overview/</link>
-    <description>Recent content in Overview on Project Discover™</description>
+    <description>Recent content in Overview on Project Discover</description>
     <generator>Hugo -- gohugo.io</generator>
     
 	  <atom:link href="https://tibcosoftware.github.io/labs-discover/docs/overview/index.xml" rel="self" type="application/rss+xml" />

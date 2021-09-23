@@ -17,49 +17,66 @@ import scala.util.{Failure, Success, Try}
 
 object metrics {
 
-  def AnalysisMetrics(df_cases: DataFrame, df_events: DataFrame, spark: SparkSession): Unit = {
+  def AnalysisMetrics(df_cases: DataFrame, df_events: DataFrame, spark: SparkSession): DataFrame = {
 
+    var df_out = spark.emptyDataFrame
     Try{
-      println(s"###########  Starting Metrics ##########")
-      println(s"###########  Fetching Datas and Aggregates ##########")
+      logger.info(s"###########  Starting Metrics ##########")
+      logger.info(s"###########  Fetching Datas and Aggregates ##########")
 
+      df_cases.printSchema()
       df_cases.repartition(numParts.toInt).createOrReplaceTempView("cases")
       df_events.repartition(numParts.toInt).createOrReplaceTempView("events")
 
-      val df_casesMetrics = spark.sql(s" select count(cases.case_id) as `num_of_cases`," +
-        s"double(avg(cases.total_case_duration))  as `AvgTime`," +
-        s"double(approx_percentile(cases.total_case_duration, 0.5)) as `MedianTime`," +
-        s"count(distinct(cases.variant_id)) as `num_of_variants`," +
-        s"max(cases.activities_per_case) as `max_activities`," +
-        s"min(cases.activities_per_case) as `min_activities` " +
+      val df_casesMetrics = spark.sql(
+        s"select count(case_id) as `num_of_cases`, " +
+        s"double(avg(total_case_duration))  as `AvgTime`, " +
+        s"double(min(total_case_duration))  as `MinTime`, " +
+        s"double(max(total_case_duration))  as `MaxTime`, " +
+        s"double(approx_percentile(total_case_duration, 0.5)) as `MedianTime`, " +
+        s"count(distinct(variant_id)) as `num_of_variants`," +
+        s"max(activities_per_case) as `max_activities`, " +
+        s"min(activities_per_case) as `min_activities`, " +
+        s"avg(activities_per_case) as `avg_activities` " +
         s"from cases")
 
 
       //df_casesMetrics.printSchema()
 
-      val df_eventsMetrics =  spark.sql(s" select count(row_id) as `num_of_events`," +
-        s"count(distinct(activity_id))  as `num_of_activities` " +
-        s"from events")
+      val df_eventsMetrics =  spark.sql(
+        s"select count(row_id) as `num_of_events`, " +
+        s"count(distinct(activity_id))  as `num_of_activities`, " +
+        s"count(distinct(resource_id))  as `num_of_res`, " +
+        s"string(min(activity_start_timestamp))  as `minTimestamp`, " +
+        s"string(max(activity_start_timestamp))  as `maxTimestamp` " +
+        s"from events"
+      )
 
 
       //df_cases.unpersist()
       //df_events.unpersist()
 
       val avgDuration = df_casesMetrics.first().getDouble(1).toInt
-      val medianDuration = df_casesMetrics.first().getDouble(2).toInt
+      val medianDuration = df_casesMetrics.first().getDouble(4).toInt
+      val maxDuration = df_casesMetrics.first().getDouble(2).toInt
+      val minDuration = df_casesMetrics.first().getDouble(3).toInt
 
-      println(s"###########  Avg : ${avgDuration.toString} Median : ${medianDuration.toString} ##########")
+      logger.info(s"###########  Avg : ${avgDuration.toString} Median : ${medianDuration.toString} ##########")
 
       val caseMetrics = df_casesMetrics.toJSON.first()
       val eventMetrics = df_eventsMetrics.toJSON.first
 
-      println(s"###########  Parse JSON ##########")
+      logger.info(s"###########  Parse JSON ##########")
       val jsonStr: Json = parser.parse(raw"""$caseMetrics""").getOrElse(Json.Null)
       val jsonStr2: Json = parser.parse(raw"""$eventMetrics""").getOrElse(Json.Null)
 
-      println(s"###########  Optics Transformation JSON ##########")
+      logger.info(s"###########  Optics Transformation JSON ##########")
       val avgDurationTran: Json => Json = root.AvgTime.double.modify(_ => doubleToStringTimeSpanDays(avgDuration))
       val medianDurationTran: Json => Json = root.MedianTime.double.modify(_ => doubleToStringTimeSpanDays(medianDuration))
+      val minDurationTran: Json => Json = root.MedianTime.double.modify(_ => doubleToStringTimeSpanDays(minDuration))
+      val maxDurationTran: Json => Json = root.MedianTime.double.modify(_ => doubleToStringTimeSpanDays(maxDuration))
+
+
 
       if (jsonStr.isNull || jsonStr2.isNull) {
         throw new Exception("Error parsing JSON")
@@ -67,16 +84,18 @@ object metrics {
 
       val jsonStrTmp: Json = avgDurationTran(jsonStr)
       val jsonStrTmp2: Json = medianDurationTran(jsonStrTmp)
+      val jsonStrTmp3: Json = minDurationTran(jsonStrTmp2)
+      val jsonStrTmp4: Json = maxDurationTran(jsonStrTmp3)
 
-      println(s"###########  Deep Merge JSON ##########")
-      val result: Json = jsonStrTmp2.deepMerge(jsonStr2)
+      logger.info(s"###########  Deep Merge JSON ##########")
+      val result: Json = jsonStrTmp4.deepMerge(jsonStr2)
 
       // .replaceAll("\\\"", Matcher.quoteReplacement(""))
 
       val out: RDD[String] = spark.sparkContext.parallelize(result.noSpaces :: Nil)
 
       import spark.sqlContext.implicits._
-      var df_out = spark.sqlContext.read.json(out.toDS())
+      df_out = spark.sqlContext.read.json(out.toDS())
 
 
       df_out = df_out.withColumn("ANALYSIS_ID", lit(analysisId))
@@ -88,9 +107,15 @@ object metrics {
         "num_of_activities",
         "AvgTime",
         "MedianTime",
+        "MinTime",
+        "MaxTime",
         "num_of_variants",
         "max_activities",
         "min_activities",
+        "avg_activities",
+        "num_of_res",
+        "minTimestamp",
+        "maxTimestamp",
         "ANALYSIS_ID")
 
       //val currentCols = df_out.columns
@@ -100,20 +125,23 @@ object metrics {
       df_out = df_out.select(finalColumnsOrderedName.head, finalColumnsOrderedName.tail: _*)
 
       // Delete any previous analysisID in DB
-      DataFrameUtils.deleteAnalysisJDBC(databaseName, "metrics")
+      //DataFrameUtils.deleteAnalysisJDBC(databaseName, "metrics")
       //Write Events table
-      if (backEndType.equals("aurora")) {
-        DataFrameUtils.writeAnalysisJDBC(df_out, databaseName, "metrics")
-      }
+      //if (backEndType.equals("aurora")) {
+      //  DataFrameUtils.writeAnalysisJDBC(df_out, databaseName, "metrics")
+     // }
 
-      println(df_out.schema.toString())
-      println("")
-      println(jsonStr2.noSpaces)
-      println(jsonStr.noSpaces)
-      println("Results :  " + result.noSpaces)
+      logger.info(df_out.schema.toString())
+      logger.info("")
+      logger.info(jsonStr2.noSpaces)
+      logger.info(jsonStr.noSpaces)
+      logger.info("Results :  " + result.noSpaces)
     }match {
-      case Success(_) => println("Metrics Done")
-      case Failure(e) => println("Error in metrics : " +e.getMessage)
+      case Success(_) => {
+        logger.info("Metrics Done")
+        df_out
+      }
+      case Failure(e) => logger.info("Error in metrics : " +e.getMessage)
         throw e
     }
 

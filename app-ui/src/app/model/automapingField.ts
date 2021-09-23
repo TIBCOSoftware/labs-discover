@@ -12,7 +12,7 @@
 
 
 export interface AutomapingField { 
-    field?: string;
-    counter?: number;
+    word?: string;
+    occurrence?: number;
 }
 

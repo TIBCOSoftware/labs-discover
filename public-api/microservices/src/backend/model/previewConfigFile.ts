@@ -11,11 +11,13 @@
  */
 
 import { RequestFile } from './models';
+import { SchemaPreview } from './schemaPreview';
 
 export class PreviewConfigFile {
     'Token': string;
     'Organization': string;
     'DatasetId': string;
+    'schema'?: Array<SchemaPreview>;
 
     static discriminator: string | undefined = undefined;
 
@@ -34,6 +36,11 @@ export class PreviewConfigFile {
             "name": "DatasetId",
             "baseName": "DatasetId",
             "type": "string"
+        },
+        {
+            "name": "schema",
+            "baseName": "schema",
+            "type": "Array<SchemaPreview>"
         }    ];
 
     static getAttributeTypeMap() {

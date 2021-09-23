@@ -1,0 +1,1754 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Authorization Engine Service
+  description: |
+    The TIBCO Cloud(TM) Live Apps Authorization Engine Service manages the organization model and subscription resources used by each TIBCO(R) Live Apps subscription. These resources are:
+      * __Sandboxes__: There are two types of Sandbox:
+      
+        * __Production__: A subscription contains a single Production Sandbox, in which published applications run and are used.
+        
+        * __Developer__: A subscription contains a Developer Sandbox for every user who is mapped to the ApplicationDeveloper Group in the Production Sandbox. Each User owns their Developer Sandbox and can use it to write and test applications in isolation before publishing them.
+        
+        Users and Groups are mapped to Sandboxes.
+      
+      * __Users__: Users are created at a subscription level. They are mapped to Groups and to Sandboxes that they are authorized to access. 
+      
+      * __Groups__: There are two types of Group:
+      
+        * _System-defined_ Groups. There are four of these:
+          * __AllUsers__: Users mapped to this Group are authorized to access the Live Apps Case Manager.
+          * __Administrator__: Users mapped to this Group are authorized to access the Live Apps Administrator.
+          * __ApplicationDeveloper__: Users mapped to this Group are authorized to access the Live Apps Designer.
+          * __UIDeveloper__: Reserved for future use.
+                  
+        * _Subscription-defined_ (or custom) groups, which Users can be mapped to as required. These Groups must have a type of __SubscriptionDefined__. 
+        
+          NOTE: You can use the Authorization Service to retrieve information about all types of Group, but you can only create, update or delete subscription-defined Groups.
+      
+      * __UserGroupMappings__ (or __Mappings__): UserGroupMappings define all the mappings between Users, Groups and Sandboxes. 
+      
+      * __Claims__: Claims are associated with Users. They hold the information about which Sandboxes and Groups the User has access to. Whenever a User attempts to access a Live Apps resource, the Authorization Engine Service validates the Claims held for the User who is making the request against the resources they are attempting to access.
+      
+      * __Parameters__: Provide configuration details about the subscription.
+      
+      The Authorization Engine Service allows you to retrieve information about these resources. In the case of subscription-defined Groups and UserGroupMappings, you can also create, update and delete them.
+  termsOfService: ../../contexthelp/common/TIB_bpm-cloud_1.0.0_license.pdf
+  contact:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+    email: liveapps@tibco.com
+  license:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+schemes:
+  - https
+basePath: /organisation/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: Users
+    description: Methods on Users
+  - name: UserRules
+    description: Methods on UserRules
+  - name: Claims
+    description: Methods on Claims
+  - name: Groups
+    description: Methods on Groups
+  - name: Sandboxes
+    description: Methods on Sandboxes
+  - name: Mappings
+    description: Methods on UserGroupMappings
+  - name: Parameters
+    description: Methods on subscription Parameters
+paths:
+  #######################################
+  # Operations to deal with users
+  #######################################
+  /users:
+    get:
+      summary: Returns the details for each User in the current subscription whose name matches the specified query parameters. 
+      description: "" 
+      tags:
+        - Users
+      operationId: getUsers
+      parameters:
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - $ref: '#/parameters/userFilter'
+      responses:
+        '200':
+          description: OK - Returns the details for each User in the current subscription. 
+          examples: 
+            application/json: [{"externalId":"1FBDD1F1-2986-6450-DA68-54B091AB597B","firstName":"Alison","lastName":"Davidson","username":"adavidson","email":"adavidson@example.com","type":"Standard","id":"1"},{"externalId":"3945137D-7407-57CA-FC9E-395DAF42831C","firstName":"Vicky","lastName":"Caines","username":"vcaines","email":"vcaines@example.com","type":"Standard","id":"947"},{"externalId":"874E2D99-1DCB-4270-1837-67B53C9E3F83","firstName":"Bob","lastName":"Panos","username":"bpanos","email":"bpanos@example.com","type":"Standard","id":"948"},{"externalId":"60F022C2-5D8D-372C-BA4A-447E1B7008EB","firstName":"Noel","lastName":"Lawrence","username":"nlawrence","email":"nlawrence@example.com","type":"Standard","id":"949"},{"externalId":"40F022C2-5D8D-372C-BA4A-457E1B7008AC","firstName":"Jodie","lastName":"Pearce","username":"jpearce","email":"jpearce@example.com","type":"Standard","id":"950"},{"externalId":"920F022C2-5D8D-372C-BA4A-457E1B7008YX","firstName":"Liam","lastName":"Harris","username":"lharris","email":"lharris@example.com","type":"Standard","id":"951"},{"externalId":"320F022C2-5D8D-372C-BA7Z-457E1B7008YX","firstName":"Logan","lastName":"Walton","username":"lwalton","email":"lwalton@example.com","type":"Standard","id":"952"}]
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}:
+    get:
+      summary: Returns the details for a specfic User. 
+      description: ""
+      tags:
+        - Users
+      operationId: getUser
+      parameters:
+        - $ref: '#/parameters/userIdFlex'
+      responses:
+        '200':
+          description: OK - Returns the details for the specified User.
+          schema:
+            $ref: '#/definitions/User'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified User does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}/groups:
+    get:
+      summary: Returns details of all the Groups to which the specified User has access. The $sandbox parameter is required.
+      description: ""
+      tags:
+        - Users
+      operationId: getGroupsForUser
+      parameters:
+        - $ref: '#/parameters/userId'
+        - $ref: "#/parameters/sandboxParamRequired"
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+      responses:
+        '200':
+          description: OK - Returns details of all the Groups to which the specified User has access.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified User does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}/sandboxes:
+    get:
+      summary: Returns details of all the Sandboxes to which the specified User has access.
+      description: ""
+      tags:
+        - Users
+      operationId: getSandboxesForUser
+      parameters:
+        - $ref: '#/parameters/userId'
+      responses:
+        '200':
+          description: OK - Returns details of all the Sandboxes to which the specified User has access.
+          examples:  
+            application/json:    
+             [{"name":"Production Sandbox","type":"Production","subscriptionId":"1","ownerId":null,"id":"1"},{"name":"Developer Sandbox","type":"Developer","subscriptionId":"1","ownerId":"947","id":"167"}]
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Sandbox'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified User does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}/userGroupMappings:
+    get:
+      summary: Returns a list of UserGroupMappings that reference the specified User.
+      description: ""
+      tags:
+        - Users
+      operationId: getUserGroupMappingsForUser
+      parameters:
+        - $ref: '#/parameters/userId'
+        - $ref: "#/parameters/sandboxParam"
+      responses:
+        '200':
+          description: |
+            OK - Returns a list of UserGroupMappings that reference the specified User. The Example Value below is for the request:
+
+            GET /users/947/userGroupMappings?$sandbox=167
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserGroupMapping'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified User does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}/userRules:
+    get:
+      summary: Returns a list of UserRules that reference the belong to the specified User.
+      description: ""
+      tags:
+        - Users
+      operationId: getUserRulesForUser
+      parameters:
+        - $ref: '#/parameters/userId'
+      responses:
+        '200':
+          description: |
+            OK - Returns a list of UserRules that the belong to the specified User. The Example Value below is for the request:
+
+            GET /users/947/userRules
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserRuleList'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified User does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    
+  ###################################
+  # Operations to deal with UserRules
+  ###################################
+  /userRules:
+    post:
+      summary: Creates a UserRule.
+      description: ""
+      tags:
+        - UserRules
+      operationId: createUserRule
+      parameters:
+        - name: ruleDetails
+          in: body
+          description: |
+            The UserRule definition (owner ID, target ID and period) for the UserRule that you want to create. 
+          required: true
+          schema:
+            $ref: '#/definitions/UserRuleContent'
+      responses:
+        '200':
+          description: OK - Returns the unique identifier of the created UserRule.
+          schema:
+            description: Unique identifier ('id') of the UserRule
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /userRules/{id}:
+    get:
+      summary: Returns the details for a specific UserRule.
+      description: ""
+      tags:
+        - UserRules
+      operationId: getUserRule
+      parameters:
+        - $ref: '#/parameters/userRuleId'
+      responses:
+        '200':
+          description: OK - Returns the details for the specified UserRule. 
+          schema:
+            $ref: '#/definitions/UserRule'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates the details for a specific UserRule.
+      description: ""
+      tags:
+        - UserRules
+      operationId: updateUserRule
+      parameters:
+        - $ref: '#/parameters/userRuleId'
+        - name: ruleDetails
+          in: body
+          description: The UserRule definition (owner ID, target ID and period) for the UserRule that you want to update. 
+          required: true
+          schema:
+            $ref: '#/definitions/UserRuleContent'
+      responses:
+        '200':
+          description: OK - Returns the full details for the specified Group.
+          schema:
+            $ref: '#/definitions/UserRule'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a specific UserRule.
+      description: ""
+      tags:
+        - UserRules
+      operationId: deleteUserRule
+      parameters:
+        - $ref: '#/parameters/userRuleId'
+      responses:
+        '200':
+          description: OK - The specified Group has been successfully deleted.
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  ################################
+  # Operations to deal with Claims
+  ################################
+  /claims:
+    get:
+      summary: Returns the Claims held for the currently logged in User.
+      description: ""
+      tags:
+        - Claims
+      operationId: getClaims
+      responses:
+        '200':
+          description: OK - Returns the Claims held for the currently logged in User.
+          schema:
+            $ref: '#/definitions/Claims'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+
+  #######################################
+  # Operations to deal with Groups
+  #######################################
+  /groups:
+    get:
+      summary: Returns the details for each Group in the current subscription that matches the specified query parameters.
+      description: ""
+      tags:
+        - Groups
+      operationId: getGroups
+      parameters:
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - in: query
+          name: $filter
+          description: |
+            A filter expression that defines the Groups for which data should be returned. The expression can contain the following operand:  
+            
+            * __name__ (optional): The case-insensitive name of the Group(s) for which data should be returned. Only one name can be used. You can search for partial names by using the contains function.
+              
+              Supported operator: 'eq'
+              Supported function: 'contains(name,'value')'
+            
+            Note: Using this filter automatically restricts the returned data to match only Groups of type SubscriptionDefined.
+            
+            For example, the following string returns data for the Group called 'Support' or 'support':
+              
+                $filter=contains(name,'support')
+                
+            The following string returns data for all Groups that contain 'Support' or 'support' in their name:
+              
+                $filter=contains(name,'Support')            
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK - Returns the details for each Group in the current subscription. 
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a subscription-defined Group.
+      description: |
+        __Note__: You cannot create a system-defined Group.
+      tags:
+        - Groups
+      operationId: createGroup
+      parameters:
+        - name: groupContent
+          in: body
+          description: |
+            The GroupDetails (name, description and type) for the Group that you want to create. 
+            
+            Note: _type_ must be 'SubscriptionDefined'. You cannot create any other type of Group.
+          required: true
+          schema:
+            $ref: '#/definitions/GroupDetails'
+      responses:
+        '200':
+          description: OK - Returns the unique identifier of the created Group.
+          schema:
+            description: Unique identifier ('id') of the Group
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates the details for one or more Groups.
+      description: ""
+      tags:
+        - Groups
+      operationId: updateGroups
+      parameters:
+        - name: groups
+          in: body
+          description: | 
+            The full details of each Group that you wish to update.
+            
+            - _type_ must be 'SubscriptionDefined' You cannot update any other type of Group.
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+      responses:
+        '200':
+          description: OK - Returns the details of each updated Group. 
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /groups/{id}:
+    get:
+      summary: Returns the details for a specific Group.
+      description: ""
+      tags:
+        - Groups
+      operationId: getGroup
+      parameters:
+        - $ref: '#/parameters/groupId'
+      responses:
+        '200':
+          description: OK - Returns the details for the specified Group. 
+          schema:
+            $ref: '#/definitions/Group'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates the details for a specific Group.
+      description: ""
+      tags:
+        - Groups
+      operationId: updateGroup
+      parameters:
+        - $ref: '#/parameters/groupId'
+        - name: groupDetails
+          in: body
+          description: The GroupDetails (name, description and type) of the Group that you wish to update.
+          required: true
+          schema:
+            $ref: '#/definitions/GroupDetails'
+      responses:
+        '200':
+          description: OK - Returns the full details for the specified Group.
+          schema:
+            $ref: '#/definitions/Group'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a specific Group.
+      description: ""
+      tags:
+        - Groups
+      operationId: deleteGroup
+      parameters:
+        - $ref: '#/parameters/groupId'
+      responses:
+        '200':
+          description: OK - The specified Group has been successfully deleted.
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /groups/{id}/users:
+    get:
+      summary: Returns details of all the Users who are mapped to a specific Group, whose names match the specified query parameters. The $sandbox parameter is required.
+      description: ""
+      tags:
+        - Groups
+      operationId: getUsersMappedToGroup
+      parameters:
+        - $ref: '#/parameters/groupId'
+        - $ref: "#/parameters/sandboxParamRequired"
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - $ref: '#/parameters/userFilter'
+      responses:
+        '200':
+          description: OK - Returns details of all the Users who are mapped to a specific Group. 
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Group does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+
+  ########################################
+  # Operations to deal with group mappings
+  ########################################
+  /userGroupMappings:
+    get:
+      summary: Returns the details for each UserGroupMapping in a specific Sandbox.
+      description: ""
+      tags:
+        - Mappings
+      operationId: getUserGroupMappings
+      parameters:
+        - $ref: "#/parameters/sandboxParam"
+      responses:
+        '200':
+          description: Returns the details for each UserGroupMapping in a specific Sandbox.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserGroupMapping'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a UserGroupMapping between a User and a subscription-defined Group.
+      description: |
+        __Note__: You cannot create a UserGroupMapping to a system-defined Group.
+      tags:
+        - Mappings
+      operationId: createUserGroupMapping
+      parameters:
+        - name: userGroupMappingContents
+          in: body
+          description: The UserGroupMappingContent (sandboxId, groupId and userId) for the UserGroupMapping that you want to create.
+          required: true
+          schema:
+            $ref: '#/definitions/UserGroupMappingContent'
+      responses:
+        '200':
+          description: OK - Returns the unique identifier of the created UserGroupMapping. 
+          schema:
+            description: User Group Mapping Id
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified sandboxId, groupId or userId does not exist. 
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /userGroupMappings/{id}:
+    get:
+      summary: Returns the details for a specific UserGroupMapping.
+      description: ""
+      tags:
+        - Mappings
+      operationId: getUserGroupMapping
+      parameters:
+        - $ref: '#/parameters/userGroupMappingId'
+      responses:
+        '200':
+          description: OK - Returns the complete details for the specified UserGroupMapping.        
+          schema:
+            $ref: '#/definitions/UserGroupMapping'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified UserGroupMapping id does not exist. 
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a specific UserGroupMapping between a User and a subscription-defined Group.
+      description: |
+        __Note__: You cannot delete a UserGroupMapping to a system-defined Group.  
+      tags:
+        - Mappings
+      operationId: deleteUserGroupMapping
+      parameters:
+        - $ref: '#/parameters/userGroupMappingId'
+      responses:
+        '200':
+          description: OK - The specified UserGroupMapping has been successfully deleted.
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified UserGroupMapping Id does not exist.  
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /userGroupMappings/{id}/sandboxes:
+    get:
+      summary: Returns the details for the Sandbox identified in a specific UserGroupMapping.
+      description: "" 
+      tags:
+        - Mappings
+      operationId: getSandboxForUserGroupMapping
+      parameters:
+        - $ref: '#/parameters/userGroupMappingId'
+      responses:
+        '200':
+          description: OK - Returns the details for the Sandbox identified in the specified UserGroupMapping.
+          schema:
+            $ref: '#/definitions/Sandbox'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified mapping id does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /userGroupMappings/{id}/groups:
+    get:
+      summary: Returns the details for the Group identified in a specific UserGroupMapping.
+      description: ""
+      tags:
+        - Mappings
+      operationId: getGroupForUserGroupMapping
+      parameters:
+        - $ref: '#/parameters/userGroupMappingId'
+      responses:
+        '200':
+          description: OK - Returns the details for the Group identified in the specified UserGroupMapping. 
+          schema:
+            $ref: '#/definitions/Group'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified mapping id does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /userGroupMappings/{id}/users:
+    get:
+      summary: Returns the details for the User identified in a specific UserGroupMapping.
+      description: ""
+      tags:
+        - Mappings
+      operationId: getUserForUserGroupMapping
+      parameters:
+        - $ref: '#/parameters/userGroupMappingId'
+      responses:
+        '200':
+          description: OK - Returns the details for the USer identified in the specified UserGroupMapping.
+          schema:
+            $ref: '#/definitions/User'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified UserGroupMapping id does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+
+  ########################################
+  # Operations to deal with Sandboxes
+  ########################################
+  /sandboxes:
+    get:
+      summary: Returns the details for each Sandbox in the current subscription that matches the specified query parameters.
+      description: ""
+      tags:
+        - Sandboxes
+      operationId: getSandboxes
+      parameters:
+        - in: query
+          name: $filter
+          description: |
+            A filter expression that defines the type of Sandbox to be returned. The expression can contain the following operands:
+              
+              * __type__ (optional): The type of Sandbox to be returned. This value must be either __Production__ or __Developer__.
+              
+                Supported operator: 'eq'
+              
+              For example, the following string returns the details for each Developer Sandbox:
+              
+                $filter=type eq Developer
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK - Returns the details for each Sandbox in the current subscription.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Sandbox'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /sandboxes/{id}:
+    get:
+      summary: Returns the details for a specific Sandbox.
+      description: ""
+      tags:
+        - Sandboxes
+      operationId: getSandbox
+      parameters:
+        - $ref: '#/parameters/sandboxId'
+      responses:
+        '200':
+          description: OK - Retrurns the details for the specified Sandbox.
+          schema:
+            $ref: '#/definitions/Sandbox'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Sandbox does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /sandboxes/{id}/userGroupMappings:
+    get:
+      summary: Returns the details of each UserGroupMapping in a specific Sandbox.
+      description: ""
+      tags:
+        - Sandboxes
+      operationId: getSandboxUserGroupMappings
+      parameters:
+        - $ref: '#/parameters/sandboxId'
+      responses:
+        '200':
+          description: OK - Returns the details of each UserGroupMapping in the specified Sandbox.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserGroupMapping'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified Sandbox does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+
+  ########################################
+  # Operations to deal with Parameters
+  ########################################
+  /parameters:
+    get:
+      summary: Returns the details for each subscription Parameter in the current Subscription.
+      description: ""
+      tags:
+        - Parameters
+      operationId: getParameters
+      responses:
+        '200':
+          description: OK - Returns the details for each subscription Parameter in the current Subscription.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Parameter'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /parameters/{name}:
+    get:
+      summary: Returns the details for a specific subscription Parameter.
+      description: ""
+      tags:
+        - Parameters
+      operationId: getParameter
+      parameters:
+        - $ref: '#/parameters/parameterName'
+      responses:
+        '200':
+          description: OK - Returns the details for the specified parameter.
+          schema:
+            $ref: '#/definitions/Parameter'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found - The specified subscription Parameter does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+
+#######################################
+# Parameters
+#######################################
+parameters:
+  userId:
+    name: id
+    in: path
+    description: The unique identifier ('id') of the required User.
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  userRuleId:
+    name: id
+    in: path
+    description: The unique identifier ('id') of the required UserRule.
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  userIdFlex:
+    name: id
+    in: path
+    description: |
+      The unique identifier ('id') of the required User. 
+      
+      NOTE: Do not use the User's 'externalId' value.
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}|externalId:.*'
+  groupId:
+    name: id
+    in: path
+    description: The unique identifier of the required Group.
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  userGroupMappingId:
+    name: id
+    in: path
+    description: The unique identifier of the required user group Mapping.
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  sandboxId:
+    name: id
+    in: path
+    description: The unique identifier of the required Sandbox.
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  sandboxParam:
+    name: $sandbox
+    in: query
+    description: The unique identifier of the required Sandbox.
+    required: false
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  sandboxParamRequired:
+    name: $sandbox
+    in: query
+    description: The unique identifier of the required Sandbox. (Required)
+    required: true
+    type: string
+    maxLength: 28
+    pattern: '\d{1,28}'
+  parameterName:
+    name: name
+    in: path
+    description: The name of the required subscription Parameter.
+    required: true
+    type: string
+    maxLength: 128
+  skip:
+    name: $skip
+    in: query
+    description: The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+    required: false
+    type: integer
+    format: int32
+    minimum: 0
+  top:
+    name: $top
+    in: query
+    description: The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+    required: false
+    type: integer
+    format: int32
+    default: 1000
+    minimum: 1
+    maximum: 10000
+  userFilter:
+    name: $filter
+    in: query
+    description: |
+      A filter expression that defines the Users to be returned. The expression can contain the following operands:
+      
+        * __firstName__ (optional): The case-insensitive first name of the User to be returned. 
+        * __lastName__ (optional): The case-insensitive last name of the User to be returned. 
+        * __username__ (optional): The case-insensitive username of the User to be returned. 
+        * __type__ (optional): The type of User to be returned. This value must be either __Standard__ or __Test__.
+              
+          Supported operator: 'eq'
+          Supported function: 'contains(name,'value')'
+          Supported keywords: 'and', 'or'
+          
+      _Note_: 
+        * When using 'firstName', 'lastName' or 'username', only one name can be used. You can search for partial names by using the contains function.
+        * When using 'type':
+            * The 'contains' function is not supported.
+            * The 'type' value must be _Standard_ if 'firstName', 'lastName' or 'username' is also used.
+        * You cannot use both the 'and' and 'or' keywords in a single filter, as additional bracketing is not supported. For more information, see the Filtering and Sorting Key Concepts page.
+
+      For example: 
+        The following string returns all Users whose last name is 'Smith' or 'smith': 
+
+          $filter=lastName eq 'Smith' 
+
+        The following string returns all Users whose first name contains 'Jon' or 'jon': 
+
+          $filter=contains(firstName,'Jon') 
+
+        The following string returns all Users whose first name is 'John' or 'john' and whose last name is 'Smith' or 'smith': 
+
+          $filter=firstName eq 'John' and lastName eq 'Smith' 
+
+        The following string returns all Users whose first name contains either 'Jon', 'jon', 'Bil' or 'bil': 
+
+          $filter=contains(firstName,'Jon') or contains(firstName,'Bil') 
+
+        The following string returns Standard users only. 
+
+          $filter=type eq Standard
+    required: false
+    type: string
+
+#######################################
+# Definitions
+#######################################
+definitions:
+#######################################
+# User Definitions
+# IMPORTANT: The User Definitions existin both the private and public interface
+#            and these should be kept the same in both files
+#######################################
+  UserDetails:
+    description: The details for a User, excluding their id
+    type: object
+    required:
+      - externalId
+      - firstName
+      - lastName
+      - username
+    properties:
+      externalId:
+        description: |
+          The external identifier for the User
+          
+          __Note__: In general, use the unique identifier ('id') when specifying a User. Do not use the externalId value unless specifically requested to do so. 
+        type: string
+        maxLength: 128
+      firstName:
+        description: First name of the User
+        type: string
+        maxLength: 128
+      lastName:
+        description: Last name of the User
+        type: string
+        maxLength: 128
+      username:
+        description: Username of the User
+        type: string
+        maxLength: 256
+      email:
+        description: email address of the User
+        type: string
+        maxLength: 256
+      reportsTo:
+        description: The display name of the person this user reports to
+        type: string
+        maxLength: 256
+      jobTitle:
+        description: The job title of the user
+        type: string
+        maxLength: 128
+      description:
+        description: A text description of the user
+        type: string
+        maxLength: 512
+      department:
+        description: The name of the department the user is in
+        type: string
+        maxLength: 128
+      type:
+        description: Type of the user. (Test users cannot be created.) 
+        type: string
+        enum:
+          - Standard
+          - Test
+  User:
+    description: The complete details for a User, including their unique id
+    allOf:
+      - $ref: '#/definitions/UserDetails'
+      - type: object
+        required:
+          - id
+        properties:
+          id:
+            description: The unique identifier for a User
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+
+#######################################
+# Claims Definitions
+#######################################
+  ClaimsGroup:
+    description: The Group details needed by the Claims
+    type: object
+    required:
+      - id
+      - type
+    properties:
+      id:
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      type:
+        description: The type of Group
+        type: string
+        enum:
+          - AllUsers
+          - Administrator
+          - ApplicationDeveloper
+          - UIDeveloper
+          - SubscriptionDefined
+  ClaimsSandbox:
+    description: The Sandbox details needed by the Claims
+    type: object
+    required:
+      - id
+      - type
+      - groups
+    properties:
+      id:
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      type:
+        description: The type of Sandbox
+        type: string
+        enum:
+          - Production
+          - Developer
+      groups:
+        description: The Groups to which the user with this Sandbox has access
+        type: array
+        items:
+          $ref: '#/definitions/ClaimsGroup'
+  ClaimsValues:
+    description: Details supplied for the Claims
+    type: object
+    required:
+      - subscriptionId
+      - firstName
+      - lastName
+      - username
+    properties:
+      subscriptionId:
+        description: The subscription to which this User belongs
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      firstName:
+        description: First name of the User
+        type: string
+        maxLength: 128
+      lastName:
+        description: Last name of the User
+        type: string
+        maxLength: 128
+      username:
+        description: Username of the User
+        type: string
+        maxLength: 128
+      email:
+        description: email address of the User
+        type: string
+        maxLength: 128
+      globalSubcriptionId:
+        description: The global ID of the subscription the User belongs to.   Typically has the same value as subscriptionId
+        type: string
+      region:
+        description: The region in which the subscription resides.
+        type: string
+      guid:
+        description: The globally unique ID for the subscription the user belongs to.   Typically has the same value as globalSubsriptionId
+        type: string
+      # Unfortunately the code generator for the YAML does not support arrays of enumerations
+      # so we have to do the following instead (The YAML looks the same, but the code is not nice)
+      status:
+        description: An array of status values applicable to this User. Valid values are 'VerifyEmailOutstanding'.
+        type: array
+        items:
+          description: The possible status values
+          type: string
+          pattern: 'VerifyEmailOutstanding'
+      sandboxes:
+        description: The Sandboxes to which the User has access
+        type: array
+        items:
+          $ref: '#/definitions/ClaimsSandbox'
+      alternateUsers:
+        description: A list of user ID's for users the current user is an alternate for based on any UserRule's that were active when the claims were created, i.e. when the user logged in.
+        type: array
+        items:
+          description: The unique identifier for a User
+          type: string
+          maxLength: 28
+          pattern: '\d{1,28}'
+  Claims:
+    description: Details supplied for the Claims
+    allOf:
+      - $ref: '#/definitions/ClaimsValues'
+      - type: object
+        required:
+          - id
+        properties:
+          id:
+            description: The unique identifier for a User
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+
+#######################################
+# Group Definitions
+#######################################
+  GroupDetails:
+    description: 'The required details for a given Group'
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        description: Name of the Group
+        type: string
+        maxLength: 128
+      description:
+        description: Description of the Group
+        type: string
+        maxLength: 128
+      type:
+        description: The type of Group (SubscriptionDefined if not set)
+        type: string
+        enum:
+          - AllUsers
+          - Administrator
+          - ApplicationDeveloper
+          - UIDeveloper
+          - SubscriptionDefined
+    example: { "name": "My Own Group", "description": "My group description", "type": SubscriptionDefined }
+  Group:
+    description: 'Complete details for a Group, including the unique id'
+    allOf:
+      - $ref: '#/definitions/GroupDetails'
+      - type: object
+        required:
+          - id
+        properties:
+          id:
+            description: The unique identifier for a Group.
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+    example: { "name": "My Own Group", "description": "My group description", "type": SubscriptionDefined, "id": "1" }
+
+#######################################
+# User Group Mapping Definitions
+#######################################
+  UserGroupMappingContent:
+    description: 'The required details for a UserGroupMapping'
+    type: object
+    required:
+      - groupId
+    properties:
+      sandboxId:
+        description: The id of the Sandbox which the mapping is for
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      groupId:
+        description: The id of the Group
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      userId:
+        description: The id of the User
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+  UserGroupMapping:
+    description: 'Complete details for a UserGroupMapping, including its unique id'
+    allOf:
+      - $ref: '#/definitions/UserGroupMappingContent'
+      - type: object
+        required:
+          - id
+        properties:
+          id:
+            description: The unique identifier for a UserGroupMapping
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+
+#######################################
+# User Rule Definitions
+#######################################
+  UserRuleContent:
+    description: 'The required details for a UserRule'
+    type: object
+    required:
+      - ownerId
+      - startDate
+      - endDate
+      - targetId
+    properties:
+      ownerId:
+        description: The id of the User this rule belongs to
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      startDate:
+        description: The date and time on which the rule begins
+        type: string
+        example: 10-DEC-2019 20:21
+        format:
+          ISO8601
+        minLength:
+          1
+      endDate:
+        description: The date and time on which the rule ends
+        type: string
+        example: 10-DEC-2019 20:21
+        format:
+          ISO8601
+        minLength:
+          1
+      targetId:
+        description: The id of the target User this rule applies to
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+  UserRule:
+    description: 'Complete details for a UserRule, including its unique id'
+    allOf:
+      - $ref: '#/definitions/UserRuleContent'
+      - type: object
+        required:
+          - id
+        properties:
+          id:
+            description: The unique identifier for a UserGroupMapping
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+  UserRuleList:
+    description: 'Complete details for a UserRule, including its unique id and target username and email address'
+    allOf:
+      - $ref: '#/definitions/UserRule'
+      - type: object
+        required:
+          - username
+          - email
+        properties:
+          firstName:
+            description: First name of the User
+            type: string
+            maxLength: 128
+          lastName:
+            description: Last name of the User
+            type: string
+            maxLength: 128
+          username:
+            description: Username of the User
+            type: string
+            maxLength: 256
+          email:
+            description: email address of the User
+            type: string
+            maxLength: 256
+
+#######################################
+# Sandbox Definitions
+#######################################
+  SandboxContent:
+    description: 'The required details for a Sandbox'
+    type: object
+    required:
+      - name
+      - type
+    properties:
+      name:
+        description: Name of the Sandbox
+        type: string
+        maxLength: 128
+      type:
+        description: The type of Sandbox
+        type: string
+        enum:
+          - Production
+          - Developer
+      subscriptionId:
+        description: The subscription to which this Sandbox belongs
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+      ownerId:
+        description: The id of the User that owns the Sandbox
+        type: string
+        maxLength: 28
+        pattern: '\d{1,28}'
+  Sandbox:
+    description: 'Complete details for a Sandbox, including its unique ID'
+    allOf:
+      - $ref: '#/definitions/SandboxContent'
+      - type: object
+        required:
+          - id
+        properties:
+          id:
+            description: The unique identifier for a Sandbox
+            type: string
+            maxLength: 28
+            pattern: '\d{1,28}'
+
+############################################################################
+# Parameter Definitions
+# IMPORTANT: The Parameter Definitions exist in both the private and public
+#            interface and these should be kept the same in both files
+############################################################################
+  Parameter:
+    description: 'A Parameter for a subscription, as a name-value pair'
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        description: The name of the Parameter (case insensitive)
+        type: string
+        maxLength: 128
+      value:
+        description: The value of the Parameter
+        type: string
+        maxLength: 128
+
+#######################################
+# Error Definitions
+# IMPORTANT: The Error Definitions existin both the private and public interface
+#            and these should be kept the same in both files
+#######################################
+  ErrorAttribute:
+    description: A given error attribute
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        description: Name of the error attrubute
+        type: string
+      value:
+        description: Value of the error attribute
+        type: string
+  Error:
+    description: Error
+    type: object
+    required:
+      - errorMsg
+      - errorCode
+    properties:
+      errorMsg:
+        description: Verbose error message
+        type: string
+      errorCode:
+        description: |
+          The following are the possible error codes in the Authorization Engine Service (note that the description shown is not part of the error code):
+          - AE_UNKNOWN_ERROR - An unknown error has occurred.
+          - AE_INVALID_ARGUMENT - An invalid argument has been passed over the REST interface.
+          - AE_INVALID_ACCESS - The operation is not valid for this User.
+          - AE_ATTRIBUTE_SIZE_EXCEEDED - An argument to an interface exceeded the allowed size.
+          - AE_DATABASE_UNREACHABLE - Unable to connect to the database. (More detail is supplied in the exception.)
+          - AE_INVALID_FILTER - The supplied filter is invalid or unsupported.
+
+          - AE_SUBSCRIPTION_DOES_NOT_EXIST - The subscription requested does not exist.
+          - AE_SUBSCRIPTION_CREATE_ERROR - Failed to create the subscription.
+          - AE_SUBSCRIPTION_UPDATE_ERROR - Failed to update the subscription.
+          - AE_SUBSCRIPTION_DELETE_ERROR - Failed to delete a subscription.
+          - AE_SUBSCRIPTION_MISSING_MANDATORY_PARAMETERS - A request has been made where not all required values have been provided.
+          - AE_SUBSCRIPTION_CREATE_ERROR_ALREADY_EXISTS - A request has been made to create a subscription where one already exists with the same externalId and name.
+          - AE_SUBSCRIPTION_UPDATE_ERROR_ALREADY_EXISTS - Failed to update a subscription.
+          - AE_INVALID_PARAMETER_VALUES - Parameters were set with values that are not valid. 
+          - AE_SUBSCRIPTION_DISABLED - Subscription has been disabled.
+          - AE_SUBSCRIPTION_EXPIRED - Subscription has expired (Duration exceeded).
+
+          - AE_SANDBOX_DOES_NOT_EXIST - The requested Sandbox does not exist.
+          - AE_SANDBOX_CREATE_ERROR - Failed to create the Sandbox.
+          - AE_SANDBOX_CREATE_ERROR_ALREADY_EXISTS - A Sandbox with the same name already exists.
+          - AE_MAXIMUM_DEVELOPER_SANDBOXES_EXCEEDED - An attempt to create a Developer Sandbox would exceed the maximum allowed via the "BPMDevelopers" subscription Parameter.
+
+          - AE_USER_DOES_NOT_EXIST - The requested User does not exist.
+          - AE_USER_CREATE_ERROR - Failed to create the User.
+          - AE_USER_UPDATE_ERROR - Failed to update the User.
+          - AE_USER_DELETE_ERROR - Failed to delete the User.
+          - AE_USER_MISSING_MANDATORY_PARAMETERS - A request has been made where not all required values have been provided.
+          - AE_USER_CREATE_ERROR_ALREADY_EXISTS - A User already exists with the given Username.
+          - AE_USER_UPDATE_ERROR_ALREADY_EXISTS - A User already exists with the given Username being requested for the update.
+          - AE_USER_DELETE_ERROR_CAN_NOT_DELETE_ONLY_ADMINISTRATOR - Failed to delete User as they are the only User in the Administrator Group.
+          - AE_USER_CREATE_ERROR_SUBSCRIPTION_DOES_NOT_EXIST - The subscription for the User does not exist.
+          - AE_USER_UNSUPPORTED_USER_TYPE - An attempt has been made to create, update, delete or login as a non standard User (for example, as a Test User).
+          - AE_UPDATE_OF_UNSUPPORTED_PARAMETER - An attempt has been made to update a Parameter with a value that is not supported.
+          - AE_MAXIMUM_END_USERS_EXCEEDED - An attempt to create a new User would exceed the maximum allowed via the "EndUsers" subscription Parameter.
+
+          - AE_GROUP_DOES_NOT_EXIST - The requested Group does not exist.
+          - AE_GROUP_CREATE_ERROR - Failed to create the Group.
+          - AE_GROUP_UPDATE_ERROR - Failed to update the Group.
+          - AE_GROUP_DELETE_ERROR - Failed to delete the Group.
+          - AE_GROUP_MISSING_MANDATORY_PARAMETERS - A request has been made where not all required values have been provided.
+          - AE_GROUP_INVALID_GROUP_TYPE - An attempt has been made to create, update or delete a Group that was not SubscriptionDefined.
+          - AE_GROUP_CREATE_ERROR_ALREADY_EXISTS - A Group already exists with the given name.
+          - AE_GROUP_UPDATE_ERROR_ALREADY_EXISTS - A Group already exists with the given name being requested for the update.
+          - AE_GROUP_ERROR_PERMISSION_DENIED - The User making the request does not have permission for the Group operation.
+          - AE_GROUP_USED_BY_APPLICATION - Group cannot be removed because it is being used by an application.
+
+          - AE_USERGROUPMAPPING_DOES_NOT_EXIST - The requested UserGroupMapping does not exist.
+          - AE_USERGROUPMAPPING_CREATE_ERROR - Failed to create the UserGroupMapping.
+          - AE_USERGROUPMAPPING_DELETE_ERROR - Failed to delete the UserGroupMapping.
+          - AE_USERGROUPMAPPING_MISSING_MANDATORY_PARAMETERS - A request has been made where not all required values have been provided.
+          - AE_USERGROUPMAPPING_CREATE_ERROR_ALREADY_EXISTS - There is already a mapping for the User/Group/sandbox combination.
+          - AE_USERGROUPMAPPING_DELETE_ERROR_CAN_NOT_REMOVE_SANDBOX_ADMINISTRATOR - The Sandbox owner cannot be removed from the Administrator Group.
+          - AE_USERGROUPMAPPING_DELETE_ERROR_CAN_NOT_REMOVE_FROM_ALL_USERS_GROUP - Users can not be removed from the All Users Group.
+          - AE_USERGROUPMAPPING_CREATE_ERROR_SANDBOX_DOES_NOT_EXIST - The Sandbox defined in the mapping does not exist.
+          - AE_USERGROUPMAPPING_CREATE_ERROR_USER_DOES_NOT_EXIST - The User defined in the mapping does not exist.
+          - AE_USERGROUPMAPPING_CREATE_ERROR_GROUP_DOES_NOT_EXIST - The Group defined in the mapping does not exist.
+          - AE_USERGROUPMAPPING_CREATE_ERROR_SUBSCRIPTION_MISSMATCH - The mapping requested spans multiple Subscriptions.
+          - AE_USERGROUPMAPPING_ERROR_PERMISSION_DENIED - User is not authorized to perform this operation.
+          - AE_USERGROUPMAPPING_CREATE_ERROR_INVALID_MAPPING - The UserGroupMapping requested is invalid and not supported.
+
+          - AE_USERGROUPMAPPING_DELETE_ERROR_UNABLE_TO_REMOVE_MAPPING - It is not valid or possible to delete the requested UserGroupMapping.
+
+          - AE_PARAMETER_DOES_NOT_EXIST - The requested subscription Parameter does not exist.
+
+          - AE_TOKEN_CREATE_ERROR - Error creating the security token.
+          - AE_TOKEN_SUBSCRIPTION_ID_DOES_NOT_EXIST - The subscription for the User performing the operation no longer exists.
+          - AE_TOKEN_MISSING_TROPOSPHERE_TOKEN - Unable to retrieve the security token.
+          - AE_TOKEN_INVALID_TROPOSPHERE_TOKEN - The security token is not valid.
+          
+          - AE_USER_RULE_CREATE_ERROR - Error creating user delegate rule.
+          - AE_USER_RULE_UPDATE_ERROR - Error updating user delegate rule.
+          - AE_USER_RULE_DOES_NOT_EXIST - The specified user delegate rule does not exist.
+          - AE_USER_RULE_INVALID_DATE_FORMAT - An invalid date time format was used with trying to create a user delegate rule.
+          - AE_USER_RULE_SUBSCRIPTION_MISMATCH_ERROR - Attempt to access a user delegate rule that is not for your subscription.
+          - AE_USER_RULE_INVALID_OWNER_ID - The owner specified for a user delegate rule is not valid.
+          - AE_USER_RULE_INVALID_TARGET_ID - The target user specified for a user delegate rule is not valid.
+          - AE_USER_RULE_INVALID_DATES - The date range specified for the user delegate rule is not valid.
+          - AE_USER_RULE_TARGET_IS_OWNER - The target user specified for the user delegate rule is already the owner of a rule for the specified date range.
+          - AE_USER_RULE_OWNER_IS_TARGET - The owner specified for the user delegate rule is already the target of a rule for the specified date range.
+          - AE_USER_RULE_OWNER_HAS_OVERLAP - The date range specified in the user delegate rule overlaps an existing rule for this owner.
+        type: string
+      stackTrace:
+        description: Added if available
+        type: string
+      contextAttributes:
+        description: Error Attributes
+        type: array
+        items:
+          $ref: '#/definitions/ErrorAttribute'

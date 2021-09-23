@@ -436,4 +436,32 @@ object DataFrameUtils extends Logging {
     }
   }
 
+   def joinByColumn(colName: String, sourceDf: DataFrame, destDf: DataFrame): DataFrame = {
+    import org.apache.spark.sql.functions._
+    import org.apache.spark.sql.types.{LongType, StructField, StructType}
+    import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+    import spark.implicits._
+    sourceDf.as("src") // alias it to help selecting appropriate columns in the result
+      // the join
+      .join(broadcast(destDf).as("look"), $"look.activity_name" === $"src.$colName", "left")
+      .drop($"src.$colName")
+      // select all previous columns, plus the one that contains the match
+      .select("src.*", "look.id")
+      // rename the resulting column to have the name of the source one
+      .withColumnRenamed("id", colName)
+  }
+
+  def joinByColumnGen(colName: String, sourceDf: DataFrame, destDf: DataFrame, typeJoin: String): DataFrame = {
+    import org.apache.spark.sql.functions._
+    import org.apache.spark.sql.types.{LongType, StructField, StructType}
+    import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+    import spark.implicits._
+    sourceDf.as("src") // alias it to help selecting appropriate columns in the result
+      // the join
+      .join(broadcast(destDf).as("dest"), $"dest.$colName" === $"src.$colName", s"$typeJoin")
+      .drop($"src.$colName")
+      // select all previous columns, plus the one that contains the match
+      .select("dest.*")
+      // rename the resulting column to have the name of the source one
+  }
 }

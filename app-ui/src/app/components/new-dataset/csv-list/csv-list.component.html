@@ -4,63 +4,63 @@
       <div class="table-title">Available CSV files</div>
       <div class="search-container">
         <uxpl-form-field style="margin-bottom:15px;" type="text" valid required="true" value=""
-                        (uxplChanged)="handleSearch($event);"></uxpl-form-field>
+                         (uxplChanged)="handleSearch($event);"></uxpl-form-field>
         <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
       </div>
     </div>
-    <div class="title-right" (click)="toggleUpload()" >
-      <span class="icon-container">
-        <uxpl-icon *ngIf="dataset.csvMethod!='upload' || (dataset.csvMethod=='upload' && !file && !dataset.Dataset_Source.FileName)" class="icon" icon="pl-icon-upload" width="20px" height="20px" color="#1774E5"></uxpl-icon>
-        <uxpl-icon *ngIf="dataset.csvMethod=='upload' && (file || dataset.Dataset_Source.FileName)" class="icon" icon="pl-icon-edit" width="20px" height="20px" color="#1774E5"></uxpl-icon>
-      </span>
-      <div class="upload-csv-link" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
-        <span *ngIf="dataset.csvMethod!='upload' || (dataset.csvMethod=='upload' && !file && !dataset.Dataset_Source.FileName)">Upload a new file</span>
-        <span *ngIf="dataset.csvMethod=='upload' && (file || dataset.Dataset_Source.FileName)">Change upload</span>
-      </div>
-      <ng-template
-        cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="trigger"
-        [cdkConnectedOverlayOpen]="isOpen"
-        [cdkConnectedOverlayOffsetY]="238"
-        (overlayOutsideClick)="clickOutside($event)"
-        >
-        <div class="upload-overlay">
-          <csv-upload [filename]="filename" [filetypes]="'csv'" [filesize]="1000" [error]="csvError" (uploadFile)="onUploadFile($event)" size="small"></csv-upload>
-        </div>
-      </ng-template>
-    </div>
+    <csv-upload-button *ngIf="!isStandAlone" [dataset]="dataset" [file]="file" [csvError]="csvError"
+                       (uploadFile)="uploadFile.emit($event)" [filename]="filename"></csv-upload-button>
   </div>
   <div>
     <div class="data-wrapper" *ngIf="files == null || files.length>0">
-      <p-table #csvTable [columns]="cols" [value]="files" [globalFilterFields]="['DatasetName', 'Annotation']"
-        dataKey="name" id="pTable" styleClass="custom-table-css" [rowHover]="false" [scrollable]="true" scrollHeight="calc(90vh - 450px)" [autoLayout]="true"
-        [rows]="15" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]" [loading]="files == null" [filterDelay]="0">
+      <p-table #csvtable [columns]="cols" [value]="files"
+               dataKey="name" id="pTable" styleClass="csv-file-table" [rowHover]="true" [scrollable]="true"
+               [scrollHeight]="scrollHeight" [autoLayout]="true"
+               [showCurrentPageReport]="true" [loading]="files == null"
+               [filterDelay]="0">
         <ng-template pTemplate="header" let-columns>
-          <tr>
-            <th *ngFor="let col of columns; let i = index;" [pSortableColumn]="col.field"  class="top-row" [ngClass]="{'firstCol': i==0}">
+          <tr style="background-color: #fff;">
+            <th *ngFor="let col of columns; let i = index;" [pSortableColumn]="col.field" class="top-row"
+                [ngClass]="{'firstCol': i==0}">
               {{col.header}}
               <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
                           ariaLabelDesc="Activate to sort in descending order"
                           ariaLabelAsc="Activate to sort in ascending order"></p-sortIcon>
             </th>
-            <th class="top-row-empty"></th>
-            <th class="top-row-empty"></th>
+            <th class="top-row-empty" style="max-width: 150px;" *ngIf="!isStandAlone"></th>
+            <th class="top-row-empty" style="max-width: 50px;"></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-file>
-          <tr class="rowhover" id="toHightlight" [ngClass]="{selected: selectedFile?.OriginalFilename==file.redisFileInfo.OriginalFilename}">
-            <td class="no-padding data-row hovereffect firstCol"><div [innerHTML]="file.redisFileInfo.OriginalFilename | highlight: searchTerm : 'Multi-Match'"></div></td>
-            <td class="no-padding data-row hovereffect"><div>{{file.redisFileInfo.FileSize | csvFilesize}}</div></td>
-            <td class="no-padding data-row hovereffect"><div>{{file.redisFileInfo.LastModified | csvFiletime}}</div></td>
-            <td class="no-padding lastCol">
-              <uxpl-button type="secondary" *ngIf="dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.redisFileInfo.OriginalFilename" height="24px" width="68px" (clicked)="selectFile(file)">select</uxpl-button>
-              <div *ngIf="dataset.csvMethod=='file' && selectedFile?.OriginalFilename==file.redisFileInfo.OriginalFilename" class="selected-col">
+          <tr class="rowhover" id="toHightlight" matTooltip="{{getToolTip(file)}}" matTooltipClass="tTip"
+              [ngClass]="{selected: selectedFile?.OriginalFilename==file.redisFileInfo.OriginalFilename || dataset.Dataset_Source?.FileName===file.redisFileInfo.OriginalFilename}">
+
+            <td class="no-padding data-row hovereffect firstCol">
+              <div [innerHTML]="file.redisFileInfo.OriginalFilename | highlight: searchTerm : 'Multi-Match'"></div>
+            </td>
+            <td class="no-padding data-row hovereffect">
+              <div>{{file.fileSize | csvFilesize}}</div>
+            </td>
+            <td class="no-padding data-row hovereffect">
+              <div>{{file.redisFileInfo.LastModified | csvFiletime}}</div>
+            </td>
+            <td class="no-padding lastCol" style="max-width: 150px;" *ngIf="!isStandAlone">
+              <!--<pre>{{dataset.csvMethod}}</pre>-->
+              <div
+                *ngIf="(dataset.csvMethod==='file' || dataset.csvMethod==='upload') && (selectedFile?.OriginalFilename===file.redisFileInfo.OriginalFilename || dataset.Dataset_Source?.FileName===file.redisFileInfo.OriginalFilename); else selectButtonBlock"
+                class="selected-col">
                 <uxpl-icon class="inline-ele" icon="pl-icon-checkmark" width="14px" height="14px"></uxpl-icon>
                 <div class="selected inline-ele">selected</div>
               </div>
+              <ng-template #selectButtonBlock>
+                <uxpl-button type="secondary" height="24px" width="68px" (clicked)="selectFile(file)">select
+                </uxpl-button>
+              </ng-template>
             </td>
-            <td class="no-padding lastCol" style="width: 50px;">
-              <div *ngIf="(dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.redisFileInfo.OriginalFilename) && file.beingUsed==false" (click)="deleteFile(file, $event)" class="clickable">
+            <td class="no-padding lastCol" style="max-width: 50px;">
+              <div
+                *ngIf="(dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.redisFileInfo.OriginalFilename) && file.beingUsed==false"
+                (click)="deleteFile(file, $event)" class="clickable">
                 <uxpl-icon class="inline-ele" icon="pl-icon-delete" width="24px" height="24px"></uxpl-icon>
               </div>
             </td>
@@ -74,15 +74,22 @@
     <div *ngIf="dataset.csvMethod=='upload' && file" class="selected-data">
       <span class="title">Selected data: </span>{{file.name}}<span class="new-upload">(new upload)</span>
     </div>
-    <div *ngIf="dataset.csvMethod=='upload' && dataset.Dataset_Source && dataset.Dataset_Source.FileName && dataset.Dataset_Source.FilePath" class="selected-data">
-      <span class="title">Selected data: </span>{{dataset.Dataset_Source.FileName}}<span class="new-upload">(uploaded)</span>
+    <div
+      *ngIf="dataset.csvMethod=='upload' && dataset.Dataset_Source && dataset.Dataset_Source?.FileName && dataset.Dataset_Source?.FilePath"
+      class="selected-data">
+      <span class="title">Selected data: </span>{{dataset.Dataset_Source?.FileName}}<span
+      class="new-upload">(uploaded)</span>
     </div>
   </div>
-  <div id="popup-host" [style.top.px]="popupY" class="popup-wrapper" style="position: absolute; left: calc(80vw - 400px);">
+  <div id="popup-host" [style.top.px]="popupY" class="popup-wrapper"
+       [style]="'position: absolute; left: ' + getPopUpLeft() + ';'">
     <uxpl-popup #deletePopup id="deletepopup" slot="popup" x-position="after" y-position="above"
-      content-id="delete-action-confirm" max-width="328px" max-height="200px">
-      <action-confirm *ngIf="fileOnAction" id="delete-action-confirm" confirmQuestion="Are you sure you want to delete file '{{fileOnAction.redisFileInfo.OriginalFilename}}'? It can't be undone." doable="true" type="delete" rejectMessage="You can not delete file" 
-        yesBtnLabel="Yes, delete it" noBtnLabel="No" (actionConfirmed)=handleDeleteConfirmation($event) [shown]="showDeleteConfirm"></action-confirm>
+                content-id="delete-action-confirm" max-width="328px" max-height="200px">
+      <action-confirm *ngIf="fileOnAction" id="delete-action-confirm"
+                      confirmQuestion="Are you sure you want to delete file '{{fileOnAction.redisFileInfo.OriginalFilename}}'? It can't be undone."
+                      doable="true" type="delete" rejectMessage="You can not delete file"
+                      yesBtnLabel="Yes, delete it" noBtnLabel="No" (actionConfirmed)=handleDeleteConfirmation($event)
+                      [shown]="showDeleteConfirm"></action-confirm>
     </uxpl-popup>
   </div>
 </div>

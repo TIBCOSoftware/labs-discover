@@ -14,5 +14,6 @@
 export interface Analytics { 
     previewLocation?: string;
     server?: string;
+    previewTableName?: string;
 }
 

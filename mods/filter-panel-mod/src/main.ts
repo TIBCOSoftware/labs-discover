@@ -6,7 +6,6 @@
 
 // Import the Spotfire module
 import { Spotfire } from "./api";
-import { readRDS, dfToString } from "./jrds";
 import { FilterControls } from "./filterControls";
 
 // Const declarations
@@ -19,7 +18,8 @@ const END_TIMESTAMP_PROP = "endDateFilterString";
 Spotfire.initialize(async mod => {
     // Used later to inform Spotfire that the render is complete
     const context = mod.getRenderContext();
-    let filterControls = new FilterControls(mod);
+    let config = (await mod.property<string>("config")).value();
+    let filterControls = new FilterControls(mod, config!);
 
     /******* Readers *******/
     const dataReader = mod.createReader(
@@ -27,7 +27,6 @@ Spotfire.initialize(async mod => {
         mod.visualization.axis("Values"),
         mod.visualization.axis("Marking Axis"),
         mod.visualization.axis("Datasets"),
-        mod.property("config"),
         mod.windowSize()
     );
     dataReader.subscribe(onDataChange);
@@ -35,8 +34,14 @@ Spotfire.initialize(async mod => {
     // const historyReader = mod.createReader(mod.document.property(IN_BLOB_HIST_PROP));
     // historyReader.subscribe(onHistoryChange);
 
-    const timeRangeReader = mod.createReader(mod.document.property(START_TIMESTAMP_PROP), mod.document.property(END_TIMESTAMP_PROP));
-    timeRangeReader.subscribe(onTimeRangeChange);
+    let startTsDocProp = await mod.document.property<string>(START_TIMESTAMP_PROP).catch(() => undefined);
+    let stopTsDocProp = await mod.document.property<string>(END_TIMESTAMP_PROP).catch(() => undefined);
+
+    if(startTsDocProp && stopTsDocProp){
+        const timeRangeReader = mod.createReader(mod.document.property(START_TIMESTAMP_PROP), mod.document.property(END_TIMESTAMP_PROP));
+        timeRangeReader.subscribe(onTimeRangeChange);
+    }
+    
     /******* End Readers *******/
 
     /**
@@ -99,10 +104,9 @@ Spotfire.initialize(async mod => {
      * @param {Spotfire.Axis} valueAxis
      * @param {Spotfire.Axis} markingAxis
      * @param {Spotfire.Axis} datasetAxis
-     * @param {Spotfire.ModProperty<string>} configProp
      * @param {Spotfire.Size} size
      */
-    async function onDataChange(dataView: Spotfire.DataView, valueAxis: Spotfire.Axis, markingAxis: Spotfire.Axis, datasetAxis: Spotfire.Axis, configProp: Spotfire.ModProperty<string>, size: Spotfire.Size) {
+    async function onDataChange(dataView: Spotfire.DataView, valueAxis: Spotfire.Axis, markingAxis: Spotfire.Axis, datasetAxis: Spotfire.Axis, size: Spotfire.Size) {
         let errors = await dataView.getErrors();
         if (errors.length > 0) {
             // Data view contains errors. Display these and clear the chart to avoid
@@ -111,11 +115,13 @@ Spotfire.initialize(async mod => {
             return;
         }
         
-        if(!checkInputs(valueAxis, markingAxis, datasetAxis, configProp)){
+        if(!checkInputs(valueAxis, markingAxis, datasetAxis)){
             return;
         }
 
         mod.controls.errorOverlay.hide("DataView");
+
+        //filterControls.setConfig()
 
         let rows = await dataView.allRows();
         if (rows == null || rows.length === 0) {
@@ -130,6 +136,7 @@ Spotfire.initialize(async mod => {
         let filteredRows = rows.filter(row => row.categorical("Datasets").formattedValue() === "FilteredRows");
         filterControls.setFilteredRows(filteredRows);
 
+
         // Inform Spotfire that the render is complete (needed for export)
         context.signalRenderComplete();
     }
@@ -139,10 +146,9 @@ Spotfire.initialize(async mod => {
      * @param {Spotfire.Axis} valueAxis
      * @param {Spotfire.Axis} markingAxis
      * @param {Spotfire.Axis} datasetAxis
-     * @param {Spotfire.ModProperty<string>} configProp
      * @return {boolean} Returns false if inputs are not valid. 
      */
-    function checkInputs(valueAxis: Spotfire.Axis, markingAxis: Spotfire.Axis, datasetAxis: Spotfire.Axis, configProp: Spotfire.ModProperty<string>){
+    function checkInputs(valueAxis: Spotfire.Axis, markingAxis: Spotfire.Axis, datasetAxis: Spotfire.Axis){
 
         let isOk = true;
         mod.transaction( () => {
@@ -156,12 +162,6 @@ Spotfire.initialize(async mod => {
                 isOk = false;
             }
         });
-
-        // let config = configProp.value();
-        // if (config) {
-        //     // TODO : warn if config is empty?
-        //     config = JSON.parse(config);
-        // }
 
         return(isOk)
     }

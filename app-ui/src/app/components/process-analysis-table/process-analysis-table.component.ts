@@ -1,7 +1,16 @@
-import {Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
-import { get } from 'lodash-es';
-import { Analysis } from 'src/app/model/models';
-import {DatePipe} from '@angular/common';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
+import {get} from 'lodash-es';
+import {Analysis} from 'src/app/model/models';
 import {getRelativeTime} from '../../functions/analysis';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 
@@ -13,11 +22,12 @@ import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/ux
 
 export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
 
-  constructor() {}
+  constructor() {
+  }
 
   @Input() processAnalyses: Analysis[];
   @Input() searchTerm: string;
-  @Input() statusMap: {[key: string]: any};
+  @Input() statusMap: { [key: string]: any };
   @Input() loading;
 
   @Output() caseActionSelect: EventEmitter<any> = new EventEmitter<any>();
@@ -30,17 +40,25 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   readonly NUMBER_OF_ITEMS_BEFORE_PAGINATION = 50;
   showPagination = false;
   cols: any[];
-  popupX:string;
-  popupY:string;
+  popupX: string;
+  popupY: string;
 
-  private paToDelete: {action: string, analysisId: string, name: string};
+  expandedRows = {}
+
+
+  private paToDelete: { action: string, analysisId: string, name: string };
   paToDeleteName = '';
 
-  latestMouseEvent:MouseEvent;
+  latestMouseEvent: MouseEvent;
 
   readonly MAX_TOOLTIP_LENGTH = 250;
 
+  // public callCounter = 0;
+
+  public actions = {}
+
   ngOnInit() {
+
 
     this.cols = [
       {field: 'data.name', header: 'Name'},
@@ -52,15 +70,21 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // console.log('Change: ', changes)
+    // console.log(JSON.stringify(this.processAnalyses))
     if (!changes.searchTerm?.firstChange) {
       this.dt.filterGlobal(changes.searchTerm?.currentValue, 'contains');
     }
-    if (this.processAnalyses.length > this.NUMBER_OF_ITEMS_BEFORE_PAGINATION) {
-      this.showPagination = true;
+    if (this.processAnalyses) {
+      this.calculateActions()
+      if (this.processAnalyses.length > this.NUMBER_OF_ITEMS_BEFORE_PAGINATION) {
+        this.showPagination = true;
+      }
     }
+
   }
 
-  public buttonClicked = (rowData): void => {
+  public buttonClicked(rowData) {
     if (rowData.data.templateId === undefined || rowData.data.templateId === '') {
       this.caseActionSelect.emit({analysisId: rowData.id, name: 'change-template'});
     } else {
@@ -70,10 +94,12 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
     }
   }
 
-  public obtainData = (rowData: any, col: any): string => {
-    if(col === 'metadata.modifiedOn'){
+  public obtainData(rowData: any, col: any): string {
+    // console.log('Get data.... ')
+    // this.callCounter++;
+    if (col === 'metadata.modifiedOn') {
       const date = new Date(get(rowData, col));
-      if (date && date.getTime){
+      if (date && date.getTime) {
         return getRelativeTime(date.getTime());
       } else {
         return '';
@@ -83,14 +109,14 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
     }
   }
 
-  public getToolTip = (field: any, data: any): string => {
+  public getToolTip(field: any, data: any) {
     let re = '';
     if (field === 'metadata.state') {
-      const cellData = get(data,field);
+      const cellData = get(data, field);
       if (cellData.trim() === 'Not ready') {
         if (data.metadata.message) {
           re = data.metadata.message;
-          if(re.length > this.MAX_TOOLTIP_LENGTH){
+          if (re.length > this.MAX_TOOLTIP_LENGTH) {
             re = re.substr(0, this.MAX_TOOLTIP_LENGTH) + '... (see details for full error message)';
           }
         }
@@ -102,7 +128,7 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   public getNgClass(field, data) {
     let re = null;
     if (field === 'metadata.state') {
-      const cellData = get(data,field).trim();
+      const cellData = get(data, field).trim();
       // re = 'neutral';
       if (cellData === 'Not ready') {
         re = '#F9E1E4';
@@ -123,61 +149,109 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
     return re;
   }
 
-  public getAction = (rowData): any => {
-    const actionButtons = rowData.actions.map(element => {
-      return {
-        id: element,
-        label: element,
-        data: {
-          analysisId: rowData.id,
-          name: element,
-          action: element
+  private calculateActions() {
+    if (this.processAnalyses && this.processAnalyses.length > 0) {
+      for (const rowData of this.processAnalyses) {
+        const actionButtons = rowData.actions.map(element => {
+          return {
+            id: element,
+            label: element,
+            data: {
+              analysisId: rowData.id,
+              name: element,
+              action: element
+            }
+          }
+        });
+        if (rowData.data.templateId && rowData.data.templateId !== '' && rowData.metadata.state === 'Ready') {
+          actionButtons.splice(0, 0, {
+            id: 'Change template',
+            label: 'Change template',
+            data: {
+              analysisId: rowData.id,
+              name: 'change-template',
+              action: 'change-template'
+            }
+          })
         }
+        this.actions[rowData.id] = {options: actionButtons}
       }
-    });
-
-    if(rowData.data.templateId && rowData.data.templateId !== '' && rowData.metadata.state === 'Ready'){
-      actionButtons.splice(0, 0, {
-        label: 'Change template',
-        data: {
-          analysisId: rowData.id,
-          name: 'change-template',
-        }
-      })
     }
-    return {options: actionButtons}
   }
+
+  // This function was creating very high CPU load
+  /*
+ public getAction(rowData) {
+   const actionButtons = rowData.actions.map(element => {
+     return {
+       id: element,
+       label: element,
+       data: {
+         analysisId: rowData.id,
+         name: element,
+         action: element
+       }
+     }
+   });
+
+   if(rowData.data.templateId && rowData.data.templateId !== '' && rowData.metadata.state === 'Ready'){
+     actionButtons.splice(0, 0, {
+       id: 'Change template',
+       label: 'Change template',
+       data: {
+         analysisId: rowData.id,
+         name: 'change-template',
+       }
+     })
+   }
+     return {options: actionButtons}
+
+  }*/
+
+
   public async handleCaseActionSelect(event: any, rowNumber: number) {
-    if(event?.detail?.data.name === 'Delete') {
+    if (event?.detail?.data.name === 'Delete') {
       const paToDeleteTemp = this.processAnalyses.find(pa => pa.id === event?.detail?.data.analysisId)
-      if(paToDeleteTemp){
+      if (paToDeleteTemp) {
         this.paToDelete = event.detail.data;
         this.paToDeleteName = paToDeleteTemp.data.name;
         this.popupX = this.latestMouseEvent.pageX - 160 + 'px';
         let yDif = 20;
-        if(rowNumber < 5){
+        if (rowNumber < 5) {
           yDif += 150
         }
         this.popupY = this.latestMouseEvent.pageY + yDif + 'px';
         this.deletePopup.nativeElement.show = true;
       }
     } else {
+      const paTemp = this.processAnalyses.find(pa => pa.id === event?.detail?.data.analysisId)
+      if (paTemp && event?.detail?.data) {
+        event.detail.data.paName = paTemp.data.name
+      }
       this.caseActionSelect.emit(event.detail.data);
     }
   }
 
-  public getValue = (rowData, column): any => {
+  public getValue(rowData, column) {
     return get(rowData, column);
   }
 
+  public expandRow(name: string, value: boolean) {
+    const paT = this.processAnalyses.find(v => v.data?.name === name)
+    if (paT && paT.id) {
+      this.expandedRows[paT.id] = value;
+    }
+  }
+
   handleDeleteMenu(event: any) {
-    if(event.action){
+    if (event.action) {
       this.caseActionSelect.emit(this.paToDelete);
     }
     this.deletePopup.nativeElement.show = false;
 
   }
-  handleOptionClick(mEvent : MouseEvent) {
+
+  handleOptionClick(mEvent: MouseEvent) {
     this.latestMouseEvent = mEvent;
   }
 }

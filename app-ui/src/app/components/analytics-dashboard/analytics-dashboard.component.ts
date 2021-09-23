@@ -28,7 +28,8 @@ import {CreateCaseMenuComponent} from '../create-case-menu/create-case-menu.comp
 import {RepositoryService} from 'src/app/api/repository.service';
 import {VisualisationService} from 'src/app/api/visualisation.service';
 import {notifyUser} from '../../functions/message';
-import {Analysis} from 'src/app/model/analysis';
+import { Analysis } from 'src/app/model/analysis';
+import { InvestigationApplication } from 'src/app/model/investigationApplication';
 import {Template} from '../../model/template';
 import {SfFilterPanelComponent} from '../sf-filter-panel/sf-filter-panel.component';
 import {TemplateFilterConfigUI} from '../../models_ui/analyticTemplate';
@@ -40,6 +41,54 @@ import {Subject} from 'rxjs';
   styleUrls: ['./analytics-dashboard.component.scss']
 })
 export class AnalyticsDashboardComponent implements OnInit, OnChanges {
+
+  @Input() analysis: string;
+
+  @ViewChild('leftNav', {static: false}) leftNav: ElementRef<UxplLeftNav>;
+  @ViewChild('analysis', {static: false}) analysisRef: SpotfireViewerComponent;
+  @ViewChild('popup', {static: false}) popup: ElementRef<UxplPopup>;
+  @ViewChild('createcase', {static: false}) createCaseMenu: CreateCaseMenuComponent;
+  @ViewChild('analysisContainer', {static: false}) analysisContainer: ElementRef;
+  @ViewChild('spotfireFilterPanel', {static: false}) spotfireFilterPanel: SfFilterPanelComponent;
+
+
+  public objHeaderConfig: ObjectHeaderConfig;
+  public leftNavTabs: NavMenu[];
+  public spotfireDXP: string;
+  public analysisParameters: string;
+  public spotfireServer;
+  public markingOn: string;
+  public casesSelector: string;
+  public variantSelector: string;
+
+  private enableMenu: boolean;
+  public markedVariants: string[];
+  public markedCases: string[];
+  public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
+  public hideSelectProcess = false;
+
+  public investigationConfig: InvestigationApplication[];
+  public document: SpotfireDocument;
+  private templateNameToUse: string;
+  private analysisIdToUse: string;
+  public defaultTab: AnalyticsMenuConfigUI;
+
+  templateToUse: Template;
+  filterIds = [];
+  filterConfig: TemplateFilterConfigUI[] = [];
+  showFilterButton = false;
+  analysisReady = false;
+  showFilterPanel = false;
+  containerWidth: number;
+  containerHeight: number;
+  containerLeft: number;
+  containerTop: number;
+  filterPanelSize = {x: 578, y: 629};
+  filterPanelLeft: number;
+  filterPanelTop: number;
+  public windowResized: Subject<any> = new Subject<any>();
+  public hoverOnFilterButton = false;
+  readonly FILTER_DIV = 'FILTERDIV'
 
   constructor(
     private location: Location,
@@ -54,61 +103,14 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
   ) {
     this.messageService.getMessage('clear-analytic.topic.message').subscribe(
       (message) => {
-        console.log('Clearing Analytic: ' + message.text);
         this.spotfireDXP = null;
       });
   }
 
-  @Input() analysis: string;
-
-  @ViewChild('leftNav', {static: false}) leftNav: ElementRef<UxplLeftNav>;
-  @ViewChild('analysis', {static: false}) analysisRef: SpotfireViewerComponent;
-  @ViewChild('popup', {static: false}) popup: ElementRef<UxplPopup>;
-  @ViewChild('createcase', {static: false}) createCaseMenu: CreateCaseMenuComponent;
-  @ViewChild('analysisContainer', {static: false}) analysisContainer: ElementRef;
-  @ViewChild('spotfireFilterPanel', {static: false}) spotfireFilterPanel: SfFilterPanelComponent;
-
-  objHeaderConfig: ObjectHeaderConfig;
-  leftNavTabs: NavMenu[];
-  spotfireDXP: string;
-  analysisParameters: string;
-  spotfireServer;
-  markingOn: string;
-  casesSelector: string;
-  variantSelector: string;
-  markedVariants: string[];
-  markedCases: string[];
-  noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
-  hideSelectProcess = false;
-  investigationConfig: CaseConfig[];
-  document: SpotfireDocument;
-  defaultTab: AnalyticsMenuConfigUI;
-  templateToUse: Template;
-  filterIds = [];
-  filterConfig: TemplateFilterConfigUI[] = [];
-  showFilterButton = false;
-  analysisReady = false;
-  showFilterPanel = false;
-  containerWidth: number;
-  containerHeight: number;
-  containerLeft: number;
-  containerTop: number;
-  filterPanelSize = {x: 578, y: 629};
-  filterPanelLeft: number;
-  filterPanelTop: number;
-
-  private templateNameToUse: string;
-  private analysisIdToUse: string;
-  private enableMenu: boolean;
-
-  public windowResized: Subject<any> = new Subject<any>();
-  public hoverOnFilterButton = false;
-
-  readonly FILTER_DIV = 'FILTERDIV'
 
   ngOnInit(): void {
-    this.investigationConfig = this.configService?.config?.discover?.investigations?.caseConfig;
-    this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
+    this.investigationConfig = this.configService?.config?.discover?.investigations.applications;
+    this.spotfireServer = getSFLink(this.configService.config?.discover?.analytics);
 
     this.windowResized
       .pipe(debounceTime(500))
@@ -265,9 +267,9 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
       let CASE_TEMPLATE;
       for (const inConf of this.investigationConfig) {
         if (inConf.customTitle === investigation.type) {
-          appId = inConf.appId;
+          appId = inConf.applicationId;
           actionId = inConf.creatorId;
-          CASE_TEMPLATE = inConf.creatorConfig;
+          CASE_TEMPLATE = {}; // JSON.parse(inConf.creatorData);
         }
       }
       if (appId && actionId && CASE_TEMPLATE) {
@@ -345,21 +347,22 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
   }
 
   public setDocument = (event): void => {
-    this.document = event;
-    this.document.onDocumentReady$().subscribe(_val => {
-      // console.log('val: ' , _val);
-      this.enableMenu = true;
-      if (this.filterConfig) {
-        this.showFilterButton = true;
-        const {width, height, left, top} = this.setFilterPanelScope();
-        this.filterPanelSize.y = height - 76;
-        // this.containerHeight = height;
-        // this.containerWidth = width;
-        // this.containerLeft = left;
-        // this.containerTop = top;
-        // this.spotfireFilterPanel.setContainerScope({width, height, left, top});
-      }
-    })
+    if(!this.document) {
+      this.document = event;
+      this.document.onDocumentReady$().subscribe(_val => {
+        this.enableMenu = true;
+        if (this.filterConfig) {
+          this.showFilterButton = true;
+          const {width, height, left, top} = this.setFilterPanelScope();
+          this.filterPanelSize.y = height - 76;
+          // this.containerHeight = height;
+          // this.containerWidth = width;
+          // this.containerLeft = left;
+          // this.containerTop = top;
+          // this.spotfireFilterPanel.setContainerScope({width, height, left, top});
+        }
+      })
+    }
   }
 
   private setFilterPanelScope() {
@@ -386,7 +389,10 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
   }
 
   loadAnalytic() {
-    this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
+    this.spotfireServer = getSFLink(this.configService.config?.discover?.analytics);
+    this.showFilterButton = false;
+    this.showFilterPanel = false;
+    this.document = null;
     // Trick to force reloading of dxp
     this.spotfireDXP = null;
     setTimeout(() => {

@@ -7,7 +7,8 @@ package com.tibco.labs.pm
 
 import com.tibco.labs.utils.DataFrameUtils
 import com.tibco.labs.utils.commons.{backEndType, databaseName, _}
-import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.catalyst.expressions.GenericRow
+import org.apache.spark.sql.expressions.{MutableAggregationBuffer, Window}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
@@ -21,6 +22,8 @@ object variants {
     Try {
       import spark.implicits._
 
+      logger.info(s"###########  Creating Variants ID ##########")
+
       val df_variants = df_events.withColumn("variant", collect_list("activity_id").over(Window.partitionBy("case_id").orderBy($"ACTIVITY_START_TIMESTAMP".asc, $"row_id".asc)))
         .groupBy("case_id")
         .agg(max("variant").as("variant"))
@@ -28,11 +31,32 @@ object variants {
         .agg(count("variant").as("Frequency"))
         .orderBy(col("Frequency").desc)
 
-      println(s"###########  Creating Variants ID ##########")
+      /*
+            val case_id_glue = "case_id"
+            val activity_key = "activity_id"
+            val timestamp_key= "activity_start_timestamp"
+            val offset = 1
+
+            val windowSpec = Window.partitionBy(col(case_id_glue)).orderBy(col(case_id_glue))
+            var df_reduced_shift = df_events.withColumn(case_id_glue + "_1", lag(case_id_glue, offset, "NaN").over(windowSpec))
+            df_reduced_shift = df_reduced_shift.withColumn(activity_key + "_1", lag(activity_key, offset, "NaN").over(windowSpec))
+            df_reduced_shift = df_reduced_shift.withColumn(timestamp_key + "_1", lag(timestamp_key, offset, "NaN").over(windowSpec))
+            var df_successive_rows = df_reduced_shift.filter(df_reduced_shift(case_id_glue) === df_reduced_shift(case_id_glue + "_1"))
+            df_successive_rows = df_successive_rows.withColumn("caseDuration",unix_timestamp(df_successive_rows(timestamp_key+"_1")) - unix_timestamp(df_successive_rows(timestamp_key)))
+            val directly_follows_grouping = df_successive_rows.groupBy(activity_key, activity_key + "_1")
+
+
+            val dfg_frequency = directly_follows_grouping.count().rdd.map {
+              case (activityFrom, activityTo, count) =>
+            }
+      */
+
+
+     
 
 
       val shufflePartitim = spark.sqlContext.getConf("spark.sql.shuffle.partitions")
-      println(s"###########  spark.sql.shuffle.partitions default : $shufflePartitim ##########")
+      logger.info(s"###########  spark.sql.shuffle.partitions default : $shufflePartitim ##########")
       //snSession.sqlContext.setConf("spark.sql.shuffle.partitions", "1")
       df_variants_final = spark.createDataFrame(df_variants.sort(desc("Frequency")).rdd.zipWithUniqueId().map {
         case (rowline, index) => Row.fromSeq(rowline.toSeq :+ index + 1)
@@ -46,7 +70,7 @@ object variants {
       //Occurences over total of number of Activity grouped by Cases
 
       df_variants_final = df_variants_final.groupBy("variant", "variant_id").agg(sum("Frequency") as "Frequency").withColumn("Occurences_percent", (col("Frequency") / sum("Frequency").over()) * 100)
-      println(s"Aggregation for Variants done")
+      logger.info(s"Aggregation for Variants done")
       df_variants_final = df_variants_final.withColumn("ANALYSIS_ID", lit(analysisId))
 
       import org.apache.spark.ml.feature.Bucketizer
@@ -78,7 +102,7 @@ object variants {
 
       val lengh_bck = bucketizer.getSplits.length - 1
       var buckets_labels: Map[Double, String] = null
-      println(s"Bucketizer output with $lengh_bck buckets")
+      logger.info(s"Bucketizer output with $lengh_bck buckets")
       if (lengh_bck == 8) {
         buckets_labels = Map(
           -1.0 -> "Negative Values",
@@ -92,10 +116,10 @@ object variants {
       }
 
       val bucketL = buckets_labels.toSeq.toDF("bucketedFrequency", "bucketedFrequency_label")
-      println(s"Variants size before join ${df_variants_final.count()}")
+      logger.info(s"Variants size before join ${df_variants_final.count()}")
       df_variants_final = df_variants_final.join(bucketL, Seq("bucketedFrequency"))
 
-      println(s"Variants size After join ${df_variants_final.count()}")
+      logger.info(s"Variants size After join ${df_variants_final.count()}")
 
       val finalColumnsOrderedName: Array[String] = Array(
         "variant",
@@ -116,7 +140,7 @@ object variants {
       }*/
     } match {
       case Success(_) => df_variants_final
-      case Failure(e) => println("Error in cases : " + e.getMessage)
+      case Failure(e) => logger.error("Error in cases : " + e.getMessage)
         throw e
     }
 

@@ -65,7 +65,7 @@ export class CsvUploadComponent implements OnInit {
       }
 
       if (this.maxFileSize && file.size >= this.maxFileSize) {
-        this.error = `Please upload a file under ${this.maxFileSize}MB.`;
+        this.error = `Please upload a file under ${this.filesize}MB.`;
         return;
       }
 

@@ -26,7 +26,7 @@ export interface Dataset {
   Dataset_Id: string;
   Dataset_Name: string;
   Dataset_Source: DatasetSource;
-  schema?: DatasetSchema[];
+  schema: DatasetSchema[];
   createdDate?: number;
   updatedDate?: number;
   // the preview job status

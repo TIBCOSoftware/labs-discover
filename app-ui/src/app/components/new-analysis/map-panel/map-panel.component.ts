@@ -8,7 +8,7 @@ import {AutoMapResult} from '../../../models_ui/configuration';
 import {TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {Location} from '@angular/common';
 
-type Options = { label: string, value: string }[];
+type Options = { label: string, value: string, id: string }[];
 
 
 @Component({
@@ -221,11 +221,11 @@ export class MapPanelComponent implements OnInit, OnChanges {
           this.availableColumns = this.availableColumns.filter((value) => {
             return value !== v.key;
           });
-          return {label: v.key, value: v.key}
+          return {label: v.key, value: v.key, id: v.key}
         })
         this.columns = dataset.schema.filter(v => v.type !== 'timestamp').map(v => {
           this.availableNonTimeColumns.push(v.key);
-          return {label: v.key, value: v.key}
+          return {label: v.key, value: v.key, id: v.key}
         })
         if (this.doAutoMap) {
           this.autoMap();

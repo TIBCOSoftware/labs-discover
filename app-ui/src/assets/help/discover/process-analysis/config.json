@@ -57,7 +57,7 @@
             "name": "Fix and rerun an analysis Not Ready?",
             "label": "Fix and rerun an analysis Not Ready?",
             "title": "Fix and rerun an analysis Not Ready?",
-            "url": "assets/help/application/Process-Analysis-How-do-I-Rereun.html",
+            "url": "assets/help/application/Process-Analysis-How-do-I-Rerun.html",
             "content": "",
             "default": "true"
           }

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild, ElementRef, OnChanges, SimpleChanges} from '@angular/core';
 import {VisualisationService} from 'src/app/api/visualisation.service';
 import {Analysis} from 'src/app/model/models';
-import {notifyUser} from '../../functions/message';
+import {getShortMessage, copyToClipBoard} from '../../functions/details';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {Location} from '@angular/common';
 
@@ -12,6 +12,13 @@ import {Location} from '@angular/common';
 })
 export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
 
+  constructor(
+    private location: Location,
+    private visualisationService: VisualisationService,
+    public msService: MessageTopicService
+  ) {
+  }
+
   @Input() processAnalysis: Analysis;
 
   @Input() progress: any;
@@ -20,20 +27,13 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
   showError = false;
   errorIcon: string;
 
-  progressSet = false;
+  getShortMessage = getShortMessage;
+  copyToClipBoard = copyToClipBoard;
 
-  constructor(
-    private location: Location,
-    private visualisationService: VisualisationService,
-    private msService: MessageTopicService
-  ) {
-  }
+  paId: string;
+  paVersion: string;
 
   ngOnInit() {
-    this.progressSet = false;
-    if(this.progress){
-      this.progressSet = true;
-    }
     this.errorIcon = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/svg/error-image-2.svg');
     if (this.processAnalysis.data.templateId && this.processAnalysis.data.templateId !== '') {
       this.visualisationService.getTemplate(this.processAnalysis.data.templateId).subscribe(
@@ -46,26 +46,14 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
     }
   }
 
-  copyToClipBoard(type: string, value: any) {
-    navigator.clipboard.writeText(value).then(() => {
-      notifyUser('INFO', type + ' copied to clipboard...', this.msService);
-    }, (err) => {
-      console.error('Async: Could not copy text: ', err);
-    });
-  }
-
-  getShortMessage(message: string) {
-    if (message.length > 25) {
-      return message.substring(0, 25) + '...';
-    } else {
-      return message;
-    }
-  }
-
   ngOnChanges(changes: SimpleChanges): void {
-    if(this.progress){
-      this.progressSet = true;
+    if(this.processAnalysis && this.processAnalysis.id){
+      const idT = this.processAnalysis.id;
+      this.paId = idT.substring(0, idT.lastIndexOf('-'))
+      this.paVersion = idT.substring(idT.lastIndexOf('-') + 1)
     }
   }
+
+
 
 }

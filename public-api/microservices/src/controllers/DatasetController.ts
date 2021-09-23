@@ -37,7 +37,7 @@ export class DatasetController {
       await this.loginApi.postValidCredsRoute({
         credentials: this.getToken(token)
       } as LoginCredentials);
-    } catch(resp) {
+    } catch(resp: any) {
       response.status = resp.statusCode;
       return response;
     }
@@ -277,7 +277,7 @@ export class DatasetController {
     }
 
     const oauthToken = this.getToken(token);
-    const orgId = await this.cache.getClient(oauthToken);
+    const orgId = await this.cache.getOrgId(oauthToken);
 
     const resp = await this.fileApi.getRouteFileV2(orgId);
     const datasets = await this.datasetService.getDatasets(oauthToken);
@@ -309,7 +309,7 @@ export class DatasetController {
     }
 
     const oauthToken = this.getToken(token);
-    const orgId = await this.cache.getClient(oauthToken);
+    const orgId = await this.cache.getOrgId(oauthToken);
 
     const datasets = await this.datasetService.getDatasets(oauthToken);
 
@@ -347,12 +347,12 @@ export class DatasetController {
     }
 
     const oauthToken = this.getToken(token);
-    const orgId = await this.cache.getClient(oauthToken);
+    const orgId = await this.cache.getOrgId(oauthToken);
 
     try {
       const resp = await this.fileApi.getPreviewRoute(orgId, filename);
       return resp.body.data;
-    } catch(error) {
+    } catch(error: any) {
       response.status = error.statusCode;
       return response;
     }
@@ -367,12 +367,12 @@ export class DatasetController {
     }
 
     const oauthToken = this.getToken(token);
-    const orgId = await this.cache.getClient(oauthToken);
+    const orgId = await this.cache.getOrgId(oauthToken);
 
     try {
       const resp = await this.tdvApi.getDataJobTdvRoute(orgId, id);
       return resp.body.Data;
-    } catch(error) {
+    } catch(error: any) {
       response.status = error.statusCode;
       return response;
     }

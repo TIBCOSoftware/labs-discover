@@ -1,6 +1,7 @@
 import { Service } from "typedi";
-import { DatasetSourceTdv, FilesOperationsApi, PreviewConfigFile, SparkPreviewJobApi, TdvJob, TibcoDataVirtualizationApi } from '../backend/api';
+import { DatasetSourceTdv, FilesOperationsApi, PreviewConfigFile, SchemaPreview, SparkPreviewJobApi, TdvJob, TibcoDataVirtualizationApi } from '../backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
+import { logger } from "../common/logging";
 import { DatasetListItem, Dataset, DatasetUpdated, PreviewStatus } from "../models/datasets.model";
 import { AnalysisService } from './analysis.service';
 
@@ -88,7 +89,7 @@ export class DatasetService {
   }
   
   public cleanDataset = async(token: string, dataset: Dataset): Promise<any> => {
-    const orgId = await this.cache.getSubscriptionName(token);
+    const orgId = await this.cache.getOrgId(token);
     if (orgId) {
       this._alwaysResolvePromise(this.tdvService.deleteJobTdvRoute(orgId, dataset.Dataset_Id));
       if (dataset.Dataset_Source?.FileName) {
@@ -111,6 +112,17 @@ export class DatasetService {
     }
   }
 
+  public syncSaveStatus = async(token: string, datasetId: string, status: PreviewStatus) => {
+    if (datasetId) {
+      const dataset = await this.getDataset(token, datasetId);
+      if (dataset) {
+        dataset.previewStatus = Object.assign(dataset.previewStatus || {}, status);
+        
+        await this.updateDataset(token, datasetId, dataset);
+      }
+    }
+  }
+
   /**
    * A utility method to resolve the promise no matter if the promose is resolved or rejected.
    */
@@ -125,7 +137,7 @@ export class DatasetService {
     //   return null;
     // }
 
-    const orgId = await this.cache.getSubscriptionName(token);
+    const orgId = await this.cache.getOrgId(token);
 
     // now file is uploaded if the type
 
@@ -149,6 +161,8 @@ export class DatasetService {
         DatasetSource: tdvDataSource,
         Organization: orgId
       } as TdvJob
+
+      logger.debug(`[DatasetService] Update or create a TDV. TdvJob: ${JSON.stringify(tdvJob)}`);
 
 
       if (dataset.Dataset_Id) {
@@ -192,17 +206,28 @@ export class DatasetService {
   }
 
   public runPreview = async(token: string, dataset: Dataset, orgId: string = ''): Promise<any> => {
+    logger.debug(`[DatasetService] Start to run preview and check status. DatasetId = ${dataset.Dataset_Id}`);
     if (!orgId) {
-      orgId = await this.cache.getSubscriptionName(token);
+      orgId = (await this.cache.getTokenInformation(token)).globalSubscriptionId
     }
+
+    const schema: SchemaPreview[] = dataset.schema?.map(ele => {
+      return {
+        format: ele.format,
+        columnName: ele.key,
+        dataType: ele.type
+      }
+    });
     const previewResp = await this.previewApi.postJobPrevRoute({
       DatasetId: dataset.Dataset_Id,
       Organization: orgId,
-      Token: token
+      Token: token,
+      schema: schema
     } as PreviewConfigFile);
     const previewJobId = previewResp.body.jobId;
 
-    await this.saveStatus(token, dataset.Dataset_Id, {
+    logger.debug(`[DatasetService] Save the status of 45%`);
+    await this.syncSaveStatus(token, dataset.Dataset_Id, {
       DatasetID: dataset.Dataset_Id,
       Organisation: orgId,
       Progression: 45,
@@ -211,11 +236,31 @@ export class DatasetService {
 
     const finalStatuses = ['COMPLETED', 'FAILED', 'SUBMISSION_FAILED'];
 
-    const queryStatus = async () => {
+    const queryPreviewStatus = async () => {
+      return await new Promise<PreviewStatus>((resolve, reject) => {
+        const intervalId = setInterval(() => {
+          this.getDataset(token, dataset.Dataset_Id).then(
+            resp => {
+              if (resp.previewStatus?.Progression == 0 || resp.previewStatus?.Progression == 100) {
+                resolve(resp.previewStatus);
+                clearInterval(intervalId);
+              }
+            },
+            error => {
+              reject(error);
+              clearInterval(intervalId);
+            }
+          );
+        }, 3000)
+      })
+    };
+
+    const queryJobStatus = async () => {
       return await new Promise<string>(resolve => {
         const intervalId = setInterval(() => {
           this.previewApi.getJobPrevRoute(previewJobId).then(
             resp => {
+              logger.debug(`[DatasetService] The preview job status is ${resp.body.status}`);
               if (finalStatuses.indexOf(resp.body.status) != -1) {
                 resolve(resp.body.status);
                 clearInterval(intervalId);
@@ -226,12 +271,34 @@ export class DatasetService {
       })
     };
 
-    const status = await queryStatus();
+    let currentDataset;
+    try {
+      const previewStatus = await queryPreviewStatus();
+      logger.debug('[DatasetService] The previewStatus: ' + JSON.stringify(previewStatus));
 
-    const currentDataset = await this.getDataset(token, dataset.Dataset_Id);
-    currentDataset.status = status;
-    currentDataset.lastPreviewDate = new Date().getTime();
+      if (previewStatus.Progression == 0) {
+        let log = `[DatasetService] The preview job ${previewResp} failed`;
+        if (previewStatus.Level == 'debug') {
+          log += `The error detail: ${previewStatus.Message}`;
+        }
+        logger.info(log);
+      }
 
+      const status = await queryJobStatus();
+      logger.debug('[DatasetService] After complete The queryJobStatus: ' + JSON.stringify(status));
+
+      currentDataset = await this.getDataset(token, dataset.Dataset_Id);
+      
+      currentDataset.status = status;
+      // currentDataset.previewStatus = previewStatus;
+      currentDataset.lastPreviewDate = new Date().getTime();
+    } catch(error) {
+      logger.debug('[DatasetService] Failed to query preview status, the error is' + JSON.stringify(error));
+      currentDataset = await this.getDataset(token, dataset.Dataset_Id);
+      currentDataset.status = 'FAILED';
+      currentDataset.lastPreviewDate = new Date().getTime();
+    }
+    
     await this.updateDataset(token, currentDataset.Dataset_Id, currentDataset);
     
     await this.previewApi.deleteJobPrevRoute(previewJobId);

@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.util.Timeout
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
-import com.tibco.labs.orchestrator.api.LoginRegistry._
+import com.tibco.labs.orchestrator.api.registry.LoginRegistry._
 import com.tibco.labs.orchestrator.models.{LoginCredentials, databaseCreate}
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.{Content, ExampleObject, Schema}
@@ -18,6 +18,7 @@ import akka.http.scaladsl.server.RequestContext
 import akka.http.scaladsl.server.RouteResult
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.directives.CachingDirectives._
+import com.tibco.labs.orchestrator.api.registry.LoginRegistry
 
 import scala.concurrent.duration._
 import javax.ws.rs._

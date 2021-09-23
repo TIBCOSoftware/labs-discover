@@ -1,0 +1,358 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Event Manager Service
+  description: |
+    TIBCO Cloud(TM) Live Apps maintains an audit trail that records various business events that occur during the lifecycle of a Case - for example, when the Case was started and by whom, or when the Case state or data changed and what that change was. 
+    
+    An __AuditEvent__ is a map of attributes (name/value pairs), which provide the audit details about a specific business event. Each AuditEvent includes the following attributes:
+  
+    * __key__: Unique key value that identifies this AuditEvent within the audit trail
+    * __id__: The unique identifier of the AuditEvent
+    * __type__: The type of the AuditEvent
+    * __creationTime__: Date and time on which this AuditEvent was created
+    * __message__: Description of the AuditEvent
+    * __messageId__: The identifier for the type of AuditEvent that occurred
+    * __severity__: Severity level of the AuditEvent - for example, AUDIT, WARN or ERROR
+    * __subscriptionId__: The unique identifier of the subscription to which the AuditEvent belongs
+    * _other context-specific attributes_: Provides information relevant to the particular AuditEvent - for example, caseId, processId or userId 
+      
+    The TIBCO(R) Live Apps Event Manager Service allows you to retrieve AuditEvents for a specific Case. An audit trail is represented by a series of AuditEvents.
+
+    __Note__: An AuditEvent is only stored for a specific period of time (the AuditRetentionPeriod), which is defined for the subscription. An AuditEvent is removed when this period has expired.   
+  termsOfService: ../../contexthelp/common/TIB_bpm-cloud_1.0.0_license.pdf
+  contact:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+    email: liveapps@tibco.com
+  license:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+schemes:
+  - https
+basePath: /event/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: AuditEvents
+    description: Methods on AuditEvents
+
+paths:
+  #######################################
+  # Audit Operations
+  #######################################
+  /auditEvents:
+    get:
+      summary: Returns a list of AuditEvents for a Case that match the specified $filter, $select and $sandbox parameters.
+      description: | 
+        __Note__: This method uses the $top and $startat parameters to control paging of the returned data. (Other Live Apps services use $top and $skip instead.)
+      tags:
+        - AuditEvents
+      operationId: getAudit
+      parameters:
+        - $ref: "#/parameters/Filter"
+        - $ref: "#/parameters/Top"
+        - $ref: "#/parameters/StartAt"
+        - $ref: "#/parameters/Select"
+        - $ref: "#/parameters/Sandbox"
+        - $ref: "#/parameters/OrderBy"
+      responses:
+        '200':
+          description: OK - Returns the specified AuditEvents.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AuditEvent'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+          examples:  
+            application/json:
+              {
+                "errorMsg" : "Unknown audit type supplied (supported:case,casedata,casestate) (supplied:invalid)",
+                "errorCode" : "EM_FILTER_INVALID_TYPE",
+                "contextAttributes" : 
+                [
+                  {
+                    "name" :"supportedTypes",
+                    "values" : "case,casedata,casestate"
+                  },
+                  {
+                    "name" :"suppliedType",
+                    "values" : "invalid"
+                  }  
+                ]
+                
+              }
+        '403':
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+
+##############################
+# Parameters
+##############################
+parameters:
+  Filter:
+    name: $filter
+    in: query
+    description: | 
+      A filter expression that defines the audit data to be returned. The expression can contain the following operands: 
+      
+      * __type__ (required): The type of data to be returned. The value must be one of the following:
+      
+        * __'case'__: All AuditEvents for a specific Case
+        * __'casestate'__: Only AuditEvents generated when a state change occurred, for a specific Case 
+        * __'casedata'__: A single AuditEvent that contains the Case data associated with another AuditEvent (for a specific Case)
+      
+        Supported operators: 'eq'.
+        
+      * __id__ (required): The identifier of the specific Case or AuditEvent for which data should be returned. The value must be either:
+      
+        * _caseReference_ (if _type_ is __case__ or __casestate__): The case reference of the required Case.
+        
+        * _uuid_ (if _type_ is __casedata__): The uuid value of a specific AuditEvent for a specific Case, obtained from an earlier GET /auditEvents request.
+
+        Supported operators: 'eq'.
+        
+      * __creationTime__ (optional): The specification of a date/time range in which AuditEvents to be returned were created. The value must be specified using the format:
+      
+        *yyyy*-*mm*-*dd*THH:*MM*:*SS*.*sss*Z 
+          
+        and must include a timezone. (See the _Filtering and Sorting_ Key Concepts page for more information about how to specify date/times in $filter queries.)
+      
+        Supported operators: 'gt', 'lt', 'ge' and 'le'. Only one upper and one lower boundary can be specified.
+        
+      For example, the following string returns all AuditEvents for the Case with caseReference 5141, that were created on or after 07-Sep-2017 in the UTC-08:00 time-zone:
+      
+      `$filter=type eq 'case' and id eq '5141' and creationTime gt 2017-09-07T-08:00`
+    required: true
+    type: string
+  Top:
+    name: $top
+    in: query
+    description: The maximum number of AuditEvents to return. (If $top is omitted, the value defaults to 100.)
+    required: false
+    type: string
+  StartAt:
+    name: $startat
+    in: query
+    description: The 'key' value of the last AuditEvent returned on the previous page of data. The returned data starts from the next AuditEvent after the one whose 'key' is specified. If $startat is omitted, the first page of data is supplied.  
+    required: false
+    type: string
+  Sandbox:
+    name: $sandbox
+    in: query
+    description: | 
+      The id of the Sandbox with which the requested audit data is associated.
+      
+      __Note__: This parameter must be supplied when requesting audit data for __case__, __casestate__ or __casedata__.
+    required: false
+    type: string
+  Select:
+    name: $select
+    in: query
+    description: | 
+      A comma-separated list of attributes to be returned for each AuditEvent. Note that:
+      * Unrecognised attribute names in the $select are silently ignored.
+      * If $select is not specified, all attributes are returned. 
+    required: false
+    type: string
+  OrderBy:
+    name: $orderby
+    in: query
+    description: |
+      The order in which returned AuditEvents should be sorted: "creationTime" (defaults to asc),"creationTime asc" or "creationTime desc". If $orderby is omitted, results are sorted by "creationTime asc".
+    required: false
+    type: string
+    enum: ["creationTime", "creationTime asc", "creationTime desc"]
+
+##############################
+# Definitions
+# IMPORTANT: The AuditEvent Definitions exist in both the private and public interface
+#            and these should be kept the same in both files
+##############################
+definitions:
+  AuditEvent:
+    description:  A single AuditEvent - a map of attributes (name/value pairs) that provide the audit details about a specific business event.  
+    additionalProperties: {
+      $ref: '#/definitions/AttributeValue'
+    }
+    example: [
+    {
+        "severity": {
+            "value": "AUDIT",
+            "type": "String"
+        },
+        "messageId": {
+            "value": "BP_INSTANCE_CREATED",
+            "type": "String"
+        },
+        "id": {
+            "value": "5241",
+            "type": "String"
+        },
+        "subscriptionId": {
+            "value": "1",
+            "type": "String"
+        },
+        "key": {
+            "value": "2018-04-25T04:37:07.752Z_9754ff40_10e8_4832_a4c5_58e71867a43c",
+            "type": "String"
+        }
+    },
+    {
+        "severity": {
+            "value": "AUDIT",
+            "type": "String"
+        },
+        "messageId": {
+            "value": "BP_TASK_CREATED",
+            "type": "String"
+        },
+        "id": {
+            "value": "5241",
+            "type": "String"
+        },
+        "subscriptionId": {
+            "value": "1",
+            "type": "String"
+        },
+        "key": {
+            "value": "2018-04-25T04:37:07.761Z_9e94edd6_f603_41b2_910f_ec7fb869eb62",
+            "type": "String"
+        }
+    },
+    {
+        "severity": {
+            "value": "AUDIT",
+            "type": "String"
+        },
+        "messageId": {
+            "value": "CM_CASE_CREATED",
+            "type": "String"
+        },
+        "id": {
+            "value": "5241",
+            "type": "String"
+        },
+        "subscriptionId": {
+            "value": "1",
+            "type": "String"
+        },
+        "key": {
+            "value": "2018-04-25T04:37:07.767Z_d35433c8_5b54_45bd_ab08_c43d9b067268",
+            "type": "String"
+        }
+    },
+    {
+        "severity": {
+            "value": "AUDIT",
+            "type": "String"
+        },
+        "messageId": {
+            "value": "WR_FOLDER_CREATED",
+            "type": "String"
+        },
+        "id": {
+            "value": "5241",
+            "type": "String"
+        },
+        "subscriptionId": {
+            "value": "1",
+            "type": "String"
+        },
+        "key": {
+            "value": "2018-04-25T04:37:08.151Z_df3d9c50_62cf_4315_b686_c76706728f3f",
+            "type": "String"
+        }
+    }
+  ]
+  AttributeValue:
+    description: A specific attribute value within an AuditEvent.  
+    properties:
+      value: 
+        type: string
+      type:
+        type: string
+        enum:
+         - String
+         - Number
+         - Date
+
+############################
+# Error Definitions
+# IMPORTANT: The Error Definitions exist in both the private and public interface
+#            and these should be kept the same in both files
+############################
+  Error:
+    description: Error Response
+    type: object
+    required:
+      - errorMsg
+      - errorCode
+    properties:
+      errorMsg:
+        description: Verbose error message
+        type: string
+      errorCode:
+        description: |
+          The following are the possible error codes in the Event Manager Service (note that the description shown is not part of the error code):
+          - EM_SANDBOX_INVALID Invalid Sandbox supplied.
+          - EM_SANDBOX_MISSING $sandbox is required for this request.
+          - EM_SANDBOX_BADACCESS - Sandbox is inaccessible to this login.
+          - EM_FILTER_INVALID - Filter is invalid.
+          - EM_FILTER_PARSE_FAILED - Filter is invalid, $filter failed to parse. 
+          - EM_FILTER_MISSING_TYPE - Filter is invalid, 'type' missing from $filter. 
+          - EM_FILTER_MISSING_ID - Filter is invalid, 'id' missing from $filter. 
+          - EM_FILTER_ID_UNSUPPORTED - Filter is invalid, 'id' is not supported for this destination 'type'. 
+          - EM_FILTER_UNSUPPORTED_ATTRIBUTES - Filter is invalid, $filter contains unsupported filter attributes. 
+          - EM_FILTER_ID_ONLY_SUPPORTS_EQUALS - Filter is invalid, 'id' must always be compared using 'eq', no other comparators are supported. 
+          - EM_FILTER_TYPE_ONLY_SUPPORTS_EQUALS - Filter is invalid, 'type' must always be compared using 'eq', no other comparators are supported. 
+          - EM_FILTER_MULTIPLE_IDS - Filter is invalid, 'id' must only be used once in $filter. 
+          - EM_FILTER_MULTIPLE_TYPES - Filter is invalid, 'type' must only be used once in $filter. 
+          - EM_FILTER_INVALID_TYPE - Unknown audit type supplied. 
+          - EM_FILTER_BUILD_FAIL - A problem occurred generating the filter for this GetAudit request. 
+          - EM_FILTER_CREATION_TIME_UNEXPECTED - Filter is invalid, unexpected creationTime clause issue. Please review $filter. 
+          - EM_FILTER_CREATION_TIME_NOTEQUALS_UNSUPPORTED - Filter is invalid, cannot use NOTEQUALS with creationTime clause. 
+          - EM_FILTER_CREATION_TIME_MULTIPLE_EQUALS - Filter is invalid, more than one 'eq' operation was used on the creationTime. 
+          - EM_FILTER_CREATION_TIME_MULTIPLE_LOWER_BOUNDARIES - Filter is invalid, because more than one component of the creationTime clause set a lower boundary for the data. 
+          - EM_FILTER_CREATION_TIME_MULTIPLE_UPPER_BOUNDARIES - Filter is invalid, because more than one component of the creationTime clause set an upper boundary for the data. 
+          - EM_FILTER_CREATION_TIME_LOWER_BOUND_AFTER_HIGHER_BOUND - Filter is invalid, because the creationTime lower bound is after the upper bound. 
+          - EM_FILTER_CREATION_TIME_INVALID_DATE_FORMAT - Filter is invalid, the supplied date has an invalid format. 
+          - EM_FILTER_CREATION_TIME_MISSING_TIMEZONE - Filter is invalid, creationTime must be specified as UTC or with a Time Zone. 
+          - EM_ORDERBY_INVALID - Invalid $orderby supplied. 
+          - EM_TOP_INVALID - Invalid $top supplied. 
+          - EM_STARTAT_INVALID - Invalid $startat supplied.
+          - EM_PURGE_ALREADY_RUNNING - Purge cannot be manually started as it is already running. 
+          - EM_PURGE_UNEXPECTED_ERROR - Unexpected error occurred trying to manually purge. 
+          - EM_UNEXPECTED_ERROR - An unexpected error occurred.
+        type: string
+      stackTrace:
+        description: Added if available
+        type: string
+      contextAttributes:
+        description: List of attributes for this error
+        type: array
+        items:
+          $ref: "#/definitions/ContextAttribute"
+  ContextAttribute:
+    description: A name/value pair providing context information for this error
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        description: Name of a context attribute
+        type: string
+      value:
+        description: Value of a context attribute
+        type: string

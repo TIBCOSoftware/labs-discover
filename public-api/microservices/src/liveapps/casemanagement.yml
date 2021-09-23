@@ -1,0 +1,965 @@
+  swagger: '2.0'
+  info:
+    version: 1.0.0
+    title: Case Manager Service
+    description: |
+      The TIBCO Cloud(TM) Live Apps Case Manager Service manages the following resources:
+      
+      * __Types__: A Type contains the essential data definition of a TIBCO(R) Live Apps application - that is, the data fields, data types and states which are created by an application designer when they create an application in Live Apps Designer. There are two sorts of Type:
+      
+        * __Case__: A Case Type contains the definition of:
+            * the top-level data fields used by the application. These data fields (referred to hereafter as 'attributes' of the Case) can be either simple types (such as strings or dates), or custom data types (that group together sets of existing data fields to suit the application's purpose). 
+            * the states used by the application.
+            * details of Case Creator and Case Action processes defined in the application.            
+        * __Structured__: A Structured Type contains the definition of a custom data type used by the application, which also has fields ('attributes').
+    
+      * __Cases__: A Case is a particular instance of a Case Type. Users use Live Apps Case Manager to start Cases and run them through to completion. A Case contains the particular values of the data fields and states for that Case as it progresses from creation to completion.
+
+      __Paginating Results Lists__
+      
+      By default, the GET /cases and GET /types methods do not return their entire results list. Instead, they return 10 items from the results list, starting from the beginning of the list. You can override this default behaviour by using the following parameters:
+      
+      * $top - to specify how many items are returned from the results list. ($top must be a value from 1 to 1000.)
+      * $skip - to specify the starting position in the results list from which to return items. 
+    termsOfService: ../../contexthelp/common/TIB_bpm-cloud_1.0.0_license.pdf
+    contact:
+      name: TIBCO Software Inc
+      url: http://www.tibco.com
+      email: liveapps@tibco.com
+    license:
+      name: TIBCO Software Inc
+      url: http://www.tibco.com
+  schemes:
+    - https
+  basePath: /case/v1
+  consumes:
+    - application/json
+  produces:
+    - application/json
+  tags:
+    - name: Cases
+      description: Methods on Cases
+    - name: Types
+      description: Methods on Types
+  paths:
+  #######################################
+  # Operations to deal with Types
+  #######################################
+    /types: 
+      get:
+        summary: Returns Types that match the specified query parameters.
+        description: |
+          Case Types are always returned. If an 'applicationId' constraint is specified in the $filter query parameter, Structured Types are also included in the result. In other words, it is possible to get all Case Types for a Sandbox, or all Case Types *and* Structured Types for a specific application or set of applications.
+          
+          By default, only 10 items from the results list are returned, starting from the beginning of the list. You can override this default behaviour by using the $top and $skip parameters.
+        tags:
+          - Types
+        operationId: getTypes
+        parameters:
+          - in: query
+            name: $sandbox
+            description: The id of the Sandbox from which to return Types. (You can obtain Sandbox Ids using the Authorization Engine Service.)
+            required: true
+            type: string
+          - in: query
+            name: $select
+            description: |
+              A comma-separated list of identifiers defining the properties to be returned for each Type. If $select is not specified, all properties are returned.
+              
+                * __basic__ (or  __b__): Returns basic details - 'id', 'name', 'label', 'isCase', 'applicationId', 'applicationName' and 'applicationInternalName'. 'isCase' is not returned for a Structured Type.
+                
+                * __attributes__ (or __a__): Returns details of all attributes defined in the Type. 
+                
+                * __summaryAttributes__ (or __sa__): Returns details of  attributes that are included in the Case summary. ('summaryAttributes' are not defined for a Structured Type, so no data is returned.)
+                
+                * __states__ (or __s__): Returns details of all states defined in a Case Type. ('states' are not defined for a Structured Type, so no data is returned.)
+                
+                * __jsonSchema__ (or __js__): Returns a JSON Schema describing the format of Case data that is returned in the 'untaggedCasedata' property of the response items for the GET /cases and PUT /cases methods.
+                
+                * __creators__ (or __c__): Returns details of Case Creator processes that are defined in the application containing the Case Type. ('creators' are not defined for a Structured Type, so no data is returned. Case Creator processes that contain participant fields are also excluded.)
+                
+                * __actions__ (or __ac__): Returns details of Case Action processes that are defined in the application containing the Case Type. ('actions' are not defined for a Structured Type, so no data is returned. Case Action processes that contain participant fields are also excluded.)
+                
+                Note: The properties returned by the 'creators' and 'actions' identifiers ('id', 'name' and 'jsonSchema') can be subsequently used from the POST /processes method in the Business Process Management service to either:
+                
+                * start a new Case (by starting an instance of a Case Creator process).
+                
+                * update an existing Case (by starting an instance of a Case Action process).
+                
+                For example, the following string returns basic and states properties:
+                `$select=basic,s`
+            required: false
+            type: string
+          - in: query
+            name: $filter
+            description: |
+              A filter expression that defines the Types to be returned. The expression can contain one of the following operands:
+              
+              * __applicationId__ : The identifier of the specific application for which Types should be returned. (Both Case Types and Structured Types will be returned.)
+              
+                Supported operator: 
+
+                * 'eq' - to match a specific applicationId
+              
+                Supported function:
+              
+                * 'in' - to match a comma-separated list of applicationIds
+                
+              * __applicationName__ : The name of the specific application for which Types should be returned. (Both Case Types and Structured Types will be returned.)  Apostrophes should be prefixed with a backslash to avoid them being misinterpreted as the closing single quotation mark.
+              
+                Supported operator: 
+
+                * 'eq' - to match a specific applicationName
+                
+              * __isCase__ (optional): Boolean value specifying whether to return only Case Types (TRUE). When specifying a given application or applications via applicationId/applicationName, this option is implicitly set TRUE.
+              
+                Supported operators:
+                
+                * 'eq' - when TRUE, limits results to just Case Types
+              
+              For example:
+
+                `$filter=applicationId eq 9` 
+                `$filter=applicationId in(8,9,16)` 
+                `$filter=applicationName eq 'Policy'`
+                `$filter=applicationName eq 'Employee\'s Contract'`
+                `$filter=applicationName eq 'Purchase Order' and isCase eq TRUE`
+
+              You can use applicationId or applicationName (but not both) to limit the response to given application(s). Both Case Types and Structured Types are returned, unless 'isCase eq TRUE' is included, which limits the results to just Case Types.
+              If neither applicationId nor applicationName is specified, the response includes all applications in the Sandbox; In this scenario, only Case Types are returned. 
+            required: false
+            type: string
+          - in: query
+            name: $skip
+            description: The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+            required: false
+            type: string
+          - in: query
+            name: $top
+            description: |
+              The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be between 1 and 1000. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+              
+              If $top is not specified, a default value of 10 is used (unless $count=true is also specified, in which case the default value of 10 is ignored).
+            required: false
+            type: string
+          - in: query
+            name: $count
+            description: |
+              If set to 'TRUE', returns the number of Types in the result, rather than the Types themselves.  
+              
+              Note: $count cannot be used if $top is used. If $count=true is specified, the default $top value (10) is ignored.
+            required: false
+            type: boolean
+        responses:
+          '200':
+            description: | 
+              OK - Returns either: 
+                * the specified Types (if $count was not used), or 
+                * the number of Types matching the specified criteria (if $count was used)
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/GetTypeResponseItem"
+          '400':
+            description: Bad request - The specified request was invalid. See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '403':
+            description: Forbidden - The logged in user is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '404':
+            description: Not found. The specified Type does not exist in this application.
+            schema:
+              $ref: '#/definitions/Error'
+          '500':
+            description: Unexpected error - See the error details for more information. 
+            schema:
+              $ref: '#/definitions/Error'
+  #######################################
+  # Operations to deal with Cases
+  #######################################
+    /cases:
+      get:
+        summary: Returns Cases that match the specified query parameters.
+        description: |
+          Retrieves Cases by specifying a list of Case references or a set of criteria that Cases must match.
+          
+          By default, only 10 items from the results list are returned, starting from the beginning of the list. You can override this default behaviour by using the $top and $skip parameters.          
+        tags:
+          - Cases
+        operationId: getCases
+        parameters:
+          - in: query
+            name: $sandbox
+            description: |
+              The id of the Sandbox from which to return Cases. (You can obtain Sandbox Ids using the Authorization Engine Service.) 
+              
+              Note: This parameter is required unless $count is specified. 
+            required: false
+            type: string
+          - in: query
+            name: $filter
+            description: |
+              A filter expression that defines the Cases to be returned. The expression can contain the following operands:
+              
+              * __applicationId__ (required if $count is not used): The identifier of the specific application for which Cases should be returned.
+              
+                Supported operators: 'eq'
+                
+              * __typeId__ (required if $count is not used): The identifier of the specific Case Type for which Cases should be returned.
+              
+                Supported operators: 'eq'
+              
+              * __purgeable__ (optional): Boolean value specifying whether to return Cases that would (TRUE) or would not (FALSE) be affected by a purge request.
+              
+                Supported operators: 'eq'
+
+              * __modificationTimestamp__ (optional): The specification of a date/time range in which the Cases to be returned were last modified.
+              
+                Supported operators: 'lt', 'le'
+              
+              * __stateId__ (optional): The identifier of the specific state for which Cases should be returned.
+              
+                Supported operators: 'eq'
+              
+              * __lock__ (optional): Boolean value specifying whether to return Cases that are locked (TRUE) or locked (FALSE).
+              
+                Supported operators: 'eq'
+              
+              * __caseReference__ (optional): A comma-separated list of Case references for which Cases should be returned. (Any Case reference that no longer exists,  because the Case has been deleted, is simply ignored.)
+              
+                Supported functions: 'in'
+              
+              For example: 
+              
+              `$filter=applicationId eq 8 and typeId eq 1 and stateId eq 9`
+              
+              See the _Filtering and Sorting_ Key Concepts page for more information about how to construct valid filter expressions.
+            required: false
+            type: string
+          - in: query
+            name: $select
+            description: |
+              A comma-separated list of identifiers defining the properties to be returned for each Case. If $select is not specified, all properties are returned.
+              
+                * __caseReference__ (or __cr__): Returns the Case reference.
+                
+                * __casedata__ (or __c__): Returns the current value of all Case attributes. This format contains the system identifiers (_id and _value properties), so is not compliant with the JSON schema returned by the GET /types method in the jsonSchema object.
+
+                * __untaggedCasedata__ (or __uc__): Returns the the current value of all Case attributes with system identifiers (_id and _value properties) removed. This format is compliant with the JSON schema returned by the GET /types method (in the jsonSchema object).
+                                
+                * __summary__ (or __s__): Returns the current values of those Case attributes marked as summary attributes.
+                
+                * __metadata__ (or __m__): Returns the following metadata for the Case. Individual metadata properties can be specified by suffixing 'metadata' with a dot followed by the identifier.
+                
+                  * __createdBy__ (or __cb__)
+                  * __creationTimestamp__ (or __ct__) 
+                  * __modifiedBy__ (or __mb__)
+                  * __modificationTimestamp__ (or __mt__)
+                  * __lock__ (or __l__)
+                  * __lockType__ (or __lt__)
+                  * __lockedBy__ (or __lb__)
+                  * __msLockExpiry__ (or __msle__)
+                  * __msSystemTime__ (or __msst__)
+                  * __markedForPurge__ (or __mfp__)
+                  * __applicationId__ (or __ai__) 
+                  * __typeId__ (or __ti__)
+                
+                  Note: 'metadata' cannot be used if $search is used.
+
+              For example:
+              
+              * The following string returns the Case reference and summary attributes:
+               
+                `$select=caseReference,summary`
+                
+              * The following string returns the Case summary, modificationTimestamp and modifiedBy attributes:
+              
+                `$select=s,m.mt,m.mb`
+            required: false
+            type: string
+          - in: query
+            name: $skip
+            description: |
+              The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.  
+              
+              Note: If $search is used, the sum of $skip and $top must be less than or equal to 10000. An error will occur if this limit is exceeded.
+            required: false
+            type: string
+          - in: query
+            name: $top
+            description: |
+              The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be between 1 and 1000. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 19 or fewer items.
+              
+              If $top is not specified, a default value of 10 is used (unless $count=true is also specified, in which case the default value of 10 is ignored).        
+            required: false
+            type: string
+          - in: query
+            name: $search
+            description: |
+              Limits results to just those that match the given search string.  Only attributes that are defined as 'Searchable' in Live Apps Designer are searched.
+              
+              Note: If $search is used:
+                * $sandbox must be set to the value of the Production Sandbox. $search cannot be used on a Developer Sandbox.
+                * $select=metadata cannot be used.
+                * $top is required.
+            required: false
+            type: string
+          - in: query
+            name: $count
+            description: |
+              If set to 'TRUE', returns the number of Cases in the result, rather than the Cases themselves.  
+              
+              Note: $count cannot be used if $top is used. If $count=true is specified, the default $top value (10) is ignored.
+            required: false
+            type: boolean
+          - in: query
+            name: $user
+            description: |
+              Test userId for Development sandbox only.
+              Claims must still contain a valid userid but will be overridden
+              when the optional $user parameter is specified   
+            required: false
+            type: string            
+        responses:
+          '200':
+            description: | 
+              OK - Returns either: 
+                * the Cases matching the specified criteria (if $count was not used), in descending order of modification timestamp, or 
+                * the number of Cases matching the specified criteria (if $count was used)
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/GetCaseResponseItem"
+          '400':
+            description: Bad request - The specified request was invalid. See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '403':
+            description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '404':
+            description: Not found - The specified Case reference does not exist.
+            schema:
+              $ref: '#/definitions/Error'
+          '500':
+            description: Unexpected error - See the error details for more information. 
+            schema:
+              $ref: '#/definitions/Error'
+      delete:
+        summary: Deletes all purgeable Cases that match the specified query parameters.
+        description: |
+          Purgeable Cases - meaning those that are in a terminal (or end) state - can be deleted to prevent them from, over time, building up and consuming excessive storage space in the current Subscription. However, __use caution when deleting Cases__, as doing so permanently deletes the Case, and the deletion cannot be undone.
+          <br>
+          You can use the GET /types method to determine which states are purgeable for a particular Case Type. Terminal states have the 'isTerminal' attribute set to 'true'.
+          <br>
+          Note: Cases are not deleted immediately when this method is executed. Instead, each Case's 'metadata.markedForPurge' attribute is set and the Case is deleted asynchronously later.
+        tags:
+          - Cases
+        operationId: deleteCases
+        parameters:
+          - in: query
+            name: $sandbox
+            description: |
+              The id of the Sandbox from which to delete purgeable Cases. (You can obtain Sandbox Ids using the Authorization Engine Service.)
+            required: true
+            type: string
+          - in: query
+            name: $filter
+            description: |
+              A filter expression that defines the Cases to be deleted. The expression can contain the following operands:
+              
+              * __applicationId__ (required): The identifier of the specific application for which Cases should be deleted.
+              
+                Supported operators: 'eq'
+                
+              * __typeId__ (required): The identifier of the specific Case Type for which Cases should be deleted.
+              
+                Supported operators: 'eq'
+              
+              * __purgeable__ (required): Must be set to (TRUE). 
+              
+                Supported operators: 'eq'
+
+              * __modificationTimestamp__ (optional): The specification of a date/time range in which the Cases to be deleted were last modified.
+              
+                Supported operators: 'lt', 'le'
+              
+              * __stateId__ (optional): The identifier of the specific terminal state for which Cases should be deleted. If 'stateId' is omitted, Cases in any terminal state are deleted.
+              
+                Supported operators: 'eq'
+                           
+              For example: 
+              
+              `$filter=applicationId eq 8 and typeId eq 1 and  purgeable eq TRUE and stateId eq 9`
+              
+              See the _Filtering and Sorting_ Key Concepts page for more information about how to construct valid filter expressions.
+            required: true
+            type: string
+        responses:
+          '200':
+            description: OK - The specified Cases have been marked for deletion.
+            schema:
+              $ref: '#/definitions/DeleteCasesResponse'
+          '400':
+            description: Bad request - The specified request was invalid. See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '403':
+            description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '404':
+            description: Not found - The specified Case does not exist.
+            schema:
+              $ref: '#/definitions/Error'
+          '500':
+            description: Unexpected error - See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+    /cases/{caseReference}:
+      put:
+        summary: Unlocks a particular Case.
+        description: |
+          Unlocking a Case changes the value of the Case's 'metadata.lock' attribute. This method cannot be used to change the Case's content, state, or any other metadata.
+        tags:
+          - Cases
+        operationId: updateCase
+        parameters:
+          - in: path
+            name: caseReference
+            description: The Case reference of the Case.
+            required: true
+            type: string
+          - in: query
+            name: $sandbox
+            description: The id of the Sandbox that contains the Case.
+            required: true
+            type: string
+          - in: query
+            name: $select
+            description: |
+              The attribute to be returned (after a successul PUT operation). This must be 'metadata' - that is:
+             
+              `$select=metadata`
+            required: true
+            type: string
+          - in: body
+            name: payload
+            description: |
+              Unlocks a Case. Use the following:
+              
+              * _{"metadata":{"lock":false}}_: to unlock a Case
+              
+              As the metadata's lock property is the only thing that can be updated, anything else in the request body will be ignored.
+            required: true
+            schema:
+              $ref: "#/definitions/PutCasesRequest"
+        responses:
+          '200':
+            description: OK - Returns the metadata for the specified Case, showing the successfully updated lock status.
+            schema:
+              $ref: "#/definitions/GetCaseResponseItem"
+          '400':
+            description: Bad request - The specified request was invalid. See the error details ffor more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '403':
+            description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '404':
+            description: Not found - The specified Case reference does not exist.
+            schema:
+              $ref: '#/definitions/Error'
+          '500':
+            description: Unexpected error - See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+      get:
+        summary: Returns the set of information about a particular Case that matches the specified query parameters.
+        tags:
+          - Cases
+        operationId: getCase
+        parameters:
+          - in: path
+            name: caseReference
+            description: The Case reference of the Case.
+            required: true
+            type: string
+          - in: query
+            name: $sandbox
+            description: The ID of the Sandbox that contains the Case.
+            required: true
+            type: string
+          - in: query
+            name: $select
+            description: |
+              A comma-separated list of identifiers defining the attributes to be returned for the Case. If $select is not specified, all attributes are returned.
+              
+                * __casedata__ (or __c__): Returns the current value of all Case attributes. This format contains the system identifiers (_id and _value properties), so is not compliant with the JSON schema returned by the GET /types method in the jsonSchema object.
+
+                * __untaggedCasedata__ (or __uc__): Returns the the current value of all Case attributes with system identifiers (_id and _value properties) removed. This format is compliant with the JSON schema returned by the GET /types method (in the jsonSchema object).                
+
+                * __summary__ (or __s__): Returns the Case summary attributes and their current values.
+                
+                * __metadata__ (or __m__): Returns the following metadata attributes for the Case. Individual attributes can be specified by suffixing 'metadata' with a dot followed by the identifier.
+                
+                  * __createdBy__ (or __cb__)
+                  * __creationTimestamp__ (or __ct__) 
+                  * __modifiedBy__ (or __mb__)
+                  * __modificationTimestamp__ (or __mt__)
+                  * __lock__ (or __l__)
+                  * __lockType__ (or __lt__)
+                  * __lockedBy__ (or __lb__)
+                  * __msLockExpiry__ (or __msle__)
+                  * __msSystemTime__ (or __msst__)
+                  * __markedForPurge__ (or __mfp__)
+                  * __applicationId__ (or __ai__) 
+                  * __typeId__ (or __ti__)
+                
+              For example, the following string returns the Case summary, modificationTimestamp and modifiedBy attributes:
+              
+                `$select=s,m.mt,m.mb`          
+            required: false
+            type: string
+          - in: query
+            name: $user
+            description: |
+              Test userId for Development sandbox only.
+              Claims must still contain a valid userid but will be overridden
+              when the optional $user parameter is specified   
+            required: false
+            type: string             
+        responses:
+          '200':
+            description: |
+              OK - Returns the requested information for the specified Case.
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/GetCaseResponseItem"
+          '400':
+            description: Bad request - The specified request was invalid. See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '403':
+            description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resources(s). See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+          '404':
+            description: Not found - The specified Case reference does not exist.
+            schema:
+              $ref: '#/definitions/Error'
+          '500':
+            description: Unexpected error - See the error details for more information.
+            schema:
+              $ref: '#/definitions/Error'
+  ######################################
+  #Definitions
+  #######################################
+  definitions:
+    DeleteCasesResponse:
+      description: |
+        The response type for the DELETE /cases API
+      properties:
+        mfpCount:
+          type: integer
+          description: The number of Cases marked for deletion/purging.
+    GetCaseResponseItem:
+      properties:
+        caseReference:
+          description: The Case reference for the Case.
+          type: string
+        casedata:
+          description: |
+            The JSON Case data, serialized to a string. For example;
+            ```
+            {
+              "name_v1": "Bob", 
+              "age_v1": 21, 
+              "state": "Created"
+            }
+            ```
+          type: string
+        untaggedCasedata:
+          type: string
+          description: |
+            The JSON Case data, serialized to a string, with system identifiers (_id and _value properties) removed. This matches the JSON schema that is returned in the 'jsonSchema' property of the response item for the GET /types method.
+        summary:
+          description: |
+            The JSON Case summary, serialized to a string.
+          type: string
+        metadata:
+          $ref: '#/definitions/GetCaseResponseItemMetadata'
+    GetCaseResponseItemMetadata:
+      description: |
+        Describes the metadata for a Case. Used within GetCaseResponseItem in
+        a GET /cases response and also within PutCasesRequest when unlocking a Case.
+      properties:
+        createdBy:
+          description: The unique identifier of the User that created the Case (if known).
+          type: string
+        creationTimestamp:
+          description: The date/time at which the Case was created.
+          type: string
+        modifiedBy:
+          description: The unique identifier of the User that last modified the Case (if known).
+          type: string
+        modificationTimestamp:
+          description: The date/time at which the Case was last modified.
+          type: string 
+        lock:
+          description: true if the Case is considered locked (i.e. msLockExpiry > msSystemTime)
+          type: boolean
+        lockType:
+          description: Always "1"
+          type: string
+        lockedBy:
+          description: The user ID of the user that last locked the Case when the Case is considered locked
+          type: string
+        msLockExpiry:
+          description: The time (milliseconds since epoch) that the Case's lock is/was due to expire.
+          type: string
+        msSystemTime:
+          description: The current time (in milliseconds since epoch).
+          type: string
+        markedForPurge:
+          description: true if the Case has been marked for purge, but has yet to be purged.
+          type: boolean
+        applicationId:
+          description: The unique identifier of the application containing the Case's Type.
+          type: string
+        typeId:
+          description: The unique identifier of the Case's Type.
+          type: string
+    PutCasesRequest:
+      description: |
+        The request type for a PUT /cases request. As the metadata's lock property is the only thing that
+        can be updated, everything else is ignored.
+      properties:
+        metadata:
+          $ref: '#/definitions/GetCaseResponseItemMetadata'
+    GetTypeResponseItem:
+      description: |
+        The response type for a GET /types API. The API returns an array of these.
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the Type.
+        name:
+          type: string
+          description: The name of the Type.
+        label:
+          type: string
+          description: The label of the Type.
+        isCase:
+          type: boolean
+          description: Either true for a Case Type, or false for a Structured Type.
+        applicationId:
+          type: string
+          description: The unique identifier of the application in which the Type is defined.
+        applicationName:
+          type: string
+          description: The name of the application in which the Type is defined.
+        applicationInternalName:
+          type: string 
+          description: The internal name of the application in which the Type is defined.
+        applicationVersion:
+          type: integer
+          description: The version of the application in which the Type is defined.
+        attributes:
+          type: array
+          description: |
+            The definitions of all attributes defined in the Type.
+          items:
+            $ref: '#/definitions/GetTypeResponseItemAttribute'
+        summaryAttributes:
+          type: array
+          description: |
+            The definitions of all attributes that are included in the Case summary for the Type.
+          items:
+            $ref: '#/definitions/GetTypeResponseItemAttribute'
+        states:
+          description: The definitions of all states defined in the Type.
+          type: array
+          items:
+            $ref: '#/definitions/GetTypeResponseItemState'
+        jsonSchema:
+          type: object
+          description: A JSON schema describing the format of Case data that is returned in the 'untaggedCasedata' response item property.
+        creators:
+          type: array
+          items:
+            $ref: '#/definitions/GetTypeResponseItemCreator'
+          description: Details of Case Creator processes that are defined in the application containing this Case Type. (Case Creator processes are not defined for a Structured Type. Case Creator processes that contain participant fields are also excluded.)
+        actions:
+          type: array
+          items:
+            $ref: '#/definitions/GetTypeResponseItemAction'
+          description: Details of Case Action processes that are defined in the application containing this Case Type. (Case Action processes are not defined for a Structured Type. Case Action processes that contain participant fields are also excluded.)
+    GetTypeResponseItemAttribute:
+      description: |
+        Describes the attributes of a Case or Structured type. Used within 
+        GetTypeResponseItem.
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the attribute, which is automatically derived from the label, as follows:
+            
+            * Whitespace and non-alphanumeric characters are removed.  
+            
+            * A numeric version number suffix is added, based on the version of the application in which the attribute was added. Attributes in the initial version are suffixed '_v1'. If an application is published and a new draft created, attributes added subsequently will have '_v2', and so on.  
+            
+            Until an application is locked for publication, changes to an attribute's label will prompt corresponding changes to its name; However, if an attribute's label is changed in a later version, then the name will *not* change.
+            
+            For example, if the application designer names a data field as "Customer's Name & Address", that string is used as the attribute label and the attribute name is "CustomersNameAddress_v1". If the designer creates a new draft (version 2) of the application and renames the data field as "Policy Holder Details", the attribute label changes to "Policy Holder Details", but the attribute name remains as "CustomerNameAddress_v1".
+            
+            Note: An exception to this rule is the special State attribute, which has name 'state' and label 'State'.
+        label:
+          type: string
+          description: The name of the attribute as defined by the application designer in Live Apps Designer.
+        type:
+          type: string
+          description: | 
+            If the attribute refers to another Type, the ID of that Type. If the attribute is of a Case Type, then either "Text", "Number", "Date", "Time","User","Group","Email" or "WebLink".
+        isStructuredType:
+          type: boolean
+          description: |
+            If true, this indicates that the value for 'type' is the ID of a Structured Type.
+        isIdentifier:
+          description: |
+            true if the attribute is the Type's designated 'identifier' attribute.
+          type: boolean
+        isState:
+          description: |
+            true if the attribute is the Type's designated 'state' attribute.
+          type: boolean
+        isArray:
+          description: |
+            true if the attribute is an array.
+          type: boolean
+        isMandatory: 
+          description: |
+            true if the attribute must be populated
+          type: boolean
+        constraints:
+          $ref: '#/definitions/AttributeConstraints'
+        displayPreferences: 
+          $ref: '#/definitions/AttributeDisplayPreferences'
+    AttributeConstraints:
+      description: |
+        Constraints on permitted values for the attribute
+      properties:
+        decimalPlaces:
+          type: integer
+          description: |
+            The maximum number of decimal places permitted (only applicable to attributes of the Number type)
+    AttributeDisplayPreferences:
+      description: |
+        Indicates how clients should display an attribute
+      properties:
+        multiLine:
+          description: |
+            true if clients should present the attribute's value in a multi-line control
+            as opposed to a single line control
+          type: boolean
+        prefix:
+          description: |
+            a string clients should present as a prefix to attribute values.
+            For example, an attribute representing currency may have a prefix '$' representing dollars.
+          type: string
+        suffix:
+          description: |
+            a string clients should present as a suffix to attribute values.
+            For example, an attribute representing a person's age may have a suffix 'year(s)'.
+          type: string
+    GetTypeResponseItemState:
+      description: |
+        Describes a Case type's states. Used within GetTypeResponseItem
+      properties:
+        id:
+          type: string
+          description: |
+            The ID of the state.
+        label:
+          type: string
+          description: |
+            The name of the state defined by the application designer in Live Apps Designer.
+        value:
+          type: string     
+          description: |
+            The name of the state defined by the application designer in Live Apps Designer.
+        isTerminal:
+          description: |
+            true if the state is a 'terminal' state (one in which Cases are no longer considered active).
+          type: boolean   
+    GetTypeResponseItemCreator:
+      description: |
+        The definition of a Case Creator process (in the application containing this Case Type).
+      properties:
+        id:
+          type: string
+          description: |
+            The id of the Case Creator process.
+        name:
+          type: string
+          description: |
+            The name of the Case Creator process.
+        jsonSchema:
+          type: object
+          description: |
+            A JSON schema describing the data expected as input to this Case Creator process.
+    GetTypeResponseItemAction:
+      description:
+        The definition of a Case Action process (in the application containing this Case Type).
+      properties:
+        id:
+          type: string
+          description: |
+            The id of the Case Action process.
+        name:
+          type: string
+          description: |
+            The name of the Case Action process.
+        jsonSchema:
+          type: object
+          description: |
+            A JSON schema describing the data expected as input to this Case Action process.
+    ContextAttribute:
+      description: |
+        A name/value pair providing contextual information when an error occur.
+        Used within Error.
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+  #######################################
+  # Error Definitions
+  # IMPORTANT: The Error Definitions exist in both the private and public interface 
+  #            and these should be kept the same in both files
+  #######################################
+    Error:
+      description: |
+        Provides details when an error occurs
+      type: object
+      properties:
+        errorMsg:
+          description: Verbose error message
+          type: string
+        errorCode:
+          description: |
+            The following are the possible error codes in the Case Manager Service (note that the description shown is not part of the error code):
+            - CM_INTERNAL_ERROR - An internal error occurred.
+            - CM_PERSISTENCE_NOTCONNECTED - Service is not connected to the database.
+            - CM_PERSISTENCE_TRANSACTION_EXCEPTION - A transaction exception occurred.
+            - CM_PERSISTENCE_TRANSIENTREPOSITORYERROR - A transient repository error occurred.
+            - CM_PERSISTENCE_REPOSITORYERROR - A repository error occurred.
+            - CM_SEARCH_PERSISTENCE_NOTCONNECTED - Service is not connected to search store.
+            - CM_SEARCH_INTERACTION_TIMEDOUT - Search store interaction timed out.
+            - CM_SEARCH_INTERNAL_FAULT - Search store internal fault: {message}.
+            - CM_SEARCH_MAPPING_GENERATION_ERROR - Error occured while generating mapping.
+            - CM_SEARCH_TYPE_NOTFOUND - Unable to find Type corresponding to application {appId}.
+            - CM_SEARCH_JSON_PROCESSING_FAILURE - Failure while processing JSON.
+            - CM_SEARCH_TYPE_CREATION_ERROR - Internal error occured while creating elasticsearch type {type} in index {index} with mapping {mapping}. Casemodel is {casemodel}.
+            - CM_SEARCH_DOCUMENT_ERROR - Internal error occured while updating elasticsearch document for Case reference {caseref} with content {content} in type {type} in index {index}. Casemodel mapping is {mapping}. Casemodel content is {casemodel}.
+            - CM_CASEMODEL_CASEMODELSERIALIZATION - An error occured with Case model serialization.
+            - CM_CASEMODEL_SUMMARIZEFAILED - Failed to generated a summary for Case reference '{caseRef}'.
+            - CM_CASEMODEL_APPNOTEXIST - An Application with id '{appId}' does not exist.
+            - CM_CASEMODEL_APPNAMENOTEXIST - An Application with name '{appName}' does not exist.
+            - CM_CASEMODEL_APPANDTYPENOTEXIST - The Application id '{appId}' and Type id '{typeId}' combination does not refer to an existing Type.
+            - CM_CASEMODEL_STATEIDNOTEXIST - A state with id '{stateId}' does not exist for Type id '{typeId}' in Application id '{typeId}'.
+            - CM_CASEMODEL_STATENOTTERMINAL - The state with id '{stateId}' for Type id '{typeId}' in Application id '{appId}' is not terminal.
+            - CM_CASEREF_NOTEXIST - Case reference '{caseRef}' does not exist.
+            - CM_CASEREF_BADFORMAT - Case reference must be an integer of no more than 28 digits, not '{caseRef}'.
+            - CM_CASEREF_UPDATENOTALLOWEDINTERMINALSTATE - Case reference '{caseRef}' refers to a Case in a terminal state ('{value}' with id '{id}'). Update not allowed for this Case.
+            - CM_CASEREF_ALREADYEXISTS - Case reference '{caseRef}' already exists.
+            - CM_CASEDATA_NOTJSON - Casedata is not in JSON format.
+            - CM_CASEDATA_INVALID - Casedata is not a valid instance of the specified Case Type: {details}.
+            - CM_CASEDATA_IDVALUEMISMATCH - Casedata contains state value '{value}'. This has id '{modelId}' which does not match the supplied id '{suppliedId}'.
+            - CM_REST_APPIDPROHIBITSAPPNAME - applicationId and applicationName cannot be specified together.
+            - CM_REST_NOSUBSCRIPTIONID - No subscription id specified.
+            - CM_REST_BADSUBSCRIPTIONID - Subscription id '{subscriptionId}' does not match expected format.
+            - CM_REST_BADSANDBOXID - Sandbox id '{sandboxId}' does not match an accessible Sandbox.
+            - CM_REST_BADEXTERNALSUBSCRIPTIONID - A subscription with external id '{subscriptionId}' does not exist.
+            - CM_REST_BADSUBSCRIPTIONIDFORMAT - Subscription id must be an integer of no more than 28 digits, not '{subscriptionId}'.
+            - CM_REST_BADSANDBOXIDFORMAT - Sandbox id must be an integer of no more than 28 digits, not '{sandboxId}'.
+            - CM_REST_NEEDSANDBOXORCOUNTTRUE - $sandbox needs to be set unless $count=true is specified in the request.
+            - CM_REST_NEEDSSUBSCRIPTIONID - $subscriptionId needs to be set.
+            - CM_REST_NEEDSSUBSCRIPTIONIDORTSCSUBSCRIPTIONID - Either $subscriptionId (internal subscription id) or tscSubscriptionId (external subscription id) needs to be set.
+            - CM_REST_NEEDSSANDBOX - $sandbox needs to be set.
+            - CM_REST_NEEDSPURGEABLEFALSE - $filter must include 'purgeable eq FALSE'.
+            - CM_REST_BADAPPIDSFORMAT - For applicationId, the 'in' function expects comma-separated ids, not '{appIds}'.
+            - CM_REST_TWINAPPEXPRESSIONS - applicationId 'eq' and 'in' cannot be specified together.
+            - CM_REST_BADAPPIDFORMAT - Application id '{appId}' is of an invalid format.
+            - CM_REST_BADTYPEIDFORMAT - Type id '{typeId}' is of an invalid format.
+            - CM_REST_REQUIREAPPLICATIONID - Type id '{typeId}' needs applicationId specified too.
+            - CM_REST_BADSTATEIDFORMAT - State id '{stateId}' is of an invalid format.
+            - CM_REST_BADPURGABLEFORMAT - Purgable '{purgable}' is of an invalid format.
+            - CM_REST_BADCREATEDBYFORMAT - Created By '{createdBy}' is of an invalid format.
+            - CM_REST_ATLEASTONEUTTERANCENEEDED - One of stateUtterance,identifierUtterance,searchUtterance,allUtterance needed.
+            - CM_REST_ALLUTTERANCEUSEDWITHOTHERS - AllUtterance can't be used with stateUtterance,identifierUtterance or searchUtterance.
+            - CM_REST_UNSUPPORTEDSEARCHTYPE - Unsupported searchType {searchType}.
+            - CM_REST_BADLOCKEDFORMAT - lock '{lock}' is of an invalid format.
+            - CM_REST_BADSKIPFORMAT - Skip parameter '{skip}' is of an invalid format.
+            - CM_REST_BADTOPFORMAT - Top parameter '{top}' is of an invalid format.
+            - CM_REST_TOPEXCEEDSMAXIMUM - Top parameter '{top}' exceeds the permitted maximum ({maximum})
+            - CM_REST_SKIPANDTOPMAXLIMITEXCEEDED - Sum of $skip and $top parameters exceeds maximum limit of 10000. $skip is {skip}, $top is {top}.
+            - CM_REST_BADFILTEREXPECTINGAPP - Bad filter expression '{filter}'. Expecting applicationId.
+            - CM_REST_BADFILTEREXPECTINGAPPANDTYPE - Bad filter expression '{filter}'. Expecting applicationId and typeId.
+            - CM_REST_BADFILTEREXPECTINGAPPORAPPANDTYPE - Bad filter expression '{filter}'. Expecting applicationId and optionally typeId (omitting typeId implies all Types for the given Application).
+            - CM_REST_FILTER_MANDATORY - Filter is mandatory for this REST request.
+            - CM_REST_BADFILTEREXPECTINGAPPTYPEANDPURGEABLE - Bad filter expression '{filter}'. Expecting applicationId, typeId and purgeable.
+            - CM_REST_CASESBADCASESSELECT - Bad select expression '{select}'. Expected one or more comma-separated tokens from caseReference (or cr), casedata (or c), untaggedCasedata (or uc), summary (or s) and/or metadata (or m). Metadata can be suffixed with a dot followed by createdBy (or cb), creationTimestamp (or ct), modifiedBy (or mb), modificationTimestamp (or mt), lockType (or lt), lockedBy (or lb), msLockExpiry (or msle), msSystemTime (or msst), markedForPurge (or mfp), applicationId (or ai) or typeId (or ti).
+            - CM_REST_CASESBADPRIVATEMULTIPLECASESSELECT - Bad select expression '{select}'. Expected one or more comma-separated tokens from caseReference (or cr) and summary (or s).
+            - CM_REST_CASESBADPRIVATESINGLECASESELECT - Bad select expression '{select}'. Expected one or more comma-separated tokens from transformedCasedata (or tc) and metadata.stateLabel (or m.sl ).
+            - CM_REST_CASESBADCASETYPESSELECT - Bad select expression '{select}'. Expected one or more comma-separated tokens from basic (or b), attributes (or a), summaryAttributes (or sa), states (or s), jsonSchema (or js), creators (or c) and/or actions (or ac).
+            - CM_REST_COUNTPROHIBITSSELECT - $select is not allowed when using $count=true.
+            - CM_REST_COUNTPROHIBITSSKIP - $skip is not allowed when using $count=true.
+            - CM_REST_COUNTPROHIBITSTOP - $top is not allowed when using $count=true.
+            - CM_REST_COUNTPROHIBITSSEARCH - $search is not allowed when using $count=true.
+            - CM_REST_REFPROHIBITSSKIP - $skip is not allowed when using $filter=caseReference.
+            - CM_REST_REFPROHIBITSTOP - $top is not allowed when using $filter=caseReference.
+            - CM_REST_REFPROHIBITSSEARCH - $search is not allowed when using $filter=caseReference.
+            - CM_REST_CREATIONTIMESTAMPPROHIBITSSEARCH - $search is not allowed when using $filter=creationTimestamp.
+            - CM_REST_MODIFICATIONTIMESTAMPPROHIBITSSEARCH - $search is not allowed when using $filter=modificationTimestamp.
+            - CM_REST_STATEIDPROHIBITSSEARCH - $search is not allowed when using $filter=stateId.
+            - CM_REST_CREATEDBYPROHIBITSSEARCH - $search is not allowed when using $filter=createdBy
+            - CM_REST_REFPROHIBITSAPP - applicationId is not allowed in $filter when using caseReference.
+            - CM_REST_REFPROHIBITSTYPE - typeId is not allowed in $filter when using caseReference.
+            - CM_REST_REFPROHIBITSLOCK - lock is not allowed in $filter when using caseReference.
+            - CM_REST_REFPROHIBITSCREATEDBY - createdBy is not allowed in $filter when using caseReference.
+            - CM_REST_REFPROHIBITSCREATIONTIMESTAMP - creationTimestamp is not allowed in $filter when using caseReference.
+            - CM_REST_REFPROHIBITSMODIFICATIONTIMESTAMP - modificationTimestamp is not allowed in $filter when using caseReference.
+            - CM_REST_REFPROHIBITSCOUNT - $count=true is not allowed when using caseReference in $filter.
+            - CM_REST_BADJSON - Bad JSON in request.
+            - CM_REST_SEARCHNOTALLOWEDONDEVELOPERSANDBOX - Search not allowed on a Developer Sandbox.
+            - CM_REST_SEARCHTERMLENGTHLIMITED - Search term '{term}' has a length {length} which exceeds limit of {limit} characters.
+            - CM_REST_NONDEVELOPERSANDBOXDOESNOTEXIST - A non-Developer Sandbox with id '{sandboxId}' does not exist for subscription id '{subscriptionId}' .
+            - CM_REST_METADATANOTAVAILABLEWITHSEARCH - Search not allowed with $select=metadata.
+            - CM_REST_BADCASEREFERENCES - caseReferences must be a comma-separated list of integers of no more than 28 digits, not '{caseReferences}'.
+            - CM_REST_BADFILTEREXPRESSIONS - $filter contained invalid expression(s): {expressions}.
+            - CM_REST_NOTADMIN - This operation is only allowed for a User that belongs to an ADMINISTRATOR group.
+            - CM_REST_INTERNAL - An error occurred.
+            - CM_REST_ILLEGAL_ARGUMENT_EXCEPTION - An Illegal Argument Exception occurred.
+            - CM_REST_INVALID_URL_ENCODING - Invalid URL encoding.
+            - CM_REST_DELETEONLYPURGEABLE - Purgeable must be set true when deleting cases. Non-purgeable cases cannot be deleted.
+            - CM_REST_BADCREATIONTIMESTAMP - Creation timestamp '{timestamp}' is not in a valid format. Must be yyyy-MM-dd'T'HH:mm:ss.SSSZ (can be partially specified, elements populated left-to-right, but must include time-zone).
+            - CM_REST_BADMODIFICATIONTIMESTAMP - Modification timestamp '{timestamp}' is not in a valid format. Must be yyyy-MM-dd'T'HH:mm:ss.SSS'Z' (can be partially specified, elements populated left-to-right, but must include time-zone).
+            - CM_REST_BADCOUNT - count parameter invalid.
+            - CM_REST_CASESSELECTCASEREFERENCEWHENSEARCHING - $select must be caseReference (or cr) when $search is specified.
+            - CM_CASE_LOCK_FAIL - Could not obtain lock: {message}.
+            - CM_CASE_UNLOCK_FAIL - Could not clear lock: {message}
+          type: string
+        stackTrace:
+          description: Added if available
+          type: string
+        contextAttributes:
+          description: Error Attributes
+          type: array
+          items:
+            $ref: '#/definitions/ContextAttribute'

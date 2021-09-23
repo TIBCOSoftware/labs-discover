@@ -5,14 +5,13 @@
 */
 package com.tibco.labs.utils
 
-import com.tibco.labs.utils.commons.{analysisVersion, spark, tokenCic}
-import org.apache.spark.internal.Logging
+import com.tibco.labs.utils.commons.{analysisVersion, logger, spark, tokenCic}
 
 import java.time.LocalDateTime
 import sttp.capabilities
 import sttp.model.{MediaType, StatusCode}
 
-object Status extends Logging{
+object Status {
 
   case class Status(
                      organisation: String,
@@ -40,7 +39,7 @@ object Status extends Logging{
     import io.circe.syntax._
     import sttp.client3._
     val sttpBackend: SttpBackend[Identity, Any] = HttpURLConnectionBackend()
-    logInfo(s"Status payload for $fullId : $payload")
+    logger.info(s"Status payload for $fullId : $payload")
     val statusRequest: Request[Either[String, String], Any] = basicRequest
       .auth.bearer(tokenCic)
       .contentType("application/json")
@@ -51,11 +50,11 @@ object Status extends Logging{
 
     //Fire and Forget
     statusResponse.code match {
-      case StatusCode.Ok => logInfo("Status Updated")
+      case StatusCode.Ok => logger.info("Status Updated")
       case _ => {
         statusResponse.body match {
-          case Left(value) => logError("Status not updated, failed with" + value )
-          case Right(value) => logError("Status not updated, failed with" + value )
+          case Left(value) => logger.error("Status not updated, failed with" + value )
+          case Right(value) => logger.error("Status not updated, failed with" + value )
         }
       }
     }
@@ -64,7 +63,7 @@ object Status extends Logging{
   }
 
   def errorHandler(): Unit = {
-    logError("Exiting...")
+    logger.error("Exiting...")
     spark.stop()
     sys.exit(100)
   }

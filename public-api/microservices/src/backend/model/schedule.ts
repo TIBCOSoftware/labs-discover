@@ -13,15 +13,15 @@
 import { RequestFile } from './models';
 
 export class Schedule {
-    'Schedule': string;
+    'schedule': string;
     'isSchedule': string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "Schedule",
-            "baseName": "Schedule",
+            "name": "schedule",
+            "baseName": "schedule",
             "type": "string"
         },
         {

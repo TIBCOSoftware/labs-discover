@@ -1,18 +1,19 @@
-import { Location } from '@angular/common';
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MessageTopicService, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
-import { UxplPopup } from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
-import { OptionsMenuConfig } from '@tibco-tcstk/tc-web-components/dist/types/models/optionsMenuConfig';
-import { forkJoin, of, Subject } from 'rxjs';
-import { catchError, concatMap, map } from 'rxjs/operators';
-import { RepositoryService } from 'src/app/api/repository.service';
-import { NewDatasetWizardComponent } from 'src/app/components/new-dataset/wizard/wizard.component';
-import { Dataset, DatasetListItem } from 'src/app/models_ui/dataset';
-import { DiscoverBackendService } from 'src/app/service/discover-backend.service';
-import { getRelativeTime } from '../../functions/analysis';
-import { DatasetService } from '../../service/dataset.service';
-import {notifyUser} from '../../functions/message';
+import {Location} from '@angular/common';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
+import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
+import {OptionsMenuConfig} from '@tibco-tcstk/tc-web-components/dist/types/models/optionsMenuConfig';
+import {Subject} from 'rxjs';
+import {RepositoryService} from 'src/app/api/repository.service';
+import {NewDatasetWizardComponent} from 'src/app/components/new-dataset/wizard/wizard.component';
+import {Dataset, DatasetListItem} from 'src/app/models_ui/dataset';
+import {getRelativeTime, transformMapping} from '../../functions/analysis';
+import {DatasetService} from '../../service/dataset.service';
+import {MatDrawer} from '@angular/material/sidenav';
+import {ConfigurationService} from '../../service/configuration.service';
+import {OauthService} from '../../service/oauth.service';
 
 @Component({
   selector: 'app-dataset',
@@ -22,74 +23,87 @@ import {notifyUser} from '../../functions/message';
 
 export class DatasetComponent implements OnInit, OnDestroy {
 
-  protected _destroyed$ = new Subject();
-  public datasets: DatasetListItem[];
-  public loading: boolean;
-  public fileOptions: OptionsMenuConfig =  { options: [
-    { id: '1', label: 'Edit'},
-    { id: '2', label: 'Refresh'},
-    { id: '3', label: 'Delete'},
+  constructor(
+    private router: Router,
+    private dialog: MatDialog,
+    private location: Location,
+    private repositoryService: RepositoryService,
+    private messageService: MessageTopicService,
+    private datasetService: DatasetService) {
+    this.messageLength = this.MAX_MESSAGE_SIZE;
+  }
 
-  ]};
+  @ViewChild('datasetsTable', {static: false}) dt;
+  @ViewChild('drawer', {static: true}) drawer!: MatDrawer;
+  @ViewChild('deletePopup', {static: true}) deletePopup: ElementRef<UxplPopup>;
+
+  // protected _destroyed$ = new Subject();
+
+  readonly MIN_MESSAGE_SIZE = 30;
+  readonly MAX_MESSAGE_SIZE = 90;
+
+  datasets: DatasetListItem[];
+  loading: boolean;
+  fileOptions: OptionsMenuConfig = {
+    options: [
+      {id: '2', label: 'Refresh'},
+      {id: '3', label: 'Delete'},
+    ]
+  };
+
+  allFileOptions: OptionsMenuConfig = {
+    options: [
+      {id: '1', label: 'Edit'}, ...this.fileOptions.options
+    ]
+  };
+
   cols = [
     {field: 'name', header: 'Name'},
     {field: 'description', header: 'Description'},
     {field: 'lastPreviewDate', header: 'Last preview on'},
     {field: 'status', header: 'Status'}
   ];
-  @ViewChild('datasetsTable', {static: false}) dt;
-  public searchTerm: string;
-  public dialogRef: MatDialogRef<NewDatasetWizardComponent, any>;
+  searchTerm: string;
+  dialogRef: MatDialogRef<NewDatasetWizardComponent, any>;
+  noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
+  readyImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/states/Ready.svg');
+  notReadyImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/states/Not ready.svg');
+  getRelTime = getRelativeTime;
+  popupX: string;
+  popupY: string;
+  maxDeletePopupHeight = '162px';
+  showDeleteConfirm = false;
+  datasetOnAction: DatasetListItem = null;
+  statusMap: { [key: string]: any } = {};
+  showSide = false;
+  messageLength: number;
 
-  public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
-  public readyImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/states/Ready.svg');
-  public notReadyImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/states/Not ready.svg');
+  // availableColumns = [];
+  currentDSId;
 
-  public getRelTime = getRelativeTime;
-  public popupX:string;
-  public popupY:string;
-  public maxDeletePopupHeight = '162px';
-  public showDeleteConfirm = false;
-  @ViewChild('deletePopup', {static: true}) deletePopup: ElementRef<UxplPopup>;
-  public datasetOnAction: DatasetListItem = null;
-
-  public statusMap: {[key: string]: any} = {};
-
-  constructor(
-    protected dialog: MatDialog,
-    protected location: Location,
-    protected repositoryService: RepositoryService,
-    protected messageService: MessageTopicService,
-    protected backendService: DiscoverBackendService,
-    protected datasetService: DatasetService) { }
-
+  ngOnInit(): void {
+    this.refresh();
+  }
 
   ngOnDestroy(): void {
     console.log('stop status polling when destroy the dataset component');
     this.stopPollingStatus();
   }
 
-
-  ngOnInit(): void {
-    this.refresh();
-  }
-
-  public refresh = () => {
+  refresh = () => {
     this.listDataset();
   }
 
-  public newDatasetDialog = (): void => {
+  newDatasetDialog = (): void => {
     this.openWizard();
   }
 
-  public listDataset  = () => {
+  listDataset = () => {
     this.loading = true;
-
     this.datasetService.getDatasets().subscribe(
       datasetListItems => {
         this.datasets = datasetListItems;
         this.loading = false;
-
         // start progress query for those who doesn't have status yet
         this.startPollingStatus();
       }, error => {
@@ -100,7 +114,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
   }
 
   private stopPollingStatus() {
-    for(const datasetId in this.statusMap) {
+    for (const datasetId in this.statusMap) {
       if (this.statusMap[datasetId]) {
         this.statusMap[datasetId].stop = true;
       }
@@ -110,7 +124,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
 
   private startPollingStatus() {
     this.stopPollingStatus();
-    for (let i = 0; i < this.datasets.length; i ++) {
+    for (let i = 0; i < this.datasets.length; i++) {
       const dataset = this.datasets[i];
       if (!dataset.status) {
         const progress = {
@@ -138,29 +152,32 @@ export class DatasetComponent implements OnInit, OnDestroy {
     }
   }
 
-  public handleSearch = ($event): void => {
+  handleSearch = ($event): void => {
     this.searchTerm = $event.detail.value;
     this.dt.filterGlobal(this.searchTerm, 'contains');
   }
 
-  public getOptions = (rowData: Dataset): OptionsMenuConfig => {
-    const options = this.fileOptions.options.slice(0);
+  getOptions (rowData: Dataset): OptionsMenuConfig  {
+    // NOTE: Make sure this function does not return a new object (only send back object created on this class),
+    // otherwise the UXPL component goes in an endless loop !!!
     if (!rowData.status) {
-      options.splice(1, 1);
+      return this.fileOptions
+    } else {
+      return this.allFileOptions
     }
-    return {options};
   }
 
-  public optionSelect = ($event, datasetListItem: DatasetListItem): void => {
+  optionSelect = ($event, datasetListItem: DatasetListItem): void => {
     const label = $event.detail.label
-    if (label == 'Edit') {
+    if (label === 'Edit') {
       this.openWizard(datasetListItem);
-    } else if (label == 'Delete') {
+    } else if (label === 'Delete') {
       this.deleteDataset(datasetListItem, $event);
-    } else if (label == 'Refresh') {
+    } else if (label === 'Refresh') {
       this.refrewshPreview(datasetListItem);
     }
   }
+
 
   private refrewshPreview(dataset: DatasetListItem) {
     const datasetId = dataset.datasetid;
@@ -186,18 +203,18 @@ export class DatasetComponent implements OnInit, OnDestroy {
     const windowY = window.screenY;
 
     this.popupX = domRect.x - 328 + 'px';
-    this.popupY = domRect.y + windowY  + 'px';
+    this.popupY = domRect.y + windowY + 'px';
     this.deletePopup.nativeElement.show = true;
     this.showDeleteConfirm = true;
 
     this.datasetOnAction = dataset;
   }
 
-  public handleDeleteConfirmation($event) {
-    console.log($event);
+  handleDeleteConfirmation($event) {
+    // console.log($event);
     const action = $event.action;
     if (action) {
-      console.log('delete confirmed');
+      // console.log('delete confirmed');
       const dataset = this.datasetOnAction;
       if (dataset) {
         const datasetId = dataset.datasetid;
@@ -208,20 +225,20 @@ export class DatasetComponent implements OnInit, OnDestroy {
         this.datasetService.deleteDataset(datasetId).subscribe(resp => {
           this.refresh();
         }, error => {
-          if (error.status == 409) {
+          if (error.status === 409) {
             // the analysis linked with it is archived.
             const mes = {
-              type: "ERROR",
-              message: "The analysis created from '" + dataset.name + "' is archived"
+              type: 'ERROR',
+              message: 'The analysis created from \'' + dataset.name + '\' is archived'
             };
-            this.messageService.sendMessage("news-banner.topic.message", 'MESSAGE:' + JSON.stringify(mes));
+            this.messageService.sendMessage('news-banner.topic.message', 'MESSAGE:' + JSON.stringify(mes));
           } else {
             this.refresh();
             const mes = {
-              type: "ERROR",
-              message: "Failed to delete dataset"
+              type: 'ERROR',
+              message: 'Failed to delete dataset'
             };
-            this.messageService.sendMessage("news-banner.topic.message", 'MESSAGE:' + JSON.stringify(mes));
+            this.messageService.sendMessage('news-banner.topic.message', 'MESSAGE:' + JSON.stringify(mes));
           }
         });
       }
@@ -230,7 +247,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
     this.showDeleteConfirm = false;
   }
 
-  private openWizard(dataset: DatasetListItem | undefined = undefined) {
+  private openWizard(dataset?: DatasetListItem) {
     this.dialogRef = this.dialog.open(NewDatasetWizardComponent, {
       width: '100%',
       height: '90%',
@@ -248,7 +265,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
   }
 
   private displayStatus(status: string) {
-    if (status == 'COMPLETED') {
+    if (status === 'COMPLETED') {
       return 'Ready';
     } else {
       return 'Not ready';
@@ -256,7 +273,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
   }
 
   private getStateIcon(status: string) {
-    if (status == 'COMPLETED') {
+    if (status === 'COMPLETED') {
       return this.readyImage;
     } else {
       return this.notReadyImage;
@@ -264,7 +281,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
   }
 
   private getStateColor(status: string) {
-    if (status == 'COMPLETED') {
+    if (status === 'COMPLETED') {
       return '#E1F7EB';
     } else {
       return '#F9E1E4';
@@ -272,10 +289,32 @@ export class DatasetComponent implements OnInit, OnDestroy {
   }
 
   private getStateTooltip(status: string, message: string) {
-    if (status == 'COMPLETED') {
+    if (status === 'COMPLETED') {
       return '';
     } else {
       return message || '';
+    }
+  }
+
+  showFiles() {
+    this.router.navigate(['/discover/files']);
+  }
+
+  previewButtonClicked(dataset: any) {
+    // console.log('ID: ', dataset.datasetid)
+    let dsChanged = true;
+    if (dataset.datasetid === this.currentDSId) {
+      dsChanged = false;
+    }
+    this.currentDSId = dataset.datasetid;
+    this.showSide = !this.showSide || dsChanged;
+    if (this.showSide) {
+      this.drawer.open();
+      this.messageLength = this.MIN_MESSAGE_SIZE;
+    } else {
+      this.drawer.close();
+      this.currentDSId = '';
+      this.messageLength = this.MAX_MESSAGE_SIZE;
     }
   }
 

@@ -1,0 +1,74 @@
+.cont-card {
+  background-color: #f4f4f4;
+  margin: 24px;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.cont-detail {
+  padding-left: 15px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+  text-align: left;
+}
+
+.cont-space{
+  width: 5px;
+}
+
+.cell-header{
+  text-align: right;
+  width: 300px;
+}
+.cell-header-main{
+  text-align: right;
+  width: 125px;
+  color: #212121;
+  font-family: "Source Sans Pro";
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 13px;
+  text-transform: uppercase;
+}
+
+.cell-row{
+  /*border-bottom: 1px solid #757575;*/
+}
+
+.detail-cell {
+  display: flex;
+  flex-direction: row;
+}
+
+.error-icon {
+  color: #1774E5;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.tables-content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.error-container {
+  margin-top: 15px;
+  margin-left: 50px;
+  margin-right: 80px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.error-details-pane {
+  margin-left: 30px;
+  margin-right: 80px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}

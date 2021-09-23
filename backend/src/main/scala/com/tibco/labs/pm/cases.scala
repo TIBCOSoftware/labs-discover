@@ -6,6 +6,8 @@
 package com.tibco.labs.pm
 
 import com.tibco.labs.utils.DataFrameUtils
+import com.tibco.labs.utils.DataFrameUtils.{joinByColumn, joinByColumnGen}
+import com.tibco.labs.utils.Status.sendBottleToTheSea
 import com.tibco.labs.utils.commons._
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
@@ -15,16 +17,16 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import scala.util.{Failure, Success, Try}
 object cases {
 
-
-  def transformCases (df_events: DataFrame, df_variants: DataFrame): DataFrame = {
+  import spark.implicits._
+  def transformCases (df_events: DataFrame, df_events_casefilter: DataFrame): DataFrame = {
     var df_cases_f = spark.emptyDataFrame
 Try {
-  import spark.implicits._
-  println(s"###########  Creating variants ##########")
 
-  println(s"###########  Ordering Cases Dataframe ##########")
+  logger.info(s"###########  Creating variants ##########")
+
+  logger.info(s"###########  Ordering Cases Dataframe ##########")
   //val df_cases_ordered = df_events.repartition(100,$"case_id").sortWithinPartitions("activity_start_timestamp", asc("row_id"))
-  println(s"###########  creating Cases Dataframe ##########")
+  logger.info(s"###########  creating Cases Dataframe ##########")
   val _Start = System.nanoTime()
   val df_cases = df_events.repartition(100, $"case_id").withColumn("variant", collect_list("activity_id")
     .over(Window.partitionBy("case_id")
@@ -38,13 +40,21 @@ Try {
       max("variant").as("variants_cases"))
   val _End = System.nanoTime()
   val time = (_End - _Start) / 1000000
-  println(s"time for agg  : $time ms")
-  println(s"########### Cast ##########")
+  logger.info(s"time for agg  : $time ms")
+  logger.info(s"########### Cast ##########")
   val df_cases_0 = df_cases.withColumn("tmpVariants", concat_ws(",", $"variants_cases")).drop("variants_cases").withColumnRenamed("tmpVariants", "variants_cases")
-  println(s"########### join  ##########")
-  df_cases_f = broadcast(df_cases_0.as("cases")).join(df_variants.as("variants"), $"cases.variants_cases" === $"variants.variant")
+  df_cases_f = df_cases_0
+  //logger.info(s"########### join  ##########")
+  //df_cases_f = broadcast(df_cases_0.as("cases")).join(df_variants.as("variants"), $"cases.variants_cases" === $"variants.variant")
   df_cases_f = df_cases_f.withColumn("analysis_id", lit(analysisId)) //.withColumn("idPK",sha2(concat_ws("||",col("VARIANT_ID"),col("analysis_id")),256))
   //val df_cases_finale_2 = df_cases_finale_1.withColumn("idPK", sha2(concat_ws("||", col("VARIANT_ID"), col("analysis_id"), col("case_id"), col("case_start_timestamp")), 256))
+  // apply filters
+  if(!df_events_casefilter.isEmpty) {
+    logger.info(s"########### filtering cases table  ##########")
+    df_cases_f = joinByColumnGen("case_id", df_events_casefilter, df_cases_f, "inner")
+  } else {
+    logger.info(s"########### no filtering cases table ##########")
+  }
 
 
   df_cases_f = df_cases_f.withColumn("tmpStart", col("case_start_timestamp").cast("timestamp")).drop("case_start_timestamp").withColumnRenamed("tmpStart", "case_start_timestamp")
@@ -85,7 +95,7 @@ Try {
 
 
   var buckets_labels: Map[Double, String] = null
-  println(s"Bucketizer output with $lengh_bck buckets")
+  logger.info(s"Bucketizer output with $lengh_bck buckets")
 
   if (lengh_bck == 8) {
     buckets_labels = Map(
@@ -112,6 +122,8 @@ Try {
 
 
 
+
+/*
   val finalColumnsOrderedName: Array[String] = Array(
 //    "variant",
     "variant_id",
@@ -123,12 +135,14 @@ Try {
 //    "CASES_EXTRA_ATTRIBUTES",
     "analysis_id",
     "bucketedDuration",
-    "bucketedDuration_label")
+    "bucketedDuration_label",
+    "caseStatus",
+    "caseStatusCategory")
 
 
 
   df_cases_f = df_cases_f.select(finalColumnsOrderedName.head, finalColumnsOrderedName.tail: _*)
-
+*/
 
 /*  // Delete any previous analysisID in DB
   DataFrameUtils.deleteAnalysisJDBC(databaseName, "cases")
@@ -138,10 +152,69 @@ Try {
   }*/
 }match{
   case Success(_) => df_cases_f
-  case Failure(e) => println("Error in cases : " +e.getMessage)
-    throw e
+  case Failure(e) => logger.error("Error in cases : " +e.getMessage)
+    //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
+    sendBottleToTheSea(s"$analysisId","Error in cases",e.getMessage,0, organisation)
+    spark.emptyDataFrame
 }
   }
+
+
+  def enrichCaseTable(df_cases: DataFrame, df_variants: DataFrame, df_activities: DataFrame): DataFrame = {
+    var df_cases_f = spark.emptyDataFrame
+    Try {
+      logger.info(s"########### join  ##########")
+      df_cases_f = broadcast(df_cases.as("cases"))
+        .join(df_variants.as("variants"), $"cases.variants_cases" === $"variants.variant")
+        .select("cases.*", "variants.variant_id")
+
+
+      // classify cases if needed
+      // add 2 new cols
+
+      if(startFilters.nonEmpty || stopFilters.nonEmpty) {
+        logger.info("Classification of cases...")
+        df_cases_f =  new casesClassifier().classify(df_cases_f, startFilters, stopFilters, df_activities)
+      } else {
+        df_cases_f = df_cases_f.withColumn("caseStatus", lit("Undefined")).withColumn("caseStatusCategory", lit("Active"))
+      }
+
+      val finalColumnsOrderedName: Array[String] = Array(
+        //    "variant",
+        "variant_id",
+        "case_id",
+        "case_start_timestamp",
+        "case_end_timestamp",
+        "total_case_duration",
+        "activities_per_case",
+        //    "CASES_EXTRA_ATTRIBUTES",
+        "analysis_id",
+        "bucketedDuration",
+        "bucketedDuration_label",
+        "caseStatus",
+        "caseStatusCategory")
+
+
+
+      df_cases_f = df_cases_f.select(finalColumnsOrderedName.head, finalColumnsOrderedName.tail: _*)
+
+
+      /*  // Delete any previous analysisID in DB
+        DataFrameUtils.deleteAnalysisJDBC(databaseName, "cases")
+        //Write Events table
+        if (backEndType.equals("aurora")) {
+          DataFrameUtils.writeAnalysisJDBC(df_cases_f, databaseName, "cases")
+        }*/
+    }match{
+      case Success(_) => df_cases_f
+      case Failure(e) => logger.error("Error in cases : " +e.getMessage)
+        //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
+        sendBottleToTheSea(s"$analysisId","Error in cases",e.getMessage,0, organisation)
+        spark.emptyDataFrame
+    }
+  }
+
+
 
   def doubleToStringTimeSpan(input: Int): String = {
     val week_r: Int = input % 604800

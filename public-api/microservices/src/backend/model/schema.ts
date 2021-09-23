@@ -14,8 +14,8 @@ import { RequestFile } from './models';
 
 export class Schema {
     'format': string;
-    'ColumnName': string;
-    'DataType': string;
+    'columnName': string;
+    'dataType': string;
 
     static discriminator: string | undefined = undefined;
 
@@ -26,13 +26,13 @@ export class Schema {
             "type": "string"
         },
         {
-            "name": "ColumnName",
-            "baseName": "ColumnName",
+            "name": "columnName",
+            "baseName": "columnName",
             "type": "string"
         },
         {
-            "name": "DataType",
-            "baseName": "DataType",
+            "name": "dataType",
+            "baseName": "dataType",
             "type": "string"
         }    ];
 

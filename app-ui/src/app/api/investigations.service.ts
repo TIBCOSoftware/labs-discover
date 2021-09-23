@@ -17,6 +17,9 @@ import { HttpClient, HttpHeaders, HttpParams,
 import { CustomHttpParameterCodec }                          from '../encoder';
 import { Observable }                                        from 'rxjs';
 
+import { Application } from '../model/models';
+import { InvestigationActions } from '../model/models';
+import { InvestigationApplicationDefinition } from '../model/models';
 import { InvestigationDetails } from '../model/models';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
@@ -85,18 +88,26 @@ export class InvestigationsService {
     }
 
     /**
-     * Returns the investigations for an id
-     * Get the investiation cases for an id
-     * @param id application id
+     * Returns all the possible actions for a given investigationAppId
+     * Get the available actions for an investigationAppId
+     * @param appId Application ID
+     * @param investigationId Investigation ID
+     * @param state State
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public getInvestigationDestilsForId(id: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Array<InvestigationDetails>>;
-    public getInvestigationDestilsForId(id: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Array<InvestigationDetails>>>;
-    public getInvestigationDestilsForId(id: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Array<InvestigationDetails>>>;
-    public getInvestigationDestilsForId(id: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
-        if (id === null || id === undefined) {
-            throw new Error('Required parameter id was null or undefined when calling getInvestigationDestilsForId.');
+    public getActionsForInvestigation(appId: string, investigationId: string, state: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Array<InvestigationActions>>;
+    public getActionsForInvestigation(appId: string, investigationId: string, state: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Array<InvestigationActions>>>;
+    public getActionsForInvestigation(appId: string, investigationId: string, state: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Array<InvestigationActions>>>;
+    public getActionsForInvestigation(appId: string, investigationId: string, state: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        if (appId === null || appId === undefined) {
+            throw new Error('Required parameter appId was null or undefined when calling getActionsForInvestigation.');
+        }
+        if (investigationId === null || investigationId === undefined) {
+            throw new Error('Required parameter investigationId was null or undefined when calling getActionsForInvestigation.');
+        }
+        if (state === null || state === undefined) {
+            throw new Error('Required parameter state was null or undefined when calling getActionsForInvestigation.');
         }
 
         let headers = this.defaultHeaders;
@@ -126,7 +137,162 @@ export class InvestigationsService {
             responseType_ = 'text';
         }
 
-        return this.httpClient.get<Array<InvestigationDetails>>(`${this.configuration.basePath}/investigation/${encodeURIComponent(String(id))}`,
+        return this.httpClient.get<Array<InvestigationActions>>(`${this.configuration.basePath}/investigation/${encodeURIComponent(String(appId))}/${encodeURIComponent(String(investigationId))}/${encodeURIComponent(String(state))}/actions`,
+            {
+                responseType: <any>responseType_,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get the possible applications that can be used to create investigations for TIBCO Labs Discover.
+     * Get the possible applications that can be used to create investigations
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getAllApplications(observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Array<Application>>;
+    public getAllApplications(observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Array<Application>>>;
+    public getAllApplications(observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Array<Application>>>;
+    public getAllApplications(observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+
+        let headers = this.defaultHeaders;
+
+        let credential: string | undefined;
+        // authentication (bearerAuth) required
+        credential = this.configuration.lookupCredential('bearerAuth');
+        if (credential) {
+            headers = headers.set('Authorization', 'Bearer ' + credential);
+        }
+
+        let httpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (httpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'application/json'
+            ];
+            httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+
+        let responseType_: 'text' | 'json' = 'json';
+        if(httpHeaderAcceptSelected && httpHeaderAcceptSelected.startsWith('text')) {
+            responseType_ = 'text';
+        }
+
+        return this.httpClient.get<Array<Application>>(`${this.configuration.basePath}/investigation/applications`,
+            {
+                responseType: <any>responseType_,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Get the application definition info by appId.
+     * Get the application definition info by appId
+     * @param appId application id
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getApplicationDefinition(appId: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<InvestigationApplicationDefinition>;
+    public getApplicationDefinition(appId: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<InvestigationApplicationDefinition>>;
+    public getApplicationDefinition(appId: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<InvestigationApplicationDefinition>>;
+    public getApplicationDefinition(appId: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        if (appId === null || appId === undefined) {
+            throw new Error('Required parameter appId was null or undefined when calling getApplicationDefinition.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        let credential: string | undefined;
+        // authentication (bearerAuth) required
+        credential = this.configuration.lookupCredential('bearerAuth');
+        if (credential) {
+            headers = headers.set('Authorization', 'Bearer ' + credential);
+        }
+
+        let httpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (httpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'application/json'
+            ];
+            httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+
+        let responseType_: 'text' | 'json' = 'json';
+        if(httpHeaderAcceptSelected && httpHeaderAcceptSelected.startsWith('text')) {
+            responseType_ = 'text';
+        }
+
+        return this.httpClient.get<InvestigationApplicationDefinition>(`${this.configuration.basePath}/investigation/${encodeURIComponent(String(appId))}/definition`,
+            {
+                responseType: <any>responseType_,
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
+
+    /**
+     * Returns the investigations for an id
+     * Get the investiation cases for an id
+     * @param appId application id
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public getInvestigationDestilsForId(appId: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<Array<InvestigationDetails>>;
+    public getInvestigationDestilsForId(appId: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpResponse<Array<InvestigationDetails>>>;
+    public getInvestigationDestilsForId(appId: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json'}): Observable<HttpEvent<Array<InvestigationDetails>>>;
+    public getInvestigationDestilsForId(appId: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json'}): Observable<any> {
+        if (appId === null || appId === undefined) {
+            throw new Error('Required parameter appId was null or undefined when calling getInvestigationDestilsForId.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        let credential: string | undefined;
+        // authentication (bearerAuth) required
+        credential = this.configuration.lookupCredential('bearerAuth');
+        if (credential) {
+            headers = headers.set('Authorization', 'Bearer ' + credential);
+        }
+
+        let httpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+        if (httpHeaderAcceptSelected === undefined) {
+            // to determine the Accept header
+            const httpHeaderAccepts: string[] = [
+                'application/json'
+            ];
+            httpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        }
+        if (httpHeaderAcceptSelected !== undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+
+        let responseType_: 'text' | 'json' = 'json';
+        if(httpHeaderAcceptSelected && httpHeaderAcceptSelected.startsWith('text')) {
+            responseType_ = 'text';
+        }
+
+        return this.httpClient.get<Array<InvestigationDetails>>(`${this.configuration.basePath}/investigation/${encodeURIComponent(String(appId))}`,
             {
                 responseType: <any>responseType_,
                 withCredentials: this.configuration.withCredentials,

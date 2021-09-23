@@ -4,6 +4,7 @@ export class DatasetListItem implements Deserializable {
     datasetid: string;
     name: string;
     fileName?: string;
+    filePath?: string;
     description?: string;
     createdDate: number;
     status?: string;
@@ -104,4 +105,5 @@ export class RedisFileInfo {
 export interface CsvFile {
     redisFileInfo: RedisFileInfo;
     beingUsed: boolean;
+    fileSize: number;
 }

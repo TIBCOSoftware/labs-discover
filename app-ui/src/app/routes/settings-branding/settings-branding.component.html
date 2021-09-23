@@ -8,25 +8,25 @@
     </div>
   </div>
   <div class="settings-container">
-    <div>
+    <div *ngIf="generalInformation">
       <h2>General</h2>
       <div class="settings-subcategory">
         <h3>Application</h3>
-        <uxpl-form-field id="#appTitle" fieldId="appTitle" style="margin-top: 5px; margin-bottom: 5px;" label="Application title" type="text" valid required="true" [value]="discover.general.applicationTitle" (uxplChanged)="handleUpdate($event, 'general')"></uxpl-form-field>
+        <uxpl-form-field id="#appTitle" fieldId="appTitle" style="margin-top: 5px; margin-bottom: 5px;" label="Application title" type="text" valid required="true" [value]="generalInformation.applicationTitle" (uxplChanged)="handleUpdate($event, 'general')"></uxpl-form-field>
       </div>
     </div>
-    <div>
+    <div *ngIf="landingPage">
       <h2>Welcome screen</h2>
       <div>
-        <div  class="settings-subcategory">
+        <div class="settings-subcategory">
             <h3>Introduction</h3>
-            <uxpl-form-field id="#welcomeScreenTitle" fieldId="welcomeScreenTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Title" type="text" valid required="true" [value]="discover.landingPage.title" (uxplChanged)="handleUpdate($event, 'landingPage', 'title')"></uxpl-form-field>
-            <uxpl-form-field id="#appTitle" fieldId="appTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Subtitle" type="text" valid required="true" [value]="discover.landingPage.subtitle" (uxplChanged)="handleUpdate($event, 'landingPage', 'subtitle')"></uxpl-form-field>
+            <uxpl-form-field id="#welcomeScreenTitle" fieldId="welcomeScreenTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Title" type="text" valid required="true" [value]="landingPage.title" (uxplChanged)="handleUpdate($event, 'landingPage', 'title')"></uxpl-form-field>
+            <uxpl-form-field id="#appTitle" fieldId="appTitle" style="padding-top: 5px; padding-bottom: 5px;" label="Subtitle" type="text" valid required="true" [value]="landingPage.subtitle" (uxplChanged)="handleUpdate($event, 'landingPage', 'subtitle')"></uxpl-form-field>
         </div>
         <div class="settings-subcategory">
           <h3>Capabilities</h3>
           <div>
-            <p-table [value]="discover.landingPage.highlights" styleClass="custom-table-css">
+            <p-table [value]="landingPage.highlights" styleClass="custom-table-css">
               <ng-template pTemplate="header">
                 <tr>
                   <th class="top-row" style="width: 15%">Icon</th>
@@ -41,8 +41,8 @@
                 <td class="no-padding data-row hovereffect">
                   {{highlight.iconURL}}
                 </td>
-                <td class="no-padding data-row hovereffect">{{highlight.title}}</td>
-                <td class="no-padding data-row hovereffect">{{highlight.content}}</td>
+                <td class="no-padding data-row hovereffect">{{ highlight.title }}</td>
+                <td class="no-padding data-row hovereffect">{{ highlight.content }}</td>
                 <td class="no-padding">
                   <uxpl-icon icon="pl-icon-edit" width="24px" height="24px" (click)="handleHighlighEdit(rowIndex)"></uxpl-icon>
                 </td>
@@ -55,7 +55,7 @@
           <h3>Background image</h3>
           <div class="settings-line">
             <input type="file" #file style="display:none" (change)="handleUpload($event.target.files[0])">
-            <uxpl-form-field class="setting-background-image" label="Background image" type="text" valid required="true" [value]="discover.landingPage.backgroundURL" (uxplChanged)="handleUpdate($event, 'landingPage', 'backgroundURL')"></uxpl-form-field>
+            <uxpl-form-field class="setting-background-image" label="Background image" type="text" valid required="true" [value]="landingPage.backgroundURL" (uxplChanged)="handleUpdate($event, 'landingPage', 'backgroundURL')"></uxpl-form-field>
             <uxpl-icon style="margin-bottom: -5px;" icon="pl-icon-upload" width="24px" height="24px" (click)="file.click()"></uxpl-icon>
           </div>
         </div>
@@ -64,11 +64,11 @@
     <div>
       <h2>Advanced <span class="advanced" (click)="showAdvanced = true">>></span></h2>
       <div *ngIf="showAdvanced" class="settings-subcategory">
-        <h3 (dblclick)="showSFServer = true">Spotfire</h3>
-        <uxpl-form-field *ngIf="showSFServer" id="#sfServer" fieldId="sfServer" style="margin-top: 5px; margin-bottom: 5px;" label="Alternative Spotfire Server (leave blank to use TIBCO Cloud Spotfire)" type="text" valid [value]="discover.analyticsSF?.customServer" (uxplChanged)="handleUpdate($event, 'advanced', 'customServer')"></uxpl-form-field>
-        <uxpl-form-field id="#previewDXP" fieldId="previewDXP" style="margin-top: 25px; margin-bottom: 5px;" label="Spotfire DXP used for preview" type="text" valid [value]="discover.analyticsSF?.previewDXPLocation" (uxplChanged)="handleUpdate($event, 'advanced', 'previewDXPLocation')"></uxpl-form-field>
-        <uxpl-form-field id="#dataTablePreviewDXP" fieldId="dataTablePreviewDXP" style="margin-top: 25px; margin-bottom: 5px;" label="Data table used in preview DXP" type="text" valid [value]="discover.analyticsSF?.previewDataTableName" (uxplChanged)="handleUpdate($event, 'advanced', 'previewDataTableName')"></uxpl-form-field>
-        <uxpl-form-field id="#userFolder" fieldId="userFolder" style="margin-top: 25px; margin-bottom: 5px;" label="Spotfire folder for user DXP's (used to store the template DXPs)" type="text" valid [value]="discover.analyticsSF?.customUserDXPFolder" (uxplChanged)="handleUpdate($event, 'advanced', 'customUserDXPFolder')"></uxpl-form-field>
+        <h3 (dblclick)="showServer = true">Spotfire</h3>
+        <uxpl-form-field *ngIf="showServer" id="#sfServer" fieldId="sfServer" style="margin-top: 5px; margin-bottom: 5px;" label="Alternative Spotfire Server (leave blank to use TIBCO Cloud Spotfire)" type="text" valid [value]="analytics.server" (uxplChanged)="handleUpdate($event, 'advanced', 'customServer')"></uxpl-form-field>
+        <uxpl-form-field id="#previewDXP" fieldId="previewDXP" style="margin-top: 25px; margin-bottom: 5px;" label="Spotfire DXP used for preview" type="text" valid [value]="analytics.previewLocation" (uxplChanged)="handleUpdate($event, 'advanced', 'previewLocation')"></uxpl-form-field>
+        <uxpl-form-field id="#dataTablePreviewDXP" fieldId="dataTablePreviewDXP" style="margin-top: 25px; margin-bottom: 5px;" label="Data table used in preview DXP" type="text" valid [value]="analytics.previewTableName" (uxplChanged)="handleUpdate($event, 'advanced', 'previewTableName')"></uxpl-form-field>
+        <uxpl-form-field id="#userFolder" fieldId="userFolder" style="margin-top: 25px; margin-bottom: 5px;" label="Spotfire folder for user DXP's (used to store the template DXPs)" type="text" valid [value]="analytics.customUserFolder" (uxplChanged)="handleUpdate($event, 'advanced', 'customUserFolder')"></uxpl-form-field>
       </div>
     </div>
   </div>

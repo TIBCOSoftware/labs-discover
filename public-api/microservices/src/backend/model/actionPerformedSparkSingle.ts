@@ -16,7 +16,7 @@ export class ActionPerformedSparkSingle {
     'message': string;
     'code': number;
     'status': string;
-    'jobId': string;
+    'jobName': string;
 
     static discriminator: string | undefined = undefined;
 
@@ -37,8 +37,8 @@ export class ActionPerformedSparkSingle {
             "type": "string"
         },
         {
-            "name": "jobId",
-            "baseName": "jobId",
+            "name": "jobName",
+            "baseName": "jobName",
             "type": "string"
         }    ];
 

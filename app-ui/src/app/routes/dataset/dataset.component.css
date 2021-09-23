@@ -45,3 +45,10 @@
   overflow: hidden;
 }
 
+.row-highlight {
+  background-color: #ebebeb !important;
+}
+
+.preview-button::part(button) {
+  background-color: #FFF;
+}

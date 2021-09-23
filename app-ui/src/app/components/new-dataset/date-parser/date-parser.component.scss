@@ -1,16 +1,12 @@
-.dates-viewport {
-  height: 300px;
-  width: 100%;
-}
-
-.data-row {
-  height: 30px;
-}
 
 .columns-row, .data-row {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+}
+
+.top-row {
+  display: table-cell;
 }
 
 .indeterminate {
@@ -141,7 +137,7 @@
 
 :host ::ng-deep .datasource-csv-preview {
   .index-col {
-    width: 100px;
+    max-width: 100px;
   }
   .date-col {
     width: 360px;

@@ -5,6 +5,7 @@ import {AnalyticsConfigSF, AnalyticsMenuConfigUI} from '../models_ui/configurati
 import {VisualisationService} from '../api/visualisation.service';
 import {Visualisation} from '../model/visualisation';
 import {map} from 'rxjs/operators';
+import { Analytics } from '../model/models';
 import {Template} from '../model/template';
 
 export const DXP_EXISTS_MESSAGE = 'A DXP with this name already exists...';
@@ -15,12 +16,14 @@ export function stripDisabledMenuItems(menu: TemplateMenuConfig[]): TemplateMenu
   const re = [];
   const tempMenu = cloneDeep(menu);
   if(tempMenu) {
-    tempMenu.forEach((mItem) => {
-      if (mItem.child && mItem.child.length > 0) {
-        mItem.child = stripDisabledMenuItems(mItem.child);
-      }
-      if (mItem.enabled) re.push(mItem);
-    })
+    if (isIterable(tempMenu)) {
+      tempMenu.forEach((mItem) => {
+        if (mItem.child && mItem.child.length > 0) {
+          mItem.child = stripDisabledMenuItems(mItem.child);
+        }
+        if (mItem.enabled) re.push(mItem);
+      })
+    }
   }
   return re;
 }
@@ -57,9 +60,9 @@ export function escapeCharsForJSON(str) {
     .replace(/[\t]/g, '\\t');
 };
 
-export function getSFLink(conf: AnalyticsConfigSF): string {
-  if (conf && conf.customServer && conf.customServer !== '') {
-    return conf.customServer;
+export function getSFLink(conf: Analytics): string {
+  if (conf && conf.server && conf.server !== '') {
+    return conf.server;
   }
   const urlLoc = window.location.href;
   let region = 'eu.';
@@ -149,12 +152,20 @@ export async function checkIfDXPExists(dxpName: string, visService: Visualisatio
 }
 
 export function clearAllNodeFromDefault(data) {
-  for (const node of data) {
-    node.isDefault = false;
-    if (node.child && node.child.length && typeof node.child === 'object') {
-      clearAllNodeFromDefault(node.child);
+  if(data) {
+    if (isIterable(data)) {
+      for (const node of data) {
+        node.isDefault = false;
+        if (node.child && node.child.length && typeof node.child === 'object') {
+          clearAllNodeFromDefault(node.child);
+        }
+      }
     }
   }
+}
+
+function isIterable (value) {
+  return Symbol.iterator in Object(value);
 }
 
 export function compareTemplates(tempA: Template, tempB: Template) {

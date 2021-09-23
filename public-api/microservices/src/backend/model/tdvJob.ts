@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 import { DatasetSourceTdv } from './datasetSourceTdv';
 
 export class TdvJob {
-    'DataSourcePath': string;
+    'DataSourcePath'?: string;
     'DataSetViewPath'?: string;
     'PublishedDataSourcePath'?: string;
     'DatasetID'?: string;
@@ -22,7 +22,7 @@ export class TdvJob {
     'DatasetDescription'?: string;
     'DatasetSource': DatasetSourceTdv;
     'Organization': string;
-    'CreationTime': object;
+    'CreationTime'?: object;
 
     static discriminator: string | undefined = undefined;
 

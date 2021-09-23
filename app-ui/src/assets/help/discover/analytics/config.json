@@ -2,7 +2,6 @@
   "side-bar": {
     "label": "How can we help?",
     "section": [
-      
       {
         "type": "inline",
         "name": "Tell_Me_About",
@@ -36,8 +35,6 @@
             "content": "",
             "default": "true"
           }
-          
-
         ]
       },
       {
@@ -119,7 +116,7 @@
             "default": "true"
           }
         ]
-      },      
+      },
       {
         "type": "inline",
         "name": "How do I",
@@ -152,7 +149,6 @@
         "title": "External link",
         "icon": "url of the icon",
         "item": [
-
           {
             "type": "external",
             "label": "Legal Notices",

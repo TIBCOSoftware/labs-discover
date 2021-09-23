@@ -1,16 +1,21 @@
 <style>
-  .inline   {
+  .inline {
     vertical-align: middle;
     height: 20px;
     width: 20px;
   }
 </style>
+<p>A process analysis can have any of these statuses.</p>
+<li><strong>Process Mining</strong>: The process mining algorithms have been sent to the backend for processing. A
+  progress bar tracks the overall progress. After processing is complete, the analysis becomes ‘Ready’ or ‘Not Ready’.
+</li>
+<li><strong>Ready</strong>: The process analysis completed successfully and analytics are ready for viewing.
+</li>
+<li><strong>Not Ready</strong>: The process analysis terminated with errors. After the errors are corrected, the
+  analysis can be rerun.
 
-  <p>Once created using the wizard, Process analysis follows one of the statuses below.</p>
-    <li> <strong>Process Mining</strong>: Once here, the computation of the process mining algorithm(s) is sent to the backend. 
-      A progress bar is visible on the status to track the overall progress. Once completed, the analysis goes automatically either in Ready ot Not Ready status. </li>
-    <li> <strong>Ready</strong>: Process Mining has been successfully completed and analysis is ready to view analytics.</li>
-    <li> <strong>Not Ready</strong>: Process Mining has terminated with errors. Those errors should be reviewed and the analysis should be edited and re-run. </li>
-    <li> <strong>Archived</strong>: This is like a read only mode. the analysis can see be viewed but not modified. </li>
-    <li> <strong>Deleted</strong>: Analysis is permanently removed from the system. </li>
+</li>
+<li><strong>Archived</strong>: The process analysis is available for viewing but can’t be modified.</li>
+<li><strong>Deleted</strong>: The process analysis has been removed from the system.
+</li>
 

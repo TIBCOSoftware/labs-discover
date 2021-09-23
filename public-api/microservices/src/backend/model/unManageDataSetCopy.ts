@@ -14,7 +14,7 @@ import { RequestFile } from './models';
 
 export class UnManageDataSetCopy {
     'DatasetName': string;
-    'Annotation': string;
+    'Annotation'?: string;
     'DatasetPath': string;
     'Organization': string;
 

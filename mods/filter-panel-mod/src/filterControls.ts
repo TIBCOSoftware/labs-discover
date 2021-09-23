@@ -30,40 +30,86 @@ export class FilterControls {
     private markedRows: Spotfire.DataViewRow[] = [];
     private filteredRows: Spotfire.DataViewRow[] = [];
 
-    private startTS: string | null = null;
-    private endTS: string | null = null;
+    private startTS: string | undefined;
+    private endTS: string | undefined;
 
-    constructor(mod: Spotfire.Mod) {
+    private config: { initStartTS: string | null, initEndTS: string | null, enableTimeFilters : boolean} = {initStartTS : null, initEndTS : null, enableTimeFilters : true};
+
+    constructor(mod: Spotfire.Mod, config: string) {
         this.mod = mod;
+        // initialize config
+        Object.assign(this.config, JSON.parse(config)); 
+        
         this.tooltip = mod.controls.tooltip;
         this.popout = mod.controls.popout;
 
-        this.initFilterExpression();
+        this.initTimeFilters();
         this.initFilterIcon();
-        this.initTimeDropdown();
-        this.initTimeInputFields();
         this.initFilterButtons();
     }
 
+    private async initTimeFilters(){
+        await this.readFilterExpression();
+        if(this.config.enableTimeFilters){
+            this.enableTimeFilters();
+        } else {
+            this.disableTimeFilters();
+        }
+    }
+
+    private enableTimeFilters(){
+        this.initFilterExpression();
+        this.initTimeDropdown();
+        this.initTimeInputFields();
+        this.showTimeControls();
+    }
+
+    private disableTimeFilters(){
+        this.hideTimeControls();
+
+        // Remove event listeners
+        let containerDiv = <HTMLElement>document.querySelector("#time-select");
+        containerDiv.outerHTML = containerDiv.outerHTML;
+
+        this.resetFilterExpression();
+
+    }
+
+    private showTimeControls() {
+        let containerDiv = <HTMLElement>document.querySelector("#time-select");
+        containerDiv.classList.remove("is-hidden");
+    }
+
+    private hideTimeControls() {
+        let containerDiv = <HTMLElement>document.querySelector("#time-select");
+        containerDiv.classList.add("is-hidden");
+    }
+
     private async initFilterButtons(){
-        let filterOn = (await this.mod.document.property<string>(FILTER_TYPE_PROPERTY)).value();
-        this.filterOn = filterOn ? filterOn : "Cases";
+
+        // Initialize Cases / Events toggle
+        let filterOnDocProp = await this.mod.document.property<string>(FILTER_TYPE_PROPERTY).catch(() => undefined);
+        this.filterOn = filterOnDocProp && filterOnDocProp.value() ? filterOnDocProp.value()! : "Cases";
 
         if(this.filterOn !== "Cases"){
             let eventToggle = <HTMLInputElement>document.getElementById("filter-on-events");
             eventToggle.click();
         }
 
-        let filterToggles = <NodeListOf<HTMLInputElement>>document.querySelectorAll("#action-buttons>.pl-text-toggle>input");
+        let filterToggles = <NodeListOf<HTMLInputElement>>document.querySelectorAll("#filter-toggle>.pl-text-toggle>input");
         filterToggles.forEach((toggle) => {
             toggle.onchange = (e) => {
                 let label =  (<HTMLElement>e.target).nextElementSibling;
                 if(label && label.textContent){
                     this.filterOn = label.textContent;
-                    this.mod.document.property(FILTER_TYPE_PROPERTY).set(this.filterOn);
+                    if(filterOnDocProp){
+                        filterOnDocProp.set(this.filterOn);
+                    }   
                 }
             };
         });
+
+        // Initialize buttons
         let filterBtn = <HTMLElement>document.getElementById("apply-filter-btn");
         if(filterBtn){
             filterBtn.onclick = () => {
@@ -83,83 +129,106 @@ export class FilterControls {
         // TODO : add checks on user input 
         let startTS = <HTMLInputElement>document.getElementById("start-timestamp");
         if(startTS){
-            startTS.onchange = () => {
-                this.mod.document.property(START_TIMESTAMP_PROP).set(startTS.value);
+            startTS.onchange = async () => {
+                let startTsDocProp = await this.mod.document.property<string>(START_TIMESTAMP_PROP).catch(() => undefined);
+                if(startTsDocProp){
+                    startTsDocProp.set(startTS.value);
+                }
             }; 
         }
 
         let stopTS = <HTMLInputElement>document.getElementById("end-timestamp");
         if(stopTS){
-            stopTS.onchange = () => {
-                this.mod.document.property(END_TIMESTAMP_PROP).set(stopTS.value);
+            stopTS.onchange = async () => {
+                let stopTsDocProp = await this.mod.document.property<string>(END_TIMESTAMP_PROP).catch(() => undefined);
+                if(stopTsDocProp){
+                    stopTsDocProp.set(stopTS.value);
+                }
             }; 
         }
     }
-    private async initFilterExpression(){
-        let filterExprProp = await this.mod.document.property<string>(FILTER_EXPR_PROPERTY);
-        let filterExpr = filterExprProp.value();
-        if(!filterExpr || filterExpr.length === 0){
-            return;
-        }
 
-        // Check if there's a filter on case start / end
-        let timeFilter = filterExpr.match(/DateTime\(DocumentProperty\(\"startDateFilterString\"\)\)(.*)DateTime\(DocumentProperty\("endDateFilterString"\)\)/m);
-        if(timeFilter) {
-            let parts = timeFilter[1].split(" AND "); // TODO : add support for OR operator
-            if(parts[0].includes("start")){
-                // Started
-                this.selectedTimeMethod = "Started";
-            }else{
-                if(parts[1].includes("start")){
-                    // Open
-                    this.selectedTimeMethod = "Open";
-                }else{
-                    // Ended
-                    this.selectedTimeMethod = "Ended";
-                }
-            }
-            // Update dropdown value
-            const dpdwnBtn = <HTMLElement>document.querySelector('#dropdown-button button span');
-            if(dpdwnBtn){
-                dpdwnBtn.textContent = this.selectedTimeMethod;
-            }
+    private async readFilterExpression(){
+        this.filterExpression = [];
+        this.timeFilterIndex = 0;
 
-            // Read filters that are before the time filter in the expression
-            let regexIndex = timeFilter.index ? timeFilter.index : 0;
-            let filters = filterExpr.substring(0, regexIndex).split(" AND ");
-            for(let i = 0, len = filters.length; i < len; i++){
-                if(filters[i].length > 0){ 
-                    this.filterExpression.push(filters[i]);
-                }
-            }
-            
-            // Then push time filter
-            this.timeFilterIndex = this.filterExpression.length;
-            this.filterExpression.push(timeFilter[0]);
-            // Then read filters that are after
-            if((regexIndex + timeFilter[1].length) < filterExpr.length){
-                filters = filterExpr.substring(regexIndex + timeFilter[0].length).split(" AND ");
-                for(let i = 0, len = filters.length; i < len; i++){
-                    if(filters[i].length > 0){ 
-                        this.filterExpression.push(filters[i]);
+        let filterExprProp = await this.mod.document.property<string>(FILTER_EXPR_PROPERTY).catch(() => undefined);
+        if(filterExprProp){
+            // Parse filter expression
+            let filterExpr = filterExprProp.value();
+            if(filterExpr){
+                // Check if there's a filter on case start / end
+                let timeFilter = filterExpr.match(/DateTime\(DocumentProperty\(\"startDateFilterString\"\)\)(.*)DateTime\(DocumentProperty\("endDateFilterString"\)\)/m);
+                if(timeFilter) {
+                    let parts = timeFilter[1].split(" AND "); // TODO : add support for OR operator
+                    if(parts[0].includes("start")){
+                        // Started
+                        this.selectedTimeMethod = "Started";
+                    }else{
+                        if(parts[1].includes("start")){
+                            // Open
+                            this.selectedTimeMethod = "Open";
+                        }else{
+                            // Ended
+                            this.selectedTimeMethod = "Ended";
+                        }
+                    }
+                    // Update dropdown value
+                    const dpdwnBtn = <HTMLElement>document.querySelector('#dropdown-button button span');
+                    if(dpdwnBtn){
+                        dpdwnBtn.textContent = this.selectedTimeMethod;
+                    }
+
+                    // Read filters that are before the time filter in the expression
+                    let regexIndex = timeFilter.index ? timeFilter.index : 0;
+                    let firstPart = filterExpr.substring(0, regexIndex).trim();
+                    if(firstPart.length > 0 && firstPart !== 'True AND'){
+                        this.filterExpression.push(firstPart);
+                    }
+                    
+                    // Then push time filter
+                    this.timeFilterIndex = this.filterExpression.length;
+                    this.filterExpression.push(timeFilter[0]);
+
+                    // Then read filters that are after
+                    if((regexIndex + timeFilter[1].length) < filterExpr.length){
+                        this.filterExpression.push(filterExpr.substring(regexIndex + timeFilter[0].length));
+                    }
+                } else {
+                    // No time filter, but expression is not empty
+                    if(filterExpr.trim() !== "True"){ // equals an empty string
+                        this.filterExpression.push(filterExpr);
+                        this.timeFilterIndex = this.filterExpression.length;
+                        this.filterExpression.push(STARTED_FILTER_EXPRESSION);
                     }
                 }
             }
-        } else {
-            // Parse the filter expression
-            // TODO : support OR operator? 
-            let filters = filterExpr.split(" AND ");
-            this.filterExpression.push(...filters);
-            this.filterExpression.push(STARTED_FILTER_EXPRESSION);
-            this.timeFilterIndex = this.filterExpression.length;
-
-            this.mod.document.property(FILTER_EXPR_PROPERTY).set(this.getFilterExpression());
         }
     }
 
+    private async initFilterExpression(){
+        switch (this.selectedTimeMethod) {
+            case 'Started':
+                this.filterExpression[this.timeFilterIndex] = STARTED_FILTER_EXPRESSION;
+                break;
+            case 'Open':
+                this.filterExpression[this.timeFilterIndex] = OPEN_FILTER_EXPRESSION;
+                break;
+            case 'Ended':
+                this.filterExpression[this.timeFilterIndex] = ENDED_FILTER_EXPRESSION;
+                break;
+        }
+        await this.persistFilterExpression();
+    }
+
+    private async resetFilterExpression(){
+        this.filterExpression[this.timeFilterIndex] = "True";
+        await this.persistFilterExpression();
+    }
+
     private async initFilterIcon() {
-        // let filterIcon = <HTMLElement>document.querySelector("#filter-icon button");
-        // if (filterIcon != null) {
+        let filterIcon = <HTMLElement>document.querySelector("#filter-icon button");
+        if (filterIcon != null) {
         //     filterIcon.addEventListener("mouseover", () => {
         //         this.tooltip.show(this.tooltipContent);
         //     });
@@ -168,13 +237,14 @@ export class FilterControls {
         //         this.tooltip.hide();
         //     });
 
-            // filterIcon.addEventListener("click", (e) => {
-            //     this.showPopout(e.clientX, e.clientY);
-            // });
-        // }
-        let nbFilters = (await this.mod.document.property<number>(FILTER_COUNT_PROPERTY)).value();
-        if(nbFilters){
-            this.filterCount = nbFilters;
+            filterIcon.addEventListener("click", (e) => {
+                this.showPopout(e.clientX, e.clientY);
+            });
+
+        }
+        let nbFilters =  await this.mod.document.property<number>(FILTER_COUNT_PROPERTY).catch(() => undefined);
+        if(nbFilters && nbFilters.value()){
+            this.filterCount = nbFilters.value()!;
             this.updateFilterBadge();
         }
     }
@@ -265,9 +335,8 @@ export class FilterControls {
                                 break;
                         }
 
-                        if (filterExpression.length > 0) {
-                            this.updateFilterExpression(filterExpression, true);
-                        }
+                        this.filterExpression[this.timeFilterIndex] = filterExpression;
+                        this.persistFilterExpression();
                     }
                 },
                 popoutContent
@@ -275,68 +344,11 @@ export class FilterControls {
         });
     }
 
-    private initTimeDropdown_old() {
-        const dpdwnEl = <HTMLElement>document.querySelector('#time-select [data-pl-dropdown-role="dropdown"]');
-        if (!dpdwnEl) {
-            console.warn('Could not initialize Time controls.');
-            return;
+    private getFilterExpression() {
+        if(this.filterExpression.length === 0){
+            return "";
         }
-
-        //TODO
-        /** @ts-ignore */
-        const dropdown = new Uxpl.Dropdown(
-            dpdwnEl
-        );
-
-        const button = <HTMLElement>dpdwnEl.querySelector("button span");
-        if (!button) {
-            return;
-        }
-
-        let firstChild = <HTMLElement>dpdwnEl.querySelector("li");
-        if (!firstChild) {
-            return;
-        }
-
-        button.textContent = firstChild.textContent;
-
-        let items = <NodeListOf<HTMLElement>>dpdwnEl.querySelectorAll("li button");
-        for (let i = 0; i < items.length; i++) {
-            items[i].addEventListener("click", (evt) => {
-                const typeButton = evt.target as HTMLElement;
-                let filterType = typeButton.textContent;
-                if (!filterType) {
-                    //TODO:
-                    return;
-                }
-
-                filterType = filterType.trim();
-
-                button.textContent = filterType;
-
-                let filterExpression = '';
-                switch (filterType) {
-                    case 'Started':
-                        filterExpression = STARTED_FILTER_EXPRESSION;
-                        break;
-                    case 'Open':
-                        filterExpression = OPEN_FILTER_EXPRESSION;
-                        break;
-                    case 'Ended':
-                        filterExpression = ENDED_FILTER_EXPRESSION;
-                        break;
-                }
-
-                if (filterExpression.length > 0) {
-                    this.updateFilterExpression(filterExpression, true);
-                }
-
-            });
-        }
-    }
-
-    private getFilterExpression(){
-        return this.filterExpression.join(" AND ");
+        return this.filterExpression.join(" ").trim();
     }
 
     public setStartTimestamp(startTS: string) {
@@ -354,15 +366,11 @@ export class FilterControls {
         inputField.value = value;
     }
 
-    private async updateFilterExpression(filter: string, isTimeFilter: boolean = false) {
-        if(isTimeFilter){
-            this.filterExpression[this.timeFilterIndex] = filter;
-        }else{
-            this.filterExpression.push(filter);
+    private async persistFilterExpression() {
+        let filterExpressionDocProp = await this.mod.document.property<string>(FILTER_EXPR_PROPERTY).catch(() => undefined);
+        if(filterExpressionDocProp){
+            filterExpressionDocProp.set(this.getFilterExpression());
         }
-
-        let filterExpression = this.getFilterExpression();
-        this.mod.document.property(FILTER_EXPR_PROPERTY).set(filterExpression);
     }
 
     private async showPopout(x: number, y: number) {
@@ -380,22 +388,22 @@ export class FilterControls {
                 children: [checkbox({
                     name: "Time filters",
                     text: "Enable",
-                    checked: true, //TODO 
+                    checked: this.config.enableTimeFilters, //TODO 
                     enabled: true
                 })]
             }));
 
-            content.push(section({
-                heading: "Columns",
-                children: columns.map(column => {
-                    return checkbox({
-                        name: column.name,
-                        text: column.name,
-                        checked: true, //TODO
-                        enabled: true
-                    });
-                })
-            }));
+            // content.push(section({
+            //     heading: "Columns",
+            //     children: columns.map(column => {
+            //         return checkbox({
+            //             name: column.name,
+            //             text: column.name,
+            //             checked: true, //TODO
+            //             enabled: true
+            //         });
+            //     })
+            // }));
             return content;
         };
 
@@ -407,16 +415,21 @@ export class FilterControls {
                 alignment: "Bottom",
                 onChange: (e) => {
                     //TODO:
-                    console.log(e.name + ": " + e.value);
+                    //console.log(e.name + ": " + e.value);
+                    if("Time filters" === e.name){
+                        this.config.enableTimeFilters = e.value;
+                        this.persistConfig();
+                        
+                        if(this.config.enableTimeFilters){
+                            this.enableTimeFilters();
+                        } else {
+                            this.disableTimeFilters();
+                        }
+                    }
                 }
             },
             popoutContent
         );
-    }
-
-    private hideTimeSelectDiv() {
-        let containerDiv = <HTMLElement>document.querySelector("#time-select");
-        containerDiv.classList.add("is-hidden");
     }
 
     public setTooltip(content: string) {
@@ -430,12 +443,10 @@ export class FilterControls {
 
     private async applyFilter(){
         // Persist current StartTS and EndTS
-        let modConfigJson = await this.mod.property<string>("config");
-        let modConfig = JSON.parse(modConfigJson.value()!);
-        if(!modConfig.initStartTS && !modConfig.initEndTS){ // if a filter has already been applied, we don't overwrite dates
-            modConfig.initStartTS = this.startTS;
-            modConfig.initEndTS = this.endTS;
-            this.mod.property<string>("config").set(JSON.stringify(modConfig));
+        if(!this.config.initStartTS && !this.config.initEndTS){ // if a filter has already been applied, we don't overwrite dates
+            this.config.initStartTS = this.startTS!;
+            this.config.initEndTS = this.endTS!;
+            this.persistConfig();
         }
 
         let dataView = await this.mod.visualization.data();
@@ -447,11 +458,15 @@ export class FilterControls {
         }
 
         // Add new one
-        this.mod.transaction(() => {
+        let filterCountDocProp = await this.mod.document.property<number>(FILTER_COUNT_PROPERTY).catch(() => undefined);
+        this.mod.transaction( () => {
             dataView.mark(this.filteredRows, "Add"); // should trigger TERR script
             this.markedRows = this.filteredRows;
             this.filterCount++;
-            this.mod.document.property(FILTER_COUNT_PROPERTY).set(this.filterCount);
+            
+            if(filterCountDocProp){
+                filterCountDocProp.set(this.filterCount);
+            }
             this.updateFilterBadge();
         });
 
@@ -461,27 +476,42 @@ export class FilterControls {
         
         //this.markedRows = [];
         let dataView = await this.mod.visualization.data();
-        let modConfigJson = await this.mod.property<string>("config");
+
+        let startTsDocProp = await this.mod.document.property<string>(START_TIMESTAMP_PROP).catch(() => undefined);
+        let stopTsDocProp = await this.mod.document.property<string>(END_TIMESTAMP_PROP).catch(() => undefined);
+        let filterCountDocProp = await this.mod.document.property<number>(FILTER_COUNT_PROPERTY).catch(() => undefined);
 
         this.mod.transaction(() => {
 
-            let modConfig = JSON.parse(modConfigJson.value()!);
-            if(modConfig.initStartTS && modConfig.initEndTS){ 
+            if(this.config.initStartTS && this.config.initEndTS){ 
                 // Reset start and stop timestamps
-                this.mod.document.property(START_TIMESTAMP_PROP).set(modConfig.initStartTS);
-                this.mod.document.property(END_TIMESTAMP_PROP).set(modConfig.initEndTS);
+                
+                if(startTsDocProp){
+                    startTsDocProp.set(this.config.initStartTS);
+                }
+                
+                if(stopTsDocProp){
+                    stopTsDocProp.set(this.config.initEndTS);
+                }
                 
                 // Reset config
-                modConfig.initStartTS =  undefined;
-                modConfig.initEndTS =  undefined;
-                this.mod.property<string>("config").set(JSON.stringify(modConfig));
+                this.config.initStartTS =  null;
+                this.config.initEndTS =  null;
+                this.persistConfig();
             }
             
             dataView.clearMarking();
             this.markedRows = [];
             this.filterCount = 0;
             this.updateFilterBadge();
-            this.mod.document.property(FILTER_COUNT_PROPERTY).set(0);
+        
+            if(filterCountDocProp){
+                filterCountDocProp.set(0);
+            }
         });
+    }
+
+    private persistConfig(){
+        this.mod.property<string>("config").set(JSON.stringify(this.config));
     }
 }

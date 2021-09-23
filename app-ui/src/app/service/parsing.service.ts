@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
 import { ConfigurationService } from './configuration.service';
 import { DateParseRecord, DateParsingResult } from '../models_ui/parsing';
+import { FieldFormats } from '../model/models';
 
 
 @Injectable({
@@ -113,7 +114,7 @@ export class ParsingService {
    */
   public validateDateAgainstDateFormats(value: string): boolean {
     let valid = false;
-    const dateFormats = this.config.config.discover.dateTimeFormats ? this.config.config.discover.dateTimeFormats : this.DATE_FORMATS;
+    const dateFormats = this.config.config.discover.formats.filter((element: FieldFormats) => element.fieldName = 'dateTime')[0].values || this.DATE_FORMATS;
     for (let i = 0; i < dateFormats.length; i++) {
       if (this.validateSingleDate(value, dateFormats[i])) {
         valid = true;
@@ -128,7 +129,7 @@ export class ParsingService {
     if (dateOptions) {
       dateFormats = dateOptions;
     } else {
-      dateFormats = this.config.config.discover.dateTimeFormats ? this.config.config.discover.dateTimeFormats : this.DATE_FORMATS;
+      dateFormats = this.config.config.discover.formats.filter((element: FieldFormats) => element.fieldName = 'dateTime')[0].values || this.DATE_FORMATS;
     }
     const validFormats: string[] = [];
     dateFormats.forEach((formatStr: string) => {

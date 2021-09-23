@@ -46,14 +46,14 @@ export class NewDatasetWizardComponent implements OnInit {
   private statuses: NewAnalysisStepStatus[];
 
   constructor(
-    protected configService: ConfigurationService,
+    private configService: ConfigurationService,
     public dialogRef: MatDialogRef<NewDatasetWizardComponent>,
-    protected csvService: CsvService,
-    protected tdvService: TDVService,
-    protected datasetService: DatasetService,
-    protected messageService: MessageTopicService,
-    protected backendService: DiscoverBackendService,
-    protected location: Location,
+    private csvService: CsvService,
+    private tdvService: TDVService,
+    private datasetService: DatasetService,
+    private messageService: MessageTopicService,
+    private backendService: DiscoverBackendService,
+    private location: Location,
     private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -197,7 +197,7 @@ export class NewDatasetWizardComponent implements OnInit {
     this.config = {...this.config, currentStepIdx: newSteptStep};
   }
 
-  public createUpdateDateset = (): void => {
+  public createUpdateDataset = (): void => {
 
     let onlyEditDataset = true;
     // tdv needs to be created/updated and preview needs to be started

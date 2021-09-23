@@ -6,6 +6,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
+import scala.collection.mutable
 import scala.tools.nsc.io.Path
 
 object common {
@@ -66,10 +67,16 @@ object common {
   var time_jdbc_destination: Long = 0
   var time_spark_serialisation: Long = 0
 
+  var timeStampMap: mutable.Map[String, String] = scala.collection.mutable.Map[String, String]()
+
+
   def normalize(columns: Seq[String]): Seq[String] = {
     columns.map { c =>
       org.apache.commons.lang3.StringUtils.stripAccents(c.replaceAll("[ ,;{}()\n\t=._+]+", "_"))
     }
   }
+    def normalizerString(aString : String): String = {
+      org.apache.commons.lang3.StringUtils.stripAccents(aString.replaceAll("[ ,;{}()\n\t=._+]+", "_"))
+    }
 
 }

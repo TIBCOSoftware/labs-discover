@@ -80,8 +80,9 @@ export class AuthInterceptor implements HttpInterceptor {
           if (error instanceof HttpErrorResponse && (error.status === 400 || error.status === 401)) {
             // can't refresh token - redirect auth
             this.isRefreshing = false;
-            console.error("can't refresh token - redirect to login");
+            console.error('can\'t refresh token - redirect to login');
             this.oauthService.setKey(undefined);
+            // return from(this.oauthService.redirectLogin())
             return from(this.oauthService.redirectLogin()).pipe(
               done => {
                 exit();

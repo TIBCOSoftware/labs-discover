@@ -13,68 +13,68 @@
 import { RequestFile } from './models';
 
 export class Mapping {
-    'Activity'?: string;
-    'CaseID'?: string;
-    'Endtime'?: string;
-    'Otherattributes'?: string;
-    'Requester'?: string;
-    'Resource'?: string;
-    'Resourcegroup'?: string;
-    'Scheduledend'?: string;
-    'Scheduledstart'?: string;
-    'Starttime'?: string;
+    'activity'?: string;
+    'caseId'?: string;
+    'endTime'?: string;
+    'otherAttributes'?: string;
+    'requester'?: string;
+    'resource'?: string;
+    'resourceGroup'?: string;
+    'scheduledEnd'?: string;
+    'scheduledStart'?: string;
+    'startTime'?: string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "Activity",
-            "baseName": "Activity",
+            "name": "activity",
+            "baseName": "activity",
             "type": "string"
         },
         {
-            "name": "CaseID",
-            "baseName": "CaseID",
+            "name": "caseId",
+            "baseName": "caseId",
             "type": "string"
         },
         {
-            "name": "Endtime",
-            "baseName": "Endtime",
+            "name": "endTime",
+            "baseName": "endTime",
             "type": "string"
         },
         {
-            "name": "Otherattributes",
-            "baseName": "Otherattributes",
+            "name": "otherAttributes",
+            "baseName": "otherAttributes",
             "type": "string"
         },
         {
-            "name": "Requester",
-            "baseName": "Requester",
+            "name": "requester",
+            "baseName": "requester",
             "type": "string"
         },
         {
-            "name": "Resource",
-            "baseName": "Resource",
+            "name": "resource",
+            "baseName": "resource",
             "type": "string"
         },
         {
-            "name": "Resourcegroup",
-            "baseName": "Resourcegroup",
+            "name": "resourceGroup",
+            "baseName": "resourceGroup",
             "type": "string"
         },
         {
-            "name": "Scheduledend",
-            "baseName": "Scheduledend",
+            "name": "scheduledEnd",
+            "baseName": "scheduledEnd",
             "type": "string"
         },
         {
-            "name": "Scheduledstart",
-            "baseName": "Scheduledstart",
+            "name": "scheduledStart",
+            "baseName": "scheduledStart",
             "type": "string"
         },
         {
-            "name": "Starttime",
-            "baseName": "Starttime",
+            "name": "startTime",
+            "baseName": "startTime",
             "type": "string"
         }    ];
 

@@ -7,13 +7,18 @@ package com.tibco.labs.utils
 
 import com.typesafe.config.{Config, ConfigFactory}
 import io.circe.Json
+import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.tools.nsc.io.Path
 
 object commons {
+
+  val logger: Logger = org.apache.log4j.Logger.getRootLogger
+
 
 
   def uuid = java.util.UUID.randomUUID.toString
@@ -136,6 +141,7 @@ object commons {
 
   val NormalizationRegexColName = """[+._ ()]+"""
   val isoDatePattern ="yyyy-MM-dd'T'HH:mm:ss.SSSSSSX"
+  val isoSpotPattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
 
   def normalizer(columns: Seq[String]): Seq[String] = {
     columns.map { c =>
@@ -147,5 +153,16 @@ object commons {
     org.apache.commons.lang3.StringUtils.stripAccents(aString.replaceAll("[ ,;{}()\n\t=._+]+", "_"))
   }
 
-  case class tFEvents(eventsDF: DataFrame, attributesDF: DataFrame)
+  case class tFEvents(eventsDF: DataFrame, attributesDF: DataFrame, eventsCasesFiltered: DataFrame)
+  val prefixColsInternal = "input_"
+
+  var startFilters: List[String] = List()
+  var stopFilters: List[String] = List()
+
+  var eventsRange: ListBuffer[(String, String,String, String, String)] = new ListBuffer[(String, String,  String, String, String)]() // (ColName, ColType, colFormat,  Min, Max)
+  var casesRange: ListBuffer[(String, String,String, String, String)] = new ListBuffer[(String, String,  String, String, String)]() // (ColName, ColType, colFormat,  Min, Max)
+  var casesValues: ListBuffer[(String, String,String, List[String])] = new ListBuffer[(String, String,  String, List[String])]() // (ColName, ColType, colFormat,  list)
+  var eventsValues: ListBuffer[(String, String,String, List[String])] = new ListBuffer[(String, String,  String, List[String])]() // (ColName, ColType, colFormat,  list)
+
+
 }

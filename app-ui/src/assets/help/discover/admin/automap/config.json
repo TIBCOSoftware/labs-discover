@@ -2,7 +2,7 @@
   "side-bar": {
     "label": "How can we help?",
     "section": [
-      
+
       {
         "type": "inline",
         "name": "Tell_Me_About",
@@ -11,9 +11,9 @@
         "item": [
           {
             "type": "inline",
-            "name": "What is Admin about?",
-            "label": "What is Admin about?",
-            "title": "What is Admin about?",
+            "name": "What can I do on the Admin pages?",
+            "label": "What can I do on the Admin pages?",
+            "title": "What can I do on the Admin pages?",
             "url": "assets/help/application/Admin-About.html",
             "content": "",
             "default": "true"
@@ -29,9 +29,9 @@
         "item": [
           {
             "type": "inline",
-            "name": "What is Auto mapping about ?",
-            "label": "What is Auto mapping about ?",
-            "title": "What is Auto mapping about ?",
+            "name": "What is auto mapping?",
+            "label": "What is auto mapping?",
+            "title": "What is auto mapping?",
             "url": "assets/help/application/Admin-Automap-What-Is-it.html",
             "content": "",
             "default": "true"

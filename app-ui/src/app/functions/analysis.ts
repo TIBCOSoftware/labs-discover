@@ -1,4 +1,5 @@
 import {DateTime} from 'luxon';
+import {Mapping} from '../model/mapping';
 
 export const START_NAME = 'Starting Activities';
 export const STOP_NAME = 'Stopping Activities';
@@ -10,6 +11,19 @@ export function normalizeColumnName(columnName: string): string {
 
 export function encodeColumnName(columnName: string): string {
   return columnName.replace(' ', '_');
+}
+
+export function transformMapping(mapping: Mapping) {
+  const colMappObj = {};
+  for (const key of Object.keys(mapping)) {
+    if (mapping[key]) {
+      if (typeof (mapping[key]) === 'string') {
+        colMappObj[key] = encodeColumnName(mapping[key]);
+        // this.mapping[key] = encodeColumnName(this.mapping[key]);
+      }
+    }
+  }
+  return colMappObj;
 }
 
 
@@ -53,4 +67,50 @@ export function stripOrgFolder(dxpLocation): string {
     }
   }
   return re;
+}
+
+
+export function convertDateFromLocale(date: string): string {
+
+  // 3/13/2010 2:16:20 PM
+  console.log('convertDateFromLocale: ', date)
+  const locale = window.navigator.language;
+  const newDateLocale = Intl.DateTimeFormat(locale).formatToParts(new Date());
+  let format = '';
+  newDateLocale.forEach((element: Intl.DateTimeFormatPart) => {
+    switch (element.type) {
+      case 'day':
+        format = format + 'd';
+        break;
+      case 'month':
+        format = format +  'M';
+        break;
+      case 'year':
+        format = format + (element.value.length === 2 ? 'yy' : 'yyyy');
+        break;
+      case 'literal':
+        // TODO: This does not work for dutch keyboard ('-' signs are separators)
+        format = format + element.value;
+        // format = format + '/';
+        break;
+      default:
+        break;
+    }
+  })
+  if(date.indexOf('PM') > - 1 || date.indexOf('AM') > - 1) {
+    format = format + ' tt';
+  } else {
+    format = format + ' hh:mm:ss';
+  }
+  // format = format + ' hh:mm:ss';
+
+  const newDate = DateTime.fromFormat(date, format, {locale}).toISO();
+  console.log('OLD DATE: ' + date + ' NEW DATE: ' + newDate);
+  return newDate;
+}
+
+export function convertDateToLocale(date: string): string {
+  const currentDate = new Date(date);
+  const locale = window.navigator.language;
+  return currentDate.toLocaleDateString(locale) + ' ' + currentDate.toLocaleTimeString(locale)
 }

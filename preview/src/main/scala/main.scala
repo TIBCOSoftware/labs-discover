@@ -7,11 +7,15 @@ import java.time.LocalDateTime
 import java.util.Properties
 import scala.util.{Failure, Success, Try}
 import com.github.mrpowers.spark.daria.sql.DariaWriters
+import com.tibco.labs.utils.MetricsSend.sendMetricsToRedis
 import com.tibco.labs.utils.Status.sendBottleToTheSea
-import com.tibco.labs.utils.previewConfigFile
+import com.tibco.labs.utils.{DataFrameProfile, previewConfigFile, profiles, schemaPreview}
 import org.apache.commons.io.FileUtils
+import org.apache.spark.sql.functions.{col, date_format, to_timestamp}
+import org.apache.spark.sql.types.TimestampType
 
 import java.io.File
+import scala.collection.mutable.ListBuffer
 
 object main extends App {
 
@@ -25,6 +29,7 @@ object main extends App {
 
   val _endSparkTimer = System.nanoTime()
   time_spark_context = (_endSparkTimer - _startSparkTimer) / 1000000000
+
   println(s"##### Spark Context init time  $time_spark_context seconds ####")
 
   // parse arguments
@@ -94,10 +99,31 @@ object main extends App {
   //val replacingColumns = _columns.map(NormalizationRegexColName.r.replaceAllIn(_, "_"))
   //val df2: DataFrame = replacingColumns.zip(_columns).foldLeft(tmpDataFrame) { (tempdf, name) => tempdf.withColumnRenamed(name._2, name._1) }
   //tmpDataFrame = tmpDataFrame.toDF(DataFrameUtils.normalizeColNames(tmpDataFrame.columns):_*)
-  val df2 = tmpDataFrame.toDF(normalize(tmpDataFrame.columns):_*)
+  var df2 = tmpDataFrame.toDF(normalize(tmpDataFrame.columns):_*)
   sendBottleToTheSea(assetId, "info", "Data Normalize", 65, organization)
   // save the DF as parquet file, coalesce(1) with gzip compression
   // using daria for simplicity
+  println("before :")
+  df2.printSchema()
+  // casting all timestamps as TimeStampType
+  val listCols: Seq[schemaPreview] = cfg.schema.getOrElse(Seq(schemaPreview(None, None, None)))
+  //All elements with a timestamp datatype, we keep a map (colName -> format)
+  val filteredTimestampList = listCols.filter(l => l.dataType.getOrElse("") == "timestamp")
+  filteredTimestampList.foreach(u => {
+    timeStampMap += (normalizerString(u.columnName.getOrElse("")) -> u.format.getOrElse(""))
+  })
+
+  timeStampMap.foreach{kv =>
+    val colName = kv._1
+    val colFormat = kv._2
+
+    df2 = df2.withColumn(s"tmp_$colName", date_format(to_timestamp(col(s"$colName"), colFormat), isoDatePattern).cast(TimestampType))
+      .drop(col(s"$colName"))
+      .withColumnRenamed(s"tmp_$colName", s"$colName")
+  }
+
+  println("after :")
+  df2.printSchema()
 
   var targetFile = ""
 
@@ -202,7 +228,7 @@ object main extends App {
     time_ins_db = (_dropend - _dropStart) / 1000000000
   } match {
     case Success(_) => println(s"Affected Rows : $affectedrows")
-      println(s"###########  inserting $assetId in $time_del_db seconds done ##########")
+      println(s"###########  inserting $assetId in $time_ins_db seconds done ##########")
       sendBottleToTheSea(assetId, "info", "Insert RDS file done", 90, organization)
 
       dbc.close()
@@ -248,7 +274,70 @@ object main extends App {
   println("##### END JOB ####")
 
 
+
+   val profilesDf1 = DataFrameProfile(df2).toDataFrame
+
+  import com.amazon.deequ.profiles.{ColumnProfilerRunner, NumericColumnProfile}
+
+  /* Make deequ profile this data. It will execute the three passes over the data and avoid
+         any shuffles. */
+  val result = ColumnProfilerRunner().onData(df2).run()
+  var profileArray: Seq[(String, String, Int, String, String, String, String, String)] =  Seq[(String, String, Int, String, String, String, String, String)]()
+
+  result.profiles.foreach { case (columnName, profile) =>
+
+    val completeness = profile.completeness.toString
+    ;
+    val approximateNumDistinctValues = profile.approximateNumDistinctValues.toString
+    val dataType = profile.dataType.toString
+    var stats = ""
+    var minVal = ""
+    var maxVal = ""
+    var meanVal = ""
+    var stdVal = ""
+
+    if(profile.dataType.toString.equalsIgnoreCase("Integral") || profile.dataType.toString.equalsIgnoreCase("Fractional")){
+      val numericProfile = result.profiles(columnName).asInstanceOf[NumericColumnProfile]
+       minVal = numericProfile.minimum.get.toString
+       maxVal = numericProfile.maximum.get.toString
+       meanVal = numericProfile.mean.get.toString
+       stdVal = numericProfile.stdDev.get.toString
+      stats = minVal+" / "+maxVal+" / "+meanVal+" / "+stdVal
+    }
+    profileArray :+= (s"$columnName",completeness, approximateNumDistinctValues.toInt, dataType, minVal, maxVal, meanVal, stdVal)
+  }
+
+  import spark.implicits._
+  val profileDf2: DataFrame = profileArray.toDF("ColumnName", "Completeness", "ApproxDistinctValues", "DataType", "StatsMin", "StatsMax", "StatsMean", "StatsStdDev")
+
+  var profilDf3 = profileDf2.join(profilesDf1,"ColumnName")
+
+
+  profilDf3.show()
+
+
+
+  val data = new ListBuffer[profiles]()
+
+
+  import io.circe.generic.auto._, io.circe.syntax._
+  val out: Unit = profilDf3.as[profiles].collect().foreach((row => data += row))
+  println(data.toList.asJson.spaces2)
+  profilDf3.printSchema()
+  val _stopJobTimer = System.nanoTime()
+  time_spark_job =  (_stopJobTimer - _startJobTimer) / 1000000000
+  val totalRows = df2.count()
+  val dupRows = df2.dropDuplicates.count
+  println("TotalRows: " + totalRows)
+  println("DistinctRows: " + dupRows)
+
+  sendMetricsToRedis(assetId,data.toList, time_ins_db, time_spark_job, organization, totalRows, dupRows )
+  //Thread.sleep(10000)
+
+
   sendBottleToTheSea(assetId, "info", "Thanks for your patience...", 100, organization)
+
+
   spark.stop()
   println("...Bye Bye...")
   sys.exit(0)

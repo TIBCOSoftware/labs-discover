@@ -5,6 +5,7 @@ import { ApiResponseText, Group, TcAppDefinitionService, TcDocumentService } fro
 import { async, from, Observable, of } from 'rxjs';
 import { StateRole, TcSharedStateService, SharedStateList, SharedStateContent, TcCoreCommonFunctions, SharedStateEntry, TcGeneralLandingPageConfigService, TcGeneralConfigService } from '@tibco-tcstk/tc-core-lib';
 import { map, flatMap, mergeMap } from 'rxjs/operators';
+import { ConfigurationService as ConfigurationServiceMS } from '../api/api';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class ConfigurationService {
 
   constructor(
     protected appDefinitionService: TcAppDefinitionService,
+    protected configurationMS: ConfigurationServiceMS,
     protected sharedStateService: TcSharedStateService,
     protected landingPageConfig: TcGeneralLandingPageConfigService,
     protected generalConfig: TcGeneralConfigService,
@@ -53,7 +55,7 @@ export class ConfigurationService {
       } else {
         return Promise.resolve(this.configuration);
       }
-      const discoverConfig = await this.getDiscoverConfig(this.config.uiAppId, true, true).toPromise();
+      const discoverConfig = await this.configurationMS.getConfiguration().toPromise();
       if (discoverConfig) {
         this.configuration.discover = discoverConfig;
         return Promise.resolve(this.configuration);
@@ -80,44 +82,44 @@ export class ConfigurationService {
     return this.readConfig();
   }
 
-  private initDiscoverConfig =  (): Observable<DiscoverConfiguration> => {
-    const ssName = this.getSharedStateName(this.config.uiAppId, this.DEFAULT_PREFIX);;
-    this.config.discover = this.appDefinitionService.appConfig.config.discover;
-    this.config.discover.csv.folder = this.config.uiAppId + '_' + this.config.discover.csv.folder;
+  // private initDiscoverConfig =  (): Observable<DiscoverConfiguration> => {
+  //   const ssName = this.getSharedStateName(this.config.uiAppId, this.DEFAULT_PREFIX);;
+  //   this.config.discover = this.appDefinitionService.appConfig.config.discover;
+  //   // this.config.discover.csv.folder = this.config.uiAppId + '_' + this.config.discover.csv.folder;
 
-    return this.createDiscoverConfig(this.config.sandboxId, this.config.uiAppId, this.config.discover).pipe(
-      flatMap((ssId: string) => {
-        this.config.discover.id = ssId;
-        return this.updateDiscoverConfig(this.config.sandboxId, this.config.uiAppId, this.config.discover, ssId).pipe(
-          map((value: DiscoverConfiguration) =>  {
-            return value as DiscoverConfiguration;
-          })
-        );
-      })
-    );
-  }
+  //   return this.createDiscoverConfig(this.config.sandboxId, this.config.uiAppId, this.config.discover).pipe(
+  //     flatMap((ssId: string) => {
+  //       this.config.discover.id = ssId;
+  //       return this.updateDiscoverConfig(this.config.sandboxId, this.config.uiAppId, this.config.discover, ssId).pipe(
+  //         map((value: DiscoverConfiguration) =>  {
+  //           return value as DiscoverConfiguration;
+  //         })
+  //       );
+  //     })
+  //   );
+  // }
 
-  private createDiscoverConfig(sandboxId: number, uiAppId: string, discoveryConfig: DiscoverConfiguration): Observable<string> {
-    const ssName = this.getSharedStateName(uiAppId, this.DEFAULT_PREFIX);;
-    const content: SharedStateContent = new SharedStateContent();
-    const group = this.appDefinitionService.groups.find(grp => {
-      return grp.name === this.SHARED_STATE_GROUP_NAME;
-    })
-    content.json = TcCoreCommonFunctions.escapeString(JSON.stringify(discoveryConfig));
-    if (group) {
-      const roles: StateRole[] = [
-        {
-          entityId: group.id,
-          role: 'OWNER'
-        } as StateRole];
-      return this.sharedStateService.createSharedState(ssName, 'SHARED', '', sandboxId, undefined, roles, undefined, content).pipe(
-        map(value => value)
-      );
-    } else {
-      console.error('Discover Users group not found - unable to create config');
-      return undefined;
-    }
-  }
+  // private createDiscoverConfig(sandboxId: number, uiAppId: string, discoveryConfig: DiscoverConfiguration): Observable<string> {
+  //   const ssName = this.getSharedStateName(uiAppId, this.DEFAULT_PREFIX);;
+  //   const content: SharedStateContent = new SharedStateContent();
+  //   const group = this.appDefinitionService.groups.find(grp => {
+  //     return grp.name === this.SHARED_STATE_GROUP_NAME;
+  //   })
+  //   content.json = TcCoreCommonFunctions.escapeString(JSON.stringify(discoveryConfig));
+  //   if (group) {
+  //     const roles: StateRole[] = [
+  //       {
+  //         entityId: group.id,
+  //         role: 'OWNER'
+  //       } as StateRole];
+  //     return this.sharedStateService.createSharedState(ssName, 'SHARED', '', sandboxId, undefined, roles, undefined, content).pipe(
+  //       map(value => value)
+  //     );
+  //   } else {
+  //     console.error('Discover Users group not found - unable to create config');
+  //     return undefined;
+  //   }
+  // }
 
   private getDiscoverConfig = (uiAppId: string, useCache: boolean, flushCache: boolean): Observable<DiscoverConfiguration> => {
     const ssName = this.getSharedStateName(uiAppId, this.DEFAULT_PREFIX);;
@@ -162,15 +164,15 @@ export class ConfigurationService {
     return uiAppId + suffix;
   }
 
-  private deleteDiscoverConfig = (): Observable<string> => {
-    return this.sharedStateService.deleteSharedState(+this.config.discover.id);
-  }
+  // private deleteDiscoverConfig = (): Observable<string> => {
+  //   return this.sharedStateService.deleteSharedState(+this.config.discover.id);
+  // }
 
   public calculateResetActions = async (reset: boolean): Promise<ResetAction[]> => {
     const actions = [];
     if (reset) {
-      actions.push({ label: 'Delete discover config SS entry', done: false, action: this.deleteDiscoverConfig() });
-      actions.push({ label: 'Delete datasource org folder', done: false, action: this.documentService.deleteOrgFolder(this.appDefinitionService.uiAppId + '_' + this.config.discover.csv.folder) });
+      // actions.push({ label: 'Delete discover config SS entry', done: false, action: this.deleteDiscoverConfig() });
+      // actions.push({ label: 'Delete datasource org folder', done: false, action: this.documentService.deleteOrgFolder(this.appDefinitionService.uiAppId + '_' + this.config.discover.csv.folder) });
       actions.push({ label: 'Delete assets org folder', done: false, action: this.documentService.deleteOrgFolder(this.appDefinitionService.uiAppId + '_assets') });
     }
 
@@ -184,8 +186,8 @@ export class ConfigurationService {
       this.createFile('/assets/init/config/processMinerScheduled_template.json', 'processMinerScheduled_template.json', 'application/json')
     ]);
 
-    actions.push({ label: 'Creates discover config SS entry', done: false, action: this.initDiscoverConfig() });
-    actions.push({ label: 'Create datasource org folder', done: false, action: this.documentService.initOrgFolder(this.appDefinitionService.uiAppId + '_' + this.appDefinitionService.appConfig.config.discover.csv.folder) });
+    // actions.push({ label: 'Creates discover config SS entry', done: false, action: this.initDiscoverConfig() });
+    // actions.push({ label: 'Create datasource org folder', done: false, action: this.documentService.initOrgFolder(this.appDefinitionService.uiAppId + '_' + this.appDefinitionService.appConfig.config.discover.csv.folder) });
     actions.push({ label: 'Create assets org folder', done: false, action: this.documentService.initOrgFolder(this.appDefinitionService.uiAppId + '_assets') });
     actions.push({ label: 'Upload default background image', done: false, action: this.documentService.uploadDocument('orgFolders', this.appDefinitionService.uiAppId + '_assets', this.appDefinitionService.sandboxId, background, 'ProcessMiningsmall.jpg','') });
     actions.push({ label: 'Upload default icon1 image', done: false, action: this.documentService.uploadDocument('orgFolders', this.appDefinitionService.uiAppId + '_assets', this.appDefinitionService.sandboxId, icon1, 'ic-community.svg','') });

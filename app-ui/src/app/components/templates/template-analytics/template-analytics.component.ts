@@ -113,8 +113,8 @@ export class TemplateAnalyticsComponent implements OnInit {
         }
         if (this.analyticsChoice === 'COPY') {
           // Add the target folder to the newLocation
-          if(this.configService.config?.discover?.analyticsSF?.customUserDXPFolder) {
-            const folder = this.configService.config?.discover?.analyticsSF?.customUserDXPFolder;
+          if(this.configService.config?.discover?.analytics?.previewLocation) {
+            const folder = this.configService.config?.discover?.analytics?.previewLocation;
             if(this.newLocation.lastIndexOf('/') > -1) {
               this.newLocation = folder + this.newLocation.substring(this.newLocation.lastIndexOf('/'), this.newLocation.length);
             } else {
@@ -194,7 +194,7 @@ export class TemplateAnalyticsComponent implements OnInit {
   }
 
   public openSFReport = (): void => {
-    window.open(getSFLink(this.configService.config?.discover?.analyticsSF) + '/spotfire/wp/analysis?file=' + this.newLocation);
+    window.open(getSFLink(this.configService.config?.discover?.analytics) + '/spotfire/wp/analysis?file=' + this.newLocation);
   }
 
   public toggleAdvanced = (event): void => {

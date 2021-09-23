@@ -6,8 +6,7 @@
       </svg>
     </div>
     <div class="upload-content">
-      <input type="file" #fileDropRef id="fileDropRef" (change)="fileBrowseHandler($event.target.files)" />
-  
+      <input type="file" id="fileDropRef" (change)="fileBrowseHandler($event.target.files)" />
       <div *ngIf="filename==null">
         <div *ngIf="size=='big'" class="">You don’t have any available files yet</div>
         <div class="desc">Drag and drop your .csv file here, or </div>

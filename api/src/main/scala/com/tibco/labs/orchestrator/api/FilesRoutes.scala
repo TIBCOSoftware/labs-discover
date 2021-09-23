@@ -9,16 +9,18 @@ import akka.http.scaladsl.server.{Directive1, Directives, MissingFormFieldReject
 import akka.stream.{IOResult, Materializer}
 import akka.stream.scaladsl.{FileIO, Sink, Source}
 import akka.util.{ByteString, Timeout}
-import com.tibco.labs.orchestrator.api.FilesRegistry._
+import com.tibco.labs.orchestrator.api.registry.FilesRegistry._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import com.tibco.labs.orchestrator.api.registry.{FilesRegistry, RedisContent, S3Content}
 import org.slf4j.LoggerFactory
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 
 import java.io.File
 import java.nio.file.Paths
@@ -62,6 +64,9 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   def getPreviewFile(id: String, fileName: String): Future[ActionPerformedFilesPreview] =
     filesRegistry.ask(getPreviewFileRegistry(id, fileName, _))
 
+  def getURLFile(token: String, fileName: String): Future[ActionPerformedFilesUrl] =
+    filesRegistry.ask(getS3FileContentRegistry(token, fileName, _))
+
 
   def uploadFile2S3(id: String, fileInfo: FileInfo, data: Source[ByteString, Any], forms: Map[String, String]): Future[ActionPerformedFiles] = {
     filesRegistry.ask(uploadFileRegistry(id, fileInfo, data, forms, _))
@@ -75,7 +80,7 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   //#users-get-delete
 
 
-  val FilesRoutes: Route = postRouteFile ~ getRouteFile ~ deleteRouteSegment ~ getRouteFileV2 ~ getPreviewRoute
+  val FilesRoutes: Route = postRouteFile ~ getRouteFile ~ deleteRouteSegment ~ getRouteFileV2 ~ getPreviewRoute ~ getRouteFileContent
 
   @POST
   @Path("{orgid}")
@@ -196,11 +201,55 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
     }
   }
 
+  @GET
+  @Path("download/{filename}")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  @Operation(
+    summary = "return signed url for 1 h to get you file from",
+    description = "Return list of files stored in this org",
+    tags = Array("Files Operations"),
+    security  = Array(new SecurityRequirement(name = "bearer")),
+    parameters = Array(new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename")),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "response",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedFilesUrl])))),
+      new ApiResponse(responseCode = "500", description = "Internal server error",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedFilesUrl])))))
+  )
+  def getRouteFileContent: Route = {
+    cors() {
+      concat(
+        // /files/<orgid>/
+        path("files" / "download" /Segment) { filename =>
+          extractCredentials { creds =>
+            concat(
+              get {
+                //#retrieve-sparkapp-info/status
+                rejectEmptyResponse {
+                  log.info(creds.getOrElse("None").toString)
+                  val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+                  onSuccess(getURLFile(token, filename)) { response =>
+                    complete(response)
+                  }
+                }
+                //#retrieve-sparkapp-info/status
+              }
+            )
+          }
+        }
+      )
+    }
+  }
+
+
 
   @GET
   @Path("preview/{orgid}/{filename}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Files Operations"),
+  @Operation(
+    summary = "Return list of files stored in this org",
+    description = "Return list of files stored in this org",
+    tags = Array("Files Operations"),
     parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename to preview (original name)")),
     responses = Array(

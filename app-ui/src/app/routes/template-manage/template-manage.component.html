@@ -26,7 +26,6 @@
         <div class="popup-text">Before deleting, ensure the template isn't used.</div>
         <uxpl-button (clicked)="cancelDelete()">Ok</uxpl-button>
       </div>
-
       <div *ngIf="usedByAnalysis.length == 0">
         <div class="popup-text">Are you sure you want to delete the template <strong>{{templateToDeleteName}}</strong>? It
           can't be undone...

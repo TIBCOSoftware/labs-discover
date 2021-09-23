@@ -16,7 +16,8 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - ../container_data/redisinsight:/db
+      - ../container_data/redisinsight/import:/import
+      - ../container_data/redisinsight/db:/db
     restart: on-failure
     depends_on: 
       - redis
@@ -33,29 +34,8 @@ services:
       - "443:443"
     network_mode: bridge
 
-  analysis:
-    image: tibcosoftware/labs-discover-api-analysis:0.4.2
-    env_file: 
-      - .env
-    environment: 
-      - LOGLEVEL=debug
-      - LIVEAPPS=https://eu.liveapps.cloud.tibco.com
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - CONTROLLER_ANALYSIS=ON
-      - CONTROLLER_TEMPLATES=OFF
-      - CONTROLLER_DATASETS=OFF
-      - CONTROLLER_CONFIGURATION=OFF
-      - CONTROLLER_INVESTIGATIONS=OFF
-      - CONTROLLER_SWAGGER=OFF
-    ports:
-      - "9080:8080"
-      - "9558:8558"
-    depends_on: 
-      - redis  
-        
   microservice:
-    image: tibcosoftware/labs-discover-api-templates:0.1.0
+    image: tibcosoftware/labs-discover-api-templates:0.5.0
     env_file: 
       - .env
     environment: 
@@ -65,7 +45,7 @@ services:
       - REDIS_PORT=6379
       - CONTROLLER_ANALYSIS=ON
       - CONTROLLER_TEMPLATES=ON
-      - CONTROLLER_DATASETS=OFF
+      - CONTROLLER_DATASETS=ON
       - CONTROLLER_CONFIGURATION=OFF
       - CONTROLLER_INVESTIGATIONS=OFF
       - CONTROLLER_SWAGGER=ON

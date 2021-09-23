@@ -6,7 +6,12 @@
   *ngIf="fieldList && fieldList.length>0">
     <div class="menu-item" *ngFor="let tf of fieldList; index as i" cdkDrag (click)="clickMenuItem(i)">
       <div class="name">
-        <uxpl-icon height="24px" width="24px" icon="pl-icon-drag" class="drag-handler" cdkDragHandle></uxpl-icon>
+        <div style="width: 24px; height: 24px;" class="drag-handler" cdkDragHandle>
+          <svg fill="currentColor" viewBox="0 0 24 24" id="pl-icon-drag" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+                  d="M11 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm3-9a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+          </svg>
+        </div>
         <div class="title">{{tf[labelAttr]}}</div>
       </div>
       <div class="action-btn">

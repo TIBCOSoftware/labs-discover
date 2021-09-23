@@ -1,6 +1,6 @@
 package com.tibco.labs.orchestrator.models
 
-import com.tibco.labs.orchestrator.api.ProcessMiningScheduledRegistry.ActionPerformedSchedules
+import com.tibco.labs.orchestrator.api.registry.ProcessMiningScheduledRegistry.ActionPerformedSchedules
 import spray.json.RootJsonFormat
 
 //#json-formats

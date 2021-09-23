@@ -4,12 +4,13 @@ import { CSVConfig } from './csv';
 import { CaseInfo, LandingPageConfig } from '@tibco-tcstk/tc-liveapps-lib';
 import { Observable } from 'rxjs';
 import {AnalyticTemplateUI} from './analyticTemplate';
+// import { ApplicationConfiguration } from '../model/models'
 
 export interface Configuration {
     uiAppId: string;
     sandboxId: number;
     claims: Claim;
-    discover: DiscoverConfiguration;
+    discover: any;
 }
 
 export interface AppInitializationInfo {
@@ -92,13 +93,14 @@ export interface Rating {
 }
 
 
+// To remove
 export interface InvestigationConfig {
   numberApplications: number;
   caseConfig: CaseConfig[];
 }
 
 // CCS Case Configuration / Custom Case Table / Custom Case List / Custom Case View / Custom Case Details
-
+// To remove
 export interface CaseConfig {
   customTitle: string;
   appId: string;

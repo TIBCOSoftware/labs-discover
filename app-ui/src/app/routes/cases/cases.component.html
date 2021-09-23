@@ -4,8 +4,8 @@
       <div class="caseview-left-nav" >
         <uxpl-left-nav-multi #leftNav (selected)="handleClick($event)" [tabs]="leftNavTabs" collapse></uxpl-left-nav-multi>
       </div>
-      <div class="caseview-table" *ngIf="caseConfig.length > 0">
-        <custom-case-list *ngFor="let cCon of caseConfig; let i = index" [cConfig]="cCon" [hidden]="hideTable[i]" (caseEvent)="caseEventClicked($event)"></custom-case-list>
+      <div class="caseview-table" *ngIf="investigations">
+        <custom-case-list *ngFor="let cCon of caseConfig; let i = index" [cConfig]="cCon" [investigations]="investigations[i]" [hidden]="hideTable[i]" (refreshEvent)="refreshEvent($event, i)"></custom-case-list>
       </div>
     </div>
     <div [hidden]="hasCaseConfig" class="center">

@@ -1,6 +1,6 @@
 /**
  * TIBCO Discover public API
- * null
+ * TIBCO Discover public API
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -9,22 +9,44 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Asset } from './asset';
 
 
 export interface DatasetListItem { 
     /**
-     * The dataset id in TIBCO Cloud Metadata
+     * The dataset id assigned by Process mining process.
      */
-    datasetid?: number;
+    datasetid?: string;
     /**
-     * The label of the dataset
+     * The name of the dataset
      */
-    label?: string;
+    name?: string;
+    /**
+     * The csv file name.
+     */
+    fileName?: string;
     /**
      * The dataset description.
      */
     description?: string;
-    preferredAsset?: Asset;
+    /**
+     * The dataset created datetime.
+     */
+    createdDate?: number;
+    /**
+     * The final status of dataset preview which is returned by process mining.
+     */
+    status?: string;
+    /**
+     * The datetime of last data preview.
+     */
+    lastPreviewDate?: number;
+    /**
+     * The type of the dataset.
+     */
+    type?: string;
+    /**
+     * The error message.
+     */
+    message?: string;
 }
 

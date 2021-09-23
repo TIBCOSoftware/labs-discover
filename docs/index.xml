@@ -1,8 +1,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Project Discover™ – Project Discovery</title>
+    <title>Project Discover – Project Discover</title>
     <link>https://tibcosoftware.github.io/labs-discover/</link>
-    <description>Recent content in Project Discovery on Project Discover™</description>
+    <description>Recent content on Project Discover</description>
     <generator>Hugo -- gohugo.io</generator>
     
 	  <atom:link href="https://tibcosoftware.github.io/labs-discover/index.xml" rel="self" type="application/rss+xml" />
@@ -13,6 +13,32 @@
     
     
     <item>
+      <title>Blog: September 2021 release</title>
+      <link>https://tibcosoftware.github.io/labs-discover/blog/2021/09/23/september-2021-release/</link>
+      <pubDate>Thu, 23 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/blog/2021/09/23/september-2021-release/</guid>
+      <description>
+        
+        
+        &lt;p&gt;What’s new in the September 2021 release Project Discover?&lt;/p&gt;
+&lt;p&gt;This major release contains:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;b&gt;File Screen&lt;/b&gt; improved usability. Part of the Datasets tab, this new screen allows to Upload, Browse and Delete CSV files separately from the new Dataset wizard.&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Details on Datasets&lt;/b&gt; allows to see meta-data information about Datasets at a glance.&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Language Review&lt;/b&gt; some terms have been improved for better user experience and ease of use.&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;major Angular 12 Update&lt;/b&gt;&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Performance Improvements&lt;/b&gt; when loading dashboards and importing data&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Bug Fixes&lt;/b&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;keep your feedbacks coming!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Blog: July 2021 release</title>
       <link>https://tibcosoftware.github.io/labs-discover/blog/2021/07/14/july-2021-release/</link>
       <pubDate>Wed, 14 Jul 2021 00:00:00 +0000</pubDate>
@@ -21,7 +47,7 @@
       <description>
         
         
-        &lt;p&gt;What’s new in the July 2021 release Project Discover™ ?&lt;/p&gt;
+        &lt;p&gt;What’s new in the July 2021 release Project Discover?&lt;/p&gt;
 &lt;p&gt;This minor release contains:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -56,7 +82,7 @@
       <description>
         
         
-        &lt;p&gt;What’s new in the June 2021 release Project Discover™ ?&lt;/p&gt;
+        &lt;p&gt;What’s new in the June 2021 release Project Discover?&lt;/p&gt;
 &lt;p&gt;This release is a major release that contains both architectural enhancements and new process mining features in the Process Control Center.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;

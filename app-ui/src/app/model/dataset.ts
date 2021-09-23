@@ -9,36 +9,65 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Schema } from './schema';
+import { PreviewStatus } from './previewStatus';
+import { RedisFileInfo } from './redisFileInfo';
+import { PublishedViews } from './publishedViews';
+import { DatasetSource } from './datasetSource';
 
 
 export interface Dataset { 
     /**
-     * The dataset id assigned by Process mining process.
+     * The dataset id.
      */
-    datasetid?: string;
+    Dataset_Id?: string;
     /**
      * The name of the dataset
      */
-    name?: string;
+    Dataset_Name?: string;
     /**
-     * The csv file name.
+     * The description of the dataset
      */
-    fileName?: string;
+    Dataset_Description?: string;
     /**
-     * The dataset description.
+     * The columns of the csv file
      */
-    description?: string;
+    schema?: Array<Schema>;
+    Dataset_Source?: DatasetSource;
     /**
      * The dataset created datetime.
      */
     createdDate?: number;
     /**
-     * The final status of dataset preview which is returned by process mining.
+     * The dateset updated datetime.
+     */
+    updatedDate?: number;
+    /**
+     * The final data preview status
      */
     status?: string;
     /**
-     * The datetime of last data preview.
+     * The last data preview datetime.
      */
     lastPreviewDate?: number;
+    /**
+     * The published view data source path.
+     */
+    PublishedView?: string;
+    previewStatus?: PreviewStatus;
+    TdvView?: PublishedViews;
+    CsvFile?: RedisFileInfo;
+    /**
+     * The type of dataset
+     */
+    type?: string;
+    /**
+     * The method of csv file is set.
+     */
+    csvMethod?: string;
+    /**
+     * Whether the dataset is marked as deleted.
+     */
+    deleted?: boolean;
 }
 

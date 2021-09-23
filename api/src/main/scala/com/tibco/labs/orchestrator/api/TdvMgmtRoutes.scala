@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.util.Timeout
-import com.tibco.labs.orchestrator.api.TdvMgmtRegistry._
+import com.tibco.labs.orchestrator.api.registry.TdvMgmtRegistry._
 import com.tibco.labs.orchestrator.models.{UnManageDataSetCopy, tdvJob}
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, ExampleObject, Schema}
@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import com.tibco.labs.orchestrator.api.registry.TdvMgmtRegistry
 
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType

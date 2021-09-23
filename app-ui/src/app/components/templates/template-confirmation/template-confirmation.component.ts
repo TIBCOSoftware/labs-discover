@@ -26,7 +26,7 @@ export class TemplateConfirmationComponent {
   }
 
   public openSFReport = (): void => {
-    window.open(getSFLink(this.configService.config?.discover?.analyticsSF) + '/spotfire/wp/analysis?file=' + this.template.spotfireLocation);
+    window.open(getSFLink(this.configService.config?.discover?.analytics) + '/spotfire/wp/analysis?file=' + this.template.spotfireLocation);
   }
 
   public getName = (): string => {

@@ -1,7 +1,7 @@
 package com.tibco.labs.orchestrator.models
 
 
-import com.tibco.labs.orchestrator.api.LoginRegistry.ActionPerformedLoginValidate
+import com.tibco.labs.orchestrator.api.registry.LoginRegistry.ActionPerformedLoginValidate
 
 import spray.json.RootJsonFormat
 

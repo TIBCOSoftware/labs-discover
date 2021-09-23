@@ -1,38 +1,52 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CaseConfig, CaseEvent, CaseField} from '../../models_ui/configuration';
-import {CaseInfo, TcAppDefinitionService} from '@tibco-tcstk/tc-liveapps-lib';
+import { CaseInfo } from '@tibco-tcstk/tc-liveapps-lib';
 import _ from 'lodash';
+import { InvestigationDetails } from 'src/app/model/investigationDetails';
+import { InvestigationMetadata } from 'src/app/model/investigationMetadata';
 
 @Component({
   selector: 'custom-case-details',
   templateUrl: './custom-case-details.component.html',
   styleUrls: ['./custom-case-details.component.css']
 })
-export class CustomCaseDetailsComponent implements OnInit {
+export class CustomCaseDetailsComponent implements OnInit, OnChanges {
 
-  constructor(protected appDefinitionService: TcAppDefinitionService) {
+  constructor() {
   }
-
   @Input() cConfig: CaseConfig;
-  @Input() caseDetail: CaseInfo;
+  @Input() caseDetail: InvestigationDetails;
   @Output() caseEvent: EventEmitter<CaseEvent> = new EventEmitter<CaseEvent>();
+
+  public transpose: any[][];
+
+  public milestone: any;
 
   protected MAX_FIELD_LENGTH = 35;
 
   ngOnInit(): void {
+    this.milestone = {
+        milestones: this.cConfig.states.map(state => { return { name: state.name, label: state.name, status: 'Pending'}})
+    };
+    this.milestone.milestones[this.milestone.milestones.length - 1].isTerminal = true;
+    this.transpose = _.cloneDeep(this.cConfig.detailFields[0].map((_, colIndex) => this.cConfig.detailFields.map(row => row[colIndex])));
+    this.milestone.milestones.filter(state => state.name === this.caseDetail.data.state)[0].status = 'InProgress';
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.cConfig && !changes.cConfig.firstChange) {
+      if (!_.isEqual(changes.cConfig.currentValue, changes.cConfig.previousValue)){
+        this.transpose = _.cloneDeep(changes.cConfig.currentValue.detailFields[0].map((_, colIndex) => changes.cConfig.currentValue.detailFields.map(row => row[colIndex])));
+      }
+    }
   }
 
   private getField(fieldV) {
-    const cas = this.caseDetail;
-    if (cas.untaggedCasedataObj) {
-      let field = 'untaggedCasedataObj.' + fieldV;
-      if (fieldV.startsWith('META:')) {
-        field = 'metadata.' + fieldV.substring(fieldV.lastIndexOf('META:') + 5);
-      }
-      if (fieldV.startsWith('CUSTOM:')) {
-        field = fieldV.substring(fieldV.lastIndexOf('CUSTOM:') + 7);
-      }
-      return _.get(cas, field);
+    if (fieldV.indexOf('META:') == -1) {
+      return _.get(this.caseDetail.data, fieldV);
+    } else {
+      fieldV =  fieldV.substring(fieldV.indexOf(':') + 1);
+      return this.caseDetail.metadata?.filter((el: InvestigationMetadata) => el.name === fieldV)[0].value;
     }
   }
 
@@ -56,7 +70,7 @@ export class CustomCaseDetailsComponent implements OnInit {
 
   eventClicked(data: CaseField) {
     const caseEvent: CaseEvent = {
-      caseInfo: this.caseDetail,
+      caseInfo: {} as CaseInfo, // this.caseDetail,
       caseFieldEvent: data
     }
     this.caseEvent.emit(caseEvent);
@@ -81,11 +95,5 @@ export class CustomCaseDetailsComponent implements OnInit {
       }
     }
     return re;
-  }
-
-
-  // Process updates from the souce pane
-  updateConfigJSON(newJson) {
-    console.log('Update JSON ', newJson);
   }
 }

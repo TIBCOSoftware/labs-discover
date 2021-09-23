@@ -1,21 +1,37 @@
 <style>
-  .inline   {
+  .inline {
     vertical-align: middle;
     height: 20px;
     width: 20px;
   }
 </style>
+<p>Click <strong>+ Dataset</strong> and follow the wizard steps.</p>
+<ul>
+  <li><strong>Basic Info</strong>: Enter a name for the dataset. The name must be unique across all your datasets.
+  </li>
+  <li><strong>Data source</strong>: Use a CSV file or TIBCO Data Virtualization (TDV) view.
+    <ul>
+      <li>CSV: Upload a CSV file or select one from the list of available files.
+      </li>
+      <li>TDV: Select one of the available views.
+      </li>
+    </ul>
+  </li>
+  <li><strong>Preview</strong>: View a preview of the data, if available. If the data isn’t what you want to work with,
+    click <strong>Previous</strong> and select or upload another file.
+  </li>
+  <li><strong>Attributes</strong>: This step displays the results of the system’s attempt to determine the data types of
+    the uploaded data. In this step, review the data types that the system selected and make any changes. The Value
+    Preview column contains the values from the first row in the dataset.
+  </li>
+  <li><strong>Dates</strong>: The system tries to figure out the format of the date fields in the imported data. Review
+    the format and change it if needed.
+    Here also you can provide your own format, please refer to <a
+      href='https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html' target='_'> this link</a> for more
+    information
+  </li>
+  <li><strong>Confirmation</strong>: Review the dataset settings. To make any changes, click Previous and navigate to
+    the step you want to revisit.
+  </li>
+</ul>
 
-  <p>To Create a new Dataset, click on the <strong>Create</strong> button and follow the steps of the wizard</p>
-  <p>
-    <li>In <strong>Basic Info</strong>, enter a name and description for the dataset. </li>
-    Note: names needs to be unique across all datasets.
-    <li><strong>Data source</strong>: Choose between Uploading a CSV File or connecting a TIBCO Data Virtualisation view</li>
-    then either select a file using the file browser, or select a view from the drop down coming from the TDV catalog.
-    <li><strong>Preview</strong>: Here you can see a sample preview of your data, to make sure it looks alright.</li>
-    <li><strong>Attributes</strong>: The system will try to automatically figure out the types, and will leave you an opportunity assign them as well in case of mistake. You have the last word!</li>
-    <li><strong>Dates</strong>: The system will try to automatically figure out the date formats for each fo the date fields. 
-     Here also you can provide your own format, please refer to <a href='https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html' target='_'> this link</a> for more information</li>
-    <li><strong>Confirmation</strong>: A summary of our dataset is displayed before you can confirlm and create it in the system.  </li>
-   
-  </P>

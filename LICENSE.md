@@ -31,5 +31,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 more details can be found in the following Repo files of this release:
 
-- [TIB_discover_2.1.0_license.pdf](TIB_discover_2.1.0_license.pdf)
-- [TIB_discover_2.1.0_license.txt](TIB_discover_2.1.0_license.txt)
+- [TIB_discover_3.0.0_license.pdf](TIB_discover_3.0.0_license.pdf)
+- [TIB_discover_3.0.0_license.txt](TIB_discover_3.0.0_license.txt)

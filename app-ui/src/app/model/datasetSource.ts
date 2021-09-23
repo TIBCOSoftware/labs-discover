@@ -13,6 +13,10 @@
 
 export interface DatasetSource { 
     /**
+     * The data source type
+     */
+    DatasourceType?: string;
+    /**
      * The charset encoding of the data source file
      */
     Encoding: string;
@@ -21,9 +25,17 @@ export interface DatasetSource {
      */
     FileEscapeChar?: string;
     /**
+     * Whether the data source csv file has column headers
+     */
+    FileHeaders?: boolean;
+    /**
      * The file name of the data source csv file.
      */
     FileName?: string;
+    /**
+     * The S3 url of data source file
+     */
+    FilePath?: string;
     /**
      * The quote char of the data source file
      */
@@ -32,33 +44,5 @@ export interface DatasetSource {
      * The separator char to parse the data source file.
      */
     FileSeparator?: string;
-    /**
-     * Whether the data source csv file has column headers
-     */
-    FileHeaders?: boolean;
-    /**
-     * The preferred asset id in TIBCO Cloud Metadata
-     */
-    MainAssetId?: number;
-    /**
-     * The S3 url of data source file
-     */
-    FilePath?: string;
-    /**
-     * The data source type
-     */
-    DatasourceType?: string;
-    /**
-     * The value to distinguish the application that dataset belongs to
-     */
-    System?: string;
-    /**
-     * The id of the TIBCO Cloud Metadata instance
-     */
-    InstanceId?: number;
-    /**
-     * The infrastructure id in TIBCO Cloud Metadata.
-     */
-    Infrastructure?: number;
 }
 

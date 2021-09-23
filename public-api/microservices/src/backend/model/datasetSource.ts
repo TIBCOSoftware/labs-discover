@@ -13,14 +13,14 @@
 import { RequestFile } from './models';
 
 export class DatasetSource {
-    'Source': string;
+    'source': string;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "Source",
-            "baseName": "Source",
+            "name": "source",
+            "baseName": "source",
             "type": "string"
         }    ];
 

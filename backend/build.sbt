@@ -19,8 +19,8 @@ val sparkLibs = Seq(
 // STTP - HTTP client
 
 libraryDependencies ++= List(
-  "com.softwaremill.sttp.client3" %% "circe" % "3.2.3",
-  "com.softwaremill.sttp.client3" %% "core" % "3.2.3"
+  "com.softwaremill.sttp.client3" %% "circe" % "3.3.11",
+  "com.softwaremill.sttp.client3" %% "core" % "3.3.11"
 )
 
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion
@@ -32,13 +32,14 @@ libraryDependencies += "org.postgresql" % "postgresql" % postgresVersion
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
 
 // circe support
-val circeVersion = "0.13.0"
+val circeVersion = "0.14.1"
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core",
   "io.circe" %% "circe-generic",
   "io.circe" %% "circe-parser",
   "io.circe" %% "circe-optics",
-  "io.circe" %% "circe-literal"
+  "io.circe" %% "circe-literal",
+  "io.circe" %% "circe-extras"
 ).map(_ % circeVersion)
 
 // iforest
@@ -91,6 +92,8 @@ libraryDependencies += "com.github.pathikrit" % "better-files_2.12" % "3.9.1"
 
 // connection pool
 libraryDependencies += "com.zaxxer" % "HikariCP" % "4.0.3"
+
+
 
 val targetDockerJarPath =  "/opt/spark/jars"
 
@@ -276,4 +279,13 @@ assemblyMergeStrategy in assembly := {
   case x =>
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
+}
+
+assembly / assemblyShadeRules := {
+  val shadePackage = "com.tibco.labs.shaded"
+  Seq(
+    ShadeRule.rename("shapeless.**" -> s"$shadePackage.shapeless.@1").inAll,
+    ShadeRule.rename("cats.kernel.**" -> s"$shadePackage.cats.kernel.@1").inAll,
+    ShadeRule.rename("com.fasterxml.**" -> s"$shadePackage.com.fasterxml.@1").inAll
+  )
 }

@@ -17,11 +17,11 @@
   <p-table #dt *ngIf="loadedData" [columns]="columns" autoLayout="true" [resizableColumns]="false" scrollHeight="flex" showCurrentPageReport="false" [value]="loadedData" [scrollable]="true" [rows]="rows" scrollHeight="300px" styleClass="custom-table-css"
       [virtualScroll]="true" [virtualRowHeight]="30" [lazy]="true" (onLazyLoad)="dataSource?.loadMore($event)">
       <ng-template pTemplate="header" let-columns>
-        <tr>
-            <th class="top-row index-col">
+        <tr style="background-color: #fff;">
+            <th class="top-row index-col" style="display: table-cell;">
                 <div>Row</div>
             </th>
-            <th *ngFor="let df of dateFields" class="top-row date-col">
+            <th *ngFor="let df of dateFields" class="top-row date-col" style="display: table-cell;">
               <div style="display: flex; flex-direction: row; justify-content: space-between;">
                 <uxpl-icon *ngIf="isBadColumn(col)" class="upload-icon warning-triangle" icon="pl-icon-warning-triangle" width="20px" height="20px" style="max-height: 20px;" color="#FAB632"></uxpl-icon>
                 <div style="overflow: hidden; flex-grow: 1">{{df.name}}</div>

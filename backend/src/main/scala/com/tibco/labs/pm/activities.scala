@@ -69,7 +69,7 @@ object activities {
 
     } match {
       case Success(_) => df_activities
-      case Failure(e) => println("Error in activities : " + e.getMessage)
+      case Failure(e) => logger.error("Error in activities : " + e.getMessage)
         //sendTCMMessage(s"$analysisId",s"$caseRef","error","Error in activities : " + e.getMessage,0, databaseName, LocalDateTime.now().toString)
         throw e
     }

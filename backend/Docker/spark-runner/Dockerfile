@@ -12,7 +12,7 @@ ARG BUILD_DATE
 ARG spark_uid=185
 
 ENV SCALA_VERSION 2.12
-ENV SPARK_VERSION 3.1.1
+ENV SPARK_VERSION 3.1.2
 ENV HADOOP_VERSION 3.2.0
 #ENV KUBERNETES_CLIENT_VERSION 4.9.1
 #ENV KUBERNETES_MODEL_VERSION 4.9.1
@@ -81,8 +81,10 @@ ENV PATH="${SPARK_HOME}/bin:${PATH}"
 ADD ${REPO_URL}/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.9.10/jackson-datatype-jsr310-2.9.10.jar ${SPARK_HOME}/jars
 ADD ${REPO_URL}/org/apache/hadoop/hadoop-common/${HADOOP_VERSION}/hadoop-common-${HADOOP_VERSION}.jar ${SPARK_HOME}/jars
 ADD ${REPO_URL}/org/apache/hadoop/hadoop-client/${HADOOP_VERSION}/hadoop-client-${HADOOP_VERSION}.jar ${SPARK_HOME}/jars
+ADD ${REPO_URL}/org/apache/hadoop/hadoop-mapreduce-client-core/${HADOOP_VERSION}/hadoop-mapreduce-client-core-${HADOOP_VERSION}.jar ${SPARK_HOME}/jars
 ADD ${REPO_URL}/org/apache/hadoop/hadoop-aws/${HADOOP_VERSION}/hadoop-aws-${HADOOP_VERSION}.jar ${SPARK_HOME}/jars
-ADD ${REPO_URL}/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar ${SPARK_HOME}/jars
+ADD ${REPO_URL}/com/amazonaws/aws-java-sdk-bundle/1.12.67/aws-java-sdk-bundle-1.12.67.jar ${SPARK_HOME}/jars
+
 
 #add spark NLP
 #ADD ${REPO_URL}/com/johnsnowlabs/nlp/spark-nlp_2.11/2.4.5/spark-nlp_2.11-2.4.5.jar ${SPARK_HOME}/jars
@@ -96,6 +98,7 @@ RUN mkdir -p /etc/metrics/conf
 ADD ${REPO_URL}/io/prometheus/jmx/jmx_prometheus_javaagent/0.15.0/jmx_prometheus_javaagent-0.15.0.jar /prometheus/
 COPY conf/metrics.properties /etc/metrics/conf
 COPY conf/prometheus.yaml /etc/metrics/conf
+COPY conf/log4j.properties /
 
 ENTRYPOINT ["/opt/entrypoint.sh"]
 #USER ${spark_uid}

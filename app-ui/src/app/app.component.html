@@ -1,13 +1,15 @@
 <!-- make case screen full height-->
 <div class="box">
   <div *ngIf="config && afterInit" class="rowC header">
-    <tc-tibco-cloud-navbar *ngIf="!isLogin" class="tcla-cloud-navbar" [integratedHelp]="true"
+    <tc-tibco-cloud-navbar #TCNavbar *ngIf="!isLogin" class="tcla-cloud-navbar" [integratedHelp]="true"
                            [disableTimeout]="disableTimeout" [appName]="config.applicationTitle"
                            [rebrandConfig]='{ "backgroundColor": "#0E4F9E"}'
-                           [contextHelp]="true" [customNavBarConfig]="navBarConfg" [logoUrl]="logoUrl"></tc-tibco-cloud-navbar>
+                           [contextHelp]="true" [customNavBarConfig]="navBarConfg"
+                           [logoUrl]="logoUrl"></tc-tibco-cloud-navbar>
   </div>
+  <help-container [showHelp]="showHelp" [helpSource]="helpSource"></help-container>
   <div *ngIf="!config || !afterInit" class="rowC header">
-      <div class="headerBack"></div>
+    <div class="headerBack"></div>
   </div>
   <div class="rowC content tcs-starter-app-router-pane">
     <router-outlet></router-outlet>

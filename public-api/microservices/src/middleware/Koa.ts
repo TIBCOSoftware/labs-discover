@@ -22,6 +22,8 @@ import { TemplatesController } from '../controllers/TemplatesController';
 import { DatasetController } from '../controllers/DatasetController';
 import { FilesOperationsApi, LoginApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi } from '../backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
+import { ConfigurationController } from '../controllers/ConfigurationController';
+import { InvestigationController } from '../controllers/InvestigationsController';
 
 
 export class KoaConfig {
@@ -78,18 +80,21 @@ export class KoaConfig {
         if (process.env.CONTROLLER_TEMPLATES && process.env.CONTROLLER_TEMPLATES === 'ON'){
           controllers = [ ...controllers, TemplatesController ]
         }
-        // if (process.env.CONTROLLER_CONFIGURATION && process.env.CONTROLLER_CONFIGURATION === 'ON'){
-        //   controllers = [ ...controllers, AnalysisController ]
-        // }
+        if (process.env.CONTROLLER_CONFIGURATION && process.env.CONTROLLER_CONFIGURATION === 'ON'){
+          controllers = [ ...controllers, ConfigurationController ]
+        }
         if (process.env.CONTROLLER_DATASETS && process.env.CONTROLLER_DATASETS === 'ON'){
           controllers = [ ...controllers, DatasetController ]
+        }
+        if (process.env.CONTROLLER_INVESTIGATIONS && process.env.CONTROLLER_INVESTIGATIONS === 'ON'){
+          controllers = [ ...controllers, InvestigationController ]
         }
         if (process.env.CONTROLLER_SWAGGER && process.env.CONTROLLER_SWAGGER === 'ON'){
           controllers = [ SwaggerController, ...controllers ];
         }
       } else {
         // Running locally. Therefore, enable all controllers
-        controllers = [ SwaggerController, AnalysisController, TemplatesController, DatasetController];
+        controllers = [ SwaggerController, AnalysisController, TemplatesController, DatasetController, ConfigurationController, InvestigationController];
       }
     } catch(err) {
       console.error(err)

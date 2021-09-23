@@ -1,7 +1,7 @@
 package com.tibco.labs.orchestrator.models
 
-import com.tibco.labs.orchestrator.api.FilesRegistry.ActionPerformedFiles
-import com.tibco.labs.orchestrator.api.{ListBucket, S3Content}
+import com.tibco.labs.orchestrator.api.registry.FilesRegistry.ActionPerformedFiles
+import com.tibco.labs.orchestrator.api.registry.{ListBucket, S3Content}
 import spray.json.RootJsonFormat
 
 //#json-formats

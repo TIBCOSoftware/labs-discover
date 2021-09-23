@@ -3,14 +3,15 @@ import { Location } from '@angular/common';
 import { Component, DoCheck, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MessageTopicService, TcCoreCommonFunctions } from "@tibco-tcstk/tc-core-lib";
-import { CaseAttribute, CaseCreatorsList, CaseInfo, CaseType, CaseTypesList, CaseTypeState, LiveAppsService, TcCaseProcessesService } from '@tibco-tcstk/tc-liveapps-lib';
 import { UxplPopup } from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import _, { cloneDeep, isEqual } from 'lodash-es';
-import { Observable, of } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { flatMap, map } from 'rxjs/operators';
 import { CaseStateEditComponent } from 'src/app/components/case-state-edit/case-state-edit.component';
-import { CaseConfig, CaseField, CaseStateConfig, DiscoverConfiguration } from 'src/app/models_ui/configuration';
+import { Application, InvestigationApplication, InvestigationApplicationDefinition, InvestigationDetails, InvestigationField, InvestigationMetadata, Investigations, InvestigationState} from 'src/app/model/models';
 import { ConfigurationService } from 'src/app/service/configuration.service';
+import { ConfigurationService as KK } from 'src/app/api/configuration.service';
+import { InvestigationsService } from 'src/app/api/investigations.service';
 
 
 @Component({
@@ -20,30 +21,18 @@ import { ConfigurationService } from 'src/app/service/configuration.service';
 })
 export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
+  public maxInvestigations: number;
   public availableApps = [];
   public availableCreators = [];
-  public discover: DiscoverConfiguration;
 
-  // the config of case type store in sharedState
-  public caseConfig: CaseConfig[];
-  // case type application details, including attributes, jsonSchema, creatorAppId, etc
-  private caseType: CaseType;
+  // the config of case type store
+  public caseConfig: InvestigationApplication[];
+  public originalData: InvestigationApplication[];
+
   // the index of the current selected menu item
   public activeCaseConfigIndex: number;
-  // the map of appId to case config
-  private appIdConfigMap: {[key: string]: any} = {};
 
-  private appId: string;
-  private creatorId: string;
-
-  private selectNewMenu: boolean = false;
-
-  public customTitle: string;
-
-  // the fields for the case table list
-  public tableFields: CaseField[] = [];
-  // the available fields list for the table
-  public tableAvailableFields: CaseField[] = [];
+  public tableAvailableFields: InvestigationField[] = [];
   // the uxpl-select-options for the available field of the table list
   public tableAvailableOptions = [];
   // the field name of the selected option
@@ -51,46 +40,21 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   // the label of the selected option
   public inputTableLabel: string;
 
-  public caseStates: CaseStateConfig[] = [];
-
-  public detailAttrs: CaseAttribute[];
-
   public detailTitleField: string;
   public showStatesMilestone: boolean;
-  public detailTitle: CaseField;
-  public detailFields: CaseField[][] = [];
-  public flatDetailFields: CaseField[] = [];
-  // 3 element array, one of them is for one column in details
-  public detailFieldsGroup: CaseField[][] = [];
-  public detailAvailableFields: CaseField[] = [];
+  public detailTitle: InvestigationField;
+  public detailFields: InvestigationField[][] = [];
+
+  public detailAvailableFields: InvestigationField[] = [];
   public detailAvailableOptions = [];
   public detailField: string;
   public detailFieldLabel: string;
   public readonly DETAIL_COLS = 3;
 
-  // public creatorConfig: {[key: string]: string} = {};
-  public creatorConfigKeys = [
-    {
-      name: 'SUMMARY',
-      label: 'summary'
-    },
-    {
-      name: 'DETAILS',
-      label: 'details'
-    },
-    {
-      name: 'CONTEXT_TYPE',
-      label: 'context type'
-    },
-    {
-      name: 'CONTEXT_IDS',
-      label: 'context IDs'
-    }
-  ];
-  // public creatorAttributesJson: any;
   public creatorAppProperties: any;
   public creatorSelections: {[key: string]: string} = {};
   public creatorSelectOptions: any = {};
+  public creatorSelectOptions2: any[] = [];
 
   public showResetConfirm: boolean = false;
   public showMenuConfirm: boolean = false;
@@ -99,7 +63,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public showEditTableField = false;
   public fieldInEdit;
-  public fieldsArrayInEdit: CaseField[];
+  public fieldsArrayInEdit: InvestigationField[];
   @ViewChild('editPopup', {static: true}) editPopup: ElementRef<UxplPopup>;
   @ViewChild('settingsMain', {static: true}) settingsMain: ElementRef;
   public editPopupX;
@@ -107,25 +71,8 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public stateDialogRef: MatDialogRef<CaseStateEditComponent, any>;
 
-  readonly metaFields = [
-    {
-      name: 'creationTimestamp',
-      format: 'DATE'
-    },
-    {
-      name: 'modificationTimestamp',
-      format: 'DATE'
-    }
-  ];
-  readonly customFields = [
-    {
-      name: 'caseReference'
-    }
-  ];
-
-  public allFieldsMap: {[key: string]: CaseField} = {};
-  public allFieldsArray: CaseField[] = [];
-  public allFieldsOptons = [];
+  public allFieldsArray: InvestigationField[] = [];
+  public allFieldsOptions = [];
   public allAppsOptions = [];
 
   public noTableFieldsSvgLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/svg/empty-state-no-columns.svg');
@@ -140,136 +87,43 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     protected location: Location,
     protected dialog: MatDialog,
     protected configService: ConfigurationService,
-    protected liveappsService: LiveAppsService,
-    protected caseProcessesService: TcCaseProcessesService,
+    protected configurationService: KK,
+    protected investigationService: InvestigationsService,
     protected messageService: MessageTopicService) { }
 
   ngDoCheck(): void {
     if (!this.loading) {
-      this.unsavedChange = this.checkNewChanges();
+      this.unsavedChange = this.isValidActiveConfiguration();
     }
   }
 
-  private constructAllFields(caseType: CaseType) {
-
-    // clean the cache
-    this.allFieldsArray = [];
-    this.allFieldsMap = {};
-
-    const attrs = caseType.attributes;
-    for (let i = 0; i < attrs.length; i++) {
-      const attr = attrs[i];
-      if (attr.isStructuredType) {
-        // get definition
-        if (caseType.jsonSchema && caseType.jsonSchema.definitions && caseType.jsonSchema.definitions[attr.name]) {
-          const defs = caseType.jsonSchema.definitions[attr.name];
-          if (defs.properties) {
-            for(let prop in defs.properties) {
-              this.addToAllFields(attr.name + '.' + prop, defs.properties[prop].title);
-            }
-          }
-        }
-      }
-      // isArray is not an attribute in CaseAttribute
-      // @ts-ignore
-      else if (attr.isArray === true) {
-        this.addToAllFields(attr.name, attr.label, 'ARRAY');
-      }
-      else {
-        this.addToAllFields(attr.name, attr.label);
-      }
+  private isValidActiveConfiguration = (): boolean => {
+    if (this.activeCaseConfig) {
+      if (this.activeCaseConfig.customTitle === '') return false;
+      if (!this.activeCaseConfig.applicationId) return false;
+      if (!this.activeCaseConfig.creatorId) return false;
+      if ( this.activeCaseConfig.headerFields.length == 0) return false;
+      if ( this.activeCaseConfig.detailFields[0].length == 0 && 
+           this.activeCaseConfig.detailFields[1].length == 0 &&
+           this.activeCaseConfig.detailFields[2].length == 0) return false;
+      if (this.activeCaseConfig.creatorData.length < 4) return false;  
     }
 
-    this.metaFields.forEach(mf => {
-      this.addToAllFields('META:' + mf.name, this.generateLabelFromFieldname(mf.name), mf.format);
-    });
-
-    this.customFields.forEach(cf => {
-      this.addToAllFields('CUSTOM:' + cf.name, this.generateLabelFromFieldname(cf.name));
-    });
-
-    this.allFieldsOptons = this.convertFieldsToSelectOptions(this.allFieldsArray);
-
-  }
-
-  private generateLabelFromFieldname(field: string) {
-    const codeA = 'A'.charCodeAt(0);
-    const codeZ = 'Z'.charCodeAt(0);
-    const wordArr = [];
-    let start = 0;
-    for (let i = 1; i < field.length; i++) {
-      if (field.charCodeAt(i) >= codeA && field.charCodeAt(i) <= codeZ) {
-        wordArr.push(field.substring(start, i));
-        start = i;
-      }
-    }
-    wordArr[0] = wordArr[0].charAt(0).toUpperCase() + wordArr[0].substring(1);
-    wordArr.push(field.substring(start));
-
-    return wordArr.join(' ');
-  }
-
-  private addToAllFields(field: string, label: string, format: string=undefined) {
-    const ele = {
-      field,
-      label,
-      format
-    }
-    this.allFieldsMap[field] = ele;
-    this.allFieldsArray.push(ele)
+    return true;
   }
 
   ngOnInit(): void {
     this.loading = true;
-    this.caseConfig = cloneDeep(this.configService.config.discover.investigations.caseConfig);
-    if (this.caseConfig.length > 0) {
-      this.activeCaseConfigIndex = 0;
-    }
-
-    this.liveappsService.getApplications(this.configService.config.sandboxId, [], 100, false).pipe(
-      map((apps: CaseTypesList) => {
-
-        this.allAppsOptions = [...apps.casetypes.map(app => { return {label: app.applicationName, value: app.applicationId }})];
-
-        // only the apps that are not set to any caseConfig can be the available app options
-        this.initAvailableApps();
-
-        this.initAppAndCreatorId();
-
-        this.initCreatorSelection();
-
-      })
-    ).pipe(
-      concatMap(() => {
-        if (this.activeCaseConfig) {
-          return this.getCaseAppInfoToInit(this.activeCaseConfig.appId);
-        } else {
-          return of({});
-        }
-      })
-    ).
-    subscribe(() => {
-      this.obtainCreators();
-      this.loading = false;
-    });
-
-    this.discover = cloneDeep(this.configService.config.discover);
+    this.reset();
   }
 
-  private initCreatorSelection() {
-    // convert the creator config to the select values which can be used in UI
-    if (this.activeCaseConfig) {
-      const creatorConfig = this.activeCaseConfig.creatorConfig;
-      if (creatorConfig) {
-        for (const creatorAppName in creatorConfig) {
-          const config = creatorConfig[creatorAppName];
-          const fields = {};
-          this.addCreatorConfig(fields, config);
-          this.creatorSelections = fields;
-        }
-      }
+  public getCreatorField = (key: string): string => {
+    const field = this.activeCaseConfig.creatorData.filter((element: InvestigationField) => element.label === key)[0];
+    if (field) {
+      return field.field;
+    } else {
+      return '';
     }
-
   }
 
   private addCreatorConfig(fields: {[key: string]: string}, config: any) {
@@ -289,35 +143,18 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     this.availableApps = [];
     for (let i = 0; i < this.allAppsOptions.length; i++) {
       if (!this.caseConfig.find((c, index) => {
-        return c.appId == this.allAppsOptions[i].value && index != this.activeCaseConfigIndex
+        return c.applicationId == this.allAppsOptions[i].id && index != this.activeCaseConfigIndex
       })) {
-        this.availableApps.push(this.allAppsOptions[i]);
+        this.availableApps.push({ label: this.allAppsOptions[i].label, value: this.allAppsOptions[i].id } );
       }
     }
+
+    this.availableApps = [...this.availableApps];
   }
 
-  /**
-   * Assign the appId in caseConfig to the application select if there is, otherwise assign the
-   */
-  private initAppAndCreatorId() {
-    if (this.availableApps && this.availableApps.length > 0 && this.activeCaseConfig && this.availableApps.find(ele => ele.value == this.activeCaseConfig.appId)) {
-      this.appId = this.activeCaseConfig.appId;
-      this.customTitle = this.activeCaseConfig.customTitle;
-    }
-  }
-
-  private addCurrentConfigToCache(appId: string) {
-    // if (this.tableFields.length != 0 || this.activeCaseConfig.states.length != 0) {
-      this.appIdConfigMap[appId] = {
-        tableFields: this.tableFields,
-        states: this.caseStates,
-        detailFields: this.detailFields,
-        detailFieldsGroup: this.detailFieldsGroup,
-        flatDetailFields: this.flatDetailFields,
-        creatorAppProperties: this.creatorAppProperties,
-        creatorSelections: this.creatorSelections
-      }
-    // }
+  private initTableFields = (): void => {
+    this.detailTitleField = this.activeCaseConfig.detailTitle?.field;
+    this.activeCaseConfig.headerFields = this.activeCaseConfig.headerFields ? this.activeCaseConfig.headerFields : [];
   }
 
   /**
@@ -327,332 +164,74 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
    * @returns
    */
   private getCaseAppInfoToInit(appId: string): Observable<any> {
-    return this.liveappsService.getCaseTypes(this.configService.config.sandboxId, appId, 100, true)
-      .pipe(
-        map((caseTypesList: CaseTypesList) => {
-          this.caseType = caseTypesList.casetypes[caseTypesList.casetypes.length-1];
-
-          this.constructAllFields(this.caseType);
-
-          let headerFields = [];
-          let caseStates = [];
-
-          if (this.appIdConfigMap[appId]) {
-            headerFields = this.appIdConfigMap[appId].tableFields;
-            caseStates = this.appIdConfigMap[appId].states;
-          }
-          else if (appId == this.activeCaseConfig.appId) {
-            if (this.activeCaseConfig.headerFields) {
-              headerFields = cloneDeep(this.activeCaseConfig.headerFields);
-            }
-
-            if (this.activeCaseConfig.states) {
-              caseStates = this.activeCaseConfig.states;
-            } else {
-              caseStates = this.generateCaseStatesConfigFromCaseType(this.caseType.states);
-            }
-          } else {
-            caseStates = this.generateCaseStatesConfigFromCaseType(this.caseType.states);
-          }
-
-          this.tableFields = headerFields;
-          this.caseStates = caseStates;
-
-          this.tableAvailableFields = [];
-          for(let i = 0; i < this.allFieldsArray.length; i++) {
-            const f = this.allFieldsArray[i];
-            let added = false;
-            for (let j = 0; j < this.tableFields.length; j++) {
-              if (this.tableFields[j].field == f.field) {
-                added = true;
-                break;
-              }
-            }
-            if (!added) {
-              this.tableAvailableFields.push(f);
-            }
-          }
-
-          this.assembleTableAvailableOption();
-
-          if (this.activeCaseConfig.detailTitle) {
-            this.detailTitleField = this.activeCaseConfig.detailTitle.field;
-          }
-          this.showStatesMilestone = this.activeCaseConfig.showMilestones;
-
-          // detail
-          let detailFields = [];
-          let detailFieldsGroup = [];
-          let flatDetailFields = [];
-          if (this.appIdConfigMap[appId]) {
-            detailFields = this.appIdConfigMap[appId].detailFields;
-            detailFieldsGroup = this.appIdConfigMap[appId].detailFieldsGroup;
-            flatDetailFields = this.appIdConfigMap[appId].flatDetailFields;
-          }
-          else if (appId == this.activeCaseConfig.appId) {
-            if (this.activeCaseConfig.detailFields) {
-              const detailFields = cloneDeep(this.activeCaseConfig.detailFields);
-              // flatten the array into 1-D array
-              flatDetailFields = detailFields.flat();
-
-              // convert the detail fields from rows to columns
-              for(let i  = 0; i < detailFields.length; i++) {
-                const row = detailFields[i];
-                for(let j = 0; j < this.DETAIL_COLS; j++) {
-                  if (!detailFieldsGroup[j]) {
-                    detailFieldsGroup[j] = [];
-                  }
-                  if (row[j]) {
-                    detailFieldsGroup[j].push(row[j]);
-                  }
-                }
-              }
-            }
-          }
-
-          this.detailFields = detailFields;
-          this.detailFieldsGroup = detailFieldsGroup;
-          this.flatDetailFields = flatDetailFields;
-
-          this.detailAvailableOptions = [];
-          for(let i = 0; i < this.allFieldsArray.length; i++) {
-            const f = this.allFieldsArray[i];
-            let added = false;
-            for (let j = 0; j < this.flatDetailFields.length; j++) {
-              if (this.flatDetailFields[j] && this.flatDetailFields[j].field == f.field) {
-                added = true;
-                break;
-              }
-            }
-            if (!added) {
-              this.detailAvailableFields.push(f);
-            }
-          }
-
-          this.assembleDetailAvailableOption();
-
-          if (this.appIdConfigMap[appId]) {
-            this.detailTitle = this.appIdConfigMap[appId].detailTitle;
-          }
-          else if (appId == this.activeCaseConfig.appId) {
-            if (this.activeCaseConfig.detailTitle) {
-              // flatten the array into 1-D array
-              this.detailTitle = cloneDeep(this.activeCaseConfig.detailTitle);
-            }
-          }
-
-          if (this.appIdConfigMap[appId]) {
-            this.creatorAppProperties = this.appIdConfigMap[appId].creatorAppProperties;
-          } else {
-            // creator config
-            const creators = this.caseType.creators;
-            const creatorAppProperties = {};
-            creators.forEach(creator => {
-              if (creator.jsonSchema.definitions &&  creator.jsonSchema.definitions[this.caseType.applicationInternalName]) {
-                const creatorFields = [];
-                const properties = creator.jsonSchema.definitions[this.caseType.applicationInternalName].properties;
-                for (const prop in properties) {
-                  if (properties[prop].type == 'string') {
-                    creatorFields.push({
-                      name: prop,
-                      label: properties[prop].title
-                    });
-                  }
-                }
-
-                const creatorOptions = creatorFields.map(field => {return {value: field.name, label: field.label}});
-                creatorAppProperties[creator.id] = {
-                  creatorFields,
-                  creatorOptions
-                }
-              }
-            });
-            this.creatorAppProperties = creatorAppProperties;
-            // if (this.creatorId) {
-            //   this.initCreatorSelectOptions();
-            // }
-
-          }
-
-        })
-      )
-  }
-
-  private generateCaseStatesConfigFromCaseType(caseTypeStates: CaseTypeState[]): CaseStateConfig[] {
-    let re =  [];
-    if (caseTypeStates && caseTypeStates.length > 0) {
-       re = caseTypeStates.map(c => {
-         return {name: c.label} as CaseStateConfig
-       });
-    }
-    return re;
+    return this.investigationService.getApplicationDefinition(appId).pipe(
+      map((appDefinition: InvestigationApplicationDefinition) => {
+        this.availableCreators = appDefinition.creators;
+        this.initCreatorSelectOptions();
+        this.activeCaseConfig.states = this.activeCaseConfig?.states?.length > 0 ? [...this.activeCaseConfig.states] : [...appDefinition.states];
+        this.allFieldsArray = appDefinition.fields;
+        this.allFieldsOptions = this.convertFieldsToSelectOptions(this.allFieldsArray);
+        this.assembleTableAvailableOption();
+        this.assembleDetailAvailableOption();
+      })
+    );
   }
 
   /**
    * Empty the current configuration
    */
   private emptyCurrentConfig() {
-    this.tableFields = [];
     this.tableAvailableFields = [];
     this.tableAvailableOptions = [];
-    this.allFieldsMap = {};
     this.allFieldsArray = [];
-    this.caseStates = [];
-    this.appId = undefined;
-    this.creatorId = undefined;
     this.detailFields = [];
-    this.detailFieldsGroup = [];
-    this.flatDetailFields = [];
     this.detailAvailableFields = [];
     this.detailAvailableOptions = [];
     this.creatorAppProperties = {};
-    this.creatorSelections = {};
+    // this.creatorSelections = {};
   }
 
   public setCustomTitle(event) {
     if (!this.loading && event.detail) {
-      this.customTitle = event.detail;
+      this.activeCaseConfig.customTitle = event.detail;
     }
   }
 
   public handleAdd = (): void => {
+    this.loading = true;
     const caseConfig = {
-      customTitle: "menu item"
-    } as CaseConfig;
-    this.customTitle = "menu item";
+      customTitle: "menu item",
+      headerFields: [],
+      detailFields: [[], [], []],
+      creatorData: [],
+      states: [],
+      detailTitle: {
+        field: '',
+        label: ''
+      }
+    } as InvestigationApplication;
     this.caseConfig.push(caseConfig);
     this.activeCaseConfigIndex = this.caseConfig.length - 1;
     this.emptyCurrentConfig();
     this.initAvailableApps();
-  }
-
-  private convertDetailFieldsTo2dArray(detailFieldsGroup: CaseField[][]): CaseField[][] {
-    const twoDiFields = [];
-
-    if (detailFieldsGroup && detailFieldsGroup.length > 0) {
-      const cloneDetailFieldsGroup = cloneDeep(detailFieldsGroup);
-      // find out how many row it will have
-      let rows = cloneDetailFieldsGroup[0].length;
-      for(let i = 1; i < cloneDetailFieldsGroup.length; i++) {
-        if (cloneDetailFieldsGroup[i].length > rows) {
-          rows = cloneDetailFieldsGroup[i].length;
-        }
-      }
-      for (let i = 0; i < rows; i++) {
-        const fields = [];
-        for (let j = 0; j < this.DETAIL_COLS; j++) {
-          if (cloneDetailFieldsGroup[j][i]) {
-            fields[j] = cloneDetailFieldsGroup[j][i];
-          } else {
-            fields[j] = null;
-          }
-        }
-        twoDiFields.push(fields);
-      }
-    }
-
-    return twoDiFields;
+    setTimeout(() => {
+      this.loading = false;
+    }, 500);
   }
 
   public handleSave = (): void => {
-    this.updateActiveCaseConfigWithSettings();
-    this.initAvailableApps();
-    if (this.activeCaseConfigIndex >= this.discover.investigations.caseConfig.length) {
-      // new case config
-      this.caseConfig[this.activeCaseConfigIndex]["allowMultiple"] = false;
-    }
-    this.discover.investigations.caseConfig[this.activeCaseConfigIndex] = this.caseConfig[this.activeCaseConfigIndex];
-    this.discover.investigations.caseConfig[this.activeCaseConfigIndex].creatorConfig = this.buildCreatorInfo();
-    this.discover.investigations.caseConfig[this.activeCaseConfigIndex].detailFields = this.convertDetailFieldsTo2dArray(this.detailFieldsGroup);
-    this.saveConfig();
-  }
-
-  private buildCreatorInfo() {
-    const creatorId = this.caseConfig[this.activeCaseConfigIndex].creatorId;
-    const creators = this.caseType.creators.filter(c => c.id == creatorId);
-    if (creators.length > 0) {
-      const creator = creators[0];
-      const jsonSchema = creator.jsonSchema;
-      const properties = jsonSchema.definitions[this.caseType.applicationInternalName].properties;
-      const attrsJson = {};
-      for (let prop in properties) {
-        // todo: if there is structural attribute
-        if (properties[prop].type == 'string') {
-          attrsJson[prop] = prop;
-        }
+    this.configurationService.postInvestigations(this.caseConfig).subscribe(
+      _ => {
+        this.messageService.sendMessage('news-banner.topic.message', 'Settings saved ...');
+        this.configService.refresh(); 
       }
-
-      const jsonData = {};
-      // need to make sure that the attributes appears in config in order then the config can be compared by json
-      for (let i = 0; i < this.creatorConfigKeys.length; i++) {
-        const key = this.creatorConfigKeys[i].name;
-        const field = this.creatorSelections[key];
-
-        if (field) {
-          let nameChain = this._setData(attrsJson, [], field);
-          const j = this._buildJson(nameChain, "@@" + key + '@@');
-          _.merge(jsonData, j);
-        }
-      }
-
-      const result = {};
-      result[this.caseType.applicationInternalName] = jsonData
-      _.merge(jsonData, {
-        "AnalysisName": "@@TEMPLATE_NAME@@",
-        "AnalysisId": "@@ANALYSIS_ID@@",
-        // todo: ?? why CommentHistory is here
-        "CommentsHistory": []
-      });
-      return result;
-    }
-  }
-
-  private _setData(attrsJson: any, nameChain: string[], field: string) {
-    for (const name in attrsJson) {
-      if (typeof attrsJson[name] == 'string' && name == field) {
-        nameChain.push(name);
-        return nameChain;
-      } else if (typeof attrsJson[name] == 'object') {
-        nameChain.push(name);
-        return this._setData(attrsJson[name], nameChain, field);
-      }
-    }
-  }
-
-  private _buildJson(nameChain: string[], value: string) {
-    if (!nameChain || nameChain.length == 0) {
-      return null;
-    }
-    let json = {};
-    nameChain = nameChain.reverse();
-    while (nameChain.length > 0) {
-      const name = nameChain.shift();
-      if (Object.keys(json).length == 0) {
-        json[name] = value;
-      } else {
-        const j = {};
-        j[name] = json;
-        json = _.merge({}, j);
-      }
-    }
-    return json;
-  }
-
-  public saveConfig() {
-    if (!isEqual(this.discover, this.configService.config.discover)) {
-      this.configService.updateDiscoverConfig(this.configService.config.sandboxId, this.configService.config.uiAppId, this.discover, this.discover.id).subscribe(
-        _ => {
-          this.messageService.sendMessage('news-banner.topic.message', 'Settings saved...');
-          this.configService.refresh();
-        }
-      );
-    }
+    );
   }
 
   public onClickReset() {
-    if (this.checkNewChanges()) {
-      this.showResetConfirm = true;
-    }
+    // if (this.checkUnsavedChange()) {
+    //   this.showResetConfirm = true;
+    // }
   }
 
   public handleReset = (event): void => {
@@ -663,13 +242,23 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   private reset() {
-    this.caseConfig = cloneDeep(this.configService.config.discover.investigations.caseConfig);
-    if (this.activeCaseConfigIndex >= this.discover.investigations.caseConfig.length) {
-      // have a new unsaved config
-      this.switchMenu(0);
-    } else {
-      this.switchMenu(this.activeCaseConfigIndex);
-    }
+    this.investigationService.getAllApplications().pipe(
+      flatMap((apps: Application[]) => {
+        this.allAppsOptions = apps;
+
+        return this.configurationService.getInvestigations().pipe(
+          map((result: Investigations) => {
+            this.caseConfig = result.applications;
+            this.originalData = cloneDeep(this.caseConfig);
+            this.maxInvestigations = result.numberApplications;
+            this.activeCaseConfigIndex = 0;
+            this.switchMenu(this.activeCaseConfigIndex);
+          })
+        );    
+      })
+    ).subscribe(() => {
+      this.loading = false;
+    });
   }
 
   public getCreator = (index: number): string => {
@@ -678,88 +267,51 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public drop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.caseConfig, event.previousIndex, event.currentIndex);
-    moveItemInArray(this.discover.investigations.caseConfig, event.previousIndex, event.currentIndex);
-    if (event.previousIndex == this.activeCaseConfigIndex) {
+    // MC moveItemInArray(this.discover.investigations.caseConfig, event.previousIndex, event.currentIndex);
+    if (event.previousIndex === this.activeCaseConfigIndex) {
       this.activeCaseConfigIndex = event.currentIndex;
-    } else {
-      if (event.currentIndex <= this.activeCaseConfigIndex) {
-        this.activeCaseConfigIndex ++;
-      }
+    } else if (event.previousIndex < this.activeCaseConfigIndex && event.currentIndex >= this.activeCaseConfigIndex) {
+      this.activeCaseConfigIndex --;
+    } else if (event.previousIndex > this.activeCaseConfigIndex && event.currentIndex <= this.activeCaseConfigIndex){
+      this.activeCaseConfigIndex ++;
     }
-  }
-
-  private obtainCreators = (): void => {
-    this.caseProcessesService.getCaseCreators(this.configService.config.sandboxId, this.activeCaseConfig.appId, '1').pipe(
-      map((casecreators: CaseCreatorsList) => {
-        this.availableCreators = [...casecreators.creators.map(creator => {return {label: creator.label, value: creator.id }})];
-
-        if (this.availableCreators && this.availableCreators.length > 0 && this.availableCreators.find(ele => ele.value == this.activeCaseConfig.creatorId)) {
-          this.creatorId = this.activeCaseConfig.creatorId;
-          if (this.creatorId) {
-            this.initCreatorSelectOptions();
-          }
-        }
-      })
-    ).subscribe();
   }
 
   public handleApplicationSelection = ($event): void => {
     if ($event.detail) {
       const appId = $event.detail.value;
-      if (!this.selectNewMenu) {
-        const priorAppId = this.caseConfig[this.activeCaseConfigIndex].appId;
-
-
-        if (priorAppId) {
-          // when add a new case type, no prior appId yet
-          this.addCurrentConfigToCache(priorAppId);
-        }
-      }
-      this.selectNewMenu = false;
+      this.activeCaseConfig.applicationId = appId;
       this.getCaseAppInfoToInit(appId).subscribe(() => {
-        this.caseConfig[this.activeCaseConfigIndex].appId = appId;
-        // this.discover.investigations.caseConfig = [...this.discover.investigations.caseConfig]
-        this.obtainCreators();
       });
     }
-
   }
 
   public handleCreatorSelection = ($event): void => {
     if ($event.detail) {
       const creatorId = $event.detail.value
-      this.caseConfig[this.activeCaseConfigIndex].creatorId = creatorId;
-      this.creatorId = creatorId;
+      this.activeCaseConfig.creatorId = creatorId;
       this.initCreatorSelectOptions();
     }
   }
 
   private initCreatorSelectOptions() {
-    this.creatorConfigKeys.forEach(key => {
-      this.creatorSelectOptions[key.name] = this.creatorAppProperties[this.creatorId].creatorOptions.concat();
-    });
+    const creator = this.availableCreators.filter(el => el.value === this.activeCaseConfig.creatorId);
+    this.creatorSelectOptions2 = creator.length > 0 ? creator[0].fields : [];
   }
 
   public handleCreatorConfigSelection = ($event, key): void => {
     if ($event.detail) {
       const field = $event.detail.value;
-      this.creatorSelections[key] = field;
-    }
-  }
-
-  public handleClick($event, key) {
-    const map = {};
-    for (const name in this.creatorSelections) {
-      if (name != key) {
-        map[this.creatorSelections[name]] = true;
+      let entry = this.activeCaseConfig.creatorData.find((element: InvestigationField) => element.label === key);
+      if (entry) {
+        entry.field = field;
+      } else {
+        this.activeCaseConfig.creatorData.push({ label: key, field: field});
       }
     }
-    const allOptions = this.creatorAppProperties[this.creatorId].creatorOptions;
-    const options = allOptions.filter(option => !map[option.value]);
-    this.creatorSelectOptions[key] = options;
   }
 
-  public get activeCaseConfig(): CaseConfig {
+  public get activeCaseConfig(): InvestigationApplication {
     if (this.caseConfig) {
       if (this.activeCaseConfigIndex < this.caseConfig.length) {
         return this.caseConfig[this.activeCaseConfigIndex];
@@ -769,7 +321,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public selectMenu(index: number) {
-    if (this.checkNewChanges()) {
+    if (isEqual(this.activeCaseConfig, this.originalData[this.activeCaseConfigIndex])) {
       this.showMenuConfirm = true;
       this.newMenuIndex = index;
     } else {
@@ -779,7 +331,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public handleSwitchMenu(event) {
     if (event.action === true) {
-      this.caseConfig = cloneDeep(this.configService.config.discover.investigations.caseConfig);
+      this.caseConfig[this.activeCaseConfigIndex] = cloneDeep(this.originalData[this.activeCaseConfigIndex]);
       this.switchMenu(this.newMenuIndex);
     }
     this.newMenuIndex = null;
@@ -788,38 +340,14 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   private switchMenu(index: number) {
     this.loading = true;
-    this.selectNewMenu = true;
-    this.activeCaseConfigIndex = index;
-    // clear appId config cache
-    this.appIdConfigMap = {};
-    this.initAvailableApps();
-    this.initAppAndCreatorId();
-    this.initCreatorSelection();
-    this.getCaseAppInfoToInit(this.activeCaseConfig.appId).subscribe(() => {
-      this.obtainCreators();
-      this.loading = false;
-    });
-  }
-
-  private updateActiveCaseConfigWithSettings() {
-    this.caseConfig[this.activeCaseConfigIndex].customTitle = this.customTitle;
-    this.caseConfig[this.activeCaseConfigIndex].headerFields = this.tableFields;
-    this.caseConfig[this.activeCaseConfigIndex].states = this.caseStates;
-    this.caseConfig[this.activeCaseConfigIndex].detailFields = this.convertDetailFieldsTo2dArray(this.detailFieldsGroup);
-    if (!this.caseConfig[this.activeCaseConfigIndex].detailTitle
-      || (this.caseConfig[this.activeCaseConfigIndex].detailTitle && this.caseConfig[this.activeCaseConfigIndex].detailTitle.field != this.detailTitle.field)) {
-        this.caseConfig[this.activeCaseConfigIndex].detailTitle = this.detailTitle;
+    if (this.caseConfig.length > 0) {
+      this.activeCaseConfigIndex = index;
+      this.initAvailableApps();
+      this.initTableFields();
+      this.getCaseAppInfoToInit(this.activeCaseConfig.applicationId).subscribe(() => {
+        this.loading = false;
+      });        
     }
-    this.caseConfig[this.activeCaseConfigIndex].showMilestones = this.showStatesMilestone;
-  }
-
-  private checkNewChanges(): boolean {
-    this.updateActiveCaseConfigWithSettings();
-    // console.log('this.discover.investigations.caseConfig[this.activeCaseConfigIndex]', JSON.stringify(this.discover.investigations.caseConfig[this.activeCaseConfigIndex]));
-    // console.log('this.caseConfig[this.activeCaseConfigIndex]', JSON.stringify(this.caseConfig[this.activeCaseConfigIndex]));
-    // console.log('!this.discover.investigations.caseConfig[this.activeCaseConfigIndex]', !this.discover.investigations.caseConfig[this.activeCaseConfigIndex])
-    // console.log('!_.isEqual(this.caseConfig[this.activeCaseConfigIndex], this.discover.investigations.caseConfig[this.activeCaseConfigIndex]', !_.isEqual(this.caseConfig[this.activeCaseConfigIndex], this.discover.investigations.caseConfig[this.activeCaseConfigIndex]));
-    return !this.discover.investigations.caseConfig[this.activeCaseConfigIndex] || !_.isEqual(this.caseConfig[this.activeCaseConfigIndex], this.discover.investigations.caseConfig[this.activeCaseConfigIndex]);
   }
 
   public clickDeleteMenu(index: number) {
@@ -837,12 +365,11 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   private deleteMenu(index: number) {
     const caseConfig = this.caseConfig[index];
-    if (this.discover.investigations.caseConfig.find(cf => cf.appId == caseConfig.appId)) {
+    if (this.caseConfig.find(cf => cf.applicationId == caseConfig.applicationId)) {
       // the caseConfig to be deleted is stored in the shared state already, need to call
       // api to save
       this.caseConfig.splice(index, 1);
-      this.discover.investigations.caseConfig = this.caseConfig;
-      this.saveConfig();
+      this.handleSave();
     } else {
       // the caseConfig is the new created one, not saved yet.
       this.caseConfig.splice(index, 1);
@@ -858,15 +385,13 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public tableFieldsDrop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(this.tableFields, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.activeCaseConfig.headerFields, event.previousIndex, event.currentIndex);
   }
 
   public handleSelectFieldForTable(event) {
     const value = event.detail.value;
-    if (this.allFieldsMap[value]) {
-      this.inputTableField = value;
-      this.inputTableLabel = this.allFieldsMap[value].label;
-    }
+    this.inputTableField = value;
+    this.inputTableLabel = this.allFieldsArray.filter((el: InvestigationField) => el.field === value)[0].label;
   }
 
   public handleEditLabelForTable(event) {
@@ -877,45 +402,41 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public addTableField() {
-    let i;
-    for (i = 0; i < this.tableAvailableFields.length; i++) {
-      if (this.tableAvailableFields[i].field == this.inputTableField) {
-        break;
-      }
-    }
-    if (i < this.tableAvailableFields.length) {
-      const addedFields = this.tableAvailableFields.splice(i, 1);
-      const addedField = this.allFieldsMap[addedFields[0].field];
-      addedField.label = this.inputTableLabel;
-      this.tableFields.push(addedField);
-
+    const fieldToAdd = this.allFieldsArray.filter((el: InvestigationField) => el.field === this.inputTableField)[0];
+    if (fieldToAdd){
+      this.activeCaseConfig.headerFields.push(
+        {
+          label: this.inputTableLabel,
+          field: this.inputTableField
+        }
+      );
       this.assembleTableAvailableOption();
     }
-
   }
 
   public addAllTableColumns() {
-    this.tableAvailableFields.forEach(field => {
-      const addedField = this.allFieldsMap[field.field];
-      this.tableFields.push(addedField);
+    this.tableAvailableOptions.forEach(el => {
+      this.activeCaseConfig.headerFields.push(
+        {
+          label: el.label,
+          field: el.value
+        }
+      );      
     });
-    this.tableAvailableFields.length = 0;
     this.assembleTableAvailableOption();
   }
 
   public deleteAllTableFields() {
-    this.tableFields.length = 0;
+    this.activeCaseConfig.headerFields = [];
     this.tableAvailableFields = [];
     for(let i = 0; i < this.allFieldsArray.length; i++) {
       const f = this.allFieldsArray[i];
       this.tableAvailableFields.push(f);
     }
-
     this.assembleTableAvailableOption();
-
   }
 
-  private convertFieldsToSelectOptions(caseFields: CaseField[]) {
+  private convertFieldsToSelectOptions(caseFields: InvestigationField[]) {
     return caseFields.map(field => {
       return {"label": field.label, "value": field.field}
     }).sort((a,b) => {
@@ -930,27 +451,32 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
    * and make the first option the selected by default
    */
   private assembleTableAvailableOption() {
-    this.tableAvailableOptions = this.convertFieldsToSelectOptions(this.tableAvailableFields);
+    const possibleFields = this.allFieldsArray.filter(ar => !this.activeCaseConfig.headerFields.find(rm => (rm.field === ar.field)));
+    this.tableAvailableOptions = this.convertFieldsToSelectOptions(possibleFields);
 
-    if (this.tableAvailableFields.length > 0) {
-      const firstField = this.allFieldsMap[this.tableAvailableOptions[0].value];
+    if (possibleFields.length > 0) {
+      const firstField = possibleFields[0];
       this.inputTableField = firstField.field;
       this.inputTableLabel = firstField.label;
     }
   }
 
   private assembleDetailAvailableOption() {
-    this.detailAvailableOptions = this.convertFieldsToSelectOptions(this.detailAvailableFields);
-
+    const possibleFields = this.allFieldsArray.
+      filter(ar => !this.activeCaseConfig.detailFields[0].find(rm => (rm.field === ar.field))).
+      filter(ar => !this.activeCaseConfig.detailFields[1].find(rm => (rm.field === ar.field))).
+      filter(ar => !this.activeCaseConfig.detailFields[2].find(rm => (rm.field === ar.field)));
+    this.detailAvailableOptions = this.convertFieldsToSelectOptions(possibleFields);
+    
     if (this.detailAvailableFields.length > 0) {
-      const firstField = this.allFieldsMap[this.detailAvailableOptions[0].value];
+      const firstField = this.detailAvailableOptions[0];
       this.detailField = firstField.field;
       this.detailFieldLabel = firstField.label;
     }
   }
 
   public deleteTableField(event) {
-    const deletedField = this.tableFields.splice(event, 1)[0];
+    const deletedField = this.activeCaseConfig.headerFields.splice(event, 1)[0];
     // const deletedField = this.allFieldsMap[event.field];
     this.tableAvailableFields.push(deletedField);
     this.assembleTableAvailableOption();
@@ -1001,11 +527,10 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public tableFieldDropped(event) {
-    // console.log(event);
   }
 
   public editStateColorAndIcon(index: number) {
-    const stateConfig = this.caseStates[index];
+    const stateConfig = this.activeCaseConfig.states[index];
     this.stateDialogRef = this.dialog.open(CaseStateEditComponent, {
       width: '400px',
       height: '460px',
@@ -1015,8 +540,8 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     });
 
     this.stateDialogRef.componentInstance.stateEditSaved.subscribe(data => {
-      this.caseStates[index].color = data.color;
-      this.caseStates[index].icon = data.icon;
+      this.activeCaseConfig.states[index].color = data.color;
+      this.activeCaseConfig.states[index].icon = data.icon;
     });
   }
 
@@ -1024,7 +549,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     if (event.detail) {
       const value = event.detail.value;
       if (value) {
-        this.detailTitle = this.allFieldsMap[value];
+        this.activeCaseConfig.detailTitle.field = value;
         if (!this.caseConfig[this.activeCaseConfigIndex].detailTitle
           || (this.caseConfig[this.activeCaseConfigIndex].detailTitle && this.caseConfig[this.activeCaseConfigIndex].detailTitle.field != this.detailTitle.field)) {
             this.caseConfig[this.activeCaseConfigIndex].detailTitle = this.detailTitle;
@@ -1038,10 +563,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public deleteDetailField(event, col) {
-    const deletedField = this.detailFieldsGroup[col].splice(event, 1)[0];
-    // const deletedField = this.allFieldsMap[event.field];
-    const index = this.flatDetailFields.findIndex(el => el.field == event.field);
-    this.flatDetailFields.splice(index, 1);
+    const deletedField = this.activeCaseConfig.detailFields[col].splice(event, 1)[0];
     if (deletedField) {
       // the config maybe is wrong, or the Live Apps app is modified after the configuration
       this.detailAvailableFields.push(deletedField);
@@ -1051,10 +573,8 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public handleSelectFieldForDetail(event) {
     const value = event.detail.value;
-    if (this.allFieldsMap[value]) {
-      this.detailFieldLabel = value;
-      this.detailFieldLabel = this.allFieldsMap[value].label;
-    }
+    this.detailField = value;
+    this.detailFieldLabel = this.allFieldsArray.filter((el: InvestigationField) => el.field === value)[0].label;
   }
 
   public handleEditLabelForDetail(event) {
@@ -1065,48 +585,43 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public addDetailField() {
-    let i: number;
-    for (i = 0; i < this.detailAvailableFields.length; i++) {
-      if (this.detailAvailableFields[i].field == this.detailField) {
-        break;
-      }
-    }
-    if (i < this.detailAvailableFields.length) {
-      const addedFields = this.detailAvailableFields.splice(i, 1);
-      const addedField = this.allFieldsMap[addedFields[0].field];
-      addedField.label = this.detailFieldLabel;
-
-      this.assignDetailFieldToColumn(addedField);
+    const fieldToAdd = this.allFieldsArray.filter((el: InvestigationField) => el.field === this.detailField)[0];
+    if (fieldToAdd){
+      const newField = (
+        {
+          label: this.detailFieldLabel,
+          field: this.detailField
+        }
+      );
+      this.assignDetailFieldToColumn(newField);
 
       this.assembleDetailAvailableOption();
     }
   }
 
-  private assignDetailFieldToColumn(addedField: CaseField) {
-
+  private assignDetailFieldToColumn(addedField: InvestigationField) {
     // special process
     if (addedField.field == 'DataSourceName') {
       addedField.format = 'EVENT-LINK';
     }
 
     // add field to the shortest column. If all columns are the same, add it to the first one
-    this.flatDetailFields.push(addedField);
     let col = 0;
     let length = 10000;
-    for (let i = 0; i < this.detailFieldsGroup.length; i++) {
-      if (this.detailFieldsGroup[i].length < length) {
+    for (let i = 0; i < this.activeCaseConfig.detailFields.length; i++) {
+      if (this.activeCaseConfig.detailFields[i].length < length) {
         col = i;
-        length = this.detailFieldsGroup[i].length;
+        length = this.activeCaseConfig.detailFields[i].length;
       }
     }
 
     for (let i = 0; i < this.DETAIL_COLS; i++) {
-      if (!this.detailFieldsGroup[i]) {
-        this.detailFieldsGroup[i] = [];
+      if (!this.activeCaseConfig.detailFields[i]) {
+        this.activeCaseConfig.detailFields[i] = [];
       }
     }
 
-    this.detailFieldsGroup[col].push(addedField);
+    this.activeCaseConfig.detailFields[col].push(addedField);
   }
 
   public addAllDetailFields() {
@@ -1122,10 +637,9 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   public deleteAllDetailFields() {
     this.detailFields = [];
-    for (let i = 0; i < this.detailFieldsGroup.length; i++) {
-      this.detailFieldsGroup[i].length = 0;
+    for (let i = 0; i < this.activeCaseConfig.detailFields.length; i++) {
+      this.activeCaseConfig.detailFields[i].length = 0;
     }
-    this.flatDetailFields.length = 0;
 
     for(let i = 0; i < this.allFieldsArray.length; i++) {
       this.detailAvailableFields.push(this.allFieldsArray[i]);
@@ -1134,83 +648,97 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     this.assembleDetailAvailableOption();
   }
 
-  public detailColumnAddField(event, index: number) {
-    console.log(event);
-    this.detailFields = this.convertDetailFieldsTo2dArray(this.detailFieldsGroup);
-  }
-
   // The cConfig that detail component needs is exactly the same json that
   public getDetailConfig() {
-    const configCopy: CaseConfig = cloneDeep(this.caseConfig[this.activeCaseConfigIndex]);
-    // configCopy.detailFields = cloneDeep(this.detailFields);
-    configCopy.detailFields = this.convertDetailFieldsTo2dArray(this.detailFieldsGroup);
+    const configCopy: InvestigationApplication = cloneDeep(this.activeCaseConfig);
     if (!configCopy.detailTitle) {
       configCopy.detailTitle = {
         field: '',
         label: ''
       }
     }
-    // tcla-live-apps-case-states component in custom-case-details.component.html will throw some errors
-    // because there is not such a case in Live Apps. Just manually hide the milestones for preview, in settings
-    // save the correct value.
-    configCopy.showMilestones = false;
+    configCopy.showMilestone = false;
+    // @ts-ignore
+    configCopy.showMilestones = true;
     return configCopy;
   }
 
-  public getDummyDetailData() {
-    const caseInfo = new CaseInfo();
-    //@ts-ignore
-    caseInfo.metadata = {};
+  public getDummyDetailData(): InvestigationDetails {
+    let metadata: InvestigationMetadata[] = [];
     const untaggedCasedataObj = {};
-    for(let i = 0; i < this.detailFieldsGroup.length; i++) {
-      const col = this.detailFieldsGroup[i];
+    for(let i = 0; i < this.activeCaseConfig.detailFields.length; i++) {
+      const col = this.activeCaseConfig.detailFields[i];
       for (let j = 0; j < col.length; j ++) {
         if (col[j]) {
           let field = col[j].field;
-          if (field.indexOf('.') != -1) {
-            const names = field.split('.');
-            let obj = untaggedCasedataObj;
-            while (names.length > 1) {
-              const n = names.shift();
-              if (!obj[n]) {
-                obj[n] = {};
-              }
-              obj = obj[n];
-            }
-            if (col[j].format == 'ARRAY') {
-              obj[names[0]] = ['Sample ' + col[j].label];
-            } else if (col[j].format == 'DATE') {
-              obj[names[0]] = new Date().toISOString();
-            } else {
-              obj[names[0]] = 'Sample ' + col[j].label;
-            }
+          if (field === '') {
+            untaggedCasedataObj[field] = '';
           } else {
-            if (field.indexOf('CUSTOM:') == 0) {
-              field = field.substr(7);
-            } else if (field.indexOf('META:') == 0) {
-              field = field.substr(5);
-              if (col[j].format == 'DATE') {
-                caseInfo.metadata[field] = new Date().toISOString();
+            if (field.indexOf('.') != -1) {
+              const names = field.split('.');
+              let obj = untaggedCasedataObj;
+              while (names.length > 1) {
+                const n = names.shift();
+                if (!obj[n]) {
+                  obj[n] = {};
+                }
+                obj = obj[n];
               }
-            }
-            if (col[j].format == 'ARRAY') {
-              untaggedCasedataObj[field] = ['Sample ' + col[j].label];
-            } else if (col[j].format == 'DATE') {
-              untaggedCasedataObj[field] = new Date().toISOString();
+              if (col[j].format == 'ARRAY') {
+                obj[names[0]] = ['Sample ' + col[j].label];
+              } else if (col[j].format == 'DATE') {
+                obj[names[0]] = new Date().toISOString();
+              } else {
+                obj[names[0]] = 'Sample ' + col[j].label;
+              }
             } else {
-              untaggedCasedataObj[field] = 'Sample ' + col[j].label;
+              if (field.indexOf('CUSTOM:') == 0) {
+                field = field.substr(7);
+              } else if (field.indexOf('META:') == 0) {
+                field = field.substr(5);
+                if (col[j].format == 'DATE') {
+                  metadata.push({ name: field, value: new Date().toISOString()} as InvestigationMetadata);
+                }
+              }
+              if (col[j].format == 'ARRAY') {
+                untaggedCasedataObj[field] = ['Sample ' + col[j].label];
+              } else if (col[j].format == 'DATE') {
+                untaggedCasedataObj[field] = new Date().toISOString();
+              } else {
+                untaggedCasedataObj[field] = 'Sample ' + col[j].label;
+              }
             }
           }
         }
       }
     }
-    caseInfo.untaggedCasedataObj = untaggedCasedataObj;
-    caseInfo.caseReference = '1234567'
-    return caseInfo;
+    // Set state to first state
+    untaggedCasedataObj['state'] = this.activeCaseConfig.states[0].name;
+
+    const dummyData: InvestigationDetails = {
+      id: '1234567',
+      data: untaggedCasedataObj,
+      metadata: metadata
+    }
+    return dummyData;
   }
 
   public clickOverlayOutside(event) {
     this.showMenuConfirm = false;
     this.showResetConfirm = false;
+  }
+
+  public isEmptyDetailGroups = (): boolean => {
+    let elements: number;
+    elements = 0;
+    this.activeCaseConfig.detailFields.forEach((el: InvestigationField[]) => { 
+      elements = elements + el.length 
+    });
+
+    return elements > 0;
+  } 
+
+  public showCreateNewInvestigation = (): boolean => {
+    return this.caseConfig?.length < this.maxInvestigations;
   }
 }

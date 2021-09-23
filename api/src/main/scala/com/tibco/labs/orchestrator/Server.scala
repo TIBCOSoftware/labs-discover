@@ -2,6 +2,8 @@ package com.tibco.labs.orchestrator
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
+import com.tibco.labs.orchestrator.api.registry.{FilesRegistry, LoginRegistry, MetricsRegistry, MiningDataRegistry, PreviewFileRegistry, ProcessMiningRegistry, ProcessMiningScheduledRegistry, TdvMgmtRegistry}
+import com.tibco.labs.orchestrator.api.{MetricsRoutes, MinerRoutes}
 //import akka.cluster.ClusterEvent
 //import akka.cluster.typed.{Cluster, Subscribe}
 import akka.http.scaladsl.Http
@@ -11,7 +13,7 @@ import akka.http.scaladsl.server.Directives._
 //import akka.management.javadsl.AkkaManagement
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.{actor => classic}
-import com.tibco.labs.orchestrator.api.{FilesRegistry, FilesRoutes, LoginRegistry, LoginRoutes, PreviewFileRegistry, PreviewFileRoutes, ProcessMiningRegistry, ProcessMiningRoutes, ProcessMiningScheduledRegistry, ProcessMiningScheduledRoutes, TdvMgmtRegistry, TdvMgmtRoutes}
+import com.tibco.labs.orchestrator.api.{FilesRoutes, LoginRoutes, PreviewFileRoutes, ProcessMiningRoutes, ProcessMiningScheduledRoutes, TdvMgmtRoutes}
 import com.tibco.labs.orchestrator.node.cluster.{SwaggerDocService, SwaggerSite, RedocSite}
 import com.tibco.labs.orchestrator.node.cluster.HealthRoutes
 
@@ -42,6 +44,10 @@ object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
     context.watch(tdvRegistryActor)
     val loginRegistryActor = context.spawn(LoginRegistry(), "LoginRegistryActor")
     context.watch(loginRegistryActor)
+    val metricsRegistryActor = context.spawn(MetricsRegistry(), "MetricsRegistryActor")
+    context.watch(metricsRegistryActor)
+    val minerRegistryActor = context.spawn(MiningDataRegistry(), "MinerRegistryActor")
+    context.watch(minerRegistryActor)
 
     //val cluster = Cluster(context.system)
     //context.log.info("Started [" + context.system + "], cluster.selfAddress = " + cluster.selfMember.address + ")")
@@ -61,6 +67,8 @@ object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
     val prevRoutes = new PreviewFileRoutes(previewRegistryActor)(context.system)
     val tdvRoutes = new TdvMgmtRoutes(tdvRegistryActor)(context.system)
     val loginRoutes = new LoginRoutes(loginRegistryActor)(context.system)
+    val metricsRoutes = new MetricsRoutes(metricsRegistryActor)(context.system)
+    val minerRoutes = new MinerRoutes(minerRegistryActor)(context.system)
 
     lazy val routes: Route = //internalRoutes.InternalRoutes ~
       pmRoutes.ProcessMiningRoutes ~
@@ -69,6 +77,8 @@ object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
       prevRoutes.PreviewRoutes ~
       fileRoutes.FilesRoutes ~
       loginRoutes.LoginRoutes ~
+        metricsRoutes.MetricsRoutes ~
+        minerRoutes.MinerRoutes ~
       SwaggerDocService.routes ~
       swaggerSiteRoute ~
       redocSiteRoute

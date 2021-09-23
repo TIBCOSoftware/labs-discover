@@ -1,10 +1,10 @@
-import sbtassembly.AssemblyPlugin.autoImport.ShadeRule
+import sbtassembly.AssemblyPlugin.autoImport.{ShadeRule, assemblyMergeStrategy}
 
 idePackagePrefix := Some("com.tibco.labs")
 ThisBuild / useCoursier := true
 
 // Version supports for libraries
-val sparkVersion = "3.1.1"
+val sparkVersion = "3.1.2"
 val sttpVersion = "2.2.9"
 val postgresVersion = "42.2.16"
 val scalaLoggingVersion = "3.9.2"
@@ -20,9 +20,11 @@ val sparkLibs = Seq(
   "org.apache.spark" %% "spark-mllib" % sparkVersion % "provided"
 )
 
+// STTP - HTTP client
+
 libraryDependencies ++= List(
-  "com.softwaremill.sttp.client3" %% "circe" % "3.2.3",
-  "com.softwaremill.sttp.client3" %% "core" % "3.2.3"
+  "com.softwaremill.sttp.client3" %% "circe" % "3.3.11",
+  "com.softwaremill.sttp.client3" %% "core" % "3.3.11"
 )
 
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % scalaLoggingVersion
@@ -36,10 +38,12 @@ libraryDependencies += "org.postgresql" % "postgresql" % postgresVersion
 libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
 
 // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.30"
+libraryDependencies += "org.slf4j" % "slf4j-api" % "2.0.0-alpha1"
 
+// connection pool
+libraryDependencies += "com.zaxxer" % "HikariCP" % "4.0.3"
 // circe support
-val circeVersion = "0.13.0"
+val circeVersion = "0.14.1"
 libraryDependencies ++= Seq(
   "io.circe" %% "circe-core",
   "io.circe" %% "circe-generic",
@@ -62,7 +66,7 @@ libraryDependencies += "com.github.mrpowers" % "spark-daria_2.12" % "1.0.0"
 lazy val commonSettings = Seq(
   organization := "com.tibco.labs",
   scalaVersion := "2.12.12",
-  version := "0.0.1",
+  version := "1.0.1",
   libraryDependencies ++= sparkLibs
 )
 
@@ -70,11 +74,12 @@ lazy val commonSettings = Seq(
 scalacOptions ++= Seq("-deprecation", "-feature")
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 // Settings
-val domain = "public.ecr.aws/tibcolabs"
+val registry = "public.ecr.aws"
+val domain = "tibcolabs"
 
 // For building the FAT jar
 lazy val assemblySettings = Seq(
-  assembly / assemblyOption := (assemblyOption in assembly).value.copy(includeScala = false),
+  assembly / assemblyOption := (assembly / assemblyOption).value.withIncludeScala(false),
   assembly / assemblyOutputPath := baseDirectory.value / "output" / s"$domain-${name.value}.jar"
 )
 
@@ -84,21 +89,21 @@ val targetDockerJarPath =  "/opt/spark/jars"
 // For building the docker image
 
 lazy val dockerSettings = Seq(
-  imageNames in docker := Seq(
+  docker / imageNames := Seq(
     //ImageName(s"$domain/${name.value}:latest"),
-    ImageName(s"$domain/${name.value}:${version.value}")
+    ImageName(s"$registry/$domain/${name.value}:${version.value}")
   ),
-  buildOptions in docker := BuildOptions(
+  docker / buildOptions := BuildOptions(
     cache = false,
     removeIntermediateContainers = BuildOptions.Remove.Always,
     pullBaseImage = BuildOptions.Pull.Always
   ),
-  dockerfile in docker := {
+    docker / dockerfile := {
     // The assembly task generates a fat JAR file
     val artifact: File = assembly.value
     val artifactTargetPath = s"$targetDockerJarPath/$domain-${name.value}.jar"
     new Dockerfile {
-      from(s"public.ecr.aws/tibcolabs/labs-discover-spark-runner:3.1.1")
+      from(s"public.ecr.aws/tibcolabs/labs-discover-spark-runner:3.1.2")
     }.add(artifact, artifactTargetPath)
   }
 )
@@ -109,9 +114,10 @@ lazy val runLocalSettings = Seq(
   // https://stackoverflow.com/questions/18838944/how-to-add-provided-dependencies-back-to-run-test-tasks-classpath/21803413#21803413
   Compile / run := Defaults
     .runTask(
-      fullClasspath in Compile,
-      mainClass in (Compile, run),
-      runner in (Compile, run)
+      Compile / fullClasspath,
+      Compile / run / mainClass,
+      //runner in (Compile, run)
+      Compile / run / runner
     )
     .evaluated
 )
@@ -248,22 +254,21 @@ lazy val createSparkApplicationYAML: Def.Initialize[Task[Seq[File]]] = Def.task 
 excludeDependencies += "com.google.code.findbugs" % "annotations"
 
 
-assemblyMergeStrategy in assembly := {
+  assembly / assemblyMergeStrategy:= {
   case "mozilla/public-suffix-list.txt" => MergeStrategy.last
   case "META-INF/io.netty.versions.properties" => MergeStrategy.last
   case PathList("org","renjin","gcc", xs @ _*) => MergeStrategy.first
   case PathList("org","renjin","math", xs @ _*) => MergeStrategy.first
   case PathList("META-INF","org.renjin.gcc.symbols",xs @ _* ) => MergeStrategy.first
   case x =>
-    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    val oldStrategy = (assembly / assemblyMergeStrategy).value
     oldStrategy(x)
 }
 
-// shading
-/*
-
-assemblyShadeRules in assembly := Seq(
-  ShadeRule.rename("org.renjin.renjin-lapack.**" -> "shadeio.lapack.@1").inAll,
-  ShadeRule.rename("org.renjin.renjin-nmath.**" -> "shadeio.nmath.@1").inAll
-)
-*/
+assembly / assemblyShadeRules := {
+  val shadePackage = "com.tibco.labs.shaded"
+  Seq(
+    ShadeRule.rename("shapeless.**" -> s"$shadePackage.shapeless.@1").inAll,
+    ShadeRule.rename("cats.kernel.**" -> s"$shadePackage.cats.kernel.@1").inAll
+  )
+}

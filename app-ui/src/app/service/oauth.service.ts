@@ -6,8 +6,9 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { APP_BASE_HREF } from '@angular/common';
 import { exit } from 'process';
-import * as CryptoJS from 'crypto-js';
+import * as CryptoES from 'crypto-es';
 import { concatMap, map } from 'rxjs/operators';
+const CryptoJS = CryptoES.default;
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +59,7 @@ export class OauthService {
     }
   }
 
-  private tokenExpiresIn(authKeys: AuthKeys): Number {
+  private tokenExpiresIn(authKeys: AuthKeys): number {
     const nowEpoch: number = Math.floor(new Date().getTime() / 1000);
     return authKeys.expiry - nowEpoch;
   }
@@ -165,23 +166,23 @@ export class OauthService {
   }
 
   public async redirectLogin() {
-    const code_verifier = this.strRandom(32);
-    const verifierHash = CryptoJS.SHA256(code_verifier).toString(CryptoJS.enc.Base64);
-    const code_challenge =  verifierHash
+    const codeVerifier = this.strRandom(32);
+    const verifierHash = CryptoJS.SHA256(codeVerifier).toString(CryptoJS.enc.Base64);
+    const codeChallenge =  verifierHash
       .replace(/=/g, '')
       .replace(/\+/g, '-')
       .replace(/\//g, '_');
-    this.setKey({verifier: code_verifier});
+    this.setKey({verifier: codeVerifier});
     // const codeChallenge = 'vVx8gU7hfb18z4v_fischYYz8aaeJP6GAio2a_WzE14';
     window.location.href = this.ACCOUNT_DOMAIN + '/idm/v1/oauth2/auth?response_type=code&scope='
       + this.SCOPE + '&redirect_uri='
       + this.APP_URL + '&client_id='
       + this.CLIENTID
-      + '&code_challenge=' + code_challenge + '&code_challenge_method=S256';
+      + '&code_challenge=' + codeChallenge + '&code_challenge_method=S256';
   }
 
   getTscHash(tokenOverride?: string): Observable<string> {
-    const url = "/tsc-ws/v2/whoami";
+    const url = '/tsc-ws/v2/whoami';
     let headers: HttpHeaders;
     if (tokenOverride) {
       // add auth header with bearer token
@@ -195,7 +196,7 @@ export class OauthService {
   }
 
   public getToken(code: string): Observable<TokenResponse> {
-    const url = this.ACCOUNT_DOMAIN + "/idm/v1/oauth2/token";
+    const url = this.ACCOUNT_DOMAIN + '/idm/v1/oauth2/token';
     const isAc = code.startsWith('ac.');
     const body = new HttpParams()
       .set('code', isAc ? code : undefined)

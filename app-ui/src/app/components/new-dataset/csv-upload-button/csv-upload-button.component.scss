@@ -1,0 +1,26 @@
+.title-right {
+  display: flex;
+  &:hover {
+    cursor: pointer;
+  }
+  .icon-container {
+    display: inline;
+    padding-top: 20px;
+  }
+  .upload-csv-link {
+    margin-top: 20px;
+    height: 21px;
+    color: #1774E5;
+    font-family: "Source Sans Pro";
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 21px;
+  }
+}
+
+.upload-overlay {
+  border-radius: 3px;
+  border: 1px solid #B6B6B6;
+  box-shadow: 0 -2px 2px 0 rgba(0,0,0,0.1);
+  background-color: #FFFFFF;
+}

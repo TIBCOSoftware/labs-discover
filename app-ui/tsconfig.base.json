@@ -15,6 +15,10 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "process": [ "./node_modules/process" ],
+      "crypto": [ "./node_modules/crypto" ]
+    }
   }
 }

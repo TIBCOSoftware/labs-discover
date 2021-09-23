@@ -9,25 +9,25 @@
   <div class="settings-container">
     <div>
       <h2>Auto Mapping of Process Mining columns</h2>
-      <div>
+      <div *ngIf="automap">
         <div class="settings-container ss-settings">
           <div class="ss-inner">
             <uxpl-button class="right-button" height="60px" style='top: 40px' (clicked)="getWords();">Get Words from<br> Previous Mappings
             </uxpl-button>
             <uxpl-button class="right-button" height="30px" (clicked)="clearAll();">Clear All
             </uxpl-button>
-            <div *ngFor="let field of FIELD_NAMES">
-              <uxpl-form-field style="width: 80%" label="Words to find the {{field}} (occurred mappings in brackets)"
+            <div *ngFor="let entry of automap">
+              <uxpl-form-field style="width: 80%" label="Words to find the {{entry.fieldName}} (occurred mappings in brackets)"
                                type="text" valid required="true"
-                               [value]="createWordsString(discover?.autoMapConfig[field])"
-                               (uxplChanged)="handleUpdate($event, field)">
+                               [value]="createWordsString(entry.fieldName)"
+                               (uxplChanged)="handleUpdate($event, entry.fieldName)">
               </uxpl-form-field>
               <br>
             </div>
             <br>
             <uxpl-form-field style="width: 80%" label="Threshold (all found mappings under this value will be ignored)"
                              type="text" valid
-                             required="true" [value]="discover?.autoMapConfig?.threshold"
+                             required="true" [value]="automap[0].threshold"
                              (uxplChanged)="handleUpdatethreshold($event)">
             </uxpl-form-field>
           </div>
@@ -41,12 +41,12 @@
             <uxpl-button class="right-button" (clicked)="testChanged();">Test Auto Mapping</uxpl-button>
             <div *ngIf="showTestResult">
               <br>
-              <div *ngFor="let field of FIELD_NAMES">
-                <div *ngIf="autoMapResults[field]">
+              <div *ngFor="let entry of automap">
+                <div *ngIf="autoMapResults[entry.fieldName]">
                   {{field}}] Column: <b>{{autoMapResults[field].columnName}}</b>
-                  ({{autoMapResults[field].likelihood | number : '1.0-2'}}) or
-                  <b>{{(autoMapResults[field].likelihood | number : '1.0-2') * 100}}%</b> Occurrences:
-                  <b>{{autoMapResults[field].occurrences}}</b>
+                  ({{autoMapResults[entry.fieldName].likelihood | number : '1.0-2'}}) or
+                  <b>{{(autoMapResults[entry.fieldName].likelihood | number : '1.0-2') * 100}}%</b> Occurrences:
+                  <b>{{autoMapResults[entry.fieldName].occurrences}}</b>
                 </div>
               </div>
             </div>

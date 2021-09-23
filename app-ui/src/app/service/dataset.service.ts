@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { parse } from 'papaparse';
 import { forkJoin, Observable, of } from 'rxjs';
-import { concatMap, delay, filter, map, repeatWhen, take } from 'rxjs/operators';
-import { ActionPerformedLoginValidate, Schema, UploadFileResponse } from '../models_ui/backend';
+import { concatMap, delay, filter, last, map, repeatWhen, take } from 'rxjs/operators';
+import { ActionPerformedLoginValidate, Schema } from '../models_ui/backend';
 import { Dataset, DatasetListItem, DatasetListItemArray } from '../models_ui/dataset';
 import { DiscoverBackendService } from './discover-backend.service';
 import { OauthService } from './oauth.service';
@@ -156,19 +156,23 @@ export class DatasetService {
     return this.callApi(url, 'get');
   }
 
-  /** some service orchestration  **/
+  /* some service orchestration  */
 
-  public uploadFileAndSaveDatasetAndPreview(dataset: Dataset, progress: any, file: File): Observable<Dataset> {
+  public uploadFile(dataset: Dataset, progress: any, file: File) {
     return this.backendService.login().pipe(
       concatMap((response: ActionPerformedLoginValidate) => {
         if (file) {
           // upload file
-          progress.status = "Uploading csv file. Please don't close browser or refresh page";
+          progress.status = 'Uploading csv file. Please don\'t close browser or refresh page';
           progress.percentage += 10;
           return this.backendService.uploadFile(response.orgId, file, dataset.Dataset_Source).pipe(
-            map((uploadFileResponse: UploadFileResponse) => {
-              return {uploadFileResponse, orgId: response.orgId.toLowerCase()};
-            })
+            map((resp: any) => {
+              if (resp.type === HttpEventType.Response && resp.ok) {
+                return {uploadFileResponse: resp.body, orgId: response.orgId.toLowerCase()};
+              }
+              
+            }),
+            last()
           );
         } else {
           return of({
@@ -177,7 +181,11 @@ export class DatasetService {
           })
         }
       })
-    ).pipe(
+    )
+  }
+
+  public uploadFileAndSaveDatasetAndPreview(dataset: Dataset, progress: any, file: File): Observable<Dataset> {
+    return this.uploadFile(dataset, progress, file).pipe(
       concatMap(resp => {
         const orgId = resp.orgId;
         if (resp.uploadFileResponse) {
@@ -194,11 +202,11 @@ export class DatasetService {
         return this.getStatus(datasetId).pipe(
           repeatWhen(obs => obs.pipe(delay(1000))),
           filter(data => {
-            if (data.Progression != 0) {
+            if (data.Progression !== 0) {
               progress.percentage = data.Progression;
               progress.status = data.Message;
             }
-            return data.Progression != null && (data.Progression == 100 || data.Progression == 0)
+            return data.Progression != null && (data.Progression === 100 || data.Progression === 0)
           }),
           take(1)
         );
@@ -208,7 +216,7 @@ export class DatasetService {
         const datasetId = resp.DatasetID;
         return this.getDataset(datasetId).pipe(
           repeatWhen(obs => obs.pipe(delay(1000))),
-          filter(data => data.status == 'COMPLETED' || data.status == 'FAILED' || data.status == 'SUBMISSION_FAILED'),
+          filter(data => data.status === 'COMPLETED' || data.status === 'FAILED' || data.status === 'SUBMISSION_FAILED'),
           take(1)
         );
       })
@@ -219,11 +227,11 @@ export class DatasetService {
     return this.getStatus(datasetId).pipe(
       repeatWhen(obs => obs.pipe(delay(2000))),
       filter(data => {
-        if (data.Progression != 0) {
+        if (data.Progression !== 0) {
           progress.percentage = data.Progression;
           progress.status = data.Message;
         }
-        return progress.stop == true || (data.Progression != null && (data.Progression == 100 || data.Progression == 0))
+        return progress.stop === true || (data.Progression != null && (data.Progression === 100 || data.Progression === 0))
       }),
       take(1)
     ).pipe(
@@ -233,7 +241,7 @@ export class DatasetService {
           // the preview is already deleted, so no way to check final status from it, should check dataset detail to get final status
           return this.getDataset(datasetId).pipe(
             repeatWhen(obs => obs.pipe(delay(1000))),
-            filter(data => progress.stop == true || (data.status == 'COMPLETED' || data.status == 'FAILED' || data.status == 'SUBMISSION_FAILED')),
+            filter(data => progress.stop===true || (data.status==='COMPLETED' || data.status==='FAILED' || data.status==='SUBMISSION_FAILED')),
             take(1)
           );
         } else {
@@ -259,7 +267,7 @@ export class DatasetService {
   }
 
   public pullPreviewData(dataset: Dataset): Observable<any> {
-    if (dataset.type == 'tdv') {
+    if (dataset.type==='tdv') {
       if (dataset.TdvView) {
         // create from tdv view
         return this.backendService.login().pipe(
@@ -303,8 +311,8 @@ export class DatasetService {
           })
         );
       }
-    } else if (dataset.type == 'csv') {
-      if (dataset.csvMethod == 'file' && dataset.CsvFile) {
+    } else if (dataset.type==='csv') {
+      if (dataset.csvMethod==='file' && dataset.CsvFile) {
         dataset.Dataset_Source.Encoding = dataset.CsvFile.Encoding;
         dataset.Dataset_Source.FileEscapeChar = dataset.CsvFile.EscapeChar;
         dataset.Dataset_Source.FileName = dataset.CsvFile.OriginalFilename;
@@ -324,7 +332,7 @@ export class DatasetService {
             }
           })
         );
-      } else if (dataset.csvMethod == 'upload' && dataset.Dataset_Id && dataset.Dataset_Source.FilePath) {
+      } else if (dataset.csvMethod==='upload' && dataset.Dataset_Id && dataset.Dataset_Source.FilePath) {
         return this.getTdvData(dataset.Dataset_Id).pipe(
           map(data => {
             console.log(data);
@@ -355,14 +363,16 @@ export class DatasetService {
   private getColumnsFromRowData(rowData: string): any[] {
     try {
       let jsonRowData;
-      if (typeof rowData == 'string') {
+      if (typeof rowData==='string') {
         jsonRowData = JSON.parse(rowData);
       } else {
         jsonRowData = rowData;
       }
       const cols = [];
-      for(let col in jsonRowData) {
-        cols.push(col);
+      for(const col in jsonRowData) {
+        if(col) {
+          cols.push(col);
+        }
       }
       return cols;
     } catch(error) {

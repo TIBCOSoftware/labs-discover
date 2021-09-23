@@ -1,6 +1,6 @@
 package com.tibco.labs.orchestrator.models
 
-import com.tibco.labs.orchestrator.api.TdvMgmtRegistry.{ActionPerformedUpdate, ActionPerformedDataSchema, ActionPerformedUnmanagedPublishedViews, ActionPerformedTDVCreate}
+import com.tibco.labs.orchestrator.api.registry.TdvMgmtRegistry.{ActionPerformedUpdate, ActionPerformedDataSchema, ActionPerformedUnmanagedPublishedViews, ActionPerformedTDVCreate}
 import spray.json.RootJsonFormat
 
 //#json-formats

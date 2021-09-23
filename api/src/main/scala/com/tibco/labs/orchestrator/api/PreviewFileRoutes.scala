@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.util.Timeout
-import com.tibco.labs.orchestrator.api.PreviewFileRegistry._
+import com.tibco.labs.orchestrator.api.registry.PreviewFileRegistry._
 import com.tibco.labs.orchestrator.models.previewConfigFile
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, ExampleObject, Schema}
@@ -13,6 +13,9 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import com.tibco.labs.orchestrator.api.registry.PreviewFileRegistry
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
 
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
@@ -27,8 +30,8 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
 
   //#user-routes-class
 
-  import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-  import com.tibco.labs.orchestrator.models.JsonFormatsPreview._
+  //import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+  //import com.tibco.labs.orchestrator.models.JsonFormatsPreview._
   //#import-json-formats
 
   // If ask takes more time than this to complete the request is failed
@@ -58,10 +61,57 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
     requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[previewConfigFile]),
       examples = Array(new ExampleObject(value =
         """{
-                                                     "Token": "CIC~IloveFoodAndWine",
-                                                     "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx",
-                                                     "DatasetId": "xxxxxxxx"
-                                                   }"""))
+                   "Token": "CIC~IloveFoodAndWine",
+                   "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx",
+                   "DatasetId": "xxxxxxxx",
+                   "schema": [
+      {
+        "format": "None",
+        "columnName": "Service ID",
+        "dataType": "string"
+      },
+      {
+        "format": "None",
+        "columnName": "Operation",
+        "dataType": "string"
+      },
+      {
+        "format": "d.M.yy H:m",
+        "columnName": "Start Date",
+        "dataType": "timestamp"
+      },
+      {
+        "format": "d.M.yy H:m",
+        "columnName": "End Date",
+        "dataType": "timestamp"
+      },
+      {
+        "format": "None",
+        "columnName": "Agent Position",
+        "dataType": "string"
+      },
+      {
+        "format": "None",
+        "columnName": "Customer ID",
+        "dataType": "string"
+      },
+      {
+        "format": "None",
+        "columnName": "Product",
+        "dataType": "string"
+      },
+      {
+        "format": "None",
+        "columnName": "Service Type",
+        "dataType": "string"
+      },
+      {
+        "format": "None",
+        "columnName": "Agent",
+        "dataType": "string"
+      }
+    ]
+           }"""))
     ))),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "Add response",

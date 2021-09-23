@@ -7,14 +7,14 @@ package com.tibco.labs.orchestrator.conf
 
 
 import better.files.{File => ScalaFile}
-import com.tibco.labs.orchestrator.api.SparkOnK8s
+import com.tibco.labs.orchestrator.api.methods.SparkOnK8s
 import com.typesafe.config.{Config, ConfigFactory}
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.{Json, _}
 import org.slf4j.{Logger, LoggerFactory}
 import redis.clients.jedis.Jedis
-
+import com.tibco.labs.orchestrator.utils.Redis._
 
 import java.nio.file.Path
 import scala.util.matching.Regex
@@ -192,7 +192,7 @@ object DiscoverConfig {
   }
 
 
-  /**
+ /* /**
    * @param f
    * @tparam T
    * @return
@@ -204,5 +204,5 @@ object DiscoverConfig {
     } finally {
       jedis.close()
     }
-  }
+  }*/
 }

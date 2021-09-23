@@ -1,0 +1,2437 @@
+swagger: '2.0'
+info:
+  title: Web Resource Provisioner Service
+  description: |   
+    The TIBCO Cloud(TM) Live Apps Web Resource Provisioner Service manages Applications and related resources in the TIBCO(R) Live Apps subscription. 
+    
+    Applications, in the context of the Web Resource Provisioner Service, are user interface applications that are served to a browser client to provide end-user functionality. Note that:
+
+    * Applications must consist entirely of static resources (such as HTML, CSS, Javascript, XML and JSON) which are served to the browser that hosts the Application. Applications must not include servlets or client-side executables, such as applets or .NET libraries.
+
+    * Applications are _not_ the applications that Users create in Live Apps Designer, manage in Live Apps Application Manager and use in Live Apps Case Manager. Those applications cannot be accessed or managed using the Web Resource Provisioner Service.
+    
+    There are four different types of Application:
+    
+    * __Applications__: These are customer-developed applications that provide custom functionality and solutions to specific business requirements. 
+      
+    * __System Applications__: These are TIBCO-developed applications that provide standard functionality available as part of a Live Apps subscription. For example, Live Apps Designer, Live Apps Application Manager and Live Apps Case Manager are System Applications. 
+         
+    * __Case Folders__: These are used to store Artifacts - such as document and image files - which are part of a Case.
+
+    * __Org Folders__: These are used to store Artifacts - such as document and images files - which can be accessed from within the subscription (for example, from another customer-developed Application).
+    
+    Other resources managed by the Web Resource Provisioner Service are:
+    
+    * __ApplicationVersions__: The ApplicationVersion (also referred to as simply Version) is a snapshot of the state of the Application and the Artifacts that it contains. Whenever a change is made to an Application, a new version is created and the Application's latestVersion property is incremented. The Application's publishedVersion property defines the version that is currently available to all Users in the subscription.
+    
+    * __Artifacts__: Artifacts are the files and folders that make up an Application or System Application. Case Folders only include files.
+
+    
+    __Application Lifecycle and Management__
+    
+    Web Resource Provisioner Service methods allow you to manage Applications in your subscription. You can:
+    
+    * Create a new Application, in several ways:
+      * Create an empty Application.
+      * Upload an archive file of an externally created application.
+      * Copy an existing Application.
+      * Copy an existing System Application that has been defined as a template.
+      * Export an Application to an external archive, for subsequent upload.
+    
+    * Modify and test Application content:
+      * Upload new or updated Artifacts, either individually or from an archive.
+      * Rename or delete existing Artifacts.
+      * Revert an Application to a different version.
+      
+      You can access and test the latestVersion of an Application by prefixing the Application's name in the URI with two underscore characters, followed by TEST, followed by two underscore characters, followed by a forward slash character.
+
+      
+    * Publish an Application so that it is available to Users:
+       * Publish the Application when you create it.
+       * Publish the latestversion of the Application at any time.
+    
+      The publishedVersion of an Application is available to every User in a subscription via its URI. 
+      
+    * Delete an Application, or a specific ApplicationVersion, that is no longer required.
+    
+    __Application Descriptor File__
+    
+    Applications and System Applications can include a descriptor file, containing name/value pairs that can be used to provide any desired custom information about the Application. For example:
+    * to associate an image with the Application.
+    * to define the Application's home page.
+    * to define the location of a configuration file for the Application.
+    
+    The descriptor file name must be {appName}.app.desc.json. The file must reside in the Application's top-level folder. The contents of the descriptor file can be accessed using the Application's 'descriptor' property.
+    
+    Case Folders do not have descriptor files.
+    
+    
+    __Access Permissions__
+    
+    Access to the methods listed below is restricted. The call must be made using the credentials of a User who is a member of either the ADMINISTRATOR or APPLICATION_DEVELOPER subscription Group. A call made using any other credentials will fail with a "WR_AUTHERROR" error:
+    
+    * The GET /applications/{appName}/export method
+    * All POST, PUT, PATCH and DELETE methods, except for the following methods - access to these is not restricted: 
+      * POST /caseFolders/{folderName}/artifacts/{artifactName}/upload
+      * DELETE /caseFolders/{folderName}/artifacts/{artifactName}
+      * POST /orgFolders/{folderName}/artifacts/{artifactName}/upload
+      * DELETE /orgFolders/{folderName}/artifacts/{artifactName}
+    
+    
+    __Case Folder Management__
+
+    A Case Folder is created automatically when a Case is created:
+    * A Case Folder's name is the Case reference of the Case.
+    * A Case Folder only has a single version. This never changes.
+    * Multiple Artifacts, and multiple versions of an Artifact, can be stored in a Case Folder.
+      
+    Web Resource Provisioner Service methods allow you to manage the content of a Case Folder, by:
+    * uploading new Artifacts or new versions of existing Artifacts.
+    * deleting the latest version of an Artifact.
+    
+    
+    __Org Folder Management__
+    
+    Web Resource Provisioner Service methods allow you to manage Org Folders and their contents in your subscription. You can:
+    * create a new Org folder.
+    * upload new Artifacts or new versions of existing Artifacts.
+    * delete the latest version of an Artifact.
+    * delete an Org Folder that is no longer required.
+    
+    Note that:
+    * An Org Folder's name must be unique in the subscription.
+    * An Org Folder only has a single version. This never changes.
+    * Multiple Artifacts, and multiple versions of an Artifact, can be stored in an Org Folder.
+    
+    
+    __Subscription Limits on Applications__
+    
+    The following Live Apps subscription Parameters enforce limits on the maximum number and size of Applications allowed in a subscription:
+    
+    * __webAppStorage__: The maximum total size (in bytes) of all Applications in the subscription. The default value is 0 (meaning unlimited). An Application's size is calculated as the total size of each unique Artifact in all Versions of the Application. Multiple uploads of the same Artifact do not increase the size.
+    * __webAppLimit__: The maximum number of Applications permitted in the subscription. The default value is  10
+    * __webAppArchiveSize__: The maximum size (in bytes) of a single, exploded archive. The default value is 300000000. If you want to use an Application that exceeds the webAppArchiveSize, you must split it into different archives and upload each one separately.
+    
+    NOTE: These limits apply only to customer-developed Applications. System Applications and Case Folders are not counted.
+    
+    You can use the GET /parameters method from the Authorization Service to find the values of these Parameters defined for your subscription.
+    
+    __Subscription Limit on Artifacts in Case Folders and Org Folders__
+    
+    The following Live Apps subscription Parameter enforces a limit on the maximum total size of Artifacts allowed in a subscription:
+    
+    * __documentStorage__: The maximum total size (in bytes) of all Artifacts in Case Folders and Org Folders. The total size is calculated as the total size of all the versions of each Artifact stored.
+    
+    
+    __Application Resource Endpoints__
+    
+    The publishedVersion of a customer-developed Application, or a component file within that Application, can be served to a web browser using the endpoint: .../webresource/apps/{appName}/{artifactName}. For example, my-test-system/webresource/apps/myUserApp/index.html.
+
+    Note that:     
+    
+    * To serve the latestVersion of an Application, prefix the Application's name in the URI with two underscore characters, followed by TEST, followed by two underscore characters, followed by a forward slash character.
+    
+    * You cannot serve System Applications or their component files using this endpoint format.
+    
+    
+    __Case Folder and Org Folder Resource Endpoints__
+
+    A file Artifact in a Case Folder or an Org Folder can be served to a web browser via the following endpoints:
+    
+    * For a Case Folder, use: .../webresource/folders/{folderName}/{sandbox}/{artifactName}?$version={versionNumber}.  
+
+    * For an Org Folder, use: .../webresource/orgFolders/{folderName}/{artifactName}?$version={versionNumber}.  
+    
+    If $version is omitted the latest version is served.
+       
+    __Default and Maximum Values for the $top Parameter__
+    
+    If $top is not specified a default of 20 is used.  
+    The maximum allowed size for $top is 200.
+    
+  version: "1.0.0"
+  termsOfService: ../../contexthelp/common/TIB_bpm-cloud_1.0.0_license.pdf
+  contact: 
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+    email: liveapps@tibco.com
+  license: 
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+schemes:
+  - https
+basePath: /webresource/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /applications/:
+    get:
+      summary: Returns Applications that match the specified query parameters.
+      description: ""
+      operationId: getApps
+      parameters:
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Applications to be returned. The expression can contain the following operands:
+              
+              * __name__ (optional): The name of the Application to be returned. Only one name can be used. You can search for partial names by using the contains function.
+              
+                Supported operator: 'eq'
+                Supported function: 'contains(name,'value')'
+              
+              * __tags/name__ (optional): The name of the tag attribute for which Applications should be returned.
+              
+                Supported operator: 'eq'
+              
+              For example, the following string returns all Applications that contain 'app' in their name and that have the tag 'MOBILE':
+              
+                $filter=contains(name,'app') and tags/name eq 'MOBILE' 
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be in the range 1 to 200. For example, `$top=50` returns 50 items from the results list, or all the results if the list contains 50 or fewer items. If $top is omitted, a default value of 20 is used.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $orderby
+          in: query
+          description: |
+            The order in which results should be sorted, either ascending order using __asc__ or descending order using __desc__, based on one of the following Application properties: name, owner, ownerSub, ownerSandbox, creationDate, lastModifiedDate, lastModifiedBy, publishedVersion, latestVersion. 
+            
+            For example, the following string sorts results in ascending order by name:
+            
+            $orderby=name asc
+          required: false
+          type: string
+        - name: $select
+          in: query
+          description: |
+            Whether the descriptor attribute for each returned Application should be included in the returned information. (The descriptor attribute contains the name/value pairs defined in the Application's _appName_.app.desc.json file, if it has one.) The only valid value is:
+            
+            * __summary__: Excludes the descriptor attribute from the returned information.
+            
+            For example:
+            
+            $select=summary
+            
+            If $select is not specified, the descriptor attribute is included in the returned information. 
+          required: false
+          type: string          
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Applications in the result, rather than the Applications themselves.  
+            
+            Note: If $count is used, $skip, $top, $orderby or $select cannot be used.
+          required: false
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns the Applications matching the specified criteria or a simple count if $count was specified
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Application'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a new, empty Application.
+      description: The Artifact methods can be used later to add content to the Application.
+      operationId: createEmptyApp
+      parameters:
+      - name: details
+        in: body
+        description: |
+          The required details for the new Application:
+          
+          * __name__ (required): Unique name for the new Application
+          
+          * __tags__: Not currently used by this method - if specified it will be ignored.
+        required: true
+        schema:
+          $ref: '#/definitions/Application'
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Application has been successfully created.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/:
+    get:
+      summary: Returns information matching the specified query parameters about a particular Application.
+      description: ""
+      produces:
+        - application/json
+      operationId: getAppsByName
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the required Application.
+          required: true
+          type: string
+        - name: $select
+          in: query
+          description: |
+            Whether the descriptor attribute for the Application should be included in the returned information. (The descriptor attribute contains the name/value pairs defined in the Application's _appName_.app.desc.json file, if it has one.) The only valid value is:
+            
+            * __summary__: Excludes the descriptor attribute from the returned information.
+            
+            For example:
+            
+            $select=summary
+            
+            If $select is not specified, the descriptor attribute is included in the returned information.
+          required: false
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns the Applications matching the specified criteria.
+          schema:
+            $ref: '#/definitions/Application'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a particular Application.
+      description: |
+        Note: This method deletes ALL versions of the specified Application. Also, it cannot be undone.
+      operationId: deleteApp
+      parameters:
+        - name: appName
+          in: path
+          description: Name of the Application to delete.
+          required: true
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Application has been successfully deleted.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a new copy of an existing Application.
+      description: |
+        The publishedVersion and latestVersion of the new Application are "1", irrespective of the version numbers in the Application being copied. 
+        
+        Each Artifact belonging to the existing Application is also copied. The new copy of each Artifact has the same artifactName as the original, but has a new, unique id and an artifactVersion of "1", irrespective of the version number of the original Artifact. 
+      operationId: copyApp
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be copied.
+          required: true
+          type: string
+        - name: details
+          in: body
+          description: |
+            The required details for the new copy of the Application:
+          
+            * __name__ (required): Unique name for the new Application.
+          
+            * __tags__: Not currently used by this method - if specified it will be ignored.          
+          required: true
+          schema:
+            $ref: '#/definitions/Application'
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that the new copy of the Application has been successfully created.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'           
+    put:
+      summary: Publishes the latest Version of an Application.
+      description: |
+        The Application's publishedVersion is set to the same value as the latestVersion and all Artifacts associated with the latestVersion are associated with the publishedVersion. The publishedVersion is the one that is available to all Users.
+      operationId: publishApp
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be published.
+          required: true
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that the latest version of the Application has been successfully published.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/export/:
+    get: 
+      summary: Exports the latest version of an Application to an archive file.
+      description: The latestVersion of the specified Application is exported as an archive file (_appName_.zip).
+      operationId: exportApp
+      produces: 
+        - application/octet-stream
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be exported.
+          required: true
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns the archive file (_appName_.zip).
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/upload/:
+    post: 
+      summary: Uploads and publishes a new or updated Application from an archive file.
+      description: |
+        The contents of the archive file are used to either create a new Application, or to update an existing Application by replacing the existing contents.
+        
+        If the specified appName does not already exist, the Application is created and published as a new Application (with latestVersion and publishedVersion of "1"). Each included Artifact has an artifactVersion of "1"
+        
+        If an Application with the specified appName already exists:
+        
+        * The latestVersion of the Application is incremented.
+        * Each existing Artifact in the latestversion of the Application is deleted.
+        * Each folder and file in the archive is added as a new Artifact (with an artifactVersion matching the latestVersion value of the Application).
+        * The latestVersion of the Application is published.
+      operationId: createApp
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be created or updated.
+          required: true
+          type: string
+        - name: appContents
+          in: formData
+          description: |
+            The archive file (_appName_.zip) to be used to create or update the Application.  
+
+            Note: The archive file must be specified in the request as a multipart/form-data attachment.
+          required: true
+          type: file
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that new Artifacts have been created, listing the number of records created (for new Artifacts) and the number of records not modified (which will be 0).
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Internal server error.  
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'           
+    patch: 
+      summary: Uploads new or updated Artifacts to an existing Application from an archive file.
+      description: |
+        The contents of the archive file are used to update an existing Application:
+        
+        * The latestVersion of the Application is incremented, but the new version is not published. 
+        * The folder structure in the archive file is merged with the existing Application.
+        * Each file in the archive that does not already exist in the latestVersion of the Application is added as a new Artifact (with an artifactVersion matching the latestVersion value of the Application).
+        * Each file in the archive that does already exist in the latestVersion of the Application is merged with the existing Artifact. If the contents are updated, the artifactVersion is updated to the latestVersion of the Application.
+      operationId: createAppArtifact
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be updated.
+          required: true
+          type: string
+        - name: artifactContents
+          in: formData
+          description: |
+            The archive file (appName.zip) to be used to update the Application.
+
+            Note: The archive file must be specified in the request as a multipart/form-data attachment.
+          required: true
+          type: file
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that new Artifacts have been created, listing the number of records created (for new or updated Artifacts) and the number of records not modified (for unchanged Artifacts).
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information. 
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/applicationVersions/:
+    get:
+      summary: Returns ApplicationVersions for the specified Application.
+      description: ""
+      operationId: getAppVersions
+      parameters:
+        - name: appName
+          in: path
+          description: Name of the Application for which ApplicationVersions should be returned.
+          required: true
+          type: string
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns the ApplicationVersions for the specified Application.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ApplicationVersion'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates the label for the specified Application.
+      description: |
+        A new Version of the Application is created, containing the updated label. Existing Versions retain their existing labels.
+      operationId: updateAppVersion
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application whose label is to be updated.
+          required: true
+          type: string
+        - name: details
+          in: body
+          description: |
+            The following values, specified in application/json format:
+            
+            * __name__ (optional): if specified, this value is ignored.
+            * __permissions__ (required): This value is ignored. 
+            * __label__ (required): The new label for the Application.
+            
+            For example:
+            
+            {
+            "permissions": 0,
+            "label": "string"
+            }
+          required: true
+          schema:
+            $ref: '#/definitions/ApplicationVersion'
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns a message indicating that a new Version of the Application has been successfully created.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/applicationVersions/{version}/:
+    get:
+      summary: Returns a particular version of an Application.
+      description: Returns the ApplicationVersion matching the specified query parameters.
+      operationId: getAppVersion
+      parameters:
+        - name: appName
+          in: path
+          description: Name of the Application for which the ApplicationVersion should be returned.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The ApplicationVersion to be returned.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns the specified ApplicationVersion.
+          schema:
+            $ref: '#/definitions/ApplicationVersion'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a particular Version of an Application.
+      description: ""
+      operationId: deleteAppVersion
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application from which a Version is to be deleted.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The Version to be deleted.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns a message indicating that the specified ApplicationVersion has been successfully deleted.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Reverts an Application to a different Version.
+      description: |
+        This method reverts the latest Version of an Application to a new Version, based on an existing Version: 
+        * A new ApplicationVersion is created, as a copy of the specified existing Version.
+        * The latestVersion is set to the new Version.
+        
+        Note: The new/reverted Version is not published. The Application's publishedVersion is not affected by this method.
+        
+        For example, suppose an Application currently has publishedVersion=9 and latestversion=11. If this method is used to revert the Application to Version 7:
+        * Version 12 of the Application is created, as a copy of Version 7.
+        * The latestVersion is now 12.
+        * The publishedVersion remains at 9.
+      operationId: revertApp
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be reverted.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The existing Version of the Application from which the new Version should be created.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Application has been successfully reverted, and showing the new version of the Application.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/applicationVersions/{version}/artifacts/:
+    get:
+      summary: Returns Artifacts for a particular Version of an Application.
+      description: ""
+      operationId: getAppArtifacts
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application for which Artifacts are to be returned.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The Version of the Application for which Artifacts are to be returned.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Artifacts to be returned. The expression can contain the following operand:
+            
+            * __name__ (optional): The name of the Artifact to be returned. Only one name can be used. You can search for partial names by using the contains function.
+            
+              Supported operator: ‘eq’
+              Supported function: ‘contains(name,’value’)'
+              
+              For example, the following string returns all Artifacts that contain ‘json’ in their name:
+              
+              $filter=contains(name,'json')
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Artifacts in the result, rather than the Artifacts themselves. 
+
+            Note: If $count is used, $skip or $top cannot be used.
+          required: false
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - An array of artifacts or a simple count if $count was specified.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Artifact'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in user is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified Resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /applications/{appName}/applicationVersions/artifacts/{artifactName}/:
+    delete:
+      summary: Deletes an Artifact from the latest Version of a particular Application.
+      description: |
+        A new Version of the Application is created from the current latestVersion and the specified Artifact is deleted from that Version. The new Version is not published.
+        
+        Existing Versions of the Application that contained the Artifact still do - they are not affected by this method.
+        
+        Note: Artifacts are automatically purged if they are no longer referenced from any ApplicationVersion.
+      operationId: deleteAppArtifact
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the application from which the Artifact is to be deleted.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact to be deleted.
+          required: true
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Artifact has been deleted and a new Version of the Application created.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in user is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified Resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    post: 
+      summary: Uploads an Artifact to an existing Application.
+      description: |
+        The contents of the request body are used to update an existing Application:
+        
+        * The latestVersion of the Application is incremented, but the new version is not published.
+        * If an Artifact with the specified artifactName does not already exist in the latestVersion of the Application, the Body contents are used to create a new Artifact with an artifactVersion matching the latestVersion value of the Application.
+        * If an Artifact with the specified artifactName already exists in the latestVersion of the Application, the Body contents are used to create a new version of the Artifact, replacing the existing content. The artifactVersion is updated to the latestVersion of the Application. (Note that the existing version of the Artifact is also retained, and any existing ApplicationVersions that reference that version of the Artifact are not affected.)
+        
+        Note: 
+      operationId: createAppArtifactSingle
+      consumes: 
+        - application/octet-stream
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application to be updated.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: |
+            The full path in the Application to which the Artifact is to be uploaded. Note that:
+            
+            * Each forward slash character in the path must be URL encoded as '%2F'.
+            * You can create a new folder path to the Artifact using this method. 
+          required: true
+          type: string
+        - name: BinaryData
+          in: body
+          description: The new content of the Artifact, encoded in application/octet-stream format.
+          required: true
+          schema: 
+            type: string
+            format: byte
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns a message indicating that new Artifacts have been created, listing the number of records created (for new or updated Artifacts) and the number of records not modified (for unchanged Artifacts).
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Renames an existing Artifact in a particular Application.
+      description: |
+        A new Version of the Application is created from the current latestVersion and the specified Artifact is renamed in that Version. The new Version is not published.
+        
+        Existing Versions of the Application that contained the Artifact still retain the Artifact's original name - they are not affected by this method.
+        
+        Note: This method can also be used to rename existing folders. Any Artifacts in the affected path are moved and made accessible via the updated path name. To rename a directory you must include a trailing space on the path in both the appName and details parameters of the request. For example, to rename a path 'dir1/dir2' as 'dir1/newdir':
+        
+        * Specify the appName as 'dir1%2fdir2%2f'.
+        
+        * Specify the details parameter as: {"name": "dir1/newdir/"}
+      operationId: renameAppArtifact
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the Application containing the Artifact that is to be renamed.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: |
+            The full Application path of the Artifact to be renamed. Each forward slash character in the path must be URL encoded as '%2F’.
+          required: true
+          type: string
+        - name: details
+          in: body
+          description: |
+            The following values, specified in application/json format:
+            
+            * __name__ (required): The new name of the Artifact.
+            * __description__ (optional): A suitable description.
+            
+            For example:
+            
+            {
+            "name": "sample1.html",
+            "description": "Renamed to fix issue"
+            }
+          required: true
+          schema:
+            $ref: '#/definitions/Artifact'
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - A message indicating that the Artifact has been renamed.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /systemApplications/:
+    get:
+      summary: Returns published System Applications that match the specified query parameters.
+      description: ""
+      operationId: getSysApps
+      parameters:
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the System Applications to be returned. The expression can contain the following operands:
+              
+              * __name__ (optional): The name of the System Application to be returned. Only one name can be used. You can search for partial names by using the contains function.
+              
+                Supported operator: 'eq'
+                Supported function: 'contains(name,'value')'
+              
+              * __tags/name__ (optional): The name of the tag attribute for which System Applications should be returned.
+              
+                Supported operator: 'eq'
+              
+              For example, the following string returns all System Applications that contain 'app' in their name and that have the tag 'MOBILE':
+              
+                $filter=contains(name,'app') and tags/name eq 'MOBILE'
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $orderby
+          in: query
+          description: |
+            The order in which results should be sorted, either ascending order using __asc__ or descending order using __desc__, based on one of the following System Application properties: name, owner, ownerSub, ownerSandbox, creationDate, lastModifiedDate, lastModifiedBy, publishedVersion, latestVersion. 
+            
+            For example, the following string sorts results in ascending order by name:
+            
+            $orderby=name asc
+          required: false
+          type: string
+        - name: $select
+          in: query
+          description: |
+            Whether the descriptor attribute for each returned System Application should be included in the returned information. (The descriptor attribute contains the name/value pairs defined in the System Application's _appName_.app.desc.json file, if it has one.) The only valid value is:
+            
+            * __summary__: Excludes the descriptor attribute from the returned information.
+            
+            For example:
+            
+            $select=summary
+            
+            If $select is not specified the descriptor attribute is included in the returned information.
+          required: false
+          type: string
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of System Applications in the result, rather than the System Applications themselves. 
+
+            Note: If $count is used, $skip, $top, $orderby or $select cannot be used.
+          required: false
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns the System Applications matching the specified criteria or a simple count if $count was specified
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SystemApplication'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  /systemApplications/{appName}/:
+    get:
+      summary: Returns information matching the specified query parameters about a particular System Application.
+      description: ""
+      produces:
+        - application/json
+      operationId: getSysAppsByName
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the required System Application.
+          required: true
+          type: string
+        - name: $select
+          in: query
+          description: |
+            Whether the descriptor attribute for the Application should be included in the returned information. (The descriptor attribute contains the name/value pairs defined in the Application's _appName_.app.desc.json file, if it has one.) The only valid value is:
+            
+            * __summary__: Excludes the descriptor attribute from the returned information.
+            
+            For example:
+            
+            $select=summary
+            
+            If $select is not specified the descriptor attribute is included in the returned information.
+          required: false
+          type: string
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns the System Application details matching the specified criteria.
+          schema:
+            $ref: '#/definitions/SystemApplication'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a new copy of an existing System Application.
+      description: |
+        The publishedVersion and latestVersion of the new System Application are "1", irrespective of the version numbers in the System Application being copied.
+        
+        Each Artifact belonging to the existing System Application is also copied. The new copy of each Artifact has the same artifactName as the original, but has a new, unique id and an artifactVersion of "1", irrespective of the version number of the original Artifact.
+        
+        Note: This method is only supported for System Applications that have a 'TEMPLATE' tag.
+      operationId: copySysApp
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the System Application to be copied.
+          required: true
+          type: string
+        - name: details
+          in: body
+          description: |
+            The required details for the new copy of the System Application:
+            
+            * __name__ (required): Unique name for the new System Application.
+            
+            * __tags__: Not currently used by this method - if specified it will be ignored.
+          required: true
+          schema:
+            $ref: '#/definitions/SystemApplication'
+      tags:
+        - Applications
+      responses:
+        200:
+          description: OK - Returns a message indicating that the new copy of the System Application has been successfully created.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'           
+  /systemApplications/{appName}/applicationVersions/:
+    get:
+      summary: Returns ApplicationVersions for the specified System Application.
+      description: ""
+      operationId: getSysAppVersions
+      parameters:
+        - name: appName
+          in: path
+          description: Name of the System Application for which ApplicationVersions should be returned.
+          required: true
+          type: string
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns the ApplicationVersions for the specified System Application.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ApplicationVersion'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /systemApplications/{appName}/applicationVersions/{version}/:
+    get:
+      summary: Returns a particular version of a System Application.
+      description: Returns the ApplicationVersion matching the specified query parameters.
+      operationId: getSysAppVersion
+      parameters:
+        - name: appName
+          in: path
+          description: Name of the System Application for which the ApplicationVersion should be returned.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The ApplicationVersion to be returned.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+      tags:
+        - ApplicationVersions
+      responses:
+        200:
+          description: OK - Returns the specified ApplicationVersion.
+          schema:
+            $ref: '#/definitions/ApplicationVersion'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /systemApplications/{appName}/applicationVersions/{version}/artifacts/:
+    get:
+      summary: Lists Artifacts for a particular Version of a System Application.
+      description: ""
+      operationId: getSysAppArtifacts
+      parameters:
+        - name: appName
+          in: path
+          description: The name of the System Application for which Artifacts are to be returned.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The Version of the System Application for which Artifacts are to be returned.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Artifacts to be returned. The expression can contain the following operand:
+            
+            * __name__ (optional): The name of the Artifact to be returned. Only one name can be used. You can search for partial names by using the contains function.
+            
+            Supported operator: ‘eq’
+            Supported function: ‘contains(name,’value’)'
+            
+            For example, the following string returns all Artifacts that contain ‘json’ in their name:
+            
+            $filter=contains(name,’json’)
+          required: false
+          type: string 
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Artifacts in the result, rather than the Artifacts themselves. 
+
+            Note: If $count is used, $skip or $top cannot be used.
+          required: false
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns the Artifacts matching the specified criteria or a simple count if $count was specified.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Artifact'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /caseFolders/:
+    get:
+      summary: Returns Case Folders in the specified Sandbox.
+      description: ""
+      operationId: getFolders
+      parameters:
+        - name: $sandbox
+          in: query
+          description: The id of the Sandbox that contains the Case Folder.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Case Folders to be returned. The expression can contain the following operand:
+            
+            * __name__ (optional): The name of the Case Folder to be returned. Only one name can be used. You can search for partial names by using the contains function.
+            
+            Supported operator: ‘eq’
+            Supported function: ‘contains(name,’value’)'
+            
+            For example, the following string returns all Case Folders that contain 'order' in their name:
+            
+            $filter=contains(name,’order’)
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $orderby
+          in: query
+          description: |
+            The order in which results should be sorted, either ascending order using __asc__ or descending order using __desc__, based on one of the following Case Folder properties: name, owner, ownerSub, ownerSandbox, creationDate, lastModifiedDate, lastModifiedBy, publishedVersion, latestVersion. 
+            
+            For example, the following string sorts results in ascending order by name:
+            
+            $orderby=name asc
+          required: false
+          type: string
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Case Folders in the result, rather than the Case Folders themselves. 
+
+            Note: If $count is used, $skip, $top or $orderby cannot be used.
+          required: false
+          type: string
+      tags:
+        - Folders
+      responses:
+        200:
+          description: OK - Returns the Case Folders matching the specified criteria or a simple count if $count was specified
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CaseFolder'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /caseFolders/{folderName}/:
+    get:
+      summary: Returns a particular Case Folder.
+      description: ""
+      produces:
+        - application/json
+      operationId: getFolderByName
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Case Folder to be returned.
+          required: true
+          type: string
+        - name: $sandbox
+          in: query
+          description: The id of the Sandbox that contains the Case Folder. 
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+      tags:
+        - Folders
+      responses:
+        200:
+          description: OK - Returns the specified Case Folder.
+          schema:
+            $ref: '#/definitions/CaseFolder'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /caseFolders/{folderName}/artifacts/:
+    get:
+      summary: Returns Artifacts for a particular Case Folder.
+      description: The latest version of each Artifact is returned. (The latest version is the one with the highest artifactVersion.)
+      operationId: getFolderArtifacts
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Case Folder for which Artifacts are to be returned.
+          required: true
+          type: string
+        - name: $sandbox
+          in: query
+          description: The id of the Sandbox containing the Case Folder. 
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Artifacts to be returned. The expression can contain the following operand: 
+            
+            * __name__ (optional): The name of the Artifact to be returned. Only one name can be used. You can search for partial names by using the contains function.
+            
+            Supported operator: ‘eq’
+            Supported function: ‘contains(name,’html’)'
+            
+            For example, the following string returns all Artifacts that contain ‘html’ in their name:
+            
+            $filter=contains(name,’order’)
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $orderby
+          in: query
+          description:  |
+            The order in which results should be sorted, either ascending order using __asc__ or descending order using __desc__, based on one of the following Case Folder properties: name, owner, ownerSub, ownerSandbox, creationDate, lastModifiedDate, lastModifiedBy, publishedVersion, latestVersion. 
+            
+            For example, the following string sorts results in ascending order by name:
+            
+            $orderby=name asc
+          required: false
+          type: string
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Artifacts in the result, rather than the Artifacts themselves. 
+
+            Note: If $count is used, $skip, $top or $orderby cannot be used.
+          required: false
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns the Artifacts matching the specified criteria or a simple count if $count was specified
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Artifact'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /caseFolders/{folderName}/artifacts/{artifactName}/artifactVersions:
+    get:
+      summary: Returns all existing versions of a particular Artifact in a Case Folder.
+      description: This method lists both the latest version and all the archived versions of the Artifact.
+      operationId: getFolderArtifactVersions
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Case Folder that contains the Artifact.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact for which versions should be returned.
+          required: true
+          type: string
+        - name: $sandbox
+          in: query
+          description: The id of the Sandbox that contains the Case Folder.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of versions of the specified Artifact in the result, rather than the versions themselves. 
+
+            Note: If $count is used, $skip or $top cannot be used.
+          required: false
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns all versions of the specified Artifact or a simple count if $count was specified.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Artifact'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Internal server error.  
+          schema:
+            $ref: '#/definitions/Error'
+  /caseFolders/{folderName}/artifacts/{artifactName}/:
+    delete:
+      summary: Deletes the latest version of an Artifact from a particular Case Folder.
+      description: |
+        This method deletes the latest version of the Artifact from the Case Folder:
+        
+        * If this is the only version of the Artifact, the Case Folder no longer references it.
+        * If one or more older versions of the Artifact exist, the Case Folder is updated to reference the most recent version instead.
+      operationId: deleteFolderArtifact
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Case Folder that contains the Artifact.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact to be deleted.
+          required: true
+          type: string
+        - name: $sandbox
+          in: query
+          description: The id of the Sandbox that contains the Case Folder. 
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Artifact has been deleted.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in user is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified Resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /caseFolders/{folderName}/artifacts/{artifactName}/upload/:
+    post: 
+      summary: Uploads a new or updated Artifact to a particular Case Folder.
+      description: |
+        * If an Artifact with the specified artifactName does not already exist in the latestVersion of the Case Folder, the contents of the uploaded file are used to create a new Artifact (with artifactversion=1).
+        * If an Artifact with the specified artifactName already exists in the latestVersion of the Case Folder, the contents of the uploaded file are used to update the existing Artifact (whose artifactversion is incremented by 1).
+      operationId: createFolderArtifact
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Case Folder to which the Artifact is to be uploaded.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact to be created or updated. Note that this name does not have to match the name of the file being uploaded.
+          required: true
+          type: string
+        - name: $sandbox
+          in: query
+          description: The id of the Sandbox that contains the Case Folder.
+          required: true
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: description
+          in: query
+          description: A suitable description for the new or updated Artifact.
+          type: string
+        - name: artifactContents
+          in: formData
+          description: |
+            The file to be used to update the Artifact.
+            
+            Note: The file must be specified in the request as a multipart/form-data attachment.
+          required: true
+          type: file
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns a message indicating that new Artifacts have been created, listing the number of records created (for new or updated Artifacts) and the number of records not modified (for unchanged Artifacts).
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'           
+  /orgFolders/:
+    get:
+      summary: Returns Org Folders in the subscription.
+      description: ""
+      operationId: getOrgFolders
+      parameters:
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Org Folders to be returned. The expression can contain the following operands:
+            
+            * __name__ (optional): The name of the Org Folder to be returned. Only one name can be used. You can search for partial names by using the contains function.
+            
+              Supported operator: ‘eq’
+              Supported function: ‘contains(name,’value’)'
+            
+              For example, the following string returns all Org Folders that contain 'documents' in their name:
+            
+                $filter=contains(name,’documents’)
+            
+            * __extRef__ (optional): The extRef associated with the Org Folders to be returned. (An extRef value can be assigned to an Org Folder when it is created.)
+            
+              Supported operator: ‘eq’
+              Supported function: ‘contains(extRef,’value’)'
+            
+              For example, the following string returns all Org Folders that contain 'app1' in their extRef:
+            
+                $filter=contains(extRef,’app1’)
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $orderby
+          in: query
+          description: |
+            The order in which results should be sorted, either ascending order using __asc__ or descending order using __desc__, based on one of the following Org Folder properties: name, owner, ownerSub, ownerSandbox, creationDate, lastModifiedDate, lastModifiedBy, publishedVersion, latestVersion. 
+            
+            For example, the following string sorts results in ascending order by name:
+            
+              $orderby=name asc
+          required: false
+          type: string
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Org Folders in the result, rather than the Org Folders themselves. 
+
+            Note: If $count is used, $skip, $top or $orderby cannot be used.
+          required: false
+          type: string
+      tags:
+        - Folders
+      responses:
+        200:
+          description: OK - Returns the Org Folders matching the specified criteria or a simple count if $count was specified.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/OrgFolder'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Creates a new, empty Org Folder.
+      description: The Artifact methods can be used later to add content to the Org Folder.
+      operationId: createOrgFolder
+      parameters:
+      - name: details
+        in: body
+        description: |
+          The required details for the new Org Folder:
+          
+          * __name__ (required): Unique name (within the subscription) for the new Org Folder.
+          
+          * __extRef__ (optional): Reference to associate with the Org Folder. An extRef value can be used to associate multiple Org Folders, and can be used in a $filter parameter when searching for Org Folders.
+          
+          * __tags__: Not currently used by this method - if specified it will be ignored.
+        required: true
+        schema:
+          $ref: '#/definitions/Application'
+      tags:
+        - Folders
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Org Folder has been successfully created.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /orgFolders/{folderName}/:
+    get:
+      summary: Returns a particular Org Folder.
+      description: ""
+      produces:
+        - application/json
+      operationId: getOrgFolderByName
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Org Folder to be returned.
+          required: true
+          type: string
+      tags:
+        - Folders
+      responses:
+        200:
+          description: OK - Returns the specified Org Folder.
+          schema:
+            $ref: '#/definitions/OrgFolder'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a particular Org Folder.
+      description: |
+        Note: This method deletes the Org Folder and all associated Artifacts. It cannot be undone.
+      operationId: deleteOrgFolder
+      parameters:
+        - name: folderName
+          in: path
+          description: Name of the Org Folder to delete.
+          required: true
+          type: string
+      tags:
+        - Folders
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Org Folder has been successfully deleted.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /orgFolders/{folderName}/artifacts/:
+    get:
+      summary: Returns Artifacts for a particular Org Folder.
+      description: The latest version of each Artifact is returned. (The latest version is the one with the highest artifactVersion.)
+      operationId: getOrgFolderArtifacts
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Org Folder for which Artifacts are to be returned.
+          required: true
+          type: string
+        - name: $filter
+          in: query
+          description: |
+            A filter expression that defines the Artifacts to be returned. The expression can contain the following operand: 
+            
+            * __name__ (optional): The name of the Artifact to be returned. Only one name can be used. You can search for partial names by using the contains function.
+            
+              Supported operator: ‘eq’
+              Supported function: ‘contains(name,’html’)'
+            
+              For example, the following string returns all Artifacts that contain ‘html’ in their name:
+            
+                $filter=contains(name,’order’)
+          required: false
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $orderby
+          in: query
+          description:  |
+            The order in which results should be sorted, either ascending order using __asc__ or descending order using __desc__, based on one of the following Org Folder properties: name, owner, ownerSub, ownerSandbox, creationDate, lastModifiedDate, lastModifiedBy, publishedVersion, latestVersion. 
+            
+            For example, the following string sorts results in ascending order by name:
+            
+              $orderby=name asc
+          required: false
+          type: string
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of Artifacts in the result, rather than the Artifacts themselves. 
+
+            Note: If $count is used, $skip, $top or $orderby cannot be used.
+          required: false
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns the Artifacts matching the specified criteria or a simple count if $count was specified.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Artifact'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /orgFolders/{folderName}/artifacts/{artifactName}/artifactVersions:
+    get:
+      summary: Returns all existing versions of a particular Artifact in an Org Folder.
+      description: This method lists both the latest version and all the archived versions of the Artifact.
+      operationId: getOrgFolderArtifactVersions
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Org Folder that contains the Artifact.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact for which versions should be returned.
+          required: true
+          type: string
+        - name: $skip
+          in: query
+          description: |
+            The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $top
+          in: query
+          description: |
+            The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+          required: false
+          type: string
+          maxLength: 28 
+          pattern: '^\d{1,28}$' 
+        - name: $count
+          in : query
+          description: |
+            If set to 'TRUE', returns the number of versions of the specified Artifact in the result, rather than the versions themselves. 
+
+            Note: If $count is used, $skip or $top cannot be used.
+          required: false
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns all versions of the specified Artifact or a simple count if $count was specified
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Artifact'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Internal server error.  
+          schema:
+            $ref: '#/definitions/Error'
+  /orgFolders/{folderName}/artifacts/{artifactName}/:
+    delete:
+      summary: Deletes the latest version of an Artifact from a particular Org Folder.
+      description: |
+        This method deletes the latest version of the Artifact from the Org Folder:
+        
+        * If this is the only version of the Artifact, the Org Folder no longer references it.
+        * If one or more older versions of the Artifact exist, the Org Folder is updated to reference the most recent version instead.
+      operationId: deleteOrgFolderArtifact
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Org Folder that contains the Artifact.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact to be deleted.
+          required: true
+          type: string
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns a message indicating that the Artifact has been deleted.
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in user is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified Resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+  /orgFolders/{folderName}/artifacts/{artifactName}/upload/:
+    post: 
+      summary: Uploads a new or updated Artifact to a particular Org Folder.
+      description: |
+        * If an Artifact with the specified artifactName does not already exist in the Org Folder, the contents of the uploaded file are used to create a new Artifact (with artifactversion=1).
+        * If an Artifact with the specified artifactName already exists in the Org Folder, the contents of the uploaded file are used to update the existing Artifact (whose artifactversion is incremented by 1).
+      operationId: createOrgFolderArtifact
+      consumes: 
+        - multipart/form-data
+      parameters:
+        - name: folderName
+          in: path
+          description: The name of the Org Folder to which the Artifact is to be uploaded.
+          required: true
+          type: string
+        - name: artifactName
+          in: path
+          description: The name of the Artifact to be created or updated. Note that this name does not have to match the name of the file being uploaded.
+          required: true
+          type: string
+        - name: description
+          in: query
+          description: A suitable description for the new or updated Artifact.
+          type: string
+        - name: artifactContents
+          in: formData
+          description: |
+            The file to be used to update the Artifact.
+            
+            Note: The file must be specified in the request as a multipart/form-data attachment.
+          required: true
+          type: file
+      tags:
+        - Artifacts
+      responses:
+        200:
+          description: OK - Returns a message indicating that new Artifacts have been created, listing the number of records created (for new or updated Artifacts) and the number of records not modified (for unchanged Artifacts).
+          schema:
+            $ref: '#/definitions/Status'
+        400:
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        403:
+          description: Forbidden - The logged in User is not authenticated, or does not have access to the requested resource(s). See the error details for more information.
+        404: 
+          description: Not found - The specified resource does not exist in this subscription.
+        500:
+          description: Unexpected error - See the error details for more information.  
+          schema:
+            $ref: '#/definitions/Error'
+        507:
+          description: Subscription storage limit exceeded.
+          schema:
+            $ref: '#/definitions/Error'           
+tags:
+  - name: Applications
+    description: Methods on Applications and System Applications.
+  - name: ApplicationVersions
+    description: Methods on ApplicationVersions.
+  - name: Artifacts
+    description: Methods on Application Artifacts.
+  - name: Folders
+    description: Methods on Folders.
+definitions:
+  Application:
+    type: object
+    description: The definition of an Application, System Application, Case Folder or Org Folder. (This object is used for the definition of all four resources.)
+    properties:
+      id:
+        type: string
+        description: The internal id of the object (used by the Web Resource Provisioner Service).
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      name:
+        type: string
+        description: The name (and unique identifier) of the object.
+      owner:
+        type: string
+        description: The id of the User who owns the object.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      ownerSub:
+        type: string
+        description: The id of the subscription to which the object belongs.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      ownerSandbox:
+        type: string
+        description: The id of the Sandbox to which the object belongs.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      creationDate:
+        type: string
+        description: The date on which the object was created.
+      lastModifiedDate:
+        type: string
+        description: The date on which the object was last modified.
+      lastModifiedBy:
+        type: string
+        description: The id of the User who last modified the object.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      publishedVersion:
+        type: string
+        description: The currently published Version of the object.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      latestVersion:
+        type: string
+        description: The latest Version of the object.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      publishedVersionId:
+        type: string
+        description: The internal id of the published version of the object (used by the Web Resource Provisioner Service).
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      latestVersionId:
+        type: string
+        description: The internal id of the latest version of the object (used by the Web Resource Provisioner Service).
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      checksum:
+        type: string
+        description: The publish checksum, used to determine if the object has changed.
+      extRef:
+        type: string
+        description: The external reference to the object.
+      tags:
+        type: array
+        items:
+          $ref: '#/definitions/Tag'
+      descriptor:
+        type: string
+        description: The contents of the Application's or System Application's {appName}.app.desc.json descriptor file (if it has one). This property is not used for a Case Folder.
+    required:
+      - name
+  ApplicationVersion:
+    type: object
+    description: The Definition of a particular version of an Application.
+    properties:
+      id:
+        type: string
+        description: The internal id of the ApplicationVersion (used by the Web Resource Provisioner Service).
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      ownerApp:
+        type: string
+        description: The id of the Application that owns the ApplicationVersion.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      version:
+        type: string
+        description: The version number (and unique identifier) of the ApplicationVersion.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      name:
+        type: string
+        description: The name of the ApplicationVersion.
+      creationDate:
+        type: string
+        description: The date on which the ApplicationVersion was created.
+      lastModifiedDate:
+        type: string
+        description: The date on which the ApplicationVersion was last modified.
+      lastModifiedBy:
+        type: string
+        description: The id of the User who last modified the application.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      permissions:
+        type: integer
+        description: The permissions for the ApplicationVersion (not currently used).
+      label:
+        type: string
+        description: The label to display for this ApplicationVersion.
+    required:
+      - name
+  Artifact:
+    type: object
+    description: |
+      The definition of an Artifact. An Artifact can be:
+      * a file or folder within an Application
+      * a file within a Case Folder or Org Folder
+    properties:
+      id:
+        type: string
+        description: The internal id of the Artifact (used by the Web Resource Provisioner Service).
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      name:
+        type: string
+        description: The name (and unique identifier) of the Artifact. For an Application, this name is the full path to the Artifact.
+      artifactVersion:
+        type: string
+        description: The version of the Artifact.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      author:
+        type: string
+        description: The id of the User who created the Artifact (by first uploading it).
+      creationDate:
+        type: string
+        description: The date on which the Artifact was created.
+      lastModifiedDate:
+        type: string
+        description: The date on which the Artifact was last modified.
+      lastModifiedBy:
+        type: string
+        description: The id of the User who last modified the Artifact.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      artifactRef:
+        type: string
+        description: The external reference to the actual Artifact.
+      artifactCheckSum:
+        type: string
+        description: The checksum used to determine if the Artifact already exists.
+      ownerApp:
+        type: string
+        description: |
+          The id of the Application or Case Folder to which the Artifact belongs. 
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      size:
+        type: string
+        description: The size of the Artifact.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      mimeType:
+        type: string
+        description: The MIME type of the Artifact.
+      description:
+        type: string
+        description: The description of the Artifact.
+  CaseFolder: 
+    allOf: 
+      - $ref: '#/definitions/Application'
+      - type: object
+  OrgFolder:
+    allOf:
+      - $ref: '#/definitions/Application'
+      - type: object
+  SystemApplication: 
+    allOf: 
+      - $ref: '#/definitions/Application'
+      - type: object
+  Tag:
+    type: object
+    description: The definition of a Tag, which can  be used to categorize different types of customer-developed Application or System Application.
+    properties:
+      id:
+        type: string
+        description: The internal id of the Tag (used by the Web Resource Provisioner Service).
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+      name:
+        type: string
+        description: The name (and unique identifier) of the Tag.
+      ownerSub:
+        type: string
+        description: The id of the subscription to which the Tag belongs.
+        maxLength: 28 
+        pattern: '^\d{1,28}$' 
+  Status:
+    type: object
+    description: The definition of a response message.
+    properties:
+      message:
+        type: string
+        description: Text giving details about the result of the REST call.
+  ContextAttribute:
+    type: object
+    description: A name/value pair, used within Error, that provides contextual information about the Error.
+    properties:
+      name: 
+        type: string
+        description: The name of the context attribute.
+      value:
+        type: string
+        description: The value of the context attribute.
+  Error:
+    type: object
+    description: The definition of an error, providing a suitable message, error code and context information.
+    properties:
+      errorMsg:
+        type: string
+        description: The textual error message.
+      errorCode:
+        type: string
+        description: |
+          The following are the possible error codes in the Web Resource Provisioner Service (note that the description shown is not part of the error code):
+          - WR_UNKNOWN_ERROR - Internal unexpected error.
+          - WR_AUTHERROR - Authorization error when User is not allowed to access resource.
+          - WR_SUBLIMIT_EXCEEDED - Subscription storage limit exceeded.
+          - WR_INVALID_FILTER - Invalid $filter string provided.
+          - WR_INVALID_SUBSCRIPTION - Invalid $subscription provided.
+          - WR_APP_DOES_NOT_EXIST - Specified Application does not exit.
+          - WR_APP_BAD_UPDATE_DATA - Invalid Application update data provided.
+          - WR_APP_CREATE_ERROR_ALREADY_EXISTS - Application cannot be created as it already exists.
+          - WR_APP_LOCKED - Application is locked by another User, try again later.
+          - WR_APP_INVALID_SORTFIELD - Invalid $orderBy provided.
+          - WR_APP_INVALID_PAGINATION - Invalid $skip or $top provided.
+          - WR_APP_INVALID_NAME - Invalid name provided.
+          - WR_APP_INVALID_DESCRIPTOR - Invalid .app.desc.json descriptor file provided.
+          - WR_APP_BAD_SELECT - Invalid $select option provided.
+          - WR_APP_BAD_ZIP - Empty or invalid archive file provided.
+          - WR_APPVERSION_DOES_NOT_EXIST - Specified Application version does not exist.
+          - WR_APPVERSION_BAD_UPDATE_DATA - Invalid Application version update data provided.
+          - WR_ARTIFACT_DOES_NOT_EXIST - Specified Artifact does not exist.
+          - WR_ARTIFACT_BAD_UPDATE_DATA - Invalid Artifact update data provided.
+          - WR_ARTIFACT_CREATE_ERROR - Error creating Artifact.
+          - WR_ARTIFACT_CREATE_ERROR_NO_FILENAME - Error creating Artifact, no filename provided.
+          - WR_ARTIFACT_CREATE_ERROR_INVALID_PATH - Error creating Artifact, invalid path provided.
+          - WR_ARTIFACT_RENAME_INVALID_PATH - Error renaming Artifact, invalid path provided.
+          - WR_ARTIFACT_RENAME_ALREADY_EXISTS - Error renaming Artifact, target already exists.
+          - WR_ARTIFACT_BAD_FILTER - Error, invalid $filter supplied.
+          - WR_ARTIFACT_DELETE_ERROR_INVALID_PATH - Error deleting Artifact, invalid path supplied.
+          - WR_ARTIFACT_CREATE_ERROR_NO_SIZE_IN_ZIP - Error creating Artifact, archive file does not contain size data.
+          - WR_ARTIFACT_BAD_SELECT - Invalid $select provided.
+          - WR_FOLDER_DOES_NOT_EXIST - Specified Folder does not exist.
+          - WR_FOLDER_CREATE_ERROR_EXTENSION_NOT_ALLOWED - Create error, Artifact with supplied extension is not allowed.
+          - WR_FOLDER_ARTIFACT_CREATE_ERROR_NO_FILENAME - Create error, no filename supplied for Artifact.
+          - WR_FOLDER_INVALID_SANDBOX - Invalid $sandbox provided.
+          - WR_FOLDER_LOCKED - Folder is locked by another User, try again later.
+          - WR_FOLDER_INVALID_NAME - Invalid Folder name supplied.
+          - WR_FOLDER_INVALID_PAGINATION - Invalid $top or $skip provided.
+          - WR_FOLDER_INVALID_SORTFIELD - Invalid $orderBy provided.
+      stackTrace:
+        type: string
+        description: Stack trace details (only provided in a debug environment).
+      contextAttributes:
+        type: array
+        description: A name/value pair that provides contextual information about the Error.
+        items:
+          $ref: '#/definitions/ContextAttribute'

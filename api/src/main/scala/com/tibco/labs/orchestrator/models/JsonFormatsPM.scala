@@ -1,6 +1,6 @@
 package com.tibco.labs.orchestrator.models
 
-import com.tibco.labs.orchestrator.api.ProcessMiningRegistry.ActionPerformedSparkSingle
+import com.tibco.labs.orchestrator.api.registry.ProcessMiningRegistry.ActionPerformedSparkSingle
 import spray.json.RootJsonFormat
 
 //#json-formats

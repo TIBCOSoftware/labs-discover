@@ -6,7 +6,8 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.{Directives, Route}
 import akka.util.Timeout
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
-import com.tibco.labs.orchestrator.api.ProcessMiningRegistry._
+import com.tibco.labs.orchestrator.api.registry.ProcessMiningRegistry
+import com.tibco.labs.orchestrator.api.registry.ProcessMiningRegistry._
 import com.tibco.labs.orchestrator.models.pmConfigLiveApps
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, ExampleObject, Schema}

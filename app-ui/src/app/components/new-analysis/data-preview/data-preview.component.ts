@@ -1,6 +1,11 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {NavMenu} from '@tibco-tcstk/tc-web-components/dist/types/models/leftNav';
-import {SpotfireDocument, SpotfireFilter, SpotfireFilterSetting, SpotfireViewerComponent} from '@tibco/spotfire-wrapper';
+import {
+  SpotfireDocument,
+  SpotfireFilter,
+  SpotfireFilterSetting,
+  SpotfireViewerComponent
+} from '@tibco/spotfire-wrapper';
 import {map} from 'rxjs/operators';
 import {ConfigurationService} from 'src/app/service/configuration.service';
 import {DiscoverBackendService} from 'src/app/service/discover-backend.service';
@@ -9,9 +14,16 @@ import {OauthService} from 'src/app/service/oauth.service';
 import {getSFLink} from '../../../functions/templates';
 import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
 // import { Map, StartStop, TypeValue } from '../../../models_ui/analysis';
-import {encodeColumnName, START_NAME, STOP_NAME} from '../../../functions/analysis';
-import { Mapping, TypeValue } from 'src/app/model/models';
-import { StartStop } from 'src/app/models_ui/analysis';
+import {
+  convertDateFromLocale,
+  encodeColumnName,
+  START_NAME,
+  STOP_NAME,
+  transformMapping
+} from '../../../functions/analysis';
+import {Mapping, TypeValue} from 'src/app/model/models';
+import {StartStop} from 'src/app/models_ui/analysis';
+import {DateTime} from 'luxon';
 
 // TODO: Use these interfaces till nicolas de roche has changed his component
 export interface MySpotfireFilter {
@@ -38,7 +50,7 @@ export class DataPreviewComponent implements OnInit {
   @ViewChild('leftNav', {static: false}) leftNav: ElementRef<UxplLeftNav>;
   @ViewChild('analysis', {static: false}) analysisRef: SpotfireViewerComponent;
 
-  public spotfireServer:string;
+  public spotfireServer: string;
   public availableColumns = [];
   public leftNavTabs: NavMenu[];
   public page: string;
@@ -55,18 +67,17 @@ export class DataPreviewComponent implements OnInit {
   private previewDataTable: string;
 
   constructor(
-    protected dataserService: DatasetService,
-    protected backendService: DiscoverBackendService,
-    protected configService: ConfigurationService,
-    protected oService: OauthService
+    private dataserService: DatasetService,
+    private backendService: DiscoverBackendService,
+    private configService: ConfigurationService,
+    private oService: OauthService
   ) {
   }
 
   ngOnInit(): void {
-    this.previewDXPLocation = this.configService.config?.discover?.analyticsSF?.previewDXPLocation;
-    this.previewDataTable = this.configService.config?.discover?.analyticsSF?.previewDataTableName;
-    console.log('this.previewDataTable: ', this.previewDataTable)
-    this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
+    this.previewDXPLocation = this.configService.config?.discover?.analytics?.previewLocation;
+    this.previewDataTable = this.configService.config?.discover?.analytics?.previewTableName;
+    this.spotfireServer = getSFLink(this.configService.config?.discover?.analytics);
 
     this.leftNavTabs = [
       {id: 'Statistics', label: 'Summary'},
@@ -96,6 +107,8 @@ export class DataPreviewComponent implements OnInit {
     // Mapping has been updated in the left panel
     if (this.document) {
       // const normalizedMap = this.analysisData.Map
+
+      /* Moved to function
       const colMappObj = {};
       for (const key of Object.keys(this.mapping)) {
         if (this.mapping[key]) {
@@ -104,19 +117,19 @@ export class DataPreviewComponent implements OnInit {
             // this.mapping[key] = encodeColumnName(this.mapping[key]);
           }
         }
-      }
+      }*/
       this.document.setDocumentProperty('DatasetId', this.selectedDataset);
-      this.document.setDocumentProperty('ColumnMapping', JSON.stringify(colMappObj));
+      this.document.setDocumentProperty('ColumnMapping', JSON.stringify(transformMapping(this.mapping)));
       this.document.setDocumentProperty('Token', this.oService.token);
-      if(this.filters && this.filters.length > 0){
+      if (this.filters && this.filters.length > 0) {
         const ssAct: StartStop = {
-          startActivities : this.filters.find (v => v.category ===  'ActivitiesStart')?.values,
-          stopActivities: this.filters.find (v => v.category ===  'ActivitiesEnd')?.values,
+          startActivities: this.filters.find(v => v.category === 'ActivitiesStart')?.values,
+          stopActivities: this.filters.find(v => v.category === 'ActivitiesEnd')?.values,
         }
         this.document.setDocumentProperty('StartStopActivities', JSON.stringify(ssAct));
         const filterColumns: SpotfireFilter[] = [];
-        this.filters.forEach( f => {
-          if(f.name.indexOf(':') > -1) {
+        this.filters.forEach(f => {
+          if (f.name.indexOf(':') > -1) {
             const fType = f.name.split(':')
             if (fType.length > 1) {
               let fSettings: SpotfireFilterSetting;
@@ -210,6 +223,11 @@ export class DataPreviewComponent implements OnInit {
               category: sfSet.values ? 'values' : 'range',
               values: sfSet.values ? sfSet.values : [sfSet.lowValue, sfSet.highValue],
               includeEmpty: sfSet.includeEmpty
+            }
+            // Check specifically for range filter
+            if (sfFilter.filterType === 'RangeFilter') {
+              caseFilterObject.category = 'range'
+              caseFilterObject.values = [convertDateFromLocale(sfSet.lowValue), convertDateFromLocale(sfSet.highValue)]
             }
             this.upsertFilter(caseFilterObject);
           })

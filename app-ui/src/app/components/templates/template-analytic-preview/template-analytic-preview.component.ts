@@ -49,7 +49,7 @@ export class TemplateAnalyticPreviewComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.spotfireServer = getSFLink(this.configService.config?.discover?.analyticsSF);
+    this.spotfireServer = getSFLink(this.configService.config?.discover?.analytics);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

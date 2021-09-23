@@ -5,7 +5,7 @@
 */
 package com.tibco.labs.pm
 
-import com.tibco.labs.utils.commons.spark
+import com.tibco.labs.utils.commons.{logger, spark}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
@@ -19,7 +19,7 @@ object attributes {
     var df_attr = spark.emptyDataFrame
 
     Try{
-      println(s"###########  Processing df_events Attributes ##########")
+      logger.info(s"###########  Processing df_events Attributes ##########")
       // define a schema of type key,val (oh well it's a map)
       val Schema = MapType(StringType, StringType)
 
@@ -44,10 +44,10 @@ object attributes {
         DataFrameUtils.writeAnalysisJDBC(df_attr, databaseName, "attributes")
       }*/
 
-      println(s"########### Attributes Done ###########")
+      logger.info(s"########### Attributes Done ###########")
     } match {
       case Success(_) =>  return df_attr
-      case Failure(e) => println("Error in attributes : " +e.getMessage)
+      case Failure(e) => logger.error("Error in attributes : " +e.getMessage)
         //sendTCMMessage(s"$analysisId",s"$caseRef","error",s"${e.getMessage}",0, databaseName, LocalDateTime.now().toString)
         throw new Exception(e.getMessage)
     }

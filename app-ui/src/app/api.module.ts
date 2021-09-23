@@ -3,6 +3,8 @@ import { Configuration } from './configuration';
 import { HttpClient } from '@angular/common/http';
 
 import { CatalogService } from './api/catalog.service';
+import { ConfigurationService } from './api/configuration.service';
+import { InvestigationsService } from './api/investigations.service';
 import { RepositoryService } from './api/repository.service';
 import { VisualisationService } from './api/visualisation.service';
 

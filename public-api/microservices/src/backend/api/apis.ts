@@ -2,6 +2,10 @@ export * from './filesOperationsApi';
 import { FilesOperationsApi } from './filesOperationsApi';
 export * from './loginApi';
 import { LoginApi } from './loginApi';
+export * from './metricsApi';
+import { MetricsApi } from './metricsApi';
+export * from './miningDataApi';
+import { MiningDataApi } from './miningDataApi';
 export * from './sparkOneTimeJobApi';
 import { SparkOneTimeJobApi } from './sparkOneTimeJobApi';
 export * from './sparkPreviewJobApi';
@@ -21,4 +25,4 @@ export class HttpError extends Error {
 
 export { RequestFile } from '../model/models';
 
-export const APIS = [FilesOperationsApi, LoginApi, SparkOneTimeJobApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi];
+export const APIS = [FilesOperationsApi, LoginApi, MetricsApi, MiningDataApi, SparkOneTimeJobApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi];

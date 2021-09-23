@@ -6,18 +6,19 @@ import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
 import {Mapping} from '../model/mapping';
 import {cloneDeep} from 'lodash-es';
 import {MapDef} from '../models_ui/analysis';
+import { Automapping } from '../model/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutoMappingService {
 
-  private autoMapConfig: AutomapConfig;
+  private autoMapConfig: Automapping[];
   private MAX_DOUBLE_MAPPING_ITERATIONS = 1000;
 
   constructor(private configService: ConfigurationService,
               private messageService: MessageTopicService) {
-    this.autoMapConfig = this.configService.config.discover.autoMapConfig;
+    this.autoMapConfig = this.configService.config.discover.automap;
   }
 
   public compare(string1, string2): number {
@@ -54,7 +55,7 @@ export class AutoMappingService {
     const possibleMap = columns?.map(element => {
       return {result: this.findBestMatch(element.word, candidates), occurrences: element.occurrence};
     }).sort((a, b) => (a?.result?.bestMatch?.rating > b?.result?.bestMatch?.rating) ? -1 : 1);
-    if (possibleMap && possibleMap.length > 0 && possibleMap[0]?.result?.bestMatch?.rating > this.autoMapConfig.threshold) {
+    if (possibleMap && possibleMap.length > 0 && possibleMap[0]?.result?.bestMatch?.rating > 0.8){ // this.autoMapConfig.threshold) {
       return {
         columnName: candidates[possibleMap[0].result.bestMatchIndex],
         likelihood: possibleMap[0]?.result.bestMatch.rating,
@@ -169,7 +170,7 @@ export class AutoMappingService {
           async (_) => {
             this.messageService.sendMessage('news-banner.topic.message', 'Mappings saved...');
             await this.configService.refresh();
-            this.autoMapConfig = this.configService.config.discover.autoMapConfig;
+            this.autoMapConfig = this.configService.config.discover.automap;
           }
         );
       }

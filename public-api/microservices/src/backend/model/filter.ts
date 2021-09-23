@@ -13,33 +13,39 @@
 import { RequestFile } from './models';
 
 export class Filter {
-    'Description': string;
-    'Name'?: string;
-    'Type'?: string;
-    'Value'?: string;
+    'description'?: string;
+    'name'?: string;
+    'category'?: string;
+    'values'?: Array<string>;
+    'includeEmpty'?: object;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "Description",
-            "baseName": "Description",
+            "name": "description",
+            "baseName": "description",
             "type": "string"
         },
         {
-            "name": "Name",
-            "baseName": "Name",
+            "name": "name",
+            "baseName": "name",
             "type": "string"
         },
         {
-            "name": "Type",
-            "baseName": "Type",
+            "name": "category",
+            "baseName": "category",
             "type": "string"
         },
         {
-            "name": "Value",
-            "baseName": "Value",
-            "type": "string"
+            "name": "values",
+            "baseName": "values",
+            "type": "Array<string>"
+        },
+        {
+            "name": "includeEmpty",
+            "baseName": "includeEmpty",
+            "type": "object"
         }    ];
 
     static getAttributeTypeMap() {

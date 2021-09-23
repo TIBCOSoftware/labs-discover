@@ -18,37 +18,38 @@ import { Schedule } from './schedule';
 import { Schema } from './schema';
 
 export class PmConfigLiveApps {
-    'Schema': Array<Schema>;
-    'Dataset_Source': DatasetSource;
-    'Filter': Array<Filter>;
-    'Groups'?: Array<Filter>;
+    'schema': Array<Schema>;
+    'datasetSource': DatasetSource;
+    'filters'?: Array<Filter>;
+    'groups'?: Array<Filter>;
     'id': string;
+    'version': string;
     'token': string;
-    'Mapping': Mapping;
-    'Organization': string;
-    'Schedule': Schedule;
+    'mappings': Mapping;
+    'organization': string;
+    'schedule'?: Schedule;
 
     static discriminator: string | undefined = undefined;
 
     static attributeTypeMap: Array<{name: string, baseName: string, type: string}> = [
         {
-            "name": "Schema",
-            "baseName": "Schema",
+            "name": "schema",
+            "baseName": "schema",
             "type": "Array<Schema>"
         },
         {
-            "name": "Dataset_Source",
-            "baseName": "Dataset_Source",
+            "name": "datasetSource",
+            "baseName": "datasetSource",
             "type": "DatasetSource"
         },
         {
-            "name": "Filter",
-            "baseName": "Filter",
+            "name": "filters",
+            "baseName": "filters",
             "type": "Array<Filter>"
         },
         {
-            "name": "Groups",
-            "baseName": "Groups",
+            "name": "groups",
+            "baseName": "groups",
             "type": "Array<Filter>"
         },
         {
@@ -57,23 +58,28 @@ export class PmConfigLiveApps {
             "type": "string"
         },
         {
+            "name": "version",
+            "baseName": "version",
+            "type": "string"
+        },
+        {
             "name": "token",
             "baseName": "token",
             "type": "string"
         },
         {
-            "name": "Mapping",
-            "baseName": "Mapping",
+            "name": "mappings",
+            "baseName": "mappings",
             "type": "Mapping"
         },
         {
-            "name": "Organization",
-            "baseName": "Organization",
+            "name": "organization",
+            "baseName": "organization",
             "type": "string"
         },
         {
-            "name": "Schedule",
-            "baseName": "Schedule",
+            "name": "schedule",
+            "baseName": "schedule",
             "type": "Schedule"
         }    ];
 

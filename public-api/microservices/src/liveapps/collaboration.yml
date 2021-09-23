@@ -1,0 +1,2782 @@
+swagger: '2.0'
+info:
+  title: Note Manager Service
+  description: |+
+    The TIBCO Cloud(TM) Live Apps Note Manager Service allows users of an application to use Notes to collaborate around a _Related Item_. The Related Item can be any element of the application you choose, for example, a case, person, work item, trouble ticket, and so on.
+
+    Each Note that is posted is associated with a single Related Item, which is identified by a unique Related Item type and ID.
+
+    Notes are conceptually organized under Collections, Topics, and Threads:
+
+    - A __Collection__ is a name used to group Topics together.  See $relatedItemCollection.
+
+    - A __Topic__ represents all of the Notes activity for a given Related Item. The Topic is used to track all activity associated with the Related Item. Each Topic can have one or more Threads. A Topic is automatically deleted if the last Thread on a Topic is deleted.  A Topic can also be explicitly deleted (see Topic Lifecycle below), which deletes any Threads or Notifications set to life-cycle with the Related Item associated with the Topic.
+
+    - A __Thread__ represents all of the Notes activity for a given top-level Note. A top-level Note is a Note that is posted directly to a Related Item and not in reply to another Note. All of the reply Notes to this top-level Note and subsequent descendant Notes are part of this Thread.  A Thread is automatically deleted if the top-level Note is deleted.
+
+    This forms a hierarchy that can be represented like this:
+
+    - Related Item 1 (Topic 1)
+        - Top-level Note 1.1 (Thread 1.1)
+            - Reply Note 1.1.1
+                - Reply to reply 1.1.1.1
+                - ... etc.
+            - Reply Note 1.1.2
+        - Top-level Note 1.2 (Thread 1.2)
+            - Reply Note 1.2.1
+            - ... etc.
+    - Related Item 2 (Topic 2)
+        - Top-level Note 2.1 (Thread 2.1)
+            - Reply Note 2.1.1
+        - Top-level Note 2.2 (Thread 2.2)
+            - Reply Note 2.2.1
+            - Reply Note 2.2.2
+            - ... etc.
+
+    - See the GET /notes description for additional details on hierarchy usage and options for paging large lists of Notes.
+
+    A Note consists of a title and optionally some simple free text.
+
+    Any User can create a top-level Note. A User can always edit or delete their own Notes (that is, Notes they created). The one exception to this is setting the Note isHidden property. The Note isHidden property cannot be changed by the Note creator unless they also have a ThreadRole of OWNER or MODERATOR. The title and text of a Note can only be modified by the User who created the Note.
+
+    If a parent Note is deleted, all reply Notes are implicitly deleted, regardless of who created the reply Notes.
+
+    A Note can optionally contain Attributes, which can be used by the client application to classify or give further meaning to the Note. These Attributes are not modelled, therefore it is up to the client application to project the appropriate meaning. An example usage might be to specify metadata in a Note Attribute that provides 'location' information related to a work process or document, which could be used by the client application to display a Note in a specific context.
+
+    When a new Thread is created, an optional list of Collection name values can be specified (see ThreadNote.relatedItemCollection).  This is used to associate the Thread's Topic to the given Collection names.
+
+    Notifications can optionally be specified for Collections, Topics, and Threads so that a notice is sent when a Note is added, and optionally when a Note is updated or deleted.  Notifications apply to Users directly or through Group membership.  If Notifications include a User more than once for a given notice event, only a single Notification is sent.  To receive a Notification, a User must have a Role that allows viewing the Notes in the Thread.  The notifications property of a ThreadNote can optionally be set when a Thread is created.  If notifications are not set in the ThreadNote, no Notifications are sent on the Thread until Notifications are added using another request.
+
+    __Note Types__
+    When a Note is created, it must be given one of the following types:
+
+    - ISSUE
+    - RESOLUTION
+    - QUESTION
+    - ANSWER
+    - INFORMATIONAL
+
+    Once a Note is created, its type can't be changed.
+
+    A top-level Note must be an ISSUE, QUESTION, or INFORMATIONAL type.  A RESOLUTION Note can only reply to an ISSUE Note and an ANSWER Note can only reply to a QUESTION Note.
+
+    An ISSUE, QUESTION, or INFORMATIONAL type Note can be a reply to any other Note.
+
+    An INFORMATIONAL Note is a general comment that does not have any specific reply type.
+
+    __Note Status__
+    Depending on the type of Note, and its current state, each Note has one of the following status values:
+
+    - UNRESOLVED
+    - UNANSWERED
+    - RESOLVED
+    - ANSWERED
+    - ACCEPTED
+    - UNACCEPTED
+    - UNCLASSIFIED
+
+    This value is set by the service to indicate the current status of each Note.  These are set as follows:
+
+    - ISSUE Notes:
+        - These initially have a status of UNRESOLVED.
+        - When a RESOLUTION reply Note is accepted, the status is changed to RESOLVED.
+        - If a previously accepted RESOLUTION reply Note is unaccepted, the status is changed back to UNRESOLVED.
+
+    - QUESTION Notes:
+        - These initially have a status of UNANSWERED.
+        - When an ANSWER reply Note is accepted, the status is changed to ANSWERED.
+        - If a previously accepted ANSWER reply Note is unaccepted, the status is changed back to UNANSWERED.
+
+    - RESOLUTION and ANSWER Notes:
+        - These initially have a status of UNACCEPTED.
+        - When a RESOLUTION or ANSWER reply Note is accepted by an ISSUE or QUESTION Note (respectively), the status is changed to ACCEPTED.
+        - If a previously accepted RESOLUTION or ANSWER reply Note is unaccepted, the status is changed back to UNACCEPTED.
+
+    - INFORMATIONAL Notes:
+        - These have a status of UNCLASSIFIED, which does not change.
+
+    __Thread Roles__
+    Roles can optionally be assigned to a Thread to add or limit specific access to Notes in a Thread. The ThreadRole types are summarized below:
+
+    __Cumulative Roles:__
+
+    The following four Roles are cumulative, with each successive Role adding more access to what is granted by the previous Role.
+
+    - A VIEWER can:
+
+        - View Notes or the Thread
+        - Receive Notifications
+        - Add, modify, or remove Notifications for themselves on a Collection, Topic, or Thread
+
+    - A REPLIER has VIEWER access and can also:
+
+        - Add a reply Note
+
+    - A MODERATOR has REPLIER access and can also:
+
+        - Hide or unhide a Note
+        - Accept or unaccept a reply
+        - Set notificationUrl and notificationLabel values
+        - Lock or unlock the Thread
+        - Add, modify, or remove Thread Notifications and Roles
+
+    - An OWNER has MODERATOR access and can also:
+
+        - Edit Note Attributes
+        - Delete Notes
+        - Delete Threads (see THREAD_DELETER Role)
+        - Update the relatedItemCollection value of a Topic (see COLLECTION_MODERATOR Role)
+
+    __Non-Cumulative Roles:__
+
+    The following Roles are not cumulative, but grant specific types of access.
+
+    - A THREAD_DELETER can:
+
+      - Delete Threads
+
+        A Thread is deleted when:
+
+        - The top-level Note for a Thread is deleted.
+        - The Topic a Thread belongs to is deleted.
+        - A Topic is deleted that matches the Related Item that a Thread is lifecycled with.
+
+    - A THREAD_VIEWER can:
+
+      - View Threads
+
+        This allows the User to view the Thread but not the Notes in the Thread.
+
+    - A COLLECTION_MODERATOR can:
+
+      - Update the relatedItemCollection value of a Topic
+
+        This allows the User to update the relatedItemCollection value of a Topic using the PUT /topics request.  The User must have COLLECTION_MODERATOR access to all of the Threads that are under a Topic to perform this request.
+
+    A Role can be assigned to a specific User or to a Group (Groups are set up using TIBCO(R) Live Apps Group Administration).  Roles can be assigned at the time a Thread is created (a new top-level Note is added) by setting the ThreadNote roles property.  Roles can also be added, modified, or deleted after the Thread is created by updating the roles property of a Thread.
+
+    - If the ThreadNote roles property is not set (null or omitted) when a Thread is created, a REPLIER Role for the 'System: ALL_USERS' Group is automatically created, which gives all users the ability to view or reply to a Note.
+    - If the ThreadNote roles property is set to an empty Array when a Thread is created, then no Roles are assigned for the Thread.
+    - The User who creates a Thread is implicitly assigned an OWNER Role for that Thread.  A User that is a member of the 'System: ADMINISTRATOR' Group is implicitly assigned an OWNER Role for all Threads.  This is an inherent behavior that cannot be modified.
+
+    If a User possesses multiple Roles, access is granted based on the least restrictive Role.
+
+    __Topic Lifecycle__
+
+    Topics that are created for Related Item Types that are specific to Live Apps internal use ('LIVEAPPS_', 'DT_', or 'RT_') are automatically deleted when the associated Related Item is deleted from the system.
+
+    For custom-defined Related Item Types, the DELETE /topics request can be used to delete a Topic for a specific Related Item.  Additionally, Threads and Collection Notifications can be associated with a Related Item so that they are also deleted when the associated Topic is deleted using the DELETE /topics request.  This is set on a Thread using the lifecycledWithType and lifecycledWithId properties of a ThreadNote (for a new Thread using POST /notes) or a Thread (for updating an existing Thread using PUT /threads).  This is set for a Collection Notification using the NotifyCollection lifecycledWithType and lifecycledWithId properties.
+
+    Note that Threads and Collection Notifications are only life-cycled when an explicit DELETE /topics request is made, and are not effected by a Topic that is automatically deleted as a result of being empty.
+
+    When a Topic is deleted, all Threads and Notes under that Topic are deleted.  When a life-cycled Thread is deleted, all Notes under that Thread are deleted.  No Notifications are sent when Notes are deleted as a result of a Topic or Thread being deleted by one of the DELETE /topics requests.
+
+    See the description under DELETE /topics for details on how the lifecycledWithType and lifecycledWithId properties are applied.
+
+  termsOfService: ../../contexthelp/common/TIB_bpm-cloud_1.0.0_license.pdf
+  contact:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+    email: liveapps@tibco.com
+  license:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+  version: 1.0.0
+schemes:
+  - https
+basePath: /collaboration/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+  - text/plain
+tags:
+  - name: Notes
+    description: Methods on Notes
+  - name: Threads
+    description: Methods on Threads
+  - name: Topics
+    description: Methods on Topics
+  - name: Attributes
+    description: Methods on Attributes
+  - name: Roles
+    description: Methods on Roles
+  - name: Notifications
+    description: Methods on Notifications
+  - name: LastAccessChanges
+    description: Methods on LastAccessChanges
+
+paths:
+  '/notes':
+    post:
+      summary: Creates a top-level Note.
+      description: |+
+        Creates a new top-level Note and Thread for the Related Item specified.
+
+        <br>A top-level Note is a Note that is posted directly to a Related Item and not in reply to another Note.
+
+        <br>When Notifications are specified on a ThreadNote, these are inherently creating Thread Notifications, and notifyCollection, topicId, and threadId must be omitted or null.
+
+        <br>For notes that need to restrict who can view the note content, you should set the role for the note to VIEWER at the time the top-level note is created (in the ThreadNote payload of this request).  If Notifications are currently set on the Topic or a Collection associated with the Topic, these notifications are sent based on initial Roles set with the top-level Note when created.  If no VIEWER Role is set then by default there are no VIEWER restrictions to sending these notifications.  If you wait to set the role at a later time, a User may view the Note or receive notifications before you submit the request to restrict access.
+
+        <br>__Note__ - Do not set the __id__ value.  This is generated by the service and returned in the response.  Also, __replyAcceptedId__ does not apply, as no reply Note can yet exist for the Note being created.
+      parameters:
+        - $ref: '#/parameters/addThreadNote'
+      tags:
+        - Notes
+      operationId: createNote
+      responses:
+        '200':
+          description: OK - The identifier for the created Note.
+          schema:
+            description: The identifier for the created Note.
+            type: string
+        '400':
+          description: 'Bad Request - The Related Item type or ID value is invalid or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates Notes.
+      description: Updates Notes.  Either all Notes are updated, or no Notes are updated if an error occurs.
+      parameters:
+        - $ref: '#/parameters/notes'
+      tags:
+        - Notes
+      operationId: updateNotes
+      responses:
+        '200':
+          description: OK - The Notes that have been updated.
+          schema:
+            title: notes
+            type: array
+            items:
+              $ref: '#/definitions/Note'
+        '400':
+          description: 'Bad Request - The request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - At least one of the Notes does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Gets Notes.
+      description: |+
+        Returns Notes determined by the supplied query parameters.  The $filter parameter can be used to qualify which Notes are returned (for more information, see the _Filtering and Sorting_ Key Concepts page.
+
+        <br>Notes can be returned in either of two ordered forms:
+
+        - In an order that represents the hierarchy as a tree.
+        - As a non-hierarchical list of Notes.
+
+        In each case, the Notes are returned in a flat array (there is no nesting of Notes).  The hierarchy is represented by the ordering of the Notes in the array.
+
+        <br>The three query parameter options shown below return Notes in an order that represents the hierarchy as a tree:
+
+        - $relatedItemType and $relatedItemId - When specified, returns a hierarchy of Notes matching the given Related Item Type and ID.
+        - $relatedItemCollection - When specified, returns a hierarchy of Notes matching the Related Items associated with the relatedItemCollection values.
+        - $repliesToId - When specified, returns a hierarchy of Notes descending from the Note matching the given repliesToId.
+
+        Otherwise, Notes are returned as a non-hierarchical list of Notes and the $filter parameter is applied to all Notes.
+
+        <br>Details for the hierarchical options are listed below:
+
+        Getting Notes for a Related Item or a Related Item Collection in Hierarchical Order
+        ---
+        When $relatedItemType and $relatedItemId are set, this returns a hierarchy of Notes matching the Related Item specified in the path parameters and determined by any additional query parameters.  Similarly, when $relatedItemCollection is set, this returns a hierarchy of Notes matching the Related Items associated with the relatedItemCollection value and determined by any additional query parameters.  Notes are returned in an order that represents the hierarchy as a tree.  The Note.level value indicates its nested position.
+
+        <br>As an example, the following JSON response (a flat array of Notes):
+
+            [
+              {"title":"Top-level Note A", "level":1, ...},
+              {"title":"Reply Note A.a", "level":2, ...},
+              {"title":"Reply Note A.b", "level":2, ...},
+              {"title":"Reply Note A.b.a", "level":3, ...},
+              {"title":"Reply Note A.c", "level":2, ...},
+              {"title":"Top-level Note B", "level":1, ...},
+              {"title":"Reply Note B.a", "level":2, ...},
+              {"title":"Reply Note B.a.a", "level":3, ...},
+              {"title":"Reply Note B.b", "level":2, ...}
+            ]
+
+        would represent a hierarchy like this:
+
+        - Top-level Note A
+            - Reply Note A.a
+            - Reply Note A.b
+                - Reply Note A.b.a
+            - Reply Note A.c
+        - Top-level Note B
+            - Reply Note B.a
+                - Reply Note B.a.a
+            - Reply Note B.b
+
+        The $filter parameter is applied only to the top-level Notes (Note.level = 1) and can be used to qualify which top-level Notes are returned.  These Notes, and all Notes descending from these, are returned in hierarchical order.  Notes at the same level are sorted as specified by the $orderby query parameter.  The hierarchical level can be limited with the $level query parameter.
+
+        Getting Reply Notes in Hierarchical Order
+        ---
+
+        When $repliesToId is set, this returns a hierarchy of Notes descending from the Note matching the given repliesToId and determined by the supplied query parameters.  Notes are returned in an order that represents the hierarchy as a tree.  The Note.level value indicates its nested position.
+
+        <br>As an example, the following JSON response (a flat array of Notes):
+
+            [
+              {"title":"Reply to noteId - A", "level":n, ...},
+              {"title":"Reply Note A.a", "level":n+1, ...},
+              {"title":"Reply Note A.b", "level":n+1, ...},
+              {"title":"Reply Note A.b.a", "level":n+2, ...},
+              {"title":"Reply Note A.c", "level":n+1, ...},
+              {"title":"Reply to noteId - B", "level":n, ...},
+              {"title":"Reply Note B.a", "level":n+1, ...},
+              {"title":"Reply Note B.a.a", "level":n+2, ...},
+              {"title":"Reply Note B.b", "level":n+1, ...}
+            ]
+
+        would represent a hierarchy like this:
+
+        - Reply to noteId - A
+            - Reply Note A.a
+            - Reply Note A.b
+                - Reply Note A.b.a
+            - Reply Note A.c
+        - Reply to noteId - B
+            - Reply Note B.a
+                - Reply Note B.a.a
+            - Reply Note B.b
+
+        The $filter parameter is applied only to the direct reply Notes to the Note matching the given repliesToId and can be used to qualify which of these reply Notes are returned.  These Notes and all Notes descending from these are returned in hierarchical order.  Notes at the same level are sorted as specified by the $orderby query parameter.  The hierarchical level can be limited with the $level query parameter.
+
+        Paging Hierarchical Notes
+        ---
+
+        Paging can be used to limit the amount of data returned by each request when dealing with a large number of Notes.  The $skip and $top query parameters can be used for this.  The $count=true query parameter might be used in an initial request to determine if paging is required.
+
+        <br>For hierarchical queries, the appropriate requests to use depends on how the Notes are displayed.  Two possible options are described here:
+
+        - Paging a fully expanded hierarchy:  In this scenario, the Notes retrieved are displayed in a fully expanded tree view and this view is then paged:
+          <br>
+          - Use $skip and $top applied to any of the hierarchical requests.
+          <br>
+        - Expanding and paging each level in the hierarchy:  For this scenario, the initial view shows only the top-level Notes.  Any reply Notes are then retrieved as needed to expand the view to include replies.  Each level in the hierarchy is paged on its own.
+
+          <br>- First GET the top-level Notes and use $skip and $top to page this top level:
+          <br>
+          - Use $relatedItemType and $relatedItemId with $level=1
+          - Or use $relatedItemCollection with $level=1
+          - Or use a non-hierarchical list with $filter set with level=1 and other filter values as needed.  Note that in the $filter expression the level refers to the Note.level property.  The $level query parameter has a distinctly different usage.  See the $level parameter description below.
+
+          <br>- Then expand each sub-level:
+          <br>
+          - Use $repliesToId with $level=1 and use $skip and $top to page this level.
+
+        When paging it is possible that Notes are added, deleted, or modified between page requests.  This can result in overlaps or omissions of Notes from one page request to the next in some cases.  When current data is required during paging, the GET /lastAccessChanges request and the isDescendantNewOrModified property of a specific Note can be used to check for such changes and update the page requests if needed.
+
+      parameters:
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - $ref: '#/parameters/noteFilter'
+        - $ref: '#/parameters/noteOrderby'
+        - $ref: '#/parameters/noteSearch'
+        - $ref: '#/parameters/noteSelect'
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/relatedItemType'
+        - $ref: '#/parameters/relatedItemId'
+        - $ref: '#/parameters/relatedItemCollection'
+        - $ref: '#/parameters/repliesToId'
+        - $ref: '#/parameters/noteLevel'
+      tags:
+        - Notes
+      operationId: getNotes
+      responses:
+        '200':
+          description: OK - The Notes determined by the supplied query parameters.
+          schema:
+            title: notes
+            type: array
+            items:
+              $ref: '#/definitions/Note'
+        '400':
+          description: 'Bad Request - Invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+
+    delete:
+      summary: Deletes Notes.
+      description: Deletes Notes determined by the $filter query parameter, which is required.  The $filter is applied to only those Notes to which the User has delete access (the User's own Notes, and Notes in a Thread for which the User has at least an OWNER Role).
+      parameters:
+        - $ref: '#/parameters/noteFilter'
+      tags:
+        - Notes
+      operationId: deleteNotes
+      responses:
+        '200':
+          description: OK - No contents returned - Notes deleted successfully.
+        '400':
+          description: 'Bad Request - No filter is provided or invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/notes/{noteId}':
+    post:
+      summary: Creates a reply Note.
+      description: |+
+        Creates a new Note that is in reply to the Note matching the given ID.
+      parameters:
+        - $ref: '#/parameters/noteId'
+        - $ref: '#/parameters/addNote'
+      tags:
+        - Notes
+      operationId: createReplyNote
+      responses:
+        '200':
+          description: OK - The identifier for the created Note.
+          schema:
+            description: The identifier for the created Note.
+            type: string
+        '400':
+          description: 'Bad Request - The request payload is badly formed or reply type is not allowed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a Note.
+      description: |+
+        Updates the Note matching the given ID.  Any Attributes that exist at the time of update are replaced with the contents of the update.
+        <br>The id property of the payload must match the noteId specified on the URL.
+      parameters:
+        - $ref: '#/parameters/noteId'
+        - $ref: '#/parameters/updateNote'
+      tags:
+        - Notes
+      operationId: updateNote
+      responses:
+        '200':
+          description: OK - The Note that has been updated.
+          schema:
+              $ref: '#/definitions/Note'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Gets a Note.
+      description: Returns the Note matching the given ID.
+      parameters:
+        - $ref: '#/parameters/noteId'
+      tags:
+        - Notes
+      operationId: getNote
+      responses:
+        '200':
+          description: OK - The Note matching the given ID.
+          schema:
+            $ref: '#/definitions/Note'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a Note.
+      description: Deletes the Note matching the given ID.  The User must have delete access to the Note (the User's own Notes, and Notes in a Thread for which the User has at least an OWNER Role), or an error is returned.
+      parameters:
+        - $ref: '#/parameters/noteId'
+      tags:
+        - Notes
+      operationId: deleteNote
+      responses:
+        '200':
+          description: OK - No contents returned - Note deleted successfully.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/notes/{noteId}/attributes':
+    post:
+      summary: Creates a NoteAttribute.
+      description: Creates a new NoteAttribute for a Note.
+      parameters:
+        - $ref: '#/parameters/noteId'
+        - $ref: '#/parameters/addAttribute'
+      tags:
+        - Attributes
+      operationId: createAttribute
+      responses:
+        '200':
+          description: OK - A new NoteAttribute created successfully.
+          schema:
+            description: The identifier for the created NoteAttribute.
+            type: string
+        '400':
+          description: 'Bad Request - The ID value is not a valid number, the request payload is badly formed, or a resource matching the given NoteAttribute already exists.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates NoteAttributes.
+      description: Updates the NoteAttributes for a Note.  Either all NoteAttributes are updated, or none of them are updated if an error occurs.
+      parameters:
+        - $ref: '#/parameters/noteId'
+        - $ref: '#/parameters/attributes'
+      tags:
+        - Attributes
+      operationId: updateAttributes
+      responses:
+        '200':
+          description: OK - The NoteAttributes that have been updated.
+          schema:
+            title: attributes
+            type: array
+            items:
+              $ref: '#/definitions/NoteAttribute'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist or at least one of the NoteAttributes does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Gets NoteAttributes.
+      description: Returns NoteAttributes from the Note matching the id.
+      parameters:
+        - $ref: '#/parameters/noteId'
+      tags:
+        - Attributes
+      operationId: getAttributes
+      responses:
+        '200':
+          description: OK - The NoteAttributes determined by the supplied query parameters.
+          schema:
+            title: attributes
+            type: array
+            items:
+              $ref: '#/definitions/NoteAttribute'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/attributes/{attributeId}':
+    put:
+      summary: Updates a NoteAttribute.
+      description: |+
+        Updates the NoteAttribute matching the given ID.
+        <br>The id property of the payload must match the attributeId specified on the URL.
+      parameters:
+        - $ref: '#/parameters/attributeId'
+        - $ref: '#/parameters/updateAttribute'
+      tags:
+        - Attributes
+      operationId: updateAttribute
+      responses:
+        '200':
+          description: OK - The NoteAttribute that has been updated.
+          schema:
+            $ref: '#/definitions/NoteAttribute'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A NoteAttribute matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Gets a NoteAttribute.
+      description: Returns the NoteAttribute matching the given ID.
+      parameters:
+        - $ref: '#/parameters/attributeId'
+      tags:
+        - Attributes
+      operationId: getAttribute
+      responses:
+        '200':
+          description: OK - The NoteAttribute matching the given ID.
+          schema:
+            $ref: '#/definitions/NoteAttribute'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A NoteAttribute matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a NoteAttribute.
+      description: Deletes the NoteAttribute matching the given ID.  The User must have delete access to the NoteAttribute (the User has at least an OWNER Role for the Thread associated with this NoteAttribute), or an error is returned.
+      parameters:
+        - $ref: '#/parameters/attributeId'
+      tags:
+        - Attributes
+      operationId: deleteAttribute
+      responses:
+        '200':
+          description: OK - No contents returned - NoteAttribute deleted successfully.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A NoteAttribute matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/threads':
+    get:
+      summary: Gets Threads.
+      description: |+
+        Returns Threads determined by the supplied query parameters.  The $filter parameter can be used to qualify which Threads are returned (for more information, see the _Filtering and Sorting_ Key Concepts page).
+        - The User must have at least a VIEWER or a THREAD_VIEWER Role for this Thread.
+      parameters:
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - $ref: '#/parameters/threadFilter'
+        - $ref: '#/parameters/threadOrderby'
+        - $ref: '#/parameters/threadSelect'
+        - $ref: '#/parameters/count'
+      tags:
+        - Threads
+      operationId: getThreads
+      responses:
+        '200':
+          description: OK - The Threads determined by the supplied query parameters.
+          schema:
+            title: threads
+            type: array
+            items:
+              $ref: '#/definitions/Thread'
+        '400':
+          description: 'Bad Request - Invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/threads/{threadId}':
+    get:
+      summary: Gets a Thread.
+      description: |+
+        Returns the Thread matching the given ID.
+        - The User must have at least a VIEWER or a THREAD_VIEWER Role for this Thread.
+      parameters:
+        - $ref: '#/parameters/threadId'
+      tags:
+        - Threads
+      operationId: getThread
+      responses:
+        '200':
+          description: OK - The Thread matching the given ID.
+          schema:
+            $ref: '#/definitions/Thread'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Thread matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a Thread.
+      description: |+
+        Updates the Thread matching the given ID.  This request is used to update a Thread with one of these changes:
+        - set or clear the isLocked flag
+        - set or clear the lifecycledWithType and lifecycledWithId values
+        - add, update, or delete the roles set for this Thread
+
+        The Thread isLocked value can be set to allow or prevent further replies on this Thread.  When isLocked is set true, no new reply Notes are permitted for this Thread, but existing Notes can still be updated or deleted.
+        - The User must have at least a MODERATOR Role for this Thread to set isLocked.
+
+        The Thread lifecycledWithType and lifecycledWithId values can be set to identify the Topic that this Thread is life-cycled with.  To clear a previously set value, set both properties to an empty String (zero length value).  Otherwise, set both properties to a non-zero length value (limited to 100 characters in length).
+        - Only the Thread creator or an OWNER can change the lifecycledWithType and lifecycledWithId values.
+
+        When updating the Thread roles, new Roles are added, existing Roles are updated, and omitted Roles are deleted.  Either all ThreadRoles are updated, or none of them are updated if an error occurs.
+        - The User must have at least a MODERATOR Role for this Thread to set roles.
+        - Only the Thread creator or an OWNER can add, update, or delete an OWNER, THREAD_DELETER, or COLLECTION_MODERATOR Role.
+
+        The id property of the payload must match the threadId specified on the URL.
+      parameters:
+        - $ref: '#/parameters/threadId'
+        - $ref: '#/parameters/updateThread'
+      tags:
+        - Threads
+      operationId: updateThread
+      responses:
+        '200':
+          description: OK - The Thread that has been updated.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Thread matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/topics':
+    get:
+      summary: Gets Topics.
+      description: |+
+        Returns Topics determined by the supplied query parameters.  The $filter parameter can be used to qualify which Topics are returned (for more information, see the _Filtering and Sorting_ Key Concepts page).
+      parameters:
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - $ref: '#/parameters/topicFilter'
+        - $ref: '#/parameters/topicOrderby'
+        - $ref: '#/parameters/topicSelect'
+        - $ref: '#/parameters/count'
+      tags:
+        - Topics
+      operationId: getTopics
+      responses:
+        '200':
+          description: OK - The Topics determined by the supplied query parameters.
+          schema:
+            title: topics
+            type: array
+            items:
+              $ref: '#/definitions/Topic'
+        '400':
+          description: 'Bad Request - Invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a Topic specified by Related Item.
+      description: |+
+        Updates the Topic matching the Related Item specified by the $relatedItemType and $relatedItemId query parameters, which are required.  If a matching Topic does not exist, an error is returned.
+        <br>This request is used to update the Topic relatedItemCollection value.
+        <br>The User must have COLLECTION_MODERATOR access to all of the Threads that are under this Topic, or an error is returned.  The User has COLLECTION_MODERATOR access to a Thread if they are the Thread creator or they have either an OWNER or COLLECTION_MODERATOR Role for that Thread.
+        <br>The relatedItemType and relatedItemId properties of the request payload must match the $relatedItemType and $relatedItemId query parameters.
+      parameters:
+        - $ref: '#/parameters/relatedItemType'
+        - $ref: '#/parameters/relatedItemId'
+        - $ref: '#/parameters/updateTopic'
+      tags:
+        - Topics
+      operationId: updateTopicRelatedItem
+      responses:
+        '200':
+          description: OK - The Topic that has been updated.
+        '400':
+          description: 'Bad Request - Missing or invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Topic matching the given Related Item does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a Topic specified by Related Item.
+      description: |+
+        Deletes the Topic matching the Related Item specified by the $relatedItemType and $relatedItemId query parameters, which are required.  If a matching Topic does not exist, this request will continue to delete any Threads lifecycled with the specified Related Item.
+        <br>The User must have delete access to all of the Threads that are deleted by this operation, or an error is returned.  The User has delete access to a Thread if they are the Thread creator or they have either an OWNER or THREAD_DELETER Role for that Thread.
+        <br>The Threads deleted include any Threads in the Topic and all Threads that have a matching lifecycledWithType and lifecycledWithId value set.  This also includes any Threads deleted by a cascade delete resulting from a subsequent 'empty' Topic being deleted.
+        <br>For example, if Topic A is deleted and Topic B has three Threads, each of which are lifecycled with the Related Item matching Topic A, then Topic B will be empty after these deletes.  As a result, Topic B is also deleted, and any Threads lifecycled with the Related Item matching Topic B are also deleted.  The cascade delete will continue in this way until all lifecycled Threads and resulting 'empty' Topics are deleted, or until a Thread is encountered for which the User does not have delete access, in which case the entire operation will fail, all changes are rolled back, and an error is returned.
+        <br>When a Topic is deleted, all Threads and Notes under that Topic are deleted.  When a life-cycled Thread is deleted, all Notes under that Thread are deleted.  No Notifications are sent when Notes are deleted as a result of a Topic or life-cycled Thread being deleted by one of the DELETE /topics requests.
+      parameters:
+        - $ref: '#/parameters/relatedItemType'
+        - $ref: '#/parameters/relatedItemId'
+      tags:
+        - Topics
+      operationId: deleteTopicRelatedItem
+      responses:
+        '200':
+          description: OK - No contents returned - Topic and lifecycled Threads deleted successfully.
+        '400':
+          description: 'Bad Request - Missing or invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/topics/{topicId}':
+    get:
+      summary: Gets a Topic.
+      description: Returns the Topic matching the given ID.
+      parameters:
+        - $ref: '#/parameters/topicId'
+      tags:
+        - Topics
+      operationId: getTopic
+      responses:
+        '200':
+          description: OK - The Topic matching the given ID.
+          schema:
+            $ref: '#/definitions/Topic'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Topic matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates a Topic.
+      description: |+
+        Updates the Topic matching the given ID.  If a matching Topic does not exist, an error is returned.
+        <br>This request is used to update the Topic relatedItemCollection value.
+        <br>The User must have COLLECTION_MODERATOR access to all of the Threads that are under this Topic, or an error is returned.  The User has COLLECTION_MODERATOR access to a Thread if they are the Thread creator or they have either an OWNER or COLLECTION_MODERATOR Role for that Thread.
+        <br>The id property of the payload must match the topicId specified on the URL.
+      parameters:
+        - $ref: '#/parameters/topicId'
+        - $ref: '#/parameters/updateTopic'
+      tags:
+        - Topics
+      operationId: updateTopic
+      responses:
+        '200':
+          description: OK - The Topic that has been updated.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Topic matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a Topic.
+      description: |+
+        Deletes the Topic matching the given ID.  If a matching Topic does not exist, an error is returned.
+        <br>The User must have delete access to all of the Threads that are deleted by this operation, or an error is returned.  The User has delete access to a Thread if they are the Thread creator or they have either an OWNER or THREAD_DELETER Role for that Thread.
+        <br>The Threads deleted include any Threads in the Topic and all Threads that have a matching lifecycledWithType and lifecycledWithId value set.  This also includes any Threads deleted by a cascade delete resulting from a subsequent 'empty' Topic being deleted.
+        <br>For example, if Topic A is deleted, and Topic B has three Threads, each of which are lifecycled with the Related Item matching Topic A, then Topic B will be empty after these deletes.  As a result, Topic B is also deleted, and any Threads lifecycled with the Related Item matching Topic B are also deleted.  The cascade delete will continue in this way until all lifecycled Threads and resulting 'empty' Topics are deleted, or until a Thread is encountered for which the User does not have delete access, in which case the entire operation will fail, all changes are rolled back, and an error is returned.
+        <br>When a Topic is deleted, all Threads and Notes under that Topic are deleted.  When a life-cycled Thread is deleted, all Notes under that Thread are deleted.  No Notifications are sent when Notes are deleted as a result of a Topic or life-cycled Thread being deleted by one of the DELETE /topics requests.
+      parameters:
+        - $ref: '#/parameters/topicId'
+      tags:
+        - Topics
+      operationId: deleteTopic
+      responses:
+        '200':
+          description: OK - No contents returned - Topic and lifecycled Threads deleted successfully.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Topic matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/threads/{threadId}/roles':
+    post:
+      summary: Creates a ThreadRole.
+      description: |+
+        Creates a new ThreadRole for a Thread.
+        - The User must have at least a MODERATOR Role for this Thread.
+        - Only the Thread creator or an OWNER can add an OWNER, THREAD_DELETER, or COLLECTION_MODERATOR Role.
+      parameters:
+        - $ref: '#/parameters/threadId'
+        - $ref: '#/parameters/addRole'
+      tags:
+        - Roles
+      operationId: createRole
+      responses:
+        '200':
+          description: OK - A new ThreadRole created successfully.
+          schema:
+            description: The identifier for the created ThreadRole.
+            type: string
+        '400':
+          description: 'Bad Request - The ID value is not a valid number, the request payload is badly formed, or a resource matching the given ThreadRole already exists.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Note matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates ThreadRoles.
+      description: |+
+        Updates the ThreadRoles for a Thread.  New Roles are added, existing Roles are updated, and omitted Roles are deleted.  Either all ThreadRoles are updated, or none of them are updated if an error occurs.
+        - The User must have at least a MODERATOR Role for this Thread.
+        - Only the Thread creator or an OWNER can add, update, or delete an OWNER, THREAD_DELETER, or COLLECTION_MODERATOR Role.
+      parameters:
+        - $ref: '#/parameters/threadId'
+        - $ref: '#/parameters/roles'
+      tags:
+        - Roles
+      operationId: updateRoles
+      responses:
+        '200':
+          description: OK - The ThreadRoles that have been updated.
+          schema:
+            title: roles
+            type: array
+            items:
+              $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found -  A Note matching the given ID does not exist or at least one of the ThreadRoles does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Gets ThreadRoles.
+      description: Returns ThreadRoles from the Thread matching the threadId.
+      parameters:
+        - $ref: '#/parameters/threadId'
+      tags:
+        - Roles
+      operationId: getRoles
+      responses:
+        '200':
+          description: OK - The ThreadRoles from the Thread matching the threadId.
+          schema:
+            title: roles
+            type: array
+            items:
+              $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Thread matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/roles/{roleId}':
+    put:
+      summary: Updates a ThreadRole.
+      description: |+
+        Updates the ThreadRole matching the given ID.
+        - The User must have at least a MODERATOR Role for this Thread.
+        - Only the Thread creator or an OWNER can update an OWNER, THREAD_DELETER, or COLLECTION_MODERATOR Role.
+
+        The id property of the payload must match the roleId specified on the URL.
+      parameters:
+        - $ref: '#/parameters/roleId'
+        - $ref: '#/parameters/updateRole'
+      tags:
+        - Roles
+      operationId: updateRole
+      responses:
+        '200':
+          description: OK - The ThreadRole that has been updated.
+          schema:
+            $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A ThreadRole matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Gets a ThreadRole.
+      description: Returns the ThreadRole matching the given ID.
+      parameters:
+        - $ref: '#/parameters/roleId'
+      tags:
+        - Roles
+      operationId: getRole
+      responses:
+        '200':
+          description: OK - The ThreadRole matching the given ID.
+          schema:
+            $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A ThreadRole matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Deletes a ThreadRole.
+      description: |+
+        Deletes the ThreadRole matching the given ID.
+        - The User must have at least a MODERATOR Role for this Thread.
+        - Only the Thread creator or an OWNER can delete an OWNER, THREAD_DELETER, or COLLECTION_MODERATOR Role.
+      parameters:
+        - $ref: '#/parameters/roleId'
+      tags:
+        - Roles
+      operationId: deleteRole
+      responses:
+        '200':
+          description: OK - No contents returned - ThreadRole deleted successfully.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A ThreadRole matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/topics/threadAccessRoles':
+    get:
+      summary: Gets ThreadRoles common to all Threads in a Topic (specified by Related Item) for the current logged-in User.
+      description: |+
+        Returns a set of ThreadRoles that apply to the current logged-in User that are common to all of the Threads under the Topic matching the Related Item specified by the $relatedItemType and $relatedItemId query parameters, which are required.  This set includes:
+
+        - a ThreadRole that is the maximum access level of the cumulative Roles
+        - a ThreadRole for each non-cumulative Role
+
+        Only Roles that apply to all the Threads in the Topic are included.  This is the intersection of Roles common to all Threads for this Topic.
+
+        A ThreadRole applies to a User if the ThreadRole matches the User ID or the User is a member of a Group specified for the ThreadRole.
+
+        <br>An implicit OWNER Role is assigned to a User in either of these two cases:
+
+        - The User is a member of the 'System: ADMINISTRATOR' Group
+        - The User is the Thread creator (created the top-level Note for the given Thread)
+
+        Only the ThreadRole.role value is returned.  All other properties are set to null.  If the User does not have any ThreadRoles or a Topic matching the Related Item does not exist, then an empty array is returned.
+      parameters:
+        - $ref: '#/parameters/relatedItemType'
+        - $ref: '#/parameters/relatedItemId'
+      tags:
+        - Roles
+      operationId: getThreadAccessRolesRelatedItem
+      responses:
+        '200':
+          description: OK - The ThreadRoles common to all Threads in a Topic for the current logged-in User.
+          schema:
+            title: roles
+            type: array
+            items:
+              $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - Missing or invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/topics/{topicId}/threadAccessRoles':
+    get:
+      summary: Gets ThreadRoles common to all Threads in a Topic for the current logged-in User.
+      description: |+
+        Returns a set of ThreadRoles that apply to the current logged-in User that are common to all of the Threads under the Topic matching the topicId.  This set includes:
+
+        - a ThreadRole that is the maximum access level of the cumulative Roles
+        - a ThreadRole for each non-cumulative Role
+
+        Only Roles that apply to all the Threads in the Topic are included.  This is the intersection of Roles common to all Threads for this Topic.
+
+        A ThreadRole applies to a User if the ThreadRole matches the User ID or the User is a member of a Group specified for the ThreadRole.
+
+        <br>An implicit OWNER Role is assigned to a User in either of these two cases:
+
+        - The User is a member of the 'System: ADMINISTRATOR' Group
+        - The User is the Thread creator (created the top-level Note for the given Thread)
+
+        Only the ThreadRole.role value is returned.  All other properties are set to null.  If the User does not have any ThreadRoles, an empty array is returned.
+      parameters:
+        - $ref: '#/parameters/topicId'
+      tags:
+        - Roles
+      operationId: getThreadAccessRoles
+      responses:
+        '200':
+          description: OK - The ThreadRoles common to all Threads in a Topic for the current logged-in User.
+          schema:
+            title: roles
+            type: array
+            items:
+              $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Topic matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/threads/{threadId}/accessRoles':
+    get:
+      summary: Gets ThreadRoles for the current logged-in User.
+      description: |+
+        Returns a set of ThreadRoles that apply to the current logged-in User for the Thread matching the threadId.  This set includes:
+
+        - a ThreadRole that is the maximum access level of the cumulative Roles
+        - a ThreadRole for each non-cumulative Role
+
+        A ThreadRole applies to a User if the ThreadRole matches the User ID or the User is a member of a Group specified for the ThreadRole.
+
+        <br>An implicit OWNER Role is assigned to a User in either of these two cases:
+
+        - The User is a member of the 'System: ADMINISTRATOR' Group
+        - The User is the Thread creator (created the top-level Note for the given Thread)
+
+        Only the ThreadRole.role value is returned.  All other properties are set to null.  If the User does not have any ThreadRoles, an empty array is returned.
+      parameters:
+        - $ref: '#/parameters/threadId'
+      tags:
+        - Roles
+      operationId: getAccessRoles
+      responses:
+        '200':
+          description: OK - The ThreadRoles that apply to the current logged-in User from the Thread matching the threadId.
+          schema:
+            title: roles
+            type: array
+            items:
+              $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Thread matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/threads/{threadId}/maxAccessRole':
+    get:
+      summary: Gets the maximum access ThreadRole for the current logged-in User.
+      deprecated: true
+      description: |+
+        This request is deprecated because it contains only the maximum
+        access level of the cumulative Roles but does not include the non-cumulative Roles subsequently added to Roles.
+
+        <br>For a complete list of ThreadRoles that apply to the current User, which includes non-cumulative Roles, see:
+        - GET /threads/{threadId}/accessRoles
+        - GET /topics/{topicId}/threadAccessRoles
+
+        Returns the ThreadRole that has the maximum access level of the cumulative Roles for the current logged-in User from the Thread matching the threadId.  Only the ThreadRole.role value is returned.  All other properties are set to null.  The ThreadRole.role value is set to null if the User does not have at least a VIEWER role.
+
+      parameters:
+        - $ref: '#/parameters/threadId'
+      tags:
+        - Roles
+      operationId: getMaxAccessRole
+      responses:
+        '200':
+          description: OK - The ThreadRole that has the maximum access level for the current logged-in User from the Thread matching the threadId.
+          schema:
+              $ref: '#/definitions/ThreadRole'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Thread matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/notifications':
+    post:
+      summary: Create Notification.
+      description: Creates a new Notification for a Collection, Topic, or Thread.  A Collection and Topic Notification can only be created for the current logged-in User (the Notification entityType set to USER and the entityId set to match the current logged-in User).  A Thread Notification can be created for the current logged-in User, if the User has a VIEWER Role on the Thread, or for another User or Group if the User has a MODERATOR Role for the Thread.
+      parameters:
+        - $ref: '#/parameters/addNotification'
+      tags:
+        - Notifications
+      operationId: createNotification
+      responses:
+        '200':
+          description: OK - A new Notification created successfully.
+          schema:
+            description: The identifier for the created Notification.
+            type: string
+        '400':
+          description: 'Bad Request - The request payload is badly formed or a resource matching the given Notification already exists.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Update Notifications.
+      description: Updates the Notifications.  All Notifications are updated, or none of the Notifications are updated if an error occurs.  Only the notifyOnUpdate and notifyOnAllReplies properties can be updated.  All other properties can be omitted except for the id property, which is required.  If other properties are set, they must match the current value.  For Collection and Topic Notifications, updates are limited to Notifications with a USER entityType and entityId that matches the current logged-in User.  For Thread Notifications, only the Thread creator or a MODERATOR can perform this operation, except for updates limited to Notifications with a USER entityType and entityId that matches the current logged-in User.
+      parameters:
+        - $ref: '#/parameters/notifications'
+      tags:
+        - Notifications
+      operationId: updateNotifications
+      responses:
+        '200':
+          description: OK - The Notifications that have been updated.
+          schema:
+            title: notifications
+            type: array
+            items:
+              $ref: '#/definitions/Notification'
+        '400':
+          description: 'Bad Request - The request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - At least one of the Notifications does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get Notifications.
+      description: |+
+        Returns Notifications determined by the supplied query parameters.  The $filter parameter can be used to qualify which Notifications are returned.  For more information, see the _Filtering and Sorting_ Key Concepts page.
+
+        <br>There are no restrictions to get Collection and Topic Notifications.  To get Thread Notifications, the calling user must have at least a VIEWER Role for the Thread.
+      parameters:
+        - $ref: '#/parameters/skip'
+        - $ref: '#/parameters/top'
+        - $ref: '#/parameters/notificationFilter'
+        - $ref: '#/parameters/notificationOrderby'
+        - $ref: '#/parameters/notificationSelect'
+        - $ref: '#/parameters/count'
+      tags:
+        - Notifications
+      operationId: getNotifications
+      responses:
+        '200':
+          description: OK - The Notifications determined by the supplied query parameters.
+          schema:
+            title: notifications
+            type: array
+            items:
+              $ref: '#/definitions/Notification'
+        '400':
+          description: 'Bad Request - Invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete Notifications.
+      description: Deletes Notifications determined by the $filter query parameter, which is required.  The $filter is applied to only those Notifications the User has delete access to (the User's own Notifications and Thread Notifications for which the User has at least a MODERATOR Role).
+      parameters:
+        - $ref: '#/parameters/notificationFilter'
+      tags:
+        - Notifications
+      operationId: deleteNotifications
+      responses:
+        '200':
+          description: OK - No contents returned - Notes deleted successfully.
+        '400':
+          description: 'Bad Request - No filter is provided or invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/notifications/{notificationId}':
+    put:
+      summary: Update Notification.
+      description: |+
+        Updates the Notification matching the given ID.
+
+        <br>Only the notifyOnUpdate and notifyOnAllReplies properties can be updated.  All other properties can be omitted except for the id property, which is required.  If other properties are set, they must match the current value.
+
+        <br>For Collection and Topic Notifications, updates are limited to Notifications with a USER entityType and entityId that matches the current logged-in User.  For Thread Notifications, only the Thread creator or a MODERATOR can perform this operation, except for updates limited to Notifications with a USER entityType and entityId that matches the current logged-in User.
+
+        <br>The id property of the payload must match the notificationId specified on the URL.
+      parameters:
+        - $ref: '#/parameters/notificationId'
+        - $ref: '#/parameters/updateNotification'
+      tags:
+        - Notifications
+      operationId: updateNotification
+      responses:
+        '200':
+          description: OK - The Notification that has been updated.
+          schema:
+            $ref: '#/definitions/Notification'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number or the request payload is badly formed.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Notification matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get Notification.
+      description: Returns the Notification matching the given ID.  There are no restrictions to get a Collection or Topic Notification.  To get a Thread Notification, the calling user must have at least a VIEWER Role for the Thread.
+      parameters:
+        - $ref: '#/parameters/notificationId'
+      tags:
+        - Notifications
+      operationId: getNotification
+      responses:
+        '200':
+          description: OK - The Notification matching the given ID.
+          schema:
+            $ref: '#/definitions/Notification'
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Notification matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete Notification.
+      description: Deletes the Notification matching the given ID.  The User must have delete access to the Notification (the User's own Notifications and Thread Notifications for which the User has at least a MODERATOR Role) or an error is returned.
+      parameters:
+        - $ref: '#/parameters/notificationId'
+      tags:
+        - Notifications
+      operationId: deleteNotification
+      responses:
+        '200':
+          description: OK - No contents returned - Notification deleted successfully.
+        '400':
+          description: 'Bad Request - The ID value is not a valid number.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - A Notification matching the given ID does not exist.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+  '/lastAccessChanges':
+    get:
+      summary: Gets LastAccessChange.
+      description: |+
+        Returns the LastAccessChange determined by the supplied query parameters.  A LastAccessChange provides information used to determine if a Topic or Collection has new or modified content.  A User's last access is tracked by the service when one of the following methods is called:
+
+          - Topic:        GET /notes with $relatedItemType and $relatedItemId
+          - Collection:   GET /notes with $relatedItemCollection
+
+        The LastAccessChange can be returned for either a Collection or a Topic:
+
+          - For a Collection, specify the following query parameter:
+            - $relatedItemCollection - The Related Item Collection values for which to get the LastAccessChange.
+          - For a Topic, specify the following query parameters:
+            - $relatedItemType - The type of Related Item for the Topic to get the LastAccessChange.
+            - $relatedItemId - The ID of the Related Item for the Topic to get the LastAccessChange.
+
+        Specify either $relatedItemCollection or both $relatedItemType and $relatedItemId.
+
+        <br>If a Topic does not exist for the given $relatedItemType and $relatedItemId, or no Topics exist for the given $relatedItemCollection, the LastAccessChange is returned as {"changedSinceDate": null,"newCount": 0,"modifiedCount": 0,"deletedCount": 0}.
+
+        <br>In the case of a Collection, a Note is only considered to be new/modified if the last time the User fetched Notes for the Topic containing the Note is older than the createdDate/modifiedDate of the Note, regardless of whether the User fetched Notes in the Topic directly or indirectly via a Collection.  In other words, if a Note is new and is fetched directly via a Topic, and then you fetch Notes for a Collection that contains that Topic, the Note is not new as it was previously fetched.  Conversely, if a Note is new and is fetched via a Collection that contains the Topic containing that Note, and then you fetch Notes directly for the Topic containing the Note, the Note is not new as it was previously fetched via the Collection.
+
+      parameters:
+        - $ref: '#/parameters/relatedItemType'
+        - $ref: '#/parameters/relatedItemId'
+        - $ref: '#/parameters/relatedItemCollectionLastAccess'
+      tags:
+        - LastAccessChanges
+      operationId: getLastAccessChange
+      responses:
+        '200':
+          description: OK - The LastAccessChange determined by the supplied query parameters.
+          schema:
+            $ref: '#/definitions/LastAccessChange'
+        '400':
+          description: 'Bad Request - Invalid query parameter.'
+          schema:
+            $ref: '#/definitions/Error'
+        '403':
+          $ref: '#/responses/forbidden'
+        '404':
+          description: Not Found - Unrecognized URL.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error.
+          schema:
+            $ref: '#/definitions/Error'
+
+parameters:
+  noteId:
+    name: noteId
+    in: path
+    description: The identifier for a Note.
+    required: true
+    type: string
+  topicId:
+    name: topicId
+    in: path
+    description: The identifier for a Topic.
+    required: true
+    type: string
+  threadId:
+    name: threadId
+    in: path
+    description: The identifier for a Thread.
+    required: true
+    type: string
+  replyId:
+    name: replyId
+    in: path
+    description: The identifier for a reply Note being accepted.
+    required: true
+    type: string
+  addThreadNote:
+    name: threadNote
+    in: body
+    description: The ThreadNote to be added.
+    required: true
+    schema:
+      $ref: '#/definitions/ThreadNote'
+  addNote:
+    name: note
+    in: body
+    description: The Note to be added.
+    required: true
+    schema:
+      $ref: '#/definitions/Note'
+  updateNote:
+    name: note
+    in: body
+    description: The Note to be updated.
+    required: true
+    schema:
+      $ref: '#/definitions/Note'
+  updateThread:
+    name: thread
+    in: body
+    description: The Thread to be updated.
+    required: true
+    schema:
+      $ref: '#/definitions/Thread'
+  updateTopic:
+    name: topic
+    in: body
+    description: The Topic to be updated.
+    required: true
+    schema:
+      $ref: '#/definitions/Topic'
+  notes:
+    name: notes
+    in: body
+    description: The Notes to be updated (containing at least one).
+    required: true
+    schema:
+      title: notes
+      type: array
+      items:
+        $ref: '#/definitions/Note'
+  attributeId:
+    name: attributeId
+    in: path
+    description: The identifier for a NoteAttribute.
+    required: true
+    type: string
+  addAttribute:
+    name: attribute
+    in: body
+    description: The NoteAttribute to be added.
+    required: true
+    schema:
+      $ref: '#/definitions/NoteAttribute'
+  updateAttribute:
+    name: attribute
+    in: body
+    description: The NoteAttribute to be updated.
+    required: true
+    schema:
+      $ref: '#/definitions/NoteAttribute'
+  attributes:
+    name: attributes
+    in: body
+    description: The Attributes to be updated (containing at least one).
+    required: true
+    schema:
+      title: attributes
+      type: array
+      items:
+        $ref: '#/definitions/NoteAttribute'
+  roleId:
+    name: roleId
+    in: path
+    description: The identifier for a ThreadRole.
+    required: true
+    type: string
+  addRole:
+    name: role
+    in: body
+    description: The ThreadRole to be added.
+    required: true
+    schema:
+      $ref: '#/definitions/ThreadRole'
+  updateRole:
+    name: role
+    in: body
+    description: The ThreadRole to be updated.
+    required: true
+    schema:
+      $ref: '#/definitions/ThreadRole'
+  roles:
+    name: roles
+    in: body
+    description: The Roles to be updated (containing at least one).
+    required: true
+    schema:
+      title: roles
+      type: array
+      items:
+        $ref: '#/definitions/ThreadRole'
+  notifications:
+    name: notifications
+    in: body
+    description: The notifications to be updated (containing at least one).
+    required: true
+    schema:
+      title: notifications
+      type: array
+      items:
+        $ref: '#/definitions/Notification'
+  notificationId:
+    name: notificationId
+    in: path
+    description: The identifier for a Notification.
+    required: true
+    type: string
+  addNotification:
+    name: notification
+    in: body
+    description: The Notification to be added.
+    required: true
+    schema:
+      $ref: '#/definitions/Notification'
+  updateNotification:
+    name: notification
+    in: body
+    description: The Notification to be updated.
+    required: true
+    schema:
+      $ref: '#/definitions/Notification'
+  relatedItemType:
+    name: $relatedItemType
+    in: query
+    description: |+
+      The type for a Related Item.
+      - This must be a non-zero length value (limited to 100 characters in length) and must be specified together with relatedItemId.
+      - Any UTF-8 characters can be used.
+      - The value is treated as case sensitive and white space is significant (not ignored).
+    required: false
+    type: string
+  relatedItemId:
+    name: $relatedItemId
+    in: query
+    description: |+
+      The ID of a Related Item.
+      - This must be a non-zero length value (limited to 100 characters in length) and must be specified together with relatedItemType.
+      - Any UTF-8 characters can be used.
+      - The value is treated as case sensitive and white space is significant (not ignored).
+    required: false
+    type: string
+  relatedItemCollection:
+    name: $relatedItemCollection
+    in: query
+    description: |+
+      The Related Item Collection values for which Notes are returned in a hierarchical order.
+      - This must not be set if $relatedItemType and $relatedItemId or $repliesToId are set.
+      - Each name value must be a non-zero length value (limited to 100 characters in length).
+      - Any UTF-8 characters can be used.
+      - The name values are treated as case sensitive and white space is significant (not ignored).
+
+      Multiple collection name values can be specified using an ampersand character '&' between each $relatedItemCollection=nameValue expression.  For example, to set two collection names ['colName1', 'colName2'] use:
+      - $relatedItemCollection=colName1&$relatedItemCollection=colName2
+    required: false
+    type: array
+    items:
+      type: string
+  relatedItemCollectionLastAccess:
+    name: $relatedItemCollection
+    in: query
+    description: |+
+      The Related Item Collection values for which to get the LastAccessChange.
+      - This must not be set if $relatedItemType and $relatedItemId or $repliesToId are set.
+      - Each name value must be a non-zero length value (limited to 100 characters in length).
+      - Any UTF-8 characters can be used.
+      - The name values are treated as case sensitive and white space is significant (not ignored).
+
+      Multiple collection name values can be specified using an ampersand character '&' between each $relatedItemCollection=nameValue expression.  For example, to set two collection names ['colName1', 'colName2'] use:
+      - $relatedItemCollection=colName1&$relatedItemCollection=colName2
+    required: false
+    type: array
+    items:
+      type: string
+  repliesToId:
+    name: $repliesToId
+    in: query
+    description: The ID of a Note for which the reply Notes are returned in a hierarchical order.  This must not be set if $relatedItemType and $relatedItemId or $relatedItemCollection are set.
+    required: false
+    type: string
+  skip:
+    name: $skip
+    in: query
+    description: |+
+      Skips the specified number of items from the beginning of the list that would normally be returned.  These skipped items are not included in the result.
+      - For example, '$skip=80' will not return the first 80 items that would otherwise be returned from the REST call.  Subsequent items are returned, starting with the 81st item in the list.
+
+      The value must be 0 or greater.  An empty string is ignored.
+      <br>Note that the GET request is stateless from one request to another and so the underlying set of items in the list effected by $skip can change from one call to the next.
+    required: false
+    type: string
+  top:
+    name: $top
+    in: query
+    description: |+
+      Returns only this number of items from the start of the list that would be returned (subject to any use of $skip).
+      - For example, '$top=20' results in only the first 20 items from the list being returned.
+
+      The value must be 1 or greater and less than or equal to a maximum value of 500.  If not specified (or set to an empty string), a default value of 50 is used.  The maximum and default values do not apply when $count is set to true.
+      <br>Note that the GET request is stateless from one request to another and so the underlying set of items in the list effected by $top can change from one call to the next.
+    required: false
+    type: string
+  noteFilter:
+    name: $filter
+    in: query
+    description: |+
+      The filter query option enables specific queries to be defined, based on inherent Note properties (title, type, id, relatedItemType, relatedItemId, relatedItemCollection, topicId, threadId, parentId, status, isHidden, level, notificationLabel, createdById, createdByName, createdDate, modifiedById, modifiedByName, modifiedDate, replyDate, replyCount, replyAcceptedId) or any Attributes defined for the Note, that returns the required set of items.  The Attribute names on the Note are qualified in the filter expression with the 'attributes/' prefix, that is, attributes/attrName eq 'value'.
+
+      <br>Both Note title and Attribute name are case-sensitive (a filter with title eq 'Case Example' or attributes/attrName eq 'Case Example' would match 'Case Example' but not 'case example'). (To perform case in-sensitive filtering, use the tolower and toupper functions (for more information, see the _Filtering and Sorting_ Key Concepts page).
+
+      <br>Non-hierarchical queries can include any of the Note properties in the $filter.  Hierarchical queries cannot include certain properties in the $filter, as indicated in the table below:
+
+      | Specified by                        | Excluded properties                                                                       |
+      | ----------------------------------- |:-----------------------------------------------------------------------------------------:|
+      | $relatedItemType and $relatedItemId | relatedItemType, relatedItemId, relatedItemCollection, topicId, parentId, level           |
+      | $relatedItemCollection              | relatedItemCollection, parentId, level                                                    |
+      | $repliesToId                        | relatedItemType, relatedItemId, relatedItemCollection, topicId, threadId, parentId, level |
+
+
+      <br>If the filter does not explicitly contain a filter clause for type, then by default, Notes of all types are returned.  A special filter property 'isCreatedByMe' allows filtering based on the current User having created a Note.  This is set true or false (isCreatedByMe eq true).  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  notificationFilter:
+    name: $filter
+    in: query
+    description: |+
+      The filter query option enables specific queries to be defined, based on inherent Notification properties (id, entityId, entityType, type, collectionName, lifecycledWithType, lifecycledWithId, topicId, threadId, entityName, notifyOnUpdate, notifyOnAllReplies).  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  threadFilter:
+    name: $filter
+    in: query
+    description: |+
+      The filter query option enables specific queries to be defined, based on inherent Thread properties (id, relatedItemType, relatedItemId, relatedItemCollection, topicId, topLevelNoteId, status, isLocked, lifecycledWithType, lifecycledWithId, createdById, createdByName, createdDate, modifiedById, modifiedByName, modifiedDate, actionDate, totalCount, issueNoteCount, resolutionNoteCount, questionNoteCount, answerNoteCount, informationalNoteCount, unresolvedStatusCount, unansweredStatusCount, resolvedStatusCount, answeredStatusCount, acceptedStatusCount, unacceptedStatusCount, unclassifiedStatusCount, isOrphaned, isAbandoned), or Roles assigned (roleEntityType, roleEntityId, roleType) that will return the required set of items.  A special filter property 'isCreatedByMe' allows filtering based on the current User having created a Thread.  This is set true or false (isCreatedByMe eq true).  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  topicFilter:
+    name: $filter
+    in: query
+    description: |+
+      The filter query option enables specific queries to be defined, based on inherent Topic properties (id, relatedItemType, relatedItemId, relatedItemCollection, createdDate, actionDate, totalCount, threadCount, issueNoteCount, resolutionNoteCount, questionNoteCount, answerNoteCount, informationalNoteCount, unresolvedStatusCount, unansweredStatusCount, resolvedStatusCount, answeredStatusCount, acceptedStatusCount, unacceptedStatusCount, unclassifiedStatusCount).  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  noteOrderby:
+    name: $orderby
+    in: query
+    description: |+
+      This query option is used to request items in either ascending order using __asc__ or descending order using __desc__, based on one of the Note properties (title, type, id, relatedItemType, relatedItemId, relatedItemCollection, topicId, threadId, parentId, status, isHidden, level, notificationLabel, createdById, createdByName, createdDate, modifiedById, modifiedByName, modifiedDate, replyDate, replyCount, replyAcceptedId).  For a hierarchical query ($relatedItemType and $relatedItemId, $relatedItemCollection, or $repliesToId are set), this query option is used to sort items in a hierarchy that are siblings at the same level (having the same parentId) in either ascending order using __asc__ or descending order using __desc__, based on one of the Note properties, excluding the properties indicated by the following table:
+
+      | Specified by                        | Excluded properties                                                                       |
+      | ----------------------------------- |:-----------------------------------------------------------------------------------------:|
+      | $relatedItemType and $relatedItemId | relatedItemType, relatedItemId, relatedItemCollection, topicId, parentId, level           |
+      | $relatedItemCollection              | relatedItemCollection, parentId, level                                                    |
+      | $repliesToId                        | relatedItemType, relatedItemId, relatedItemCollection, topicId, threadId, parentId, level |
+
+      <br>The default order is by createdDate ASC.  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  notificationOrderby:
+    name: $orderby
+    in: query
+    description: |+
+      This query option allows clients to request items in either ascending order using asc (ascending) or descending order using desc (descending) according to the nature of one of the Notification properties (id, entityId, entityType, type, collectionName, lifecycledWithType, lifecycledWithId, topicId, threadId, entityName, notifyOnUpdate, notifyOnAllReplies).  The default order is by id ASC.  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  threadOrderby:
+    name: $orderby
+    in: query
+    description: |+
+      This query option is used to request items in either ascending order using __asc__ or descending order using __desc__, based on one of the Thread properties (id, relatedItemType, relatedItemId, relatedItemCollection, topicId, topLevelNoteId, status, isLocked, lifecycledWithType, lifecycledWithId, createdById, createdByName, createdDate, modifiedById, modifiedByName, modifiedDate, actionDate, totalCount, issueNoteCount, resolutionNoteCount, questionNoteCount, answerNoteCount, informationalNoteCount, unresolvedStatusCount, unansweredStatusCount, resolvedStatusCount, answeredStatusCount, acceptedStatusCount, unacceptedStatusCount, unclassifiedStatusCount, isOrphaned, isAbandoned).  The default order is by createdDate ASC.  For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  topicOrderby:
+    name: $orderby
+    in: query
+    description: |+
+      This query option is used to request items in either ascending order using __asc__ or descending order using __desc__, based on one of the Topic properties (id, relatedItemType, relatedItemId, relatedItemCollection, createdDate, actionDate, totalCount, threadCount, issueNoteCount, resolutionNoteCount, questionNoteCount, answerNoteCount, informationalNoteCount, unresolvedStatusCount, unansweredStatusCount, resolvedStatusCount, answeredStatusCount, acceptedStatusCount, unacceptedStatusCount, unclassifiedStatusCount).  The default order is by createdDate ASC. For more information, see the _Filtering and Sorting_ Key Concepts page.
+    required: false
+    type: string
+  noteSearch:
+    name: $search
+    in: query
+    description: The $search value restricts the result to include only those Notes containing the specified search value (case sensitively).  This performs a textual search on the string of the Note text.  For example, '$search=Scottsdale' returns Notes where the sub-string 'Scottsdale' is located somewhere within the string of the Note text property.
+    required: false
+    type: string
+  noteSelect:
+    name: $select
+    in: query
+    description: This query option allows the selection of specific property values from the Note to be returned.  Other property values not included in the $select list will be returned as null.  The property names are specified as a comma-separated string that can contain any of ['title', 'type', 'text', 'notificationUrl', 'notificationLabel', 'attributes', 'id', 'relatedItemType', 'relatedItemId', 'relatedItemCollection', 'topicId', 'threadId', 'parentId', 'status', 'level', 'createdById', 'createdByName', 'createdDate', 'modifiedById', 'modifiedByName', 'modifiedDate', 'replyDate', 'replyCount', 'replyAcceptedId', 'isNew', 'isModified', 'isDescendantNewOrModified', 'descendantModifiedDate', 'thread'].  For example, '$select=text,type,id' results in only the text, type, and id property values being returned. All of the other properties are returned with a null value in place of the actual property value.
+    required: false
+    type: string
+  notificationSelect:
+    name: $select
+    in: query
+    description: This query option allows the selection of specific property values from the Notification to be returned.  Other property values not included in the $select list are returned as null.  The property names are specified as a comma-separated string that can contain any of ['id', 'entityId', 'entityType', 'type', 'notifyCollection', 'topicId', 'threadId', 'entityName', 'notifyOnUpdate', 'notifyOnAllReplies'].  For example, '$select=collectionName,entityName' results in only the collectionName and entityName property values being returned.  All of the other properties are returned with a null value in place of the actual property value.
+    required: false
+    type: string
+  threadSelect:
+    name: $select
+    in: query
+    description: This query option allows the selection of specific property values from the Thread to be returned.  Other property values not included in the $select list will be returned as null.  The property names are specified as a comma-separated string that can contain any of ['id', 'relatedItemType', 'relatedItemId', 'relatedItemCollection', 'topicId', 'topLevelNoteId', 'status', 'isLocked', 'lifecycledWithType', 'lifecycledWithId', 'createdById', 'createdByName', 'createdDate', 'modifiedById', 'modifiedByName', 'modifiedDate', 'actionDate', 'actionId', 'actionType', 'roles', 'totalCount', 'issueNoteCount', 'resolutionNoteCount', 'questionNoteCount', 'answerNoteCount', 'informationalNoteCount', 'unresolvedStatusCount', 'unansweredStatusCount', 'resolvedStatusCount', 'answeredStatusCount', 'acceptedStatusCount', 'unacceptedStatusCount', 'unclassifiedStatusCount', 'isOrphaned', 'isAbandoned'].  For example, '$select=actionDate,actionType' results in only the actionDate and actionType property values being returned. All of the other properties are returned with a null value in place of the actual property value.
+    required: false
+    type: string
+  topicSelect:
+    name: $select
+    in: query
+    description: This query option allows the selection of specific property values from the Topic to be returned.  Other property values not included in the $select list will be returned as null.  The property names are specified as a comma-separated string that can contain any of ['id', 'relatedItemType', 'relatedItemId', 'relatedItemCollection', 'createdDate', 'actionDate', 'actionId', 'actionType', 'totalCount', 'threadCount', 'issueNoteCount', 'resolutionNoteCount', 'questionNoteCount', 'answerNoteCount', 'informationalNoteCount', 'unresolvedStatusCount', 'unansweredStatusCount', 'resolvedStatusCount', 'answeredStatusCount', 'acceptedStatusCount', 'unacceptedStatusCount', 'unclassifiedStatusCount'].  For example, '$select=actionDate,actionType' results in only the actionDate and actionType property values being returned. All of the other properties are returned with a null value in place of the actual property value.
+    required: false
+    type: string
+  count:
+    name: $count
+    in: query
+    description: Return a simple number only, this being the count of the items that would be returned from the request if the count query option was not present.  Note that the assigned value for $count is true, that is, the correct use of the count query option is '$count=true'.  If '$count=false' is used, then this will have no effect.  It is recognized that $count is an expensive method and should not be used by clients without consideration.
+    required: false
+    type: string
+  noteLevel:
+    name: $level
+    in: query
+    description: Limits the hierarchical level returned by the request.  This applies only for hierarchical queries (when $relatedItemType and $relatedItemId, $relatedItemCollection, or $repliesToId are set) and returns an error otherwise.  The value must be 1 or greater.  An empty string is ignored.  For example '$level=1' would limit the results to include only top-level Notes (or Notes that are a direct reply to the given $repliesToId if set), '$level=2' would limit the results to include the first level of Notes and the first level of subsequent reply Notes.  The default level is unlimited.
+    required: false
+    type: string
+responses:
+  forbidden:
+    description: Forbidden - The User is not authenticated.
+    schema:
+      $ref: '#/definitions/Error'
+definitions:
+  ThreadNote:
+    description: Used to create a top-level Note with optional Roles applied to the Thread created for this Note.  Although Roles can be applied to a Thread at any time, care should be taken to apply Roles at the time a top-level Note is created if there is a need to restrict who can view the Note content or receive Collection or Topic Notifications if they exist. If Notifications are currently set on the Topic or a Collection associated with the Topic, those notifications are sent based on initial Roles set with the top-level Note when created.  If you wait to set the Role at a later time, a User may view the Note or receive a Notification before you submit the request to restrict access.
+    type: object
+    required:
+      - relatedItemType
+      - relatedItemId
+      - note
+    properties:
+      relatedItemType:
+        description: |+
+          The type of the Related Item.
+          - This must be a non-zero length value (limited to 100 characters in length) and must be specified together with relatedItemId.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive and white space is significant (not ignored).
+          - All relatedItemType values that start with 'LIVEAPPS_', 'DT_', or 'RT_' are reserved for internal use by Live Apps.
+        type: string
+      relatedItemId:
+        type: string
+        description: |+
+          The ID for the Related Item.
+          - This must be a non-zero length value (limited to 100 characters in length) and must be specified together with relatedItemType.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive and white space is significant (not ignored).
+      relatedItemCollection:
+        type: array
+        items:
+          type: string
+        description: |+
+          An optional list of Collection name values used to associate a new Topic specified by relatedItemType and relatedItemId to the given Collection names, default = null.
+          - Each name value must be a non-zero length value (limited to 100 characters in length).
+          - Any UTF-8 characters can be used.
+          - The name values are treated as case sensitive and white space is significant (not ignored).
+
+          The relatedItemCollection value is applied to new Topics only and is ignored if the Topic already exists.  To modify the relatedItemCollection value of an existing topic use the PUT /topics request.
+      note:
+        $ref: '#/definitions/Note'
+      roles:
+        description: The Roles applied to the Thread initiated by this top-level Note.
+        type: array
+        items:
+          $ref: '#/definitions/ThreadRole'
+      notifications:
+        description: The Notifications applied to the Thread initiated by this top-level Note.
+        type: array
+        items:
+          $ref: '#/definitions/Notification'
+      lifecycledWithType:
+        description: |+
+          An optional value that together with lifecycledWithId identify the Topic that this Thread is life-cycled with.
+          - If set, this must be a non-zero length value (limited to 100 characters in length) and must be specified together with lifecycledWithId.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive, and white space is significant (not ignored).
+          - All lifecycledWithType values that start with 'LIVEAPPS_', 'DT_', or 'RT_' are reserved for internal use by Live Apps.
+        type: string
+        readOnly: false
+      lifecycledWithId:
+        description: |+
+          An optional value that together with lifecycledWithType identify the Topic that this Thread is life-cycled with.
+          - If set, this must be a non-zero length value (limited to 100 characters in length) and must be specified together with lifecycledWithType.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive, and white space is significant (not ignored).
+        type: string
+        readOnly: false
+  Note:
+    description: A Note used to collaborate around a specific Related Item.
+    type: object
+    properties:
+      type:
+        description: An optional Note type, default=INFORMATIONAL.
+        type: string
+        enum:
+          - ISSUE
+          - RESOLUTION
+          - QUESTION
+          - ANSWER
+          - INFORMATIONAL
+      title:
+        description: An optional title for this Note (max size of 100 characters).
+        type: string
+      text:
+        description: Optional text for this Note (max size of 10000 characters).
+        type: string
+      notificationUrl:
+        description: |+
+          [Not currently used.]
+          An optional URL to display the Note in context from a Notification link.  The following substitution parameters may be included in the URL - {$noteId$}, {$threadId$}, and {$topicId$}.  The corresponding ID values will be substituted for the tokens.  For example - notificationUrl set in the request payload to "http://_host_:_port_/_path_$noteId={$noteId$}&threadId={$threadId$}&topicId={$topicId$}" would result in the notificationUrl being saved as "http://_host_:_port_/_path_$noteId=234&threadId=14&topicId=87" where the corresponding ID values are 234, 14, and 87.  This allows a POST of a new Note to set these values without requiring a subsequent PUT to update the notificationUrl, as these ID values are not known when constructing the POST payload.  The substitution parameters may also be used on PUT updates to a Note.
+        type: string
+      notificationLabel:
+        description: |+
+          [Not currently used.]
+          An optional label used in a Notification to describe the Note context.
+        type: string
+      attributes:
+        description: An optional set of named Attributes that may be relevant to this Note.
+        type: array
+        items:
+          $ref: '#/definitions/NoteAttribute'
+      id:
+        description: Set by the service.  The unique identifier for this Note assigned by the service when created.
+        type: string
+        readOnly: false
+      relatedItemType:
+        description: Set by the service.  The type of the Related Item.  Set by the service when created.
+        type: string
+        readOnly: false
+      relatedItemId:
+        type: string
+        description: Set by the service.  The ID for the Related Item.  Set by the service when created.
+        readOnly: false
+      relatedItemCollection:
+        type: array
+        items:
+          type: string
+        description: Set by the service.  A list of Collection name values used to associate the Topic this Note belongs to with those Collection names.  This property is maintained by the service.
+        readOnly: false
+      topicId:
+        description: Set by the service.  The unique identifier for the Topic this Note belongs to.  This is assigned by the service when created.
+        type: string
+        readOnly: false
+      threadId:
+        description: Set by the service.  The unique identifier for the Thread this Note belongs to.  This is assigned by the service when created.
+        type: string
+        readOnly: false
+      parentId:
+        description: Set by the service.  The unique identifier for the Note that is being replied to by this Note.  If it is a top-level Note, this is Null.  This property is assigned by the service when created.
+        type: string
+        readOnly: false
+      status:
+        description: |
+          Set by the service.  The status of the Note.  This value is set by the service to indicate the current status of this Note.  These are set as follows:
+          - ISSUE Notes have a status of UNRESOLVED until a RESOLUTION reply Note is accepted, which changes the status to RESOLVED.
+          - QUESTION Notes have a status of UNANSWERED until an ANSWER reply Note is accepted, which changes the status to ANSWERED.
+          - RESOLUTION and ANSWER Notes have a status of UNACCEPTED until they are accepted, which changes the status to ACCEPTED.
+          - INFORMATIONAL Notes have a status of UNCLASSIFIED.
+        type: string
+        enum:
+          - UNRESOLVED
+          - UNANSWERED
+          - RESOLVED
+          - ANSWERED
+          - ACCEPTED
+          - UNACCEPTED
+          - UNCLASSIFIED
+        readOnly: false
+      isHidden:
+        description: This is set to true if the Note has been hidden.  The title and text of a hidden Note are only visible to the Note creator, and users with a ThreadRole of OWNER or MODERATOR.  Only users with a ThreadRole of OWNER or MODERATOR can change this value.  The isHidden property cannot be changed by the Note creator unless that User also has a ThreadRole of OWNER or MODERATOR.
+        type: boolean
+        readOnly: false
+      level:
+        description: |
+          Set by the service.  The hierarchical level of this Note. This property is maintained by the service.
+          - A top-level Note has a level = 1.
+          - A reply to a top-level Note has a level = 2.
+          - The first-level reply to a reply has a level = 3, and so on.
+        type: integer
+        readOnly: false
+      createdById:
+        description: Set by the service. The unique identifier for the User who created this Note.  This is set by the service when a Note is created.  The User who creates a Note implicitly has a Role of OWNER (as it applies to this Note).
+        type: string
+        readOnly: false
+      createdByName:
+        description: Set by the service. The username of the User who created this Note.  This is set by the service when a Note is created and is used for display purposes only.  If the User has been deleted then this value is set to 'Unknown User'.
+        type: string
+        readOnly: false
+      createdDate:
+        description: Set by the service.  The date-time (UTC) when this Note was created.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      modifiedById:
+        description: Set by the service.  The unique identifier for the User who last modified this Note.  This value is set by the service when a Note is modified.
+        type: string
+        readOnly: false
+      modifiedByName:
+        description: Set by the service.  The username of the User who last modified this Note.  This value is set by the service when a Note is modified and is used for display purposes only.  If the User has been deleted then this value is set to 'Unknown User'.
+        type: string
+        readOnly: false
+      modifiedDate:
+        description: Set by the service.  The date-time (UTC) when this Note was last modified.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      replyDate:
+        description: Set by the service.  The date-time (UTC) when this Note last received a reply Note.  Null if no replies exist.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      replyCount:
+        description: Set by the service.  The number of direct reply Notes for this Note.  This property is maintained by the service.
+        type: integer
+        readOnly: false
+      replyAcceptedId:
+        description: Applies specifically to ISSUE/QUESTION Notes.  The unique identifier for the Note that has been accepted as a reply to this Note.  This is null if no reply has been accepted.  A RESOLUTION Note can only reply to an ISSUE Note and an ANSWER Note can only reply to a QUESTION Note.  Setting replyAcceptedId to a valid Note ID causes the service to set the status of the reply Note to 'ACCEPTED', and the status of a previously accepted Note set to 'UNACCEPTED' if changed.  To clear a previously set value, set the replyAcceptedId to an empty String.  Only the Note creator, an OWNER, or MODERATOR can change this value.
+        type: string
+        readOnly: false
+      isNew:
+        description: Set by the service.  This is set to true if the Note is new.  A Note is new if it was created since the last time the User fetched Notes in this Topic, whether they fetched the Notes for the Topic directly, or fetched the Notes for the Topic indirectly by fetching the Notes in a Collection that contains the Topic.  This flag is always false on a Note when returned for the User who created the Note.  This property is maintained by the service.
+        type: boolean
+        readOnly: false
+      isModified:
+        description: Set by the service.  This is set to true if the Note has been modified.  A Note has been modified if it was modified since the last time the User fetched Notes in this Topic, whether they fetched the Notes for the Topic directly, or fetched the Notes for the Topic indirectly by fetching the Notes in a Collection that contains the Topic.  This flag is always false on a Note when returned for the User who last modified the Note.  This property is maintained by the service.
+        type: boolean
+        readOnly: false
+      isDescendantNewOrModified:
+        description: Set by the service.  This is set to true if there is new or modified content somewhere in the descendant hierarchy of this Note (new/modified since the User's last access to the Topic containing the Note).  This property is maintained by the service.
+        type: boolean
+        readOnly: false
+      descendantModifiedDate:
+        description: Set by the service.  The date-time (UTC) when a descendant of this Note was created or modified.  This is null if no descendant exists.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      thread:
+        $ref: '#/definitions/Thread'
+  NoteAttribute:
+    description: A name/value pair relevant to a Note.
+    type: object
+    required:
+      - name
+      - value
+    properties:
+      name:
+        description: |+
+          The Note Attribute name.  Attribute names can be any combination of: letters, numbers, and the following four special characters: - (dash), _ (underscore), . (dot), $ (dollar).  Attribute names are case-sensitive for uniqueness and filtering.  Attributes can be used to filter Notes (see $filter parameter).
+        type: string
+      value:
+        description: The Note Attribute value.
+        type: string
+      id:
+        description: Set by the service.  The unique identifier for this NoteAttribute assigned by the service when created.
+        type: string
+        readOnly: false
+      noteId:
+        description: Set by the service.  The unique identifier for the Note that this NoteAttribute is assigned to.
+        type: string
+        readOnly: false
+  ThreadRole:
+    description: Assigns a Thread access Role to an Organization Model Entity.  Provides access to Notes associated with a Thread to which the Role is assigned.  Each ThreadRole matches a Role type (OWNER, MODERATOR, REPLIER, or VIEWER) to an Organization Model Entity (Group or User).  The current User's memberships in the Organization Model then determines which Roles the User has to access a given Thread, or Notes in the Thread.  The User who creates a top-level Note implicitly has a Role of OWNER.  If a Thread or an Organization Model Entity is deleted, any associated ThreadRole is also deleted automatically.
+    type: object
+    required:
+      - entityId
+      - entityType
+      - role
+    properties:
+      entityId:
+        description: The unique identifier for an Organization Model Entity (Group or User).
+        type: string
+      entityType:
+        description: The type of Organization Model Entity specified by entityId.
+        type: string
+        enum:
+          - USER
+          - GROUP
+        readOnly: false
+      role:
+        description: |+
+          The Role controlling access to Notes and the Thread.  One of [ 'VIEWER', 'REPLIER', 'MODERATOR', 'OWNER', 'THREAD_DELETER', 'THREAD_VIEWER', 'COLLECTION_MODERATOR' ].
+
+           __Cumulative Roles:__
+
+           The following four Roles are cumulative, with each successive Role adding more access to what is granted by the previous Role.
+
+           - A VIEWER can: View Notes or the Thread, receive Notifications, add / modify / remove Notifications for themselves on a Collection, Topic, or Thread.
+
+           - A REPLIER can also: Add a reply Note.
+
+           - A MODERATOR can also: Lock or unlock the Thread, hide or unhide a Note, accept or unaccept a reply, add / modify / remove Thread Notifications and Roles.
+
+           - An OWNER can also: Edit Note Attributes, Delete Notes, Delete Threads (see THREAD_DELETER Role), Update the relatedItemCollection value of a Topic (see COLLECTION_MODERATOR Role)
+
+           __Non-Cumulative Roles:__
+
+           The following Roles are not cumulative, but grant specific types of access.
+
+           - A THREAD_DELETER can:
+
+             - Delete Threads
+
+               A Thread is deleted when:
+
+               - The top-level Note for a Thread is deleted.
+               - The Topic a Thread belongs to is deleted.
+               - A Topic is deleted that matches the Related Item that a Thread is lifecycled with.
+
+
+           - A THREAD_VIEWER can:
+
+             - View Threads
+
+               This allows the User to view the Thread but not the Notes in the Thread.
+
+           - A COLLECTION_MODERATOR can:
+
+             - Update the relatedItemCollection value of a Topic
+
+               This allows the User to update the relatedItemCollection value of a Topic using the PUT /topics request.  The User must have COLLECTION_MODERATOR access to all of the Threads that are under a Topic to perform this request.
+
+        type: string
+        enum:
+          - OWNER
+          - MODERATOR
+          - REPLIER
+          - VIEWER
+          - THREAD_DELETER
+          - THREAD_VIEWER
+          - COLLECTION_MODERATOR
+      id:
+        description: Set by the service.  The unique identifier for this ThreadRole assigned by the service when created.
+        type: string
+        readOnly: false
+      threadId:
+        description: Set by the service.  The unique identifier for the Thread that this ThreadRole is assigned to.
+        type: string
+        readOnly: false
+      entityName:
+        description: Set by the service.  The display name of the Organization Model Entity specified by entityId.  This value is set by the service when a ThreadRole is created and is used for display purposes only.
+        type: string
+        readOnly: false
+  Notification:
+    description: |+
+      Assigns notification for activity on a Collection, Topic, or Thread to an Organization Model Entity.  When specific changes are made to Notes associated with a Collection, Topic, or Thread, the Organization Model Entity (Group or User) defined here receives the type of notification indicated.  The user making the change on the Note does not receive a notification.
+
+      When creating a new Notification, the scope of the Notification (Collection, Topic, Thread) is specified as follows:
+
+      - To create a Notification for a Collection, set the appropriate values for NotifyCollection and set topicId and threadId to null.
+      - To create a Notification for a Topic, set topicId to the ID of the Topic and set threadId and notifyCollection to null.
+      - To create a Notification for a Thread, set threadId to the ID of the Thread and set topicID and notifyCollection to null.
+      - In the case of specifying a Notification on a ThreadNote when creating a new top-level Note, this is inherently creating a Thread Notification and notifyCollection, topicId, and threadId must be omitted or null.
+
+      Only one of these conditions can exist.  An exception is thrown if none of these conditions exist or if more than one of these conditions exist.
+
+      If Notifications include a User more than once for a given notice event, only a single Notification is sent.  If a Related Item, Thread, or Organization Model Entity is deleted, any associated Notification is also deleted automatically.
+    type: object
+    properties:
+      entityId:
+        description: The unique identifier for an Organization Model Entity (Group or User).  If both entityId and entityType are omitted (or set to null), these values are set for the current User.
+        type: string
+        readOnly: false
+      entityType:
+        description: The type of Organization Model Entity specified by entityId.  If both entityId and entityType are omitted (or set to null), these values are set for the current User.
+        type: string
+        enum:
+          - USER
+          - GROUP
+        readOnly: false
+      type:
+        description: An optional type for the Notification (default = EMAIL).  SMS is not supported at this time.
+        type: string
+        enum:
+          - EMAIL
+          - SMS
+        readOnly: false
+      id:
+        description: Set by the service.  The unique identifier for this Notification, which is assigned by the service when the Notification is created.
+        type: string
+        readOnly: false
+      notifyCollection:
+        $ref: '#/definitions/NotifyCollection'
+      topicId:
+        description: The unique identifier for the Topic to which this Notification is assigned.  Null if notifyCollection or threadId is specified, or when set on a ThreadNote.
+        type: string
+        readOnly: false
+      threadId:
+        description: The unique identifier for the Thread to which this Notification is assigned.  Null if notifyCollection or topicId is specified, or when set on a ThreadNote.
+        type: string
+        readOnly: false
+      entityName:
+        description: Set by the service.  The display name of the Organization Model Entity specified by entityId.  This value is set by the service when a Notification is created and is used for display purposes only.
+        type: string
+        readOnly: false
+      notifyOnUpdate:
+        description: |+
+          An optional flag that indicates if a Notification is sent when a Note for this Topic or Thread is updated or deleted (default=true).  When set to true, a Notification is sent for any update or deletion of: a top-level Note (for Topic Notifications), top-level Note and direct replies to a top-level Note (for Thread Notifications), and nested reply Notes based on the notifyOnAllReplies setting.  When set to false, notifications are not sent for any Note updates or deletions.
+        type: boolean
+        readOnly: false
+      notifyOnAllReplies:
+        description: An optional value that determines if a Notification is sent for all new replies (and all updates based on the notifyOnUpdate flag) (default=true).  When set to true, a notification is sent for any new top-level Notes (for Topic Notifications) and all new replies (replies to the top-level Note and nested child Note replies).  When set to false, a Notification is sent only for new top-level Notes (for Topic Notifications) or new replies to the top-level Note (for Thread Notifications).
+        type: boolean
+        readOnly: false
+
+  Thread:
+    description: A new Thread is created for each top-level Note, which contains information related to all of the reply Notes that are part of the Thread initiated when a top-level Note is created.  This is also used to set Roles.  Only top-level Notes have the thread property set.  All Thread properties are set by the service and cannot be modified by a client except the isLocked, lifecycledWithType, lifecycledWithId, and roles properties.
+    type: object
+    readOnly: false
+    properties:
+      id:
+        description: The unique identifier for this Thread.
+        type: string
+        readOnly: false
+      relatedItemType:
+        description: The type of the Related Item.  Set by the service when created.
+        type: string
+        readOnly: false
+      relatedItemId:
+        description: The ID for the Related Item.  Set by the service when created.
+        type: string
+        readOnly: false
+      relatedItemCollection:
+        type: array
+        items:
+          type: string
+        description: A list of Collection name values used to associate the Topic this Thread belongs to with those Collection names.  This property is maintained by the service.
+        readOnly: false
+      topicId:
+        description: The unique identifier for the Topic this Thread belongs to.  This is assigned by the service when created.
+        type: string
+        readOnly: false
+      topLevelNoteId:
+        description: The unique identifier for the top-level Note that began this Thread.  This is assigned by the service when created.
+        type: string
+        readOnly: false
+      status:
+        description: The status of the Thread.  This value is set by the service to indicate the current status of this Thread.  These are set as follows.  OPEN indicates a top-level Note that is an ISSUE or QUESTION that has not yet received a RESOLUTION or ANSWER reply.  PENDING indicates a RESOLUTION or ANSWER reply has been posted but not yet accepted.  COMPLETE indicates a RESOLUTION or ANSWER has been accepted.  INFO indicates a top-level Note that is INFORMATIONAL.
+        type: string
+        enum:
+          - OPEN
+          - PENDING
+          - COMPLETE
+          - INFO
+        readOnly: false
+      isLocked:
+        description: This is set to true if the Thread has been locked.  A locked Thread prevents any further reply Notes being added to the Thread.  This does not prevent updates on Notes in the Thread.  Only the Thread creator, an OWNER, or MODERATOR can change this value.
+        type: boolean
+        readOnly: false
+      lifecycledWithType:
+        description: |+
+          An optional value that together with lifecycledWithId identify the Topic that this Thread is life-cycled with.
+          - If set, this must be a non-zero length value (limited to 100 characters in length) and must be specified together with lifecycledWithId.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive, and white space is significant (not ignored).
+          - All lifecycledWithType values that start with 'LIVEAPPS_', 'DT_', or 'RT_' are reserved for internal use by Live Apps.
+        type: string
+        readOnly: false
+      lifecycledWithId:
+        description: |+
+          An optional value that together with lifecycledWithType identify the Topic that this Thread is life-cycled with.
+          - If set, this must be a non-zero length value (limited to 100 characters in length) and must be specified together with lifecycledWithType.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive, and white space is significant (not ignored).
+        type: string
+        readOnly: false
+      createdById:
+        description: |+
+          The unique identifier for the User who created the top-level Note for this Thread.  This value is set by the service when a new Thread is created.  The User who creates a top-level Note implicitly has a Role of OWNER for the Thread.
+        type: string
+        readOnly: false
+      createdByName:
+        description: The username of the User who created this Thread.  This value is set by the service when a Thread is created and is used for display purposes only.  If the User has been deleted then this value is set to 'Unknown User'.
+        type: string
+        readOnly: false
+      createdDate:
+        description: The date-time (UTC) when this Thread was created.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      modifiedById:
+        description: The unique identifier for the User who last modified this Thread.  A Thread is modified when isLocked, lifecycledWithType, lifecycledWithId, or roles are changed.  This value is set by the service when a Thread is modified.
+        type: string
+        readOnly: false
+      modifiedByName:
+        description: The username of the User who last modified this Thread.  A Thread is modified when isLocked, lifecycledWithType, lifecycledWithId, or roles are changed.  This value is set by the service when a Thread is modified and is used for display purposes only.  If the User has been deleted then this value is set to 'Unknown User'.
+        type: string
+        readOnly: false
+      modifiedDate:
+        description: The date-time (UTC) when this Thread was last modified.  A Thread is modified when isLocked, lifecycledWithType, lifecycledWithId, or roles are changed.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      actionDate:
+        description: The date-time (UTC) when any Note in this Thread was last added, modified, or deleted.
+        type: string
+        format: date-time
+        readOnly: false
+      actionId:
+        description: The unique identifier for the Note in this Thread that was last added or modified.  The value is null when the actionType is DELETE.
+        type: string
+        readOnly: false
+      actionType:
+        description: The type of the last associated Note action.  POST for a new top-level Note, REPLY for a new Note that is a reply to a Note, UPDATE for any change to a Note, or DELETE for a deleted Note.
+        type: string
+        enum:
+          - POST
+          - REPLY
+          - UPDATE
+          - DELETE
+        readOnly: false
+      roles:
+        description: The Roles associated with this Thread.
+        type: array
+        items:
+          $ref: '#/definitions/ThreadRole'
+        readOnly: false
+      totalCount:
+        description: The total number of Notes in this Thread.
+        type: integer
+        readOnly: false
+      issueNoteCount:
+        description: The total number of Notes in this Thread that have an ISSUE type.
+        type: integer
+        readOnly: false
+      resolutionNoteCount:
+        description: The total number of Notes in this Thread that have a RESOLUTION type.
+        type: integer
+        readOnly: false
+      questionNoteCount:
+        description: The total number of Notes in this Thread that have a QUESTION type.
+        type: integer
+        readOnly: false
+      answerNoteCount:
+        description: The total number of Notes in this Thread that have an ANSWER type.
+        type: integer
+        readOnly: false
+      informationalNoteCount:
+        description: The total number of Notes in this Thread that have an INFORMATIONAL type.
+        type: integer
+        readOnly: false
+      unresolvedStatusCount:
+        description: The total number of Notes in this Thread that have an UNRESOLVED status.
+        type: integer
+        readOnly: false
+      unansweredStatusCount:
+        description: The total number of Notes in this Thread that have an UNANSWERED status.
+        type: integer
+        readOnly: false
+      resolvedStatusCount:
+        description: The total number of Notes in this Thread that have a RESOLVED status.
+        type: integer
+        readOnly: false
+      answeredStatusCount:
+        description: The total number of Notes in this Thread that have an ANSWERED status.
+        type: integer
+        readOnly: false
+      acceptedStatusCount:
+        description: The total number of Notes in this Thread that have an ACCEPTED status.
+        type: integer
+        readOnly: false
+      unacceptedStatusCount:
+        description: The total number of Notes in this Thread that have an UNACCEPTED status.
+        type: integer
+        readOnly: false
+      unclassifiedStatusCount:
+        description: The total number of Notes in this Thread that have an UNCLASSIFIED status.
+        type: integer
+        readOnly: false
+      isOrphaned:
+        description: This is true if the User who created the Thread is deleted.
+        type: boolean
+        readOnly: false
+      isAbandoned:
+        description: |
+          This is true if no OWNER exists as a result of either of these conditions:
+          - the User who created the Thread is deleted and no other OWNER Role exists.
+          - a Group is deleted, which is the only OWNER Role and the Thread isOrphaned flag is set.
+        type: boolean
+        readOnly: false
+
+  Topic:
+    description: A new Topic is created by the service when a new top-level Note is created that is the first Note associated with a given Related Item.  This is maintained by the service and contains statistical information for all Notes for this Topic.  All Topic properties are read-only.
+    type: object
+    readOnly: false
+    properties:
+      id:
+        description: The unique identifier for this Topic.
+        type: string
+        readOnly: false
+      relatedItemType:
+        description: The type of the Related Item.  Set by the service when created.
+        type: string
+        readOnly: false
+      relatedItemId:
+        description: The ID for the Related Item.  Set by the service when created.
+        type: string
+        readOnly: false
+      relatedItemCollection:
+        type: array
+        items:
+          type: string
+        description: A list of Collection name values used to associate this Topic with those Collection names.  This property can be initially set on a new Topic using the ThreadNote.relatedItemCollection property and subsequently updated using the PUT /topics request.
+        readOnly: false
+      createdDate:
+        description: The date-time (UTC) when this Topic was created.  This property is maintained by the service.
+        type: string
+        format: date-time
+        readOnly: false
+      actionDate:
+        description: The date-time (UTC) when any Note for this Topic was last added, modified, or deleted.
+        type: string
+        format: date-time
+        readOnly: false
+      actionId:
+        description: The unique identifier for the Note in this Topic that was last added or modified.  The value is null when the actionType is DELETE.
+        type: string
+        readOnly: false
+      actionType:
+        description: The type of the last associated Note action.  POST for a new top-level Note, REPLY for a new Note that is a reply to a Note, UPDATE for any change to a Note, DELETE for a deleted Note.
+        type: string
+        enum:
+          - POST
+          - REPLY
+          - UPDATE
+          - DELETE
+        readOnly: false
+      totalCount:
+        description: The total number of Notes in this Topic.
+        type: integer
+        readOnly: false
+      threadCount:
+        description: The total number of top-level Notes (Threads) in this Topic.
+        type: integer
+        readOnly: false
+      issueNoteCount:
+        description: The total number of Notes in this Topic that have an ISSUE type.
+        type: integer
+        readOnly: false
+      resolutionNoteCount:
+        description: The total number of Notes in this Topic that have a RESOLUTION type.
+        type: integer
+        readOnly: false
+      questionNoteCount:
+        description: The total number of Notes in this Topic that have a QUESTION type.
+        type: integer
+        readOnly: false
+      answerNoteCount:
+        description: The total number of Notes in this Topic that have an ANSWER type.
+        type: integer
+        readOnly: false
+      informationalNoteCount:
+        description: The total number of Notes in this Topic that have an INFORMATIONAL type.
+        type: integer
+        readOnly: false
+      unresolvedStatusCount:
+        description: The total number of Notes in this Topic that have an UNRESOLVED status.
+        type: integer
+        readOnly: false
+      unansweredStatusCount:
+        description: The total number of Notes in this Topic that have an UNANSWERED status.
+        type: integer
+        readOnly: false
+      resolvedStatusCount:
+        description: The total number of Notes in this Topic that have a RESOLVED status.
+        type: integer
+        readOnly: false
+      answeredStatusCount:
+        description: The total number of Notes in this Topic that have an ANSWERED status.
+        type: integer
+        readOnly: false
+      acceptedStatusCount:
+        description: The total number of Notes in this Topic that have an ACCEPTED status.
+        type: integer
+        readOnly: false
+      unacceptedStatusCount:
+        description: The total number of Notes in this Topic that have an UNACCEPTED status.
+        type: integer
+        readOnly: false
+      unclassifiedStatusCount:
+        description: The total number of Notes in this Topic that have an UNCLASSIFIED status.
+        type: integer
+        readOnly: false
+  LastAccessChange:
+    description: A LastAccessChange provides information used to determine if a Topic or Collection has new or modified content.
+    type: object
+    properties:
+      changedSinceDate:
+        description: |+
+          The calling User's last access date-time (UTC) as follows: For a Collection, this is the calling User's oldest last access date and time for the Topics in any of the Collection names.  For a Topic, this is the calling User's last access date and time for that Topic.  The value is null if the User has never accessed the Topic or any Topic in a Collection.
+        type: string
+        format: date-time
+        readOnly: true
+      newCount:
+        description: The number of Notes in the Topic or Collection that have been created by other users since the last time the User fetched Notes for the Topic.   This count does not include Notes that were created by the calling User.  If the User never previously fetched Notes for the Topic or Collection, the value returned is the total number of Notes in the Topic or Collection.
+        type: integer
+        readOnly: true
+      modifiedCount:
+        description: The number of Notes in the Topic or Collection that have been modified by other users since the last time the User fetched Notes for the Topic.  This count does not include Notes that were modified by the calling User.   If the User never previously fetched Notes for the Topic or Collection, the value returned is zero.
+        type: integer
+        readOnly: true
+      deletedCount:
+        description: The number of Notes in the Topic or Collection that have been deleted by other users since the last time the User fetched Notes for the Topic.  This count does not include Notes that were deleted by the calling User.  If the User never previously fetched Notes for the Topic or Collection, the value returned is zero.
+        type: integer
+        readOnly: true
+  NotifyCollection:
+    description: This object is used to specify notifications for a Collection.  Null if topicId or threadId is specified, or when set on a ThreadNote.  The value of collectionName specifies the Collection name to which this Notification applies.  The lifecycledWithType and lifecycledWithId are optional values that together identify the Topic that this Notification is life-cycled with.  If specified, this Notification is automatically deleted when the referenced Topic is deleted.
+    type: object
+    required:
+      - collectionName
+    properties:
+      collectionName:
+        description: The Collection name to which this Notification applies.
+        type: string
+        readOnly: false
+      lifecycledWithType:
+        description: |+
+          An optional value that together with lifecycledWithId identify the Topic that this Notification is life-cycled with.
+          - If set, this must be a non-zero length value (limited to 100 characters in length) and must be specified together with lifecycledWithId.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive, and white space is significant (not ignored).
+          - All lifecycledWithType values that start with 'LIVEAPPS_', 'DT_', or 'RT_' are reserved for internal use by Live Apps.
+        type: string
+        readOnly: false
+      lifecycledWithId:
+        description: |+
+          An optional value that together with lifecycledWithType identify the Topic that this Notification is life-cycled with.
+          - If set, this must be a non-zero length value (limited to 100 characters in length) and must be specified together with lifecycledWithType.
+          - Any UTF-8 characters can be used.
+          - The property is treated as case sensitive, and white space is significant (not ignored).
+        type: string
+        readOnly: false
+  Error:
+    description: The JSON payload to be returned when either a 400 or 500 HTTP status code is returned.
+    type: object
+    properties:
+      errorMsg:
+        description: Verbose error message.
+        type: string
+        readOnly: true
+      errorCode:
+        description: |
+          The following are the possible error codes in the Note Manager Service (note that the description shown is not part of the error code):
+          - NM_DB_READ_ERROR - Error while reading an entity.
+          - NM_DB_WRITE_ERROR - Error while writing an entity.
+          - NM_DB_DELETE_ERROR - Error while deleting an entity.
+          - NM_DB_NULL_ENTITY - Attempt to write a null entity.
+          - NM_DB_NO_SUBSCRIPTION - No Subscription can be identified from security context.
+          - NM_DB_MANDATORY_PROPERTY_MISSING - A mandatory property has not been supplied in the request.
+          - NM_DB_NOT_AUTHENTICATED - No authenticated caller can be identified from the security context.
+          - NM_DB_CONSTRAINT_ERROR - A constraint error occurred while writing an entity.
+          - NM_DB_INCONSISTENT_DATA_ERROR - An unexpected data condition detected.
+          - NM_SRVC_UNKNOWN_ENTITY - Unable to locate the identified entity.
+          - NM_SRVC_NOT_AUTHENTICATED - Unable to identify the caller.
+          - NM_SRVC_SERVICE_NOT_AUTHORIZED - The caller is not authorized to access the identified service.
+          - NM_SRVC_ENTITY_NOT_AUTHORIZED - The caller is not authorized to access the identified entity.
+          - NM_SRVC_NOT_REGISTERED - The caller is not a registered BPM Note Manager user.
+          - NM_SRVC_MISSING_MANDATORY_PARAMETER - A mandatory parameter has not been supplied in the request.
+          - NM_SRVC_INVALID_PARAMETER - A parameter supplied in the request is invalid.
+          - NM_SRVC_THREAD_LOCKED - A reply Note cannot be added to a Thread that is locked.
+        type: string
+        readOnly: true
+      stackTrace:
+        description: Added if available and requested by X-Provide-Stacktrace HTTP header.
+        type: string
+        readOnly: true
+      contextAttributes:
+        description: A set of named Attributes that may be relevant to the error in order to determine the cause of the error.
+        type: array
+        items:
+          $ref: '#/definitions/ErrorContextAttribute'
+        readOnly: true
+  ErrorContextAttribute:
+    description: A name/value pair relevant to an error.
+    type: object
+    properties:
+      name:
+        description: The attribute name.
+        type: string
+        readOnly: true
+      value:
+        description: The attribute value.
+        type: string
+        readOnly: true

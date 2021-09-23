@@ -57,8 +57,8 @@ export class DiscoverComponent implements AfterViewInit {
     }
 
     // console.log(this.configService.config.discover.navBarMessages);
-    if(this.configService?.config?.discover?.navBarMessages && this.configService?.config?.discover?.navBarMessages.length > 0) {
-      for (const not of this.configService?.config?.discover?.navBarMessages){
+    if(this.configService?.config?.discover?.messages && this.configService?.config?.discover?.messages.length > 0) {
+      for (const not of this.configService?.config?.discover?.messages){
         this.messageService.sendMessage('navbar.message', JSON.stringify(not));
       }
     }

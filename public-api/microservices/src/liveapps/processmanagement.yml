@@ -1,0 +1,437 @@
+swagger: '2.0'
+info:
+  title: Business Process Management Service
+  description: |
+    The TIBCO(R) Live Apps Business Process Management Service manages the following resources:
+    
+    * __Case Creator processes__: A Case Creator process is a process definition containing the business logic used to create a Case - this may simply be a single step process that provides a form for a user to complete, or a more involved sequence of steps. An application designer creates at least one Case Creator process when they create an application in Live Apps Designer. A user creates a Process Instance when they use Live Apps Case Manager to start a Case.
+       
+    * __Case Action processes__: A Case Action process is a process definition containing the business logic used to execute some sort of unscheduled action on an active Case. An application designer creates as many Case Action processes as they need when they create an application in Live Apps Designer. A user creates a Process Instance when they use Live Apps Case Manager to execute an Action on an existing Case.
+      
+    * __Process Instances__: A Process Instance is a particular instance of a Case Creator process or a Case Action process.
+     
+    * Process Instance __States__: A Process Instance is, at any time, in one of the following States: STARTED, ACTIVE, COMPLETED, DELAYED, CANCELLED, HALTED or UNKNOWN. Process Instance States are system-defined values representing logical stages in the lifecycle of a process and are used by every Process Instance. 
+    
+      Note: Process Instance States should not be confused with Case states, which are application-defined values representing logical stages in the lifecycle of a Case. An application designer creates whatever Case states they need when they create an application in Live Apps Designer. They can configure the application to only allow users to execute a particular Case Action (that is, start a Process Instance of a Case Action process) when a Case is in a particular (Case) state.
+  termsOfService: ../../contexthelp/common/TIB_bpm-cloud_1.0.0_license.pdf
+  contact:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+    email: liveapps@tibco.com
+  license:
+    name: TIBCO Software Inc
+    url: http://www.tibco.com
+  version: "1.0.0"
+schemes:
+  - https
+basePath: /process/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: Instances
+    description: Methods on Process Instances
+  - name: Instance States
+    description: Methods on States of a specific Process Instance
+  - name: Processes
+    description: Methods on Processes
+paths:
+  /instances:
+    get:
+      summary: Returns summary information about Process Instances that match the specified query parameters.
+      description: Information is returned only for Process Instances to which the current User has access.
+      tags:
+        - Instances
+      operationId: listInstances
+      parameters:
+        - $ref: '#/parameters/Sandbox'
+        - $ref: '#/parameters/Filter'
+        - $ref: '#/parameters/Skip'
+        - $ref: '#/parameters/Top'
+      responses:
+        '200':
+          description: OK - Returns summary information about the matching Process Instances.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Instance'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+  '/instances/{id}':
+    get:
+      summary: Returns summary information about a specified Process Instance.
+      description: ""
+      tags:
+        - Instances
+      operationId: getInstance
+      parameters:
+        - $ref: '#/parameters/InstanceId'
+      responses:
+        '200':
+          description: OK - Returns summary information about the specified Process Instance.
+          schema:
+            $ref: '#/definitions/Instance'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found. The specified Process Instance does not exist in this Sandbox.
+          schema:
+            $ref: '#/definitions/Error'
+  '/instanceStates/{id}':
+    get:
+      summary: Returns the current state and data for a specified Process Instance.
+      description: |
+        Returns the current State of the Process Instance, along with its current data fields (system-defined and process-defined) and values.
+        
+        Information returned from this method can be updated as required and then passed to the 
+        PUT InstanceStates method - for example, to retry the execution of a HALTED Process Instance.
+      tags:
+        - Instance States
+      operationId: getInstanceState
+      parameters:
+        - $ref: '#/parameters/InstanceId'
+        - $ref: '#/parameters/Sandbox'
+      responses:
+        '200':
+          description: OK - Returns the current state and data for the specified Process Instance.
+          schema:
+            $ref: '#/definitions/InstanceState'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found. The specified Process Instance does not exist in the specified Sandbox.
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates the current state and data for a specified Process Instance.
+      description: |
+        Updates the current State of a Process Instance, along with the values of any (process-defined) data fields. 
+        
+        This method can be used to manage Process Instance lifecycle, for example:
+        
+        * Retry the execution of a HALTED Process Instance (by changing State from HALTED to ACTIVE).
+        
+        * Cancel a Process Instance (by changing State to CANCELLED).
+        
+        * Fire a timer to continue a delayed Process Instance immediately (by changing State from DELAYED to ACTIVE).
+        
+        Note: The calling User must be a member of the Administrator Group to be able to use this method.
+      tags:
+        - Instance States
+      operationId: updateInstanceState
+      parameters:
+        - $ref: '#/parameters/InstanceId'
+        - name: state
+          in: body
+          description: |
+            An 'InstanceState' object containing:
+            
+            * __state__ (required): The new State in which to place the Process Instance.
+            
+            * __sandboxId__ (optional): The id of the Sandbox containing the specified Process Instance id. (You can obtain the sandboxId by using the GET /sandboxes method in the Authorization Engine Service.) 
+            
+            * __systemAttributes__ and __definitionAttributes__ (optional): Any updated values for data fields.
+          
+          required: true
+          schema:
+            $ref: '#/definitions/InstanceState'
+      responses:
+        '200':
+          description: OK - Returns the updated State and data for the specified Process Instance.
+          schema:
+            $ref: '#/definitions/InstanceState'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: Not found. The specified Process Instance does not exist in this Sandbox.
+          schema:
+            $ref: '#/definitions/Error'
+  '/processes':
+    post:
+      summary: Creates an instance of a specified Case Creator or Case Action process.
+      description: |
+        This method can be used to:
+        
+        * Create a new Case (creating an instance of a Case Creator process).
+        
+        * Update an existing Case by performing a specific action (creating an instance of a Case Action process). Note: The calling User must have the appropriate permissions to execute the requested action.
+                
+        Any data required to start the process can also be supplied.
+        
+        In each case, you can obtain the necessary details of the process to be started from the GET /types and GET /cases methods in the Case Manager service.
+      tags:
+        - Processes
+      operationId: processCreate
+      parameters:
+        - name: details
+          in: body
+          description: |
+            A 'ProcessDetails' object containing: 
+            
+            * __id__ (required): The id of the Case Creator process or Case Action process from which you want to start a Process Instance. (You can obtain this id by using the GET /types method in the Case Manager Service.) 
+            
+            * __applicationId__ (required): The id of the application that contains the specified Case Creator process or Case Action process. (You can obtain the applicationId by using the GET /types method in the Case Manager Service.) 
+            
+            * __sandboxId__ (required): The id of the Sandbox containing the specified applicationId. (You can obtain the sandboxId by using the GET /sandboxes method in the Authorization Engine Service.) 
+            
+            * __caseReference__ (optional - but see Note below): The Case reference of an existing Case for which you want to start a Case Action Process Instance. (You can obtain the caseReference by using the GET /cases method in the Case Manager Service.) 
+            
+              Note: 
+              
+              * A 'caseReference' is __required__ when starting an Instance of a Case Action process, otherwise a 400 error is returned. 
+              
+              * If you supply a 'caseReference' when starting an Instance of a Case Creator process, a 400 error is returned.
+              
+            * __data__ (optional): The data that you wish to supply when starting the Process Instance. This data must conform to the JSON schema of the Case Creator process or Case Action process that you are starting. (You can obtain that JSON schema by using the GET /types method in the Case Manager Service.)  
+          required: true
+          schema:
+            $ref: '#/definitions/ProcessDetails'
+      responses:
+        '200':
+          description: Instance created
+          schema:
+            $ref: '#/definitions/ProcessDetails'
+        '400':
+          description: Bad request - The specified request was invalid. See the error details for more information.
+          schema:
+            $ref: '#/definitions/Error'
+parameters:
+  InstanceId:
+    name: id
+    in: path
+    description: The unique identifier of the Process Instance.
+    required: true
+    type: string
+  Filter:
+    name: $filter
+    in: query
+    description: |
+      A filter expression that defines the Process Instances to be returned. The expression can contain the following operands:
+      
+      * __caseReference__ (required if 'state' is not used): The reference of the specific Case for which Process Instances should be returned.
+      
+      * __state__ (required if 'caseReference' is not used): The identifier of the specific State for which Process Instances should be returned. This must be one of the following strings: 'STARTING', 'ACTIVE', 'COMPLETED', 'CANCELLED, 'DELAYED' or 'HALTED'.
+      
+      Supported operators: 'eq'
+      
+      Note: Either 'caseReference' or 'state' must be specified, or both can be specified by using the 'AND' operator.
+      
+      For example, the following string returns all Process Instances for caseReference '35' that are currently 'ACTIVE': 
+      
+        $filter=caseReference eq 35 and state eq 'ACTIVE'
+    required: false
+    type: string
+  Sandbox:
+    name: $sandbox
+    in: query
+    description: The id of the Sandbox from which to return data. (You can obtain Sandbox Ids using the GET /sandboxes method in the Authorization Engine Service.) 
+    required: true
+    type: string
+  Skip:
+    name: $skip
+    in: query
+    description: |
+      The number of items to exclude from the results list, counting from the beginning of the list. The value must be 0 or greater. For example, `$skip=80` results in the first 80 items in the results list being ignored. Subsequent items are returned, starting with the 81st item in the list. 
+      
+      Note: '$top' must also be used if '$skip' is used.
+    required: false
+    type: integer
+    format: int32
+  Top:
+    name: $top
+    in: query
+    description: |
+      The maximum number of items to be returned from the results list (with the first item determined by the value of the $skip parameter). The value of $top must be 1 or greater. For example, `$top=20` returns 20 items from the results list, or all the results if the list contains 20 or fewer items.
+      
+      Note: '$skip' must also be used if '$top' is used.
+    required: false
+    type: integer
+    format: int32
+definitions:
+  InstanceState:
+    description: The current State and data for a Process Instance.
+    type: object
+    required:
+      - state
+      - systemAttributes
+      - definitionAttributes
+    properties:
+      sandboxId:
+        description: The id of the Sandbox containing the Process Instance.
+        type: string
+      state:
+        description: The current State of the Process Instance.
+        type: string
+        enum:
+          - STARTING
+          - ACTIVE
+          - COMPLETED
+          - CANCELLED
+          - HALTED
+          - UNKNOWN
+          - DELAYED
+      systemAttributes:
+        description: The internal, system-defined data fields and their current values for the Process Instance.
+        type: array
+        items:
+          $ref: '#/definitions/Attribute'
+      definitionAttributes:
+        description: The process-defined data fields and their current values for the Process Instance.
+        type: array
+        items:
+          $ref: '#/definitions/Attribute'
+  Instance:
+    description: Summary information about a Process Instance (of a Case Creator or Case Action process).
+    type: object
+    required:
+      - id
+      - caseReference
+      - applicationId
+      - applicationName
+      - applicationInternalName
+      - processId
+      - processName
+      - processInternalName
+      - version
+      - state
+      - timeStarted
+      - timeCompleted
+    properties:
+      id:
+        description: The unique id of the Process Instance.
+        type: string
+      caseReference:
+        description: The Case Reference of the Case that is associated with the Process Instance. 
+        type: string
+      applicationId:
+        description: The id of the application in which the Case Creator or Case Action process is defined.
+        type: string
+      applicationName:
+        description: The name of the application in which the Case Creator or Case Action process is defined.
+        type: string
+      applicationInternalName:
+        description: The internal name of the application in which the Case Creator or Case Action process is defined.
+        type: string
+      processId:
+        description: The id of the Case Creator or Case Action process from which the Process Instance was started.
+        type: string
+      processName:
+        description: The name of the Case Creator or Case Action process from which the Process Instance was started.
+        type: string
+      processInternalName:
+        description: The internal name of the Case Creator or Case Action process from which the Process Instance was started.
+        type: string
+      version:
+        description: The version of the application in which the Case Creator or Case Action process is defined.
+        type: string
+      state:
+        description: The current State of the Process Instance.
+        type: string
+        enum:
+          - STARTING
+          - ACTIVE
+          - COMPLETED
+          - CANCELLED
+          - HALTED
+          - UNKNOWN
+          - DELAYED
+      timeStarted:
+        description: The date/time at which the Process Instance started.
+        type: string
+        format: ISO8601
+      timeCompleted:
+        description: The date/time at which the Process Instance completed (if it has completed).
+        type: string
+        format: ISO8601
+  ProcessDetails:
+    description: Details of process to start an instance of
+    type: object
+    required:
+      - id
+      - applicationId
+      - sandboxId
+    properties:
+      id:
+        description: The id of the Case Creator process or Case Action process used to start the Process Instance.
+        type: string
+      applicationId:
+        description: The id of the application that contains the Case Creator process or Case Action process used to start the Process Instance.
+        type: string
+      sandboxId:
+        description: The id of the Sandbox containing the specified applicationId.
+        type: string
+      caseReference:
+        description: The Case reference of the newly created or updated case. 
+        type: string
+      caseIdentifier:
+        description: The Case Reference of the Case that is associated with the Process Instance. 
+        type: string
+      data:
+        description: The JSON data, serialized to a string, used to start the Process Instance.
+        type: string
+  Attribute:
+    description: The definition of a system-defined or process-defined data field.
+    type: object
+    required:
+      - name
+      - type
+      - value
+    properties:
+      name:
+        description: Name of the attribute.
+        type: string
+      type:
+        description: Type of the attribute.
+        type: string
+      value:
+        description: Value of the attribute.
+        type: string
+  Error:
+    description: Error
+    type: object
+    properties:
+      errorMsg:
+        description: Verbose error message.
+        type: string
+      errorCode:
+        description: |
+            The following are the possible error codes in the Business Process Management Service (note that the description shown is not part of the error code):
+            - BP_AUTO_START_COUNT_EXCEEDED - Processing of AUTOSTART message has exceeded the maximum allowed; rejecting message.
+            - CE_AUTO_START_NOT_DEFINED - The Process referenced within the AUTOSTART message is not defined as auto-start; rejecting message.
+            - CE_BAD_START_REQUEST - Bad request received for a Process Instance start.
+            - CE_BAD_START_REQUEST_AUTO_START - Bad request received for a Process Instance start; the Process is marked as auto-start only.
+            - CE_GENERAL_FAULT - Exception generated when processing the Process Instance.
+            - CE_INVALID_CASE_ACTION_START_REQUEST - The specified process is a Case Action process, but the request does not include a Case reference ('caseReference').
+            - CE_INVALID_CASE_CREATOR_START_REQUEST - The specified process is a Case Creator process, but the request includes a case reference ('caseReference').
+            - CE_INVALID_CASE_REF - The supplied Case reference ('caseReference') is not valid.
+            - CE_INVALID_CASE_STATE - The current Case state does not permit execution of the specified Case Action.
+            - CE_INVALID_MAPPING - An error occurred while mapping data.
+            - CE_PERMISSION_DENIED - Permission denied.
+            - CE_RUN_INSTANCE_PERMISSION_DENIED - Permission denied to start or run this Process Instance.
+            - CE_SERVICE_GENERIC - Generic Business Process Management Service exception.
+            - CE_SERVICE_INVALID_PARAMETER - The JSON payload specified for the request is invalid.
+            - CE_SERVICE_MISSING_APP_PROCESS - The service request failed to find the specified application or process.
+            - CE_SERVICE_MISSING_DELAYED_MESSAGE_ID - Cannnot fire timer immediately due to missing delayed message id.
+            - CE_SERVICE_MISSING_INSTANCE - The service request failed to find the specified Process Instance.
+            - CE_SERVICE_MISSING_PARAMETER - The service request is missing a required parameter.
+            - CE_SERVICE_MISSING_PROCESS - The service request failed to find the specified process in the specified application.
+            - CE_SERVICE_MISSING_PROCESS_ID - The service request failed to find the specified process.
+            - CE_SERVICE_STATE_CHANGE_NOT_ALLOWED - The specified State change is not allowed for the Process Instance.
+            - CE_SERVICE_UNKNOWN_ATTRIBUTE - The specified attribute is unknown for the Process Instance.
+            - CE_SERVICE_UNKNOWN_STATE - The specified State is unknown or unsupported.
+        type: string
+      stackTrace:
+        description: Stack trace details (only provided in a debug environment).
+        type: string
+      contextInfo:
+        description: Contextual information about the Error.
+        type: string

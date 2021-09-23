@@ -1,0 +1,25 @@
+<div class="title-right" (click)="toggleUpload()">
+      <span class="icon-container">
+        <uxpl-icon
+          *ngIf="dataset.csvMethod!='upload' || (dataset.csvMethod=='upload' && !file && !dataset.Dataset_Source?.FileName)"
+          class="icon" icon="pl-icon-upload" width="20px" height="20px" color="#1774E5"></uxpl-icon>
+        <uxpl-icon *ngIf="dataset.csvMethod=='upload' && (file || dataset.Dataset_Source?.FileName)" class="icon"
+                   icon="pl-icon-edit" width="20px" height="20px" color="#1774E5"></uxpl-icon>
+      </span>
+  <div class="upload-csv-link" cdkOverlayOrigin #trigger="cdkOverlayOrigin">
+    <span
+      *ngIf="dataset.csvMethod!='upload' || (dataset.csvMethod=='upload' && !file && !dataset.Dataset_Source?.FileName)">Upload a new file</span>
+    <span *ngIf="dataset.csvMethod=='upload' && (file || dataset.Dataset_Source?.FileName)">Change upload</span>
+  </div>
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="isOpen"
+    [cdkConnectedOverlayOffsetY]="238"
+    (overlayOutsideClick)="clickOutside()">
+    <div class="upload-overlay">
+      <csv-upload [filename]="filename" [filetypes]="'csv'" [filesize]="1000" [error]="csvError"
+                  (uploadFile)="onUploadFile($event)" size="small"></csv-upload>
+    </div>
+  </ng-template>
+</div>

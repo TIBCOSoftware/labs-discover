@@ -1,0 +1,369 @@
+# CM API for Ariel
+swagger: '2.0'
+info:
+  title: UP API
+  description: UP for Cloud BPM
+  version: "1.0.0"
+# the domain of the service
+host: ariel-tst-lin-1.eme.tibco.com
+# array of all schemes that your API supports
+schemes:
+  - https
+  # will be prefixed to all paths
+basePath: /up/v1/
+consumes:
+  - application/json
+produces:
+    - application/json
+tags:
+    - name: Case Creators
+      description: Operations on case creators
+    - name: Case Actions
+      description: Operations on case actions    
+paths:
+  /caseCreators/:
+    get:
+      summary: List caseCreators
+      description: List all caseCreators
+      tags:
+        - Case Creators
+      operationId: listCaseCreators
+      parameters:
+        - name: $sandbox
+          in: query
+          type: string
+          required: true
+          description: Sandbox Id
+        - name: $filter
+          in: query
+          type: string
+          required: false
+          description: Can filtered by applicationId and CaseType. Otherwise, all applications are included.
+      responses:
+        200:
+          description: CaseCreators
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CaseCreator'
+        default:
+          description: Error response
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Starts an instance of CaseCreator
+      description: Starts an instance of CaseCreator
+      tags:
+        - Case Creators
+      operationId: startCaseCreatorInstance
+      parameters:
+        - name: $sandbox
+          in: query
+          type: string
+          required: true
+          description: Sandbox Id      
+        - name: caseCreatorTemplate
+          in: body
+          description: CaseCreator Template.
+          required: false
+          schema:
+            $ref: "#/definitions/CaseCreator"
+      responses:
+        '200':
+          description: Instance created successfully 
+          schema:
+            $ref: '#/definitions/CaseCreatorInstance'
+        '400':
+          description: Error if the request is invalid
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      summary: Updates an instance of CaseCreator
+      description: Updates an instance by sending a message to BP
+      tags:
+        - Case Creators
+      operationId: updateCaseCreatorInstance
+      parameters:
+        - name: $sandbox
+          in: query
+          type: string
+          required: true
+          description: Sandbox Id      
+        - name: instanceMessage
+          in: body
+          description: Instance Message.
+          required: false
+          schema:
+            $ref: "#/definitions/CaseCreatorData"
+      responses:
+        '200':
+          description: Message successfully sent
+        '400':
+          description: Error if the request is invalid
+          schema:
+            $ref: "#/definitions/Error"
+            
+  /caseActions/:
+    get:
+      summary: List Case Actions
+      description: List all Case Actions
+      tags:
+        - Case Actions
+      operationId: listCaseActions
+      parameters:
+        - name: $sandbox
+          in: query
+          type: string
+          required: true
+          description: Sandbox Id
+        - name: $filter
+          in: query
+          type: string
+          required: false
+          description: Can filtered by ApplicationId, CaseType and CaseState. Otherwise, all applications are included.          
+      responses:
+        200:
+          description: CaseActions
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CaseAction'
+        default:
+          description: Error response
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Starts an instance of CaseAction
+      description: Starts an instance of CaseAction
+      tags:
+        - Case Actions
+      operationId: startCaseActionInstance
+      parameters:
+        - name: $sandbox
+          in: query
+          type: string
+          required: true
+          description: Sandbox Id
+        - name: $caseRef
+          in: query
+          type: string
+          required: true
+          description: CaseRef Id
+        - name: caseActionTemplate
+          in: body
+          description: CaseAction Template.
+          required: false
+          schema:
+            $ref: "#/definitions/CaseAction"
+      responses:
+        '200':
+          description: Instance created successfully
+          schema:
+            $ref: '#/definitions/CaseActionInstance'
+        '400':
+          description: Error if the request is invalid
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      summary: Updates an instance of CaseAction
+      description: Updates an instance by sending a message to BP
+      tags:
+        - Case Actions
+      operationId: updateCaseActionInstance
+      parameters:
+        - name: $sandbox
+          in: query
+          type: string
+          required: true
+          description: Sandbox Id      
+        - name: instanceMessage
+          in: body
+          description: Instance Message.
+          required: false
+          schema:
+            $ref: "#/definitions/CaseActionData"
+      responses:
+        '200':
+          description: Message successfully sent
+        '400':
+          description: Error if the request is invalid
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  CaseCreator:
+    description: CaseCreator
+    type: object
+    required:
+      - id
+      - name
+      - label
+      - version
+      - applicationId
+      - applicationName
+      - activityId
+      - activityName
+    properties:
+      id:
+        description: Unique id of the process
+        type: string
+      name:
+        description: Name of the process
+        type: string
+      label:
+        description: Name of the process
+        type: string        
+      version:
+        description: Version of the application
+        type: integer
+      applicationId:
+        description: Unique id of the application
+        type: string
+      applicationName:
+        description: Name of the application
+        type: string
+      activityId:
+        description: Unique id of the activity
+        type: string
+      activityName:
+        description: Name of the activity
+        type: string
+  CaseCreatorInstance:
+    description: CaseCreator
+    type: object
+    required:
+      - id
+      - name
+      - version
+      - applicationId
+      - activityName
+    properties:
+      id:
+        description: Unique id of the process
+        type: string
+      name:
+        description: Name of the process
+        type: string
+      version:
+        description: Version of the application
+        type: integer
+      applicationId:
+        description: Unique id of the application
+        type: string
+      activityName:
+        description: Name of the activity
+        type: string
+  CaseCreatorData:
+    description: CaseCreatorData
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        description: Unique id of the instance
+        type: string
+      data:
+        description: json string
+        type: string        
+  CaseAction:
+    description: CaseAction
+    type: object
+    required:
+      - id
+      - name
+      - label
+      - version
+      - applicationId
+      - applicationName
+      - activityName
+      - availableInStates
+    properties:
+      id:
+        description: Unique id of the process
+        type: string
+      name:
+        description: Name of the process
+        type: string
+      label:
+        description: Name of the process
+        type: string        
+      version:
+        description: Version of the application
+        type: integer
+      applicationId:
+        description: Unique id of the application
+        type: string
+      applicationName:
+        description: Name of the application
+        type: string
+      activityName:
+        description: Name of the Activity
+        type: string
+      availableInStates:
+        description: Case States
+        type: array
+        items:
+          type: string
+  CaseActionInstance:
+    description: CaseActionInstance
+    type: object
+    required:
+      - id
+      - name
+      - version
+      - data
+      - applicationId
+      - activityName
+    properties:
+      id:
+        description: Unique id of the process
+        type: string
+      name:
+        description: Name of the process
+        type: string
+      version:
+        description: Version of the application
+        type: integer
+      data:
+        description: Name of the process
+        type: string
+      applicationId:
+        description: Unique id of the application
+        type: string
+      activityName:
+        description: Name of the Activity
+        type: string
+  CaseActionData:
+    description: CaseActionDetails
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        description: Unique id of the instance
+        type: string
+      data:
+        description: json string
+        type: string
+      caseRef:
+        description: caseRef for a case
+        type: string
+  ContextAttribute:
+    properties:
+      name: 
+        type: string
+      value:
+        type: string
+  Error:
+    type: object
+    properties:
+      errorMsg:
+        type: string
+      errorCode:
+        type: string
+      stackTrace:
+        type: string
+      contextAttributes:
+        type: array
+        items:
+          $ref: '#/definitions/ContextAttribute'        

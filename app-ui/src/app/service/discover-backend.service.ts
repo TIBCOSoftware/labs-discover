@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class DiscoverBackendService {
    * @param fileName The file name.
    * @returns
    */
-  public uploadFile(orgId: string, file: File, dataSource: DatasetDataSource): Observable<UploadFileResponse> {
+  public uploadFile(orgId: string, file: File, dataSource: DatasetDataSource): Observable<HttpEvent<any>> {
     const url = `/files/${orgId.toLowerCase()}`;
     const headers = new HttpHeaders({
       'accept': 'application/json',
@@ -50,9 +50,9 @@ export class DiscoverBackendService {
     formData.append('quoteChar', dataSource.FileQuoteChar);
     formData.append('escapeChar', dataSource.FileEscapeChar);
     formData.append('csv', file);
-    return this.callApi(url, 'post', formData, {... headers}).pipe(
-      map(response => {
-        return response as UploadFileResponse;
+    return this.callApi(url, 'post', formData, {... headers, reportProgress: true, observe: 'events'}).pipe(
+      map(event => {
+        return event;
       })
     );
   }

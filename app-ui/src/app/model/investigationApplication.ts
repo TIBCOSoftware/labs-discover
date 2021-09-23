@@ -17,11 +17,12 @@ export interface InvestigationApplication {
     customTitle?: string;
     applicationId?: string;
     creatorId?: string;
-    creatorData?: string;
+    creatorData?: Array<InvestigationField>;
     headerFields?: Array<InvestigationField>;
     detailTitle?: InvestigationField;
     showMilestone?: boolean;
-    detailFields?: Array<InvestigationField>;
+    allowMultiple?: boolean;
+    detailFields?: Array<Array<InvestigationField>>;
     states?: Array<InvestigationState>;
 }
 

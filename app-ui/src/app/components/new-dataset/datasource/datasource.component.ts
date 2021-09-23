@@ -46,12 +46,11 @@ export class NewDatasetDatasourceComponent implements OnInit {
   public files: CsvFile[];
 
   constructor(
-    protected configService: ConfigurationService,
-    protected documentsService: TcDocumentService,
-    protected csvService: CsvService,
-    protected datasetService: DatasetService,
-    protected backendService: DiscoverBackendService,
-    protected location: Location) { }
+    private configService: ConfigurationService,
+    private csvService: CsvService,
+    private datasetService: DatasetService,
+    private backendService: DiscoverBackendService,
+    private location: Location) { }
 
   ngOnInit(): void {
 
@@ -65,7 +64,10 @@ export class NewDatasetDatasourceComponent implements OnInit {
 
   private getCsvFiles() {
     this.datasetService.getCsvFiles().subscribe(list => {
-      this.files = list;
+      this.files = list.map(file => {
+        file.fileSize = parseInt(file.redisFileInfo.FileSize);
+        return file;
+      });
     });
   }
 
@@ -89,6 +91,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
   }
 
   public onUploadFile = (file: File): void => {
+    console.log('On upload file: ' , file)
     this.isError = false;
     this.data.type = this.wizard.dataSourceType;
     this.data.csvMethod = 'upload';

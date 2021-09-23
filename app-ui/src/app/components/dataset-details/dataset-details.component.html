@@ -1,0 +1,106 @@
+<mat-card class="cont-card" *ngIf="dataset">
+  <mat-card-header>
+    <mat-card-title>{{dataset.name}} ({{dataset.status}})</mat-card-title>
+    <mat-card-subtitle>{{dataset.description}}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="tables-content">
+<!--      <table style="width:66%;">-->
+    <table style="width:100%;">
+      <tr class="cell-row">
+        <td class="cell-header-main">Name</td>
+        <td class="cont-detail">{{dataset.fileName}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Status</td>
+        <td class="cont-detail">{{dataset.status}}</td>
+        <td class="cont-space"></td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">Id</td>
+        <td class="cont-detail">
+          <div class="detail-cell">
+            <div [matTooltip]="dataset.datasetid" matTooltipClass="tTip">{{getShortMessage(dataset.datasetid, messageLength)}} </div>
+            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
+                       matTooltip="copy id to clipboard" matTooltipClass="tTip"
+                       (click)="copyToClipBoard('Id', dataset.datasetid,msService)"></uxpl-icon>
+          </div>
+        </td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Created on</td>
+        <td class="cont-detail">{{datasetDetail?.createdDate | date: 'EEEE, MMMM d, y, h:mm:ss a'}}</td>
+        <td class="cont-space"></td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">Type</td>
+        <td class="cont-detail">{{datasetDetail?.type}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Modified on</td>
+        <td class="cont-detail">{{datasetDetail?.updatedDate | date: 'EEEE, MMMM d, y, h:mm:ss a'}}</td>
+        <td class="cont-space"></td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">File Name</td>
+        <td class="cont-detail">{{dataset.fileName}}</td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main">Last previewed on</td>
+        <td class="cont-detail">{{datasetDetail?.lastPreviewDate | date: 'EEEE, MMMM d, y, h:mm:ss a'}}</td>
+        <td class="cont-space"></td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main">File Path</td>
+        <td class="cont-detail">
+          <div class="detail-cell">
+          <div [matTooltip]="dataset.filePath" matTooltipClass="tTip">{{getShortMessage(dataset.filePath, messageLength)}} </div>
+          <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
+                     matTooltip="copy path to clipboard" matTooltipClass="tTip"
+                     (click)="copyToClipBoard('Dataset Path', dataset.filePath,msService)"></uxpl-icon>
+        </div></td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main"></td>
+        <td class="cont-detail"></td>
+        <td class="cont-space"></td>
+      </tr>
+      <tr class="cell-row">
+        <td class="cell-header-main" *ngIf="datasetDetail?.status === 'FAILED'">Error</td>
+        <td class="cont-detail" *ngIf="datasetDetail?.status === 'FAILED'">
+          <div class="detail-cell">{{getShortMessage(datasetDetail?.previewStatus.Message)}}
+            <uxpl-icon *ngIf="!showError" class="error-icon" height="18px" width="18px" icon="pl-icon-caret-down"
+                       matTooltip="show error details" matTooltipClass="tTip" (click)="showError = true;"></uxpl-icon>
+            <uxpl-icon *ngIf="showError" class="error-icon" height="18px" width="18px" icon="pl-icon-caret-up"
+                       matTooltip="hide error details" matTooltipClass="tTip" (click)="showError = false"></uxpl-icon>
+            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
+                       matTooltip="copy error to clipboard" matTooltipClass="tTip"
+                       (click)="copyToClipBoard('Error',datasetDetail?.previewStatus.Message, msService)"></uxpl-icon>
+          </div>
+        </td>
+        <td class="cell-header-main" *ngIf="datasetDetail?.status !== 'FAILED'"></td>
+        <td class="cont-detail" *ngIf="datasetDetail?.status !== 'FAILED'"></td>
+        <td class="cont-space"></td>
+        <td class="cell-header-main"></td>
+        <td class="cont-detail"></td>
+        <td class="cont-space"></td>
+      </tr>
+    </table>
+<!--
+    <table style="width:24%;" *ngIf="datasetDetail">
+      <tr class="cell-row" *ngFor="let schema of datasetDetail.schema">
+        <td class="cell-header-main">key ({{schema.type}})</td>
+        <td class="cont-detail">{{schema.key}} <span *ngIf="schema.type === 'timestamp'"><br>({{schema.format}})</span>
+        </td>
+      </tr>
+    </table>
+-->
+    </div>
+    <div *ngIf="showError" class="error-container">
+      <img height=75 width=75 src="{{errorIcon}}" onerror="this.style.display='none'">
+      <div class="error-details-pane">
+        <h3>Error Details:</h3>
+        <error-details [errorMessage]="datasetDetail?.previewStatus.Message"></error-details>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!--
+<pre>{{datasetDetail | json}}</pre>
+-->

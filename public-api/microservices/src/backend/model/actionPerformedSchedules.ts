@@ -16,7 +16,7 @@ export class ActionPerformedSchedules {
     'message': string;
     'code': number;
     'status': string;
-    'jobId': string;
+    'jobName': string;
 
     static discriminator: string | undefined = undefined;
 
@@ -37,8 +37,8 @@ export class ActionPerformedSchedules {
             "type": "string"
         },
         {
-            "name": "jobId",
-            "baseName": "jobId",
+            "name": "jobName",
+            "baseName": "jobName",
             "type": "string"
         }    ];
 

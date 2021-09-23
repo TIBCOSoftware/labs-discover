@@ -5,23 +5,21 @@
                        (uxplChanged)="handleSearch($event);"></uxpl-form-field>
       <uxpl-icon class="search-icon" icon="pl-icon-search" width="24px" height="24px"></uxpl-icon>
     </div>
-    <tool-bar [notificationText]="toolBarNotification" [createNewText]="NEW_CASE"
-              (toolBarButtonClicked)="handleTBut($event)" [actionButtons]="actionButtons"></tool-bar>
+    <tool-bar [notificationText]="toolBarNotification" (toolBarButtonClicked)="handleTBut($event)" [actionButtons]="actionButtons"></tool-bar>
   </div>
   <div class="case-list-table-container">
     <!--div [hidden]="tableLoading"-->
     <div [hidden]="tableLoading">
-      <custom-case-table style="background-color: #f4f4f4;" *ngIf="caseRefs && caseRefs.length > 0"
+      <custom-case-table style="background-color: #f4f4f4;" *ngIf="investigations && investigations.length > 0"
                          [cConfig]="cConfig"
-                         [caseRefs]="caseRefs"
-                         [sandboxId]="sandboxId"
+                         [investigations]="investigations"
                          [loading]="tableLoading"
                          [searchTerm]="searchTerm"
                          (selection)="selectTableCaseRefs($event)"
                          (selectionCases)="selectCaseInfo($event)"
                          (caseEvent)="caseEventClicked($event)">
       </custom-case-table>
-      <div *ngIf="caseRefs && caseRefs.length === 0" class="center">
+      <div *ngIf="investigations && investigations.length === 0" class="center">
         <div class="img-center">
           <img width="204" [src]="noDataIconLocation">
         </div>

@@ -15,12 +15,26 @@ Spotfire.initialize(async mod => {
     let startActivities = new Set<string>();
     let stopActivities = new Set<string>();
     let markedActivities = new Set<string>();
-    let config : {startActivities: string[], stopActivities: string[]};
 
     initButtons();
 
     // Used later to inform Spotfire that the render is complete
     let context = mod.getRenderContext();
+
+    // Initialize Config
+    let configProp = await mod.document.property<string>(docPropName).catch(() => undefined);   
+    if(configProp){ // document property exists
+        // initialize config
+        let propReader = mod.createReader(mod.document.property(docPropName));
+        propReader.subscribe(async function configChange(newConfigProp) {
+            let newConfigJson = newConfigProp.value<string>();
+            let config : {startActivities : string[], stopActivities: string[]} = JSON.parse(newConfigJson!);
+            config.startActivities.forEach(activity => startActivities.add(activity));
+            config.stopActivities.forEach(activity => stopActivities.add(activity));
+        });
+    }else{
+        console.warn("Document property \"" + docPropName + "\" does not exist or is empty.");
+    }
 
     // Create a reader object that reacts only data and window size changes
     let reader = mod.createReader(mod.visualization.data()/*, mod.visualization.axis("Datasets")*/);
@@ -55,14 +69,6 @@ Spotfire.initialize(async mod => {
         //     return;
         // }
 
-        let configProp = await mod.document.property<string>(docPropName).catch(() => undefined);
-        
-        if(configProp && configProp.value()){
-            config = JSON.parse(configProp.value()!);
-        }else{
-            console.warn("Document property \"" + docPropName + "\" does not exist or is empty.");
-            config = {startActivities: [], stopActivities: []};
-        }
 
         // TODO: check that config doesn't contain activities not present in data (could be the case if the document properties is set from another dataset)
         markedActivities.clear();
@@ -99,7 +105,7 @@ Spotfire.initialize(async mod => {
         let removeStartBtn = <HTMLElement>document.getElementById("removeStartBtn");
         let removeStopBtn = <HTMLElement>document.getElementById("removeStopBtn");
 
-        // TODO :
+        // add event listeners
         startBtn.addEventListener('click', () => { addToStart(); });
         stopBtn.addEventListener('click', () => { addToStop(); });
         removeStartBtn.addEventListener('click', () => { removeFromStart(); });
@@ -111,6 +117,8 @@ Spotfire.initialize(async mod => {
             startActivities.add(activity);
         });
         updateConfig();
+
+        
     }
 
     function addToStop() {
@@ -135,10 +143,8 @@ Spotfire.initialize(async mod => {
     }
 
     async function updateConfig() {
-        config.startActivities = Array.from(startActivities);
-        config.stopActivities = Array.from(stopActivities);
+        let config = {startActivities: Array.from(startActivities), stopActivities: Array.from(stopActivities)};
 
-        mod.document.property<string>(docPropName).set(JSON.stringify(config));
         let docProp = await mod.document.property<string>(docPropName).catch(() => undefined);
         if(docProp){
             docProp.set(JSON.stringify(config));
