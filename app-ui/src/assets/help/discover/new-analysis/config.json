@@ -5,100 +5,21 @@
       {
         "type": "inline",
         "name": "Tell_Me_About",
-        "label": "Tell me more about the New Analysis Wizard ...",
+        "label": "Tell me more about Files ...",
         "title": "Tell me about ...",
         "item": [
           {
             "type": "inline",
-            "name": "Overview of the Wizard...",
-            "label": "Overview of the Wizard...",
-            "title": "Overview of the Wizard...",
-            "url": "assets/help/application/New-Process-Analysis-Wizard.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Basic info ...",
-            "label": "Basic info",
-            "title": "Basic info",
-            "url": "assets/help/application/New-Process-Analysis-Step1.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Data source",
-            "label": "Data source",
-            "title": "Data source",
-            "url": "assets/help/application/New-Process-Analysis-Step2.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Parsing",
-            "label": "Parsing",
-            "title": "Parsing",
-            "url": "assets/help/application/New-Process-Analysis-Step3.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Mapping",
-            "label": "Mapping",
-            "title": "Mapping",
-            "url": "assets/help/application/New-Process-Analysis-Step4.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Dates",
-            "label": "Dates",
-            "title": "Dates",
-            "url": "assets/help/application/New-Process-Analysis-Step5.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Confirmation",
-            "label": "Confirmation",
-            "title": "Confirmation",
-            "url": "assets/help/application/New-Process-Analysis-Step6.html",
+            "name": "Files...",
+            "label": "Files...",
+            "title": "Files...",
+            "url": "assets/help/application/Files.html",
             "content": "",
             "default": "true"
           }
         ]
       },
-      {
-        "type": "inline",
-        "name": "Tell_Me_About",
-        "label": "Tell me more about ...",
-        "title": "Tell me about ...",
-        "item": [
-          {
-            "type": "inline",
-            "name": "What happens after a new analysis is created ...",
-            "label": "What happens after a new analysis is created",
-            "title": "What happens after a new analysis is created",
-            "url": "assets/help/application/New-Process-Analysis-Wizard-Next.html",
-            "content": "",
-            "default": "true"
-          },
-          {
-            "type": "inline",
-            "name": "Can I edit the new analysis after it's created ?",
-            "label": "Can I edit the new analysis after it's created ?",
-            "title": "Can I edit the new analysis after it's created ?",
-            "url": "assets/help/application/New-Process-Analysis-Wizard-Edit.html",
-            "content": "",
-            "default": "true"
-          }
-        ]
-      },      {
+  {
         "type": "external",
         "name": "External_Link",
         "title": "External link",

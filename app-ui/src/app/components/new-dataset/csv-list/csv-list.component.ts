@@ -1,19 +1,28 @@
 import {Location} from '@angular/common';
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
+import {CatalogService} from 'src/app/backend/api/catalog.service';
+import {CsvFile} from 'src/app/backend/model/csvFile';
+import {Dataset} from 'src/app/backend/model/dataset';
+import {DatasetListItem} from 'src/app/backend/model/datasetListItem';
+import {RedisFileInfo} from 'src/app/backend/model/redisFileInfo';
 import {DatasetService} from 'src/app/service/dataset.service';
-import {CsvFile, Dataset, DatasetListItem, RedisFileInfo} from '../../../models_ui/dataset';
+
+export type CsvFile_UI = CsvFile & { fileSizeNumber?: number }
 
 @Component({
   selector: 'csv-list',
   templateUrl: './csv-list.component.html',
   styleUrls: ['./csv-list.component.scss']
 })
-export class CsvListComponent implements OnInit {
+export class CsvListComponent implements OnInit, OnChanges {
 
   constructor(
     protected location: Location,
-    protected datasetService: DatasetService
+    protected datasetService: DatasetService,
+    protected catalogService: CatalogService
   ) {
   }
 
@@ -23,6 +32,7 @@ export class CsvListComponent implements OnInit {
   @Input() csvError: string;
   @Input() isStandAlone: boolean;
   @Output() fileSelected: EventEmitter<any> = new EventEmitter();
+  @Output() fileDownload: EventEmitter<string> = new EventEmitter();
   @Output() uploadFile: EventEmitter<File> = new EventEmitter();
   @Output() updateFiles: EventEmitter<any> = new EventEmitter();
 
@@ -31,16 +41,17 @@ export class CsvListComponent implements OnInit {
 
   searchTerm: string;
   filename: string = null;
-  selectedFile: RedisFileInfo
+  selectedFile: RedisFileInfo;
   popupY: number;
   showDeleteConfirm = false;
   fileOnAction: CsvFile;
   allDatasets: DatasetListItem[]
+  myFiles: CsvFile_UI[]
 
   cols = [
-    {field: 'redisFileInfo.OriginalFilename', header: 'Name'},
-    {field: 'fileSize', header: 'Size'},
-    {field: 'redisFileInfo.LastModified', header: 'Modified on'}
+    {sortField: 'redisFileInfo.OriginalFilename', field: 'redisFileInfo.OriginalFilename', header: 'Name'},
+    {sortField: 'fileSizeNumber', field: 'fileSizeNumber', header: 'Size'},
+    {sortField: 'redisFileInfo.LastModified', field: 'redisFileInfo.LastModified', header: 'Modified on'}
   ];
   scrollHeight = 'calc(90vh - 450px)';
 
@@ -53,17 +64,31 @@ export class CsvListComponent implements OnInit {
     if (this.isStandAlone) {
       this.scrollHeight = 'calc(100vh - 280px)'
     }
-    this.selectedFile = this.dataset.CsvFile;
-    this.filename = this.dataset?.Dataset_Source?.FileName;
-    if (this.selectedFile) {
-      this.dataset.csvMethod = 'file';
-    } else {
-      this.dataset.csvMethod = 'upload';
+
+    if (this.dataset.csvMethod === 'upload') {
+      this.filename = this.dataset?.Dataset_Source?.FileName;
+    } else if (this.dataset.csvMethod === 'file') {
+      this.selectedFile = this.dataset.CsvFile;
     }
 
-    this.datasetService.getDatasets().subscribe(datasets => {
+    this.catalogService.getAllDatasets().subscribe(datasets => {
       this.allDatasets = datasets;
     })
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(this.files && this.files.length > 0){
+      this.myFiles = []
+      for(const file of this.files) {
+        this.myFiles.push(file)
+        const id = this.myFiles.length - 1
+        if(this.myFiles[id].redisFileInfo?.FileSize) {
+          try {
+            this.myFiles[id].fileSizeNumber = Number(this.myFiles[id].redisFileInfo?.FileSize)
+          } catch (e) {} // Do nothing
+        }
+      }
+    }
   }
 
   handleSearch = ($event): void => {
@@ -101,7 +126,7 @@ export class CsvListComponent implements OnInit {
     if (action) {
       const file = this.fileOnAction;
       if (file) {
-        this.datasetService.deleteCsvFile(file.redisFileInfo.OriginalFilename).subscribe(resp => {
+        this.catalogService.catalogFilesFilenameDelete(file.redisFileInfo.OriginalFilename).subscribe(resp => {
           this.updateFiles.emit();
         }, error => {
         });
@@ -126,6 +151,7 @@ export class CsvListComponent implements OnInit {
       this.dsFileTuple[fileLocation] = ''
       let usedInDs = 0;
       for(const dsTemp of this.allDatasets){
+        // @ts-ignore
         if(dsTemp.filePath === fileLocation) {
           this.dsFileTuple[fileLocation] += ' ' + dsTemp.name + ','
           usedInDs++
@@ -149,5 +175,12 @@ export class CsvListComponent implements OnInit {
       return 'calc(100vw - 340px)'
     }
     return 'calc(80vw - 400px)'
+  }
+
+  fileClicked(fileInfo: RedisFileInfo) {
+    // Use the part after the '/' in the file location
+    // TODO: use this part directly from the backend
+    const fileNameToUse =  /[^/]*$/.exec(fileInfo.FileLocation)[0];
+    this.fileDownload.emit(fileNameToUse)
   }
 }

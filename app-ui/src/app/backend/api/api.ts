@@ -1,0 +1,13 @@
+export * from './catalog.service';
+import { CatalogService } from './catalog.service';
+export * from './configuration.service';
+import { ConfigurationService } from './configuration.service';
+export * from './documentations.service';
+import { DocumentationsService } from './documentations.service';
+export * from './investigations.service';
+import { InvestigationsService } from './investigations.service';
+export * from './repository.service';
+import { RepositoryService } from './repository.service';
+export * from './visualisation.service';
+import { VisualisationService } from './visualisation.service';
+export const APIS = [CatalogService, ConfigurationService, DocumentationsService, InvestigationsService, RepositoryService, VisualisationService];

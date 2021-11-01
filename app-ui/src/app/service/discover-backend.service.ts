@@ -2,10 +2,11 @@ import { HttpClient, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ActionPerformed4, ActionPerformedLoginValidate, ActionPerformedPreview, ActionPerformedTDVCreate, ActionPerformedUpdate, PreviewConfigFile, PublishedTdvDataset, PublishedViews, Schema, TdvJob, UploadFileResponse } from '../models_ui/backend';
-import { DatasetDataSource } from '../models_ui/dataset';
+import { environment } from '../../environments/environment';
+import { DatasetSource } from '../backend/model/datasetSource';
 import { OauthService } from './oauth.service';
 import { ParsingService } from './parsing.service';
+
 
 
 @Injectable({
@@ -35,7 +36,7 @@ export class DiscoverBackendService {
    * @param fileName The file name.
    * @returns
    */
-  public uploadFile(orgId: string, file: File, dataSource: DatasetDataSource): Observable<HttpEvent<any>> {
+  public uploadFile(orgId: string, file: File, dataSource: DatasetSource): Observable<HttpEvent<any>> {
     const url = `/files/${orgId.toLowerCase()}`;
     const headers = new HttpHeaders({
       'accept': 'application/json',
@@ -57,142 +58,20 @@ export class DiscoverBackendService {
     );
   }
 
-  public deleteFile(orgId: string, filename: string) {
-     const url = `/files/${orgId}/${filename}`;
-     return this.callApi(url, 'delete');
-  }
-
-  public downloadFile(path: string): Observable<Blob> {
-    return this.http.get(path, {
-      responseType: 'blob',
-      withCredentials: true
-    });
-  }
-
-  public createTdvForCsv(tdvJob: TdvJob): Observable<ActionPerformedTDVCreate> {
-    const url = '/tdv/managed/csv';
-    return this.callApi(url, 'post', tdvJob).pipe(
-      map(response => {
-        return response as ActionPerformedTDVCreate;
-      })
-    );
-  }
-
-  public updateTdvForCsv(tdvJob: TdvJob): Observable<ActionPerformedUpdate> {
-    const url = '/tdv/managed/csv';
-    return this.callApi(url, 'put', tdvJob).pipe(
-      map(response => {
-        return response as ActionPerformedUpdate;
-      })
-    );
-  }
-
-  public login(): Observable<ActionPerformedLoginValidate> {
+  public login(): Observable<any> {
     const url = '/login/validate';
     let token = this.oauthService.token;
     return this.callApi(url, 'post', {
       "credentials": token
     }).pipe(
       map(response => {
-        return response as ActionPerformedLoginValidate;
+        return response;
       })
     );
-  }
-
-  public triggerPreview(config: PreviewConfigFile): Observable<ActionPerformedPreview> {
-    const url = '/preview';
-    return this.callApi(url, 'post', config).pipe(
-      map(response => {
-        return response as ActionPerformedPreview;
-      })
-    );
-  }
-
-  public getTdvData(orgId: string, datasetId: string): Observable<ActionPerformed4> {
-    const url = `/tdv/data/${orgId}/${datasetId}`;
-    return this.callApi(url, 'get').pipe(
-      map(response => {
-        return response as ActionPerformed4;
-      })
-    );
-  }
-
-  public getTdvMetaData(orgId: string, datasetId: string): Observable<Schema[]> {
-    const url = `/tdv/metadata/${orgId}/${datasetId}`;
-    return this.callApi(url, 'get').pipe(
-      map(response => {
-        return response.tdv.schema as Schema[];
-      })
-    );
-  }
-
-  public getPreview(jobId: string): Observable<ActionPerformedPreview> {
-    const url = `/preview/${jobId}`;
-    return this.callApi(url, 'get').pipe(
-      map(response => {
-        return response as ActionPerformedPreview;
-      })
-    );
-  }
-
-  public deletePreview(jobId: string): Observable<ActionPerformedPreview> {
-    const url = `/preview/${jobId}`;
-    return this.callApi(url, 'delete').pipe(
-      map(response => {
-        return response as ActionPerformedPreview;
-      })
-    );
-  }
-
-  public getUnmanagedTdvView(orgId: string): Observable<PublishedViews[]> {
-    const url = `/tdv/unmanaged/views/${orgId.toLowerCase()}`;
-    return this.callApi(url, 'get').pipe(
-      map((response: any) => {
-        return response.Datasets;
-      })
-    );
-  }
-
-  public copyUnmanagedTdv(orgId: string, tdv: PublishedViews): Observable<any> {
-    const url = '/tdv/unmanaged/copy';
-    return this.callApi(url, 'post', {
-      Organization: orgId,
-      DatasetName: tdv.DatasetName,
-      Annotation: tdv.Annotation,
-      DatasetPath: tdv.DatasetPath
-    });
-  }
-
-  public getPreviewFromSpark = (dsname: string, orgId: string): Observable<any> => {
-    const url = `/tdv/data/${orgId}/${dsname}`;
-    return this.callApi(url, 'get').pipe(
-      map((response: any) => {
-        return response.Data;
-      })
-    )
-  }
-
-  public getColumnsFromSpark = (dsname: string, orgId: string): Observable<any> => {
-    const url = `/tdv/metadata/${orgId}/${dsname}`;
-    return this.callApi(url, 'get').pipe(
-      map((response: any) => {
-        return response.tdv.schema;
-      })
-    )
-  }
-
-  public createSparkJob = (request: any): Observable<any> => {
-    const url = '/processmining';
-    return this.callApi(url, 'post', request)
-  }
-
-  public deleteTdv = (orgId: string, datasetId: string): Observable<any> => {
-    const url = `/tdv/managed/csv/${orgId}/${datasetId}`;
-    return this.callApi(url, 'delete');
   }
 
   private callApi(url: string, method: string = 'GET', body: any = undefined, customOptions: any = {}): Observable<any> {
-    url = this.baseUrl + url;
+    url = environment.apiURL + url;
     const options = {... this.generateOptions(), ... customOptions};
     if (method.toUpperCase() === 'POST') {
       return this.http.post(url, body, options);

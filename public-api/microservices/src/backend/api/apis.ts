@@ -1,3 +1,5 @@
+export * from './assetsStorageOperationsApi';
+import { AssetsStorageOperationsApi } from './assetsStorageOperationsApi';
 export * from './filesOperationsApi';
 import { FilesOperationsApi } from './filesOperationsApi';
 export * from './loginApi';
@@ -25,4 +27,4 @@ export class HttpError extends Error {
 
 export { RequestFile } from '../model/models';
 
-export const APIS = [FilesOperationsApi, LoginApi, MetricsApi, MiningDataApi, SparkOneTimeJobApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi];
+export const APIS = [AssetsStorageOperationsApi, FilesOperationsApi, LoginApi, MetricsApi, MiningDataApi, SparkOneTimeJobApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi];

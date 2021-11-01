@@ -106,4 +106,17 @@ export interface Analytics {
     previewLocation: string;
     previewTableName: string;
     server: string;
+    customUserFolder: string;
+}
+
+export interface WhoAmI {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    subscriptionId: string;
+    isUser: boolean;
+    isAdmin: boolean;
+    isAnalyst: boolean;
+    isResolver: boolean;
 }

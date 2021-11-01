@@ -33,7 +33,7 @@
             </div>
           </div>
         </div>
-        <ng-template 
+        <ng-template
           cdkConnectedOverlay
           [cdkConnectedOverlayOrigin]="triggerMenu"
           [cdkConnectedOverlayOpen]="showMenuConfirm"
@@ -45,7 +45,7 @@
               yesBtnLabel="Yes, discard" noBtnLabel="No, keep editing" (actionConfirmed)="handleSwitchMenu($event)"></action-confirm>
           </div>
         </ng-template>
-        <ng-template 
+        <ng-template
           cdkConnectedOverlay
           [cdkConnectedOverlayOrigin]="triggerMenu"
           [cdkConnectedOverlayOpen]="showDeleteConfirm"
@@ -101,15 +101,15 @@
         </div>
         <div style="display: flex;">
           <uxpl-select-input class="flex-field flex-margin" select-caption=""
-            label="Case type (case or variant)" [value]="getCreatorField('CONTEXT_TYPE')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'CONTEXT_TYPE')"></uxpl-select-input>
+            label="Case type (case or variant)" [value]="getCreatorField('type')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'type')"></uxpl-select-input>
           <uxpl-select-input class="flex-field flex-margin" select-caption=""
-            label="Case id (case or variant)" [value]="getCreatorField('CONTEXT_IDS')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'CONTEXT_IDS')"></uxpl-select-input>
+            label="Case id (case or variant)" [value]="getCreatorField('ids')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'ids')"></uxpl-select-input>
         </div>
         <div style="display: flex;">
           <uxpl-select-input class="flex-field flex-margin" select-caption=""
-            label="Summary of investigation" [value]="getCreatorField('SUMMARY')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'SUMMARY')"></uxpl-select-input>
+            label="Summary of investigation" [value]="getCreatorField('summary')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'summary')"></uxpl-select-input>
           <uxpl-select-input class="flex-field flex-margin" select-caption=""
-            label="Additional" [value]="getCreatorField('DETAILS')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'DETAILS')"></uxpl-select-input>
+            label="Additional" [value]="getCreatorField('details')" [options]="creatorSelectOptions2" (uxplSelection)="handleCreatorConfigSelection($event, 'details')"></uxpl-select-input>
         </div>
       </div>
 
@@ -120,7 +120,7 @@
           <div class="table-fields-list">
             <drag-drop-fields-list *ngIf="activeCaseConfig.headerFields && activeCaseConfig.headerFields.length>0; else noTableFields" previewClass="table-cdk-preview" labelAttr="label"
               [fieldList]="activeCaseConfig.headerFields" listId="table-fields-cdk-list" (listItemDropped)="tableFieldDropped($event)" (deleteField)="deleteTableField($event)" (editField)="editTableField($event, activeCaseConfig.headerFields)"></drag-drop-fields-list>
-            
+
             <ng-template #noTableFields>
               <div class="no-table-columns">
                 <div class="no-fields-image">
@@ -220,10 +220,10 @@
               </div>
               <div class="action-panel">
                 <uxpl-button [disabled]="!detailField || detailAvailableOptions.length == 0" type="secondary" (clicked)="addDetailField()">Add</uxpl-button>
-                <div class="link-wrapper" *ngIf="detailAvailableFields.length!=0">
+                <div class="link-wrapper" *ngIf="detailAvailableOptions.length!=0">
                   <a class="link" (click)="addAllDetailFields()">Add all fields</a>
                 </div>
-                <div class="link-wrapper" *ngIf="detailAvailableFields.length==0">
+                <div class="link-wrapper" *ngIf="detailAvailableOptions.length==0">
                   <a class="link" (click)="deleteAllDetailFields()">Remove all fields</a>
                 </div>
               </div>

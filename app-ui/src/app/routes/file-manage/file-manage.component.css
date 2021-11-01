@@ -1,20 +1,9 @@
 .file-selector-wrapper {
   height: 100%;
   overflow: auto;
-  margin: 0px 20px;
+  margin-left: 20px;
 }
 
-.upload-file-button-container {
-  margin-bottom: 15px
+.file-select-container {
+  height: 100%;
 }
-
-/* TODO: See if we can make file upload button primary, with white text and icon
-.upload-file-button-container icon {
-  color: white !important;
-}
-.upload-file-button-container upload-csv-link {
-  color: white !important;
-}
-.upload-csv-link {
-  color: white !important;
-} */

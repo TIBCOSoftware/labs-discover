@@ -9,9 +9,13 @@ export function copyToClipBoard(type: string, value: any, messageService) {
 }
 
 export function getShortMessage(message: string, shortLength = 25) {
-  if (message.length > shortLength) {
-    return message.substring(0, shortLength) + '...';
-  } else {
-    return message;
+  if (message) {
+    if (message.length > shortLength) {
+      return message.substring(0, shortLength) + '...';
+    } else {
+      return message;
+    }
   }
+  return '';
+  
 }

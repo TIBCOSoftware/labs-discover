@@ -1,0 +1,61 @@
+<p-dialog class="tibco-pm-dialog" [ngStyle]="{'width':!filename ? '500px' : '75vw' }"
+          [modal]=true
+          [(visible)]="display"
+          [closable]=true
+          [closeOnEscape]=true
+          [focusOnShow]=false
+          (onHide)="toggleDisplay()">
+  <ng-template pTemplate="header">
+    <div class="p-dialog-title">
+      <span>Upload File<ng-container *ngIf="filename"> - {{filename}}</ng-container></span>
+    </div>
+    <div class="close-icon">
+      <uxpl-icon class="close-icon" icon="pl-icon-close" size="20px" color="#727272"
+                 (click)="handleDialogClose()"></uxpl-icon>
+    </div>
+  </ng-template>
+  <p-body>
+    <div class="pm-dialog-body">
+      <div class="upload-body-top">
+        <csv-upload [filename]="filename" [filetypes]="'csv'" [filesize]="1000" [error]="csvError"
+                    (uploadFile)="selectedFile($event)" size="small"></csv-upload>
+        <parse-csv [hidden]="!filename" [dataSource]="datasource" [numberRowsForPreview]="numberRowsForPreview"
+                   [file]="file" #parseCSV
+                   (handlePreviewData)="refreshCSVPreview($event)"
+                   (updateNumberRowsForPreview)="numberRowsForPreview = $event"></parse-csv>
+      </div>
+      <div *ngIf="previewData.length > 0 ; else loadingData">
+        <div class="parse-preview-container">
+          <div>Data Preview</div>
+          <div *ngIf="previewColumns?.length > 0" class="dataset-preview-table">
+            <tcpmg-generic-table [columnDefs]="previewColumns" [rowData]="previewData"
+                                 [autoLayout]="false" [showSortIcon]="false"
+                                 [showExpandButton]="false" [paginator]="false"
+                                 [showCurrentPageReport]="false" [showFilterRow]="false"
+            ></tcpmg-generic-table>
+          </div>
+        </div>
+        <div style="margin-top: 12px;">Previewing the first  {{numberRowsForPreview}} rows</div>
+      </div>
+      <ng-template #loadingData>
+        <div class="center">
+          <div class="img-center">
+            <img width="204" [src]="noDataIconLocation">
+          </div>
+          <div class="no-data-available"><br></div>
+          <div class="no-data-available" style="font-weight: bold">Select a file to preview<br></div>
+        </div>
+      </ng-template>
+    </div>
+  </p-body>
+  <p-footer>
+    <div class="pm-dialog-footer-content">
+      <uxpl-button type="secondary" width="70px" (clicked)="handleDialogClose()">
+        <div class="cancel-button-label">Cancel</div>
+      </uxpl-button>
+      <uxpl-button type="primary" width="70px" (clicked)="handleUploadFile()" [disabled]="disableUpload">
+        <div class="close-button-label">Upload File</div>
+      </uxpl-button>
+    </div>
+  </p-footer>
+</p-dialog>

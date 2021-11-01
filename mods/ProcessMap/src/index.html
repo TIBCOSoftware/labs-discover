@@ -13,15 +13,70 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>Process Map</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="stylesheet" type="text/css" media="all" href="main.css" />
+        
         <link rel="stylesheet" type="text/css" media="all" href="https://unpkg.com/cytoscape-panzoom@2.5.3/cytoscape.js-panzoom.css" />
         <link rel="stylesheet" type="text/css" media="all" href="https://use.fontawesome.com/releases/v5.12.0/css/all.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="https://unpkg.com/cytoscape-context-menus/cytoscape-context-menus.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="main.css" />
+        
     </head>
     <body>
         <div id="content">
             <div id="visualization"> </div>
         </div>
 
+        <script>
+
+
+            var modsCntxtMenuLstnr = null;
+            var cyCntxtMenuLstnr = null;
+            var lastCntxtEvent = null;
+
+            function cntxtLstnrWrapper(event) {
+                lastCntxtEvent = event;
+                if(cyCntxtMenuLstnr){
+                    cyCntxtMenuLstnr(event);
+                }
+            }
+
+            function showSpotfireCntxtMenu(){
+                if(modsCntxtMenuLstnr && lastCntxtEvent){
+                    modsCntxtMenuLstnr(lastCntxtEvent);
+                }
+            }
+
+            // Overwrite addEventListener function on Window to capture the event listener registered by the Spotfire mods api 
+            Window.prototype._addEventListener = Window.prototype.addEventListener;
+
+            Window.prototype.addEventListener = function(type, listener, options) {
+                if(type == "contextmenu") {
+                   if( modsCntxtMenuLstnr == null){ // Spotfire mods api is registering the event listener before cytocape (based on the order of loading of the scripts)
+                        // don't register listener
+                        modsCntxtMenuLstnr = listener;
+                        return;
+                    }
+                } 
+                this._addEventListener(type, listener, options);
+            };
+
+            // Wrapping our "right-click" listener to store the last 'right-click' event 
+            // and pass it to the Spotfire 'contextmenu' listener when user wants to open default context menu.
+            let vizEle = document.getElementById("visualization");
+            vizEle._addEventListener = vizEle.addEventListener;
+            vizEle.addEventListener = function(type, listener, options){
+                if(type === "contextmenu"){
+                    if(cyCntxtMenuLstnr == null){
+                        
+                        cyCntxtMenuLstnr = listener;
+                        this._addEventListener(type, cntxtLstnrWrapper, options);
+                        return;
+                    }
+                }
+                this._addEventListener(type, listener, options);
+            };
+
+        </script>
+        
         <script id="spotfire-loader">var Spotfire=function(e){"use strict";return e.initialize=function(e){var t="sfTemp"+1e4*Math.random()+"Cb",a=window;a[t]=e;var r={subject:"GetUrl",callbackId:-1,options:{cbId:t}};a.addEventListener("message",function e(t){if(t.source===a.parent&&t.data.src){a.removeEventListener("message",e);var r=document,n=r.createElement("script");n.src=t.data.src,(r.head||r.body).appendChild(n)}}),a.parent.postMessage(r,"*")},e}({});</script>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -35,7 +90,12 @@
         <script src="https://cdn.jsdelivr.net/npm/elkjs@0.7.0/lib/elk.bundled.js"></script>
         <script src="https://unpkg.com/cytoscape-elk@1.2.2/cytoscape-elk.js"></script>
 
+        <!-- Compound nodes-->
         <!-- <script src="https://cdn.jsdelivr.net/gh/cytoscape/cytoscape.js-compound-drag-and-drop/cytoscape-compound-drag-and-drop.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/cytoscape-expand-collapse/cytoscape-expand-collapse.js"></script>
+
+        <!-- Context menu-->
+        <script src="https://unpkg.com/cytoscape-context-menus/cytoscape-context-menus.js"></script>
 
         <script src="spotfire-cytoscape-layout.js"></script>
         <script src="spotfire-cytoscape-style.js"></script>

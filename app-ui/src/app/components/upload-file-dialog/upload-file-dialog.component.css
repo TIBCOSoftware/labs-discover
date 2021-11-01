@@ -1,0 +1,98 @@
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-header {
+  height: 68px;
+  max-height: 68px;
+  min-height: 68px;
+  border-bottom: 1px solid #DEDEDE;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
+  border-radius: 3px 3px 0 0;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: row;
+}
+
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-footer {
+  border-top: 1px solid #DEDEDE;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
+  padding: 1rem 1.5rem 1rem 1.5rem;
+}
+
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-header .p-dialog-title {
+  color: #212121;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 36px;
+  flex: 1;
+}
+
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-header .p-dialog-header-icons {
+  display: none;
+}
+
+.pm-dialog-body {
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-body-top {
+  display: flex;
+  flex-direction: row;
+  margin: auto;
+}
+
+
+.pm-header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 24px;
+  max-height: 24px;
+  min-height: 24px;
+}
+
+.pm-column.header-column {
+  flex: 0;
+}
+
+.close-icon :hover {
+  cursor: pointer;
+}
+
+.close-button-label {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.cancel-button-label {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.center {
+  position: relative;
+  margin: auto;
+  width: 60%;
+  height: 170px;
+  padding: 10px;
+}
+
+.img-center {
+  margin: auto;
+  width: 204px;
+}
+
+.no-data-available {
+  color: #4A4A4A;
+  font-family: "Source Sans Pro";
+  font-size: 18px;
+  letter-spacing: 0.96px;
+  line-height: 22px;
+  text-align: center;
+}

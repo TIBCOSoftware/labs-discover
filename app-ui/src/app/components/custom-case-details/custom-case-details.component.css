@@ -91,3 +91,7 @@ md-tooltip.tt-multiline ._md-content {
   display: flex;
   flex-direction: row;
 }
+
+.milestone-container {
+  padding-left: 30px;
+}

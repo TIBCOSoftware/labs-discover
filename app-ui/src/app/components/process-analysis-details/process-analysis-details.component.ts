@@ -1,9 +1,12 @@
-import {Component, Input, OnInit, ViewChild, ElementRef, OnChanges, SimpleChanges} from '@angular/core';
-import {VisualisationService} from 'src/app/api/visualisation.service';
-import {Analysis} from 'src/app/model/models';
+import {Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter} from '@angular/core';
+import {VisualisationService} from 'src/app/backend/api/visualisation.service';
+import {Analysis} from 'src/app/backend/model/models';
 import {getShortMessage, copyToClipBoard} from '../../functions/details';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
-import {Location} from '@angular/common';
+import {DatePipe, Location} from '@angular/common';
+import { AttributeDef } from '@tibco-tcstk/tc-web-components/dist/types/models/attributeDef';
+import { ChartService, SummaryConfig } from '../../service/chart.service';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'process-analysis-details',
@@ -15,7 +18,9 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
   constructor(
     private location: Location,
     private visualisationService: VisualisationService,
-    public msService: MessageTopicService
+    public msService: MessageTopicService,
+    private datePipe: DatePipe,
+    protected chartService: ChartService
   ) {
   }
 
@@ -23,19 +28,30 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
 
   @Input() progress: any;
 
+  @Output() doCompare: EventEmitter<Analysis> = new EventEmitter<Analysis>();
+
   templateName: string;
   showError = false;
   errorIcon: string;
+  attrDefs: AttributeDef[];
+  moreInfo = false;
+
+  activitiesChartConfig: any;
+  durationChartConfig: any;
+  summaryConfig: SummaryConfig;
 
   getShortMessage = getShortMessage;
   copyToClipBoard = copyToClipBoard;
 
   paId: string;
   paVersion: string;
+  chartData: any;
+  display = false;
 
   ngOnInit() {
     this.errorIcon = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/svg/error-image-2.svg');
-    if (this.processAnalysis.data.templateId && this.processAnalysis.data.templateId !== '') {
+    /* no longer required as we have templateLabel from the analysis service */
+    /* if (this.processAnalysis.data.templateId && this.processAnalysis.data.templateId !== '') {
       this.visualisationService.getTemplate(this.processAnalysis.data.templateId).subscribe(
         result => {
           this.templateName = result.name;
@@ -43,6 +59,9 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
       )
     } else {
       this.templateName = 'Not assigned';
+    } */
+    if (!this.processAnalysis.data.templateLabel || this.processAnalysis.data.templateLabel === '') {
+      this.processAnalysis.data.templateLabel = 'Not assigned';
     }
   }
 
@@ -51,9 +70,78 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
       const idT = this.processAnalysis.id;
       this.paId = idT.substring(0, idT.lastIndexOf('-'))
       this.paVersion = idT.substring(idT.lastIndexOf('-') + 1)
+      if (!this.processAnalysis.data.templateLabel || this.processAnalysis.data.templateLabel === '') {
+        this.processAnalysis.data.templateLabel = 'Not assigned';
+      }
+      if (this.processAnalysis?.metrics) {
+        this.chartData = this.chartService.buildChartConfig(this.processAnalysis.metrics);
+        this.summaryConfig = this.chartData.summaryConfig;
+        this.activitiesChartConfig = this.chartData.activitiesChartConfig;
+        this.durationChartConfig = this.chartData.durationChartConfig;
+      }
     }
   }
 
+  get attributeDefs(): AttributeDef[] {
+    if (this.processAnalysis) {
+      const defs: AttributeDef[] = [
+        { label: 'Created by', value: this.processAnalysis.metadata.createdBy },
+        // { label: 'Case ID', value: this.processAnalysis.data.mappings.caseId },
+        // { label: 'Start time', value: this.processAnalysis.data.mappings.startTime },
+        { label: 'Created on', value: this.datePipe.transform(this.processAnalysis.metadata.createdOn, 'short') },
+        // { label: 'Activity', value: this.processAnalysis.data.mappings.activity },
+        // { label: 'End time', value: this.processAnalysis.data.mappings.endTime },
+        { label: 'Template', value: this.processAnalysis.data.templateLabel },
+        // { label: 'Resource', value: this.processAnalysis.data.mappings.resource },
+        // { label: 'Scheduled start time', value: this.processAnalysis.data.mappings.scheduledStart },
+        { label: 'Id', value: this.paId, copyable: true },
+        // { label: 'Department', value: this.processAnalysis.data.mappings.resourceGroup },
+        // { label: 'Secheduled end time', value: this.processAnalysis.data.mappings.scheduledEnd },
+        // { label: 'Version', value: this.paVersion, copyable: true },
+        // { label: 'Requester', value: this.processAnalysis.data.mappings.requester },
+        // { label: 'Other attributes', value: this.processAnalysis.data.mappings.otherAttributes ? 'true' : 'false' }
+      ]
+      if (this.processAnalysis.metadata.message) {
+        defs.push({ label: 'Error', value: this.processAnalysis.metadata.message, copyable: true});
+      }
+      return defs;
+    } else {
+      return [];
+    }
 
+  }
+
+  get label(): string {
+    /* if (this.processAnalysis) {
+      return this.processAnalysis?.data?.name + ' (' + this.processAnalysis?.metadata?.state + ')'
+    } else { */
+      return 'Additional Info';
+    // }
+
+  }
+
+  handleMoreInfoToggle() {
+    this.moreInfo = !this.moreInfo;
+  }
+
+  handleCompareClick() {
+    if (this.processAnalysis?.metrics) {
+      this.doCompare.emit(this.processAnalysis);
+    }
+  }
+
+  handleDetailAttributeCopy(attribute: AttributeDef) {
+    copyToClipBoard(attribute.label, attribute.value, this.msService)
+  }
+
+  get timespan(): string {
+    const start: DateTime = DateTime.fromISO(this.processAnalysis.metrics.minTimestamp);
+    const end: DateTime = DateTime.fromISO(this.processAnalysis.metrics.maxTimestamp);
+    if (start.isValid && end.isValid) {
+      return start.toLocaleString() + ' -> ' + end.toLocaleString();
+    } else {
+      return 'invalid start/end timestamps';
+    }
+  }
 
 }

@@ -4,11 +4,11 @@ ThisBuild / organization  := "com.tibco.labs.orchestrator"
 name := "labs-processmining-api"
 
 scalaVersion := "2.12.14"
-lazy val akkaHttpVersion = "10.2.5"
-lazy val akkaVersion = "2.6.15"
+lazy val akkaHttpVersion = "10.2.6"
+lazy val akkaVersion = "2.6.16"
 lazy val akkaManagementVersion = "1.0.9"
 lazy val postgresVersion = "42.2.23"
-lazy val alpakkaVersion = "3.0.2"
+lazy val alpakkaVersion = "3.0.3"
 
 // make version compatible with docker for publishing
 ThisBuild / dynverSeparator := "-"
@@ -64,9 +64,9 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
     "com.typesafe.akka" %% "akka-http-xml" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-caching" % akkaHttpVersion,
-    "de.heikoseeberger" %% "akka-http-circe" % "1.37.0",
+    "de.heikoseeberger" %% "akka-http-circe" % "1.38.2",
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % alpakkaVersion,
-    "ch.qos.logback" % "logback-classic" % "1.2.5",
+    "ch.qos.logback" % "logback-classic" % "1.2.6",
     "com.lightbend.akka" %% "akka-stream-alpakka-csv" % alpakkaVersion,
     "com.lightbend.akka" %% "akka-stream-alpakka-text" % alpakkaVersion,
     //"com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % akkaManagementVersion,
@@ -76,7 +76,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
     "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion % Test,
     "com.typesafe.akka" %% "akka-http-testkit"   % akkaHttpVersion % Test,
-    "org.scalatest"     %% "scalatest"           % "3.2.9"         % Test)
+    "org.scalatest"     %% "scalatest"           % "3.2.9"    % Test)
 }
 dependencyOverrides ++= Seq(
   "org.typelevel" %% "cats-core" % "2.6.1",
@@ -114,7 +114,7 @@ libraryDependencies ++= Seq(
 
   // Start with this one
   "org.tpolecat" %% "doobie-core"      % "0.13.4",
- "io.monix" %% "monix" % "3.4.0",
+  //"io.monix" %% "monix" % "3.4.0",
   // And add any of these as needed
   "org.tpolecat" %% "doobie-hikari"    % "0.13.4",          // HikariCP transactor.
   "org.tpolecat" %% "doobie-postgres"  % "0.13.4"          // Postgres driver 42.2.19 + type mappings.
@@ -134,25 +134,31 @@ libraryDependencies ++= List(
   "com.softwaremill.sttp.client3" %% "core" % "3.3.11"
 )
 
-libraryDependencies += "com.squareup.okhttp3" % "logging-interceptor" % "4.9.1"
+libraryDependencies += "com.squareup.okhttp3" % "logging-interceptor" % "4.9.2"
 //JDBC
 
 libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % postgresVersion
 )
 //swagger
-val swaggerVersion = "2.1.10"
+val swaggerVersion = "2.1.11"
+val jacksonVersion = "2.13.0"
 libraryDependencies ++= Seq(
+  "jakarta.ws.rs" % "jakarta.ws.rs-api" % "3.0.0",
   "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1",
-  "com.github.swagger-akka-http" %% "swagger-akka-http" % "2.4.2",
-  "com.github.swagger-akka-http" %% "swagger-scala-module" % "2.3.1",
-  "com.github.swagger-akka-http" %% "swagger-enumeratum-module" % "2.1.1",
-  "pl.iterators" %% "kebs-spray-json" % "1.9.2",
+  "javax.xml.bind" % "jaxb-api" % "2.3.1",
+  "jakarta.xml.bind" % "jakarta.xml.bind-api" % "3.0.1",
+  "org.glassfish.jaxb"% "jaxb-runtime"% "3.0.1",
+  "com.github.swagger-akka-http" %% "swagger-akka-http" % "2.6.0",
+  "com.github.swagger-akka-http" %% "swagger-scala-module" % "2.5.2",
+  "com.github.swagger-akka-http" %% "swagger-enumeratum-module" % "2.3.0",
+  "pl.iterators" %% "kebs-spray-json" % "1.9.3",
   "io.swagger.core.v3" % "swagger-core" % swaggerVersion,
   "io.swagger.core.v3" % "swagger-annotations" % swaggerVersion,
   "io.swagger.core.v3" % "swagger-models" % swaggerVersion,
   "io.swagger.core.v3" % "swagger-jaxrs2" % swaggerVersion,
-  "ch.megard" %% "akka-http-cors" % "1.1.1"
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+  "ch.megard" %% "akka-http-cors" % "1.1.2"
 )
 
 libraryDependencies ++= Seq(

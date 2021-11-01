@@ -1,0 +1,3759 @@
+openapi: '3.0.0'
+info: 
+  title: TIBCO Nimbus Public REST API
+  version: '1'
+servers: 
+  - url: https://nimbus.tenant-integration.tcie.pro/01FJBTV4SKXGQVB9ENR654CSFX/ctrlwebisapi.dll
+tags: 
+  - name: Diagrams
+    description: A set of APIs for creating, editing and deleting process diagrams.
+  - name: Diagram Images
+    description: A set of APIs for uploading and retrieving images used to enrich Nimbus process diagrams.
+  - name: Maps
+    description: A collection of endpoints for working with Nimbus maps.
+  - name: Map Folders
+    description: A collection of endpoints for working with Nimbus map folders.
+  - name: Languages
+    description: A collection of endpoints for interrogating which languages are available in the respository.
+  - name: Resources
+    description: A collection of APIs for managing the resources used by Nimbus process maps.
+  - name: Resource Groups
+    description: A collection of APIs for working with Nimbus resource groups.
+  - name: User Accounts
+    description: A set of APIs for querying user accounts
+paths: 
+  /api/v1/diagrams: 
+    get: 
+      tags: 
+        - Diagrams
+      security: 
+        - ApiKeyAuth: []
+      summary: Query a range of diagrams from a single map.
+      description: Query a range of diagrams from a single map by specifying a map id and an optional diagram title or parent diagram id.
+      operationId: getDiagrams
+      parameters: 
+        - name: mapId
+          in: query
+          required: false
+          description: Id of the map to search in.
+          schema: 
+            type: string
+        - name: name
+          in: query
+          required: false
+          description: Name to search for.
+          schema: 
+            type: string
+        - name: parentDiagramId
+          in: query
+          required: false
+          description: Id of the parent diagram to search in.
+          schema: 
+            type: string
+        - name: languageId
+          in: query
+          required: false
+          description: An integer value that identifies a specific language in the repository.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/DiagramCollection'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/diagrams/{mapAndDiagramId}: 
+    get: 
+      tags: 
+        - Diagrams
+      security: 
+        - ApiKeyAuth: []
+      summary: Returns a single diagram from a specific map.
+      description: Fetch the full definition of a single diagram including its layout.
+      operationId: getDiagram
+      parameters: 
+        - name: mapAndDiagramId
+          in: path
+          required: true
+          description: 'A string parameter that contains a map id and a diagram id separated by a period. eg : 0:9CB21226514442E0967F1250FA1EDFCB.C750D64DB9FC4174B42EEE7C8A93E9D2'
+          schema: 
+            type: string
+        - name: languageId
+          in: query
+          required: false
+          description: An integer value that identifies a specific language in the repository.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully retrieved.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/DiagramModel'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    put: 
+      tags: 
+        - Diagrams
+      security: 
+        - ApiKeyAuth: []
+      summary: Update an existing diagram.
+      description: Update an existing diagram. For this operation to be successful the diagram must be an unlocked draft that the user has permission to update.
+      operationId: updateDiagram
+      parameters: 
+        - name: mapAndDiagramId
+          in: path
+          required: true
+          description: 'A string parameter that contains a map id and a diagram id separated by a period. eg : 0:9CB21226514442E0967F1250FA1EDFCB.C750D64DB9FC4174B42EEE7C8A93E9D2'
+          schema: 
+            type: string
+        - name: layout
+          in: query
+          required: false
+          description: Direction to use when automatically positioning diagram objects.
+          schema: 
+            type: string
+            enum: 
+            - None
+            - Rows
+            - Columns
+            default: none
+        - name: itemsPerLine
+          in: query
+          required: false
+          description: Maximum number of objects to include per line. If this value is set to zero then all objects will appear in one continuous row or column.
+          schema: 
+            type: integer
+            default: 4
+        - name: objectWidth
+          in: query
+          required: false
+          description: Width to use for activities and text boxes
+          schema: 
+            type: integer
+            default: 160
+            minimum: 50
+            maximum: 500
+        - name: objectHeight
+          in: query
+          required: false
+          description: Height to use for activities and text boxes
+          schema: 
+            type: integer
+            default: 120
+            minimum: 50
+            maximum: 500
+        - name: horzGap
+          in: query
+          required: false
+          description: Width of the gap to place between activities.
+          schema: 
+            type: integer
+            default: 240
+        - name: vertGap
+          in: query
+          required: false
+          description: Height of the gap to place between activities.
+          schema: 
+            type: integer
+            default: 160
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/DiagramModel'
+      responses: 
+        '200': 
+          description: The item was successfully updated.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/DiagramModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    delete: 
+      tags: 
+        - Diagrams
+      security: 
+        - ApiKeyAuth: []
+      summary: Delete an existing diagram.
+      description: Delete an existing diagram. The diagram must be an unlocked draft that the user has write access to. The delete diagram will be stored in the deletion recovery manager for a period of time before being finally purged. It is not possible to delete the level 1 diagram.
+      operationId: deleteDiagram
+      parameters: 
+        - name: mapAndDiagramId
+          in: path
+          required: true
+          description: 'A string parameter that contains a map id and a diagram id separated by a period. eg : 0:9CB21226514442E0967F1250FA1EDFCB.C750D64DB9FC4174B42EEE7C8A93E9D2'
+          schema: 
+            type: string
+      responses: 
+        '200': 
+          description: The item was successfully deleted.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/diagrams/{mapAndDiagramId}/parent/{parentObjectId}: 
+    post: 
+      tags: 
+        - Diagrams
+      security: 
+        - ApiKeyAuth: []
+      summary: Create a new child diagram.
+      description: Create a new child diagram by specifying the parent diagram and object. For this operation to be successful the parent must be an unlocked draft that the user has permission to update.
+      operationId: createDiagram
+      parameters: 
+        - name: mapAndDiagramId
+          in: path
+          required: true
+          description: 'A string parameter that contains a map id and a diagram id separated by a period. eg : 0:9CB21226514442E0967F1250FA1EDFCB.C750D64DB9FC4174B42EEE7C8A93E9D2'
+          schema: 
+            type: string
+        - name: parentObjectId
+          in: path
+          required: true
+          description: A UUID string value that identifies the parent object for a child diagram. This is normally an activity but can also be an image or textbox.
+          schema: 
+            type: string
+        - name: layout
+          in: query
+          required: false
+          description: Direction to use when automatically positioning diagram objects.
+          schema: 
+            type: string
+            enum: 
+            - None
+            - Rows
+            - Columns
+            default: rows
+        - name: itemsPerLine
+          in: query
+          required: false
+          description: Maximum number of objects to include per line. If this value is set to zero then all objects will appear in one continuous row or column.
+          schema: 
+            type: integer
+            default: 4
+        - name: objectWidth
+          in: query
+          required: false
+          description: Width to use for activities and text boxes
+          schema: 
+            type: integer
+            default: 160
+            minimum: 50
+            maximum: 500
+        - name: objectHeight
+          in: query
+          required: false
+          description: Height to use for activities and text boxes
+          schema: 
+            type: integer
+            default: 120
+            minimum: 50
+            maximum: 500
+        - name: horzGap
+          in: query
+          required: false
+          description: Width of the gap to place between activities.
+          schema: 
+            type: integer
+            default: 240
+        - name: vertGap
+          in: query
+          required: false
+          description: Height of the gap to place between activities.
+          schema: 
+            type: integer
+            default: 160
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/DiagramModel'
+      responses: 
+        '201': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/DiagramModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/diagrams/{mapAndDiagramId}/parent-activity/{parentActivityId}: 
+    post: 
+      tags: 
+        - Diagrams
+      security: 
+        - ApiKeyAuth: []
+      summary: Create a new child diagram.
+      description: Create a new child diagram by specifying the parent diagram and activity. For this operation to be successful the parent must be an unlocked draft that the user has permission to update.
+      operationId: createDiagram2
+      parameters: 
+        - name: mapAndDiagramId
+          in: path
+          required: true
+          description: 'A string parameter that contains a map id and a diagram id separated by a period. eg : 0:9CB21226514442E0967F1250FA1EDFCB.C750D64DB9FC4174B42EEE7C8A93E9D2'
+          schema: 
+            type: string
+        - name: parentActivityId
+          in: path
+          required: true
+          description: An integer value that identifies the activity that will drill-down to the new diagram.
+          schema: 
+            type: integer
+        - name: layout
+          in: query
+          required: false
+          description: Direction to use when automatically positioning diagram objects.
+          schema: 
+            type: string
+            enum: 
+            - None
+            - Rows
+            - Columns
+            default: rows
+        - name: itemsPerLine
+          in: query
+          required: false
+          description: Maximum number of objects to include per line. If this value is set to zero then all objects will appear in one continuous row or column.
+          schema: 
+            type: integer
+            default: 4
+        - name: objectWidth
+          in: query
+          required: false
+          description: Width to use for activities and text boxes
+          schema: 
+            type: integer
+            default: 160
+            minimum: 50
+            maximum: 500
+        - name: objectHeight
+          in: query
+          required: false
+          description: Height to use for activities and text boxes
+          schema: 
+            type: integer
+            default: 120
+            minimum: 50
+            maximum: 500
+        - name: horzGap
+          in: query
+          required: false
+          description: Width of the gap to place between activities.
+          schema: 
+            type: integer
+            default: 240
+        - name: vertGap
+          in: query
+          required: false
+          description: Height of the gap to place between activities.
+          schema: 
+            type: integer
+            default: 160
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/DiagramModel'
+      responses: 
+        '201': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/DiagramModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/diagrams/{mapAndDiagramId}/images/{imageId}: 
+    get: 
+      tags: 
+        - Diagram Images
+      security: 
+        - ApiKeyAuth: []
+      summary: Retrieve an image used by a process diagram.
+      description: Retrieve an image used by a process diagram. Use the optional query parameters to resize the image.
+      operationId: getImage
+      parameters: 
+        - name: mapAndDiagramId
+          in: path
+          required: true
+          description: 'A string parameter that contains a map id and a diagram id separated by a period. eg : 0:9CB21226514442E0967F1250FA1EDFCB.C750D64DB9FC4174B42EEE7C8A93E9D2'
+          schema: 
+            type: string
+        - name: imageId
+          in: path
+          required: true
+          description: A UUID string parameter that identifies an image that can be shared across the map.
+          schema: 
+            type: string
+        - name: height
+          in: query
+          required: false
+          description: Resizes image to the specified height.
+          schema: 
+            type: integer
+        - name: width
+          in: query
+          required: false
+          description: Resizes image to the specified width.
+          schema: 
+            type: integer
+        - name: revision
+          in: query
+          required: false
+          description: Specifies which version of the image to return.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully retrieved.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ImageUploadResult'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/diagrams/{mapId}/images: 
+    post: 
+      tags: 
+        - Diagram Images
+      security: 
+        - ApiKeyAuth: []
+      summary: Upload a new image to a map.
+      description: Upload a new image to a map so that it can be used in process diagrams. Ensure that the content type is set to multipart/form-data
+      operationId: createImage
+      parameters: 
+        - name: mapId
+          in: path
+          required: true
+          description: Id of the map to use.
+          schema: 
+            type: string
+      requestBody: 
+        content: 
+          multipart/form-data: 
+            schema: 
+              type: object
+              properties: 
+                filename: 
+                  type: string
+                  format: binary
+      responses: 
+        '201': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ImageUploadResult'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/maps: 
+    get: 
+      tags: 
+        - Maps
+      security: 
+        - ApiKeyAuth: []
+      summary: Query maps by parent folder or by the map name.
+      description: Search for a collection of maps by using a parent folder id or by partial matching on the map name.
+      operationId: getMaps
+      parameters: 
+        - name: name
+          in: query
+          required: false
+          description: Name to search for.
+          schema: 
+            type: string
+        - name: mapFolderId
+          in: query
+          required: false
+          description: The id of the parent folder to search in.
+          schema: 
+            type: integer
+        - name: exactMatch
+          in: query
+          required: false
+          description: Only return items that exactly match the search term.
+          schema: 
+            type: boolean
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapCollection'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    post: 
+      tags: 
+        - Maps
+      security: 
+        - ApiKeyAuth: []
+      summary: Create a new map
+      description: Creates a new map and add its to the specified map folder.
+      operationId: createMap
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/MapModel'
+      responses: 
+        '201': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/maps/{id}: 
+    get: 
+      tags: 
+        - Maps
+      security: 
+        - ApiKeyAuth: []
+      summary: Find map by process id.
+      description: Returns a single process map for the specified process id.
+      operationId: getMap
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: An integer value used to identify a specific map.
+          schema: 
+            type: string
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    put: 
+      tags: 
+        - Maps
+      security: 
+        - ApiKeyAuth: []
+      summary: Update an existing map.
+      description: Update an existing map.
+      operationId: updateMap
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: An integer value used to identify a specific map.
+          schema: 
+            type: string
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/MapModel'
+      responses: 
+        '200': 
+          description: The item was successfully updated.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    delete: 
+      tags: 
+        - Maps
+      security: 
+        - ApiKeyAuth: []
+      summary: Delete a map.
+      description: Delete a process map and send it to the deletion recovery manager.
+      operationId: deleteMap
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: An integer value used to identify a specific map.
+          schema: 
+            type: string
+      responses: 
+        '200': 
+          description: The item was successfully deleted.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/mapfolders: 
+    get: 
+      tags: 
+        - Map Folders
+      security: 
+        - ApiKeyAuth: []
+      summary: Query map folders by parent folder id.
+      description: Search for a collection of map folders by using a parent folder id.
+      operationId: getMapFolders
+      parameters: 
+        - name: parentMapFolderId
+          in: query
+          required: false
+          description: The id of the parent folder to search in.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapFolderCollection'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    post: 
+      tags: 
+        - Map Folders
+      security: 
+        - ApiKeyAuth: []
+      summary: Add a new map folder.
+      description: Add a new map folder, specifying the name, parent folder and any access rights.
+      operationId: createMapFolder
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/MapFolderModel'
+      responses: 
+        '201': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapFolderModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/mapfolders/{id}: 
+    get: 
+      tags: 
+        - Map Folders
+      security: 
+        - ApiKeyAuth: []
+      summary: Find map folder by id.
+      description: Returns a single map folder.
+      operationId: getMapFolder
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: An integer value used to identify a specific map folder.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully retrieved.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapFolderModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    put: 
+      tags: 
+        - Map Folders
+      security: 
+        - ApiKeyAuth: []
+      summary: Update an existing map folder.
+      description: Update an existing map folder.
+      operationId: updateMapFolder
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: An integer value used to identify a specific map folder.
+          schema: 
+            type: integer
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/MapFolderModel'
+      responses: 
+        '200': 
+          description: The item was successfully updated.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/MapFolderModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    delete: 
+      tags: 
+        - Map Folders
+      security: 
+        - ApiKeyAuth: []
+      summary: Delete an existing map folder.
+      description: Deletes an existing map folder on the condition that it is empty.
+      operationId: deleteMapFolder
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: An integer value used to identify a specific map folder.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully deleted.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/languages: 
+    get: 
+      tags: 
+        - Languages
+      security: 
+        - ApiKeyAuth: []
+      summary: Retrieves a list of all available languages in the repository.
+      operationId: getLanguages
+      parameters: 
+        - name: includeDeleted
+          in: query
+          required: false
+          description: Determine if deleted languages should be include. 0 = false, 1 = true. Default is 0.
+          schema: 
+            type: boolean
+        - name: languageCode
+          in: query
+          required: false
+          description: Specify which language code to search for.
+          schema: 
+            type: string
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/LanguageModelItems'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/languages/{LanguageId}: 
+    get: 
+      tags: 
+        - Languages
+      security: 
+        - ApiKeyAuth: []
+      summary: Retrieves the details of a specific language.
+      operationId: getLanguage
+      parameters: 
+        - name: LanguageId
+          in: path
+          required: true
+          description: Id of language to use for localizable text properties.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/LanguageModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/languages/default: 
+    get: 
+      tags: 
+        - Languages
+      security: 
+        - ApiKeyAuth: []
+      summary: Retrieves the details of the default language.
+      operationId: getDefaultLanguage
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/LanguageModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/resources: 
+    get: 
+      tags: 
+        - Resources
+      security: 
+        - ApiKeyAuth: []
+      summary: Query a range of resources from the central library.
+      description: Query a range of central resources by specifying a name to search for.
+      operationId: getCentralResources
+      parameters: 
+        - name: resourceGroupId
+          in: query
+          required: false
+          description: The id of a resource group to search in.
+          schema: 
+            type: integer
+        - name: name
+          in: query
+          required: false
+          description: Name to search for.
+          schema: 
+            type: string
+        - name: exactMatch
+          in: query
+          required: false
+          description: Only return items that exactly match the search term.
+          schema: 
+            type: boolean
+        - name: languageId
+          in: query
+          required: false
+          description: Id of language to use for localizable text properties.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceModelItems'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    post: 
+      tags: 
+        - Resources
+      security: 
+        - ApiKeyAuth: []
+      summary: Create a new child resource.
+      description: Create a new central resource. Note that the resource name must be unique. For this operation to be successful the user must have the resource manager role.
+      operationId: createCentralResource
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/ResourceModel'
+      responses: 
+        '200': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/resources/{resourceId}: 
+    get: 
+      tags: 
+        - Resources
+      security: 
+        - ApiKeyAuth: []
+      summary: Returns a single resource from the central library.
+      description: Fetch the full resource definition.
+      operationId: getCentralResource
+      parameters: 
+        - name: resourceId
+          in: path
+          required: true
+          description: Id of the central resource to use.
+          schema: 
+            type: integer
+        - name: languageId
+          in: query
+          required: false
+          description: Id of language to use for localizable text properties.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully retrieved.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    put: 
+      tags: 
+        - Resources
+      security: 
+        - ApiKeyAuth: []
+      summary: Update an existing resource.
+      description: Update an existing resource. For this operation to be successful the user must have the resource manager role.
+      operationId: updateCentralResource
+      parameters: 
+        - name: resourceId
+          in: path
+          required: true
+          description: Id of the central resource to use.
+          schema: 
+            type: integer
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/ResourceModel'
+      responses: 
+        '200': 
+          description: The item was successfully updated.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    delete: 
+      tags: 
+        - Resources
+      security: 
+        - ApiKeyAuth: []
+      summary: Delete an existing resource.
+      description: Delete an existing resource from the central library. For this operation to be successful the user must have the resource manager role.
+      operationId: deleteCentralResource
+      parameters: 
+        - name: resourceId
+          in: path
+          required: true
+          description: Id of the central resource to use.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully deleted.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/resource-groups: 
+    get: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Query resources by name or resource group id.
+      description: Search for a collection of resources by using a partial-matching name or a resource group id.
+      operationId: getResourceGroups
+      parameters: 
+        - name: languageId
+          in: query
+          required: false
+          description: Id of language to use for localizable text properties.
+          schema: 
+            type: integer
+        - name: name
+          in: query
+          required: false
+          description: Name to search for.
+          schema: 
+            type: string
+        - name: parentResourceGroupId
+          in: query
+          required: false
+          description: The id of a resource group to search in.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceGroupModelItems'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    post: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Create a new resource group.
+      description: Create a new resource group.
+      operationId: createResourceGroup
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/ResourceGroupModel'
+      responses: 
+        '201': 
+          description: The item was successfully created.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceGroupModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/resource-groups/{ResourceGroupId}: 
+    get: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Get a resource group.
+      description: Fetch a resource group by its resource id. Use the languageId query parameter to specify which language to use for the text properties.
+      operationId: getResourceGroup
+      parameters: 
+        - name: ResourceGroupId
+          in: path
+          required: true
+          description: The id of the resource group to use.
+          schema: 
+            type: integer
+        - name: languageId
+          in: query
+          required: false
+          description: Id of language to use for localizable text properties.
+          schema: 
+            type: integer
+        - name: name
+          in: query
+          required: false
+          description: Name to search for.
+          schema: 
+            type: string
+        - name: parentResourceGroupId
+          in: query
+          required: false
+          description: The id of a resource group to search in.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully retrieved.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceGroupModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    put: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Update a resource group.
+      description: Updates a specific resource group.
+      operationId: updateResourceGroup
+      parameters: 
+        - name: ResourceGroupId
+          in: path
+          required: true
+          description: The id of the resource group to use.
+          schema: 
+            type: integer
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/ResourceGroupModel'
+      responses: 
+        '200': 
+          description: The item was successfully updated.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceGroupModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    delete: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Delete a resource group.
+      description: Deletes a specific resource group.
+      operationId: deleteResourceGroup
+      parameters: 
+        - name: ResourceGroupId
+          in: path
+          required: true
+          description: The id of the resource group to use.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully deleted.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/resource-groups/{ResourceGroupId}/members: 
+    get: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Fetch all resources in a particular group
+      description: Fetch all resources in a particular group
+      operationId: getResourceGroupMembers
+      parameters: 
+        - name: ResourceGroupId
+          in: path
+          required: true
+          description: The id of the resource group to use.
+          schema: 
+            type: integer
+        - name: languageId
+          in: query
+          required: false
+          description: Id of language to use for localizable text properties.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ResourceGroupMembers'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+    post: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Add resources to a group
+      description: Add one or more central resources to a group. The resources must not already be members of the group.
+      operationId: createResourceGroupMember
+      parameters: 
+        - name: ResourceGroupId
+          in: path
+          required: true
+          description: The id of the resource group to use.
+          schema: 
+            type: integer
+      requestBody: 
+        content: 
+          application/json: 
+            schema: 
+              $ref: '#/components/schemas/ResourceGroupMembers'
+      responses: 
+        '201': 
+          description: The item was successfully created.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/resource-groups/{ResourceGroupId}/members/{ResourceId}: 
+    delete: 
+      tags: 
+        - Resource Groups
+      security: 
+        - ApiKeyAuth: []
+      summary: Delete a resource from a group.
+      description: Delete an existing central resource from a group.
+      operationId: deleteResourceGroupMember
+      parameters: 
+        - name: ResourceGroupId
+          in: path
+          required: true
+          description: The
+          schema: 
+            type: integer
+        - name: ResourceId
+          in: path
+          required: true
+          description: id
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The item was successfully deleted.
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/user-accounts: 
+    get: 
+      tags: 
+        - User Accounts
+      security: 
+        - ApiKeyAuth: []
+      summary: Query user accounts by name or role.
+      description: Find matching user accounts by specifiying a name to search for. This will search in the first name, last name, email address and account name. You can also specify an optional role to search for.
+      operationId: getUserAccounts
+      parameters: 
+        - name: name
+          in: query
+          required: false
+          description: Specify text to search for in the first name, last name, email address and account name fields.
+          schema: 
+            type: string
+        - name: skip
+          in: query
+          required: false
+          description: Used for pagination. Specify the number of records to skip when retrieving user account records.
+          schema: 
+            type: integer
+            default: 0
+        - name: top
+          in: query
+          required: false
+          description: Used for pagination. Specify the number of records to include the response.
+          schema: 
+            type: integer
+            default: 25
+        - name: role
+          in: query
+          required: false
+          description: Specify which role the users should be able to perform. Cannot be used with the "userType" query parameter.
+          schema: 
+            type: string
+            enum: 
+            - Any
+            - ContentAuthor
+            - ContentOwner
+            - ContentAuthorizer
+            - ContentReviewer
+            - StmtSetOwner
+            - StmtManager
+            - AuditManager
+            - StoryboardOwner
+            - StoryboardAuthor
+            - ActionOwner
+            - ActionAssignee
+            - ActionEditor
+            - ActionViewer
+            - ScorecardOwner
+            default: any
+        - name: userType
+          in: query
+          required: false
+          description: Specify which account type to search for. Cannot be used with the "role" query parameter.
+          schema: 
+            type: string
+            enum: 
+            - Administrator
+            - Author
+            - Contributor
+            - Unassigned
+        - name: sortOrder
+          in: query
+          required: false
+          description: Specify the order in which to return user account details.
+          schema: 
+            type: string
+            enum: 
+            - LastName
+            - FirstName
+            - AccountName
+            default: lastName
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/UserAccountModelItems'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/user-accounts/{UserId}: 
+    get: 
+      tags: 
+        - User Accounts
+      security: 
+        - ApiKeyAuth: []
+      summary: Fetch a specific user account by its id value.
+      operationId: getUserAccount
+      parameters: 
+        - name: UserId
+          in: path
+          required: true
+          description: Integer id of user account to use.
+          schema: 
+            type: integer
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/UserAccountModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+  /api/v1/user-accounts/me: 
+    get: 
+      tags: 
+        - User Accounts
+      security: 
+        - ApiKeyAuth: []
+      summary: Fetch the user account details for the logged on user.
+      operationId: getMe
+      responses: 
+        '200': 
+          description: The query was successfully executed.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/UserAccountModel'
+        '400': 
+          description: The request could not be validated successfully.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '401': 
+          description: Unable to find an authenticated session.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '403': 
+          description: The current user does not have the correct privileges to perform that request.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+        '404': 
+          description: The requested item could not be found.
+          content: 
+            application/json: 
+              schema: 
+                $ref: '#/components/schemas/ExceptionSchema'
+components: 
+  securitySchemes: 
+    ApiKeyAuth: 
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter the OAuth token below. Ensure it is prefixed with the word Bearer followed by a space.
+  schemas: 
+    ExceptionSchema: 
+      type: object
+      properties: 
+        message: 
+          readOnly: true
+          example: Example error message
+          type: string
+        errorCode: 
+          readOnly: true
+          example: E_EXAMPLE_ERROR_CODE
+          type: string
+        context: 
+          readOnly: true
+          example: #
+          type: string
+    DiagramCollection: 
+      type: object
+      properties: 
+        diagrams: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              controlPanel: 
+                readOnly: true
+                type: object
+                properties: 
+                  owner: 
+                    type: object
+                    properties: 
+                      id: 
+                        example: 5
+                        type: integer
+                        format: int32
+                      name: 
+                        readOnly: true
+                        example: John Doe
+                        type: string
+                  author: 
+                    type: object
+                    properties: 
+                      id: 
+                        example: 5
+                        type: integer
+                        format: int32
+                      name: 
+                        readOnly: true
+                        example: John Doe
+                        type: string
+                  version: 
+                    example: 1.1
+                    type: string
+                    minLength: 1
+                    maxLength: 10
+                  title: 
+                    example: Sample diagram title
+                    type: string
+                    minLength: 1
+                    maxLength: 300
+                  description: 
+                    example: Sample diagram description
+                    type: string
+                  authorizationStatus: 
+                    readOnly: true
+                    type: string
+                    enum: 
+                    - updatePending
+                    - authorizationPending
+                    - promotionReady
+                    - draftLocked
+                    - authorized
+                  lockTitle: 
+                    type: boolean
+                required: 
+                  - version
+                  - title
+              diagramId: 
+                readOnly: true
+                example: A1EA84CD84794AA69B5007885B636148
+                type: string
+              level: 
+                readOnly: true
+                example: 1
+                type: string
+    DiagramModel: 
+      type: object
+      properties: 
+        controlPanel: 
+          type: object
+          properties: 
+            owner: 
+              type: object
+              properties: 
+                id: 
+                  example: 5
+                  type: integer
+                  format: int32
+                name: 
+                  readOnly: true
+                  example: John Doe
+                  type: string
+            author: 
+              type: object
+              properties: 
+                id: 
+                  example: 5
+                  type: integer
+                  format: int32
+                name: 
+                  readOnly: true
+                  example: John Doe
+                  type: string
+            version: 
+              example: 1.1
+              type: string
+              minLength: 1
+              maxLength: 10
+            title: 
+              example: Sample diagram title
+              type: string
+              minLength: 1
+              maxLength: 300
+            description: 
+              example: Sample diagram description
+              type: string
+            authorizationStatus: 
+              readOnly: true
+              type: string
+              enum: 
+              - updatePending
+              - authorizationPending
+              - promotionReady
+              - draftLocked
+              - authorized
+            lockTitle: 
+              type: boolean
+          required: 
+            - version
+            - title
+        diagramId: 
+          example: FF51A620FD01458498FF566F1965569A
+          type: string
+        language: 
+          type: object
+          properties: 
+            languageId: 
+              example: 1
+              type: integer
+              format: int32
+            name: 
+              readOnly: true
+              example: US English
+              type: string
+          required: 
+            - languageId
+        level: 
+          readOnly: true
+          example: 1.1
+          type: string
+        mode: 
+          readOnly: true
+          example: modern
+          type: string
+          enum: 
+          - classic
+          - modern
+        objects: 
+          type: array
+          items: 
+            anyOf: 
+              - $ref: '#/components/schemas/ActivityModel'
+              - $ref: '#/components/schemas/ImageBoxModel'
+              - $ref: '#/components/schemas/TextboxModel'
+              - $ref: '#/components/schemas/FlowlineModel'
+            discriminator: 
+              propertyName: objectType
+              mapping: 
+                activity: '#/components/schemas/ActivityModel'
+                image: '#/components/schemas/ImageBoxModel'
+                textbox: '#/components/schemas/TextboxModel'
+                line: '#/components/schemas/FlowlineModel'
+        parentObjectId: 
+          readOnly: true
+          type: string
+        parentDiagramId: 
+          readOnly: true
+          type: string
+        revision: 
+          example: 10
+          type: integer
+          format: int32
+        themed: 
+          readOnly: true
+          type: boolean
+        width: 
+          readOnly: true
+          example: 1100
+          type: integer
+          format: int32
+        height: 
+          readOnly: true
+          example: 800
+          type: integer
+          format: int32
+      required: 
+        - language
+    ActivityModel: 
+      type: object
+      properties: 
+        bubbleText: 
+          type: object
+          properties: 
+            text: 
+              type: object
+              properties: 
+                value: 
+                  example: Example text
+                  type: string
+                format: 
+                  example: plain
+                  type: string
+                  enum: 
+                  - html
+                  - plain
+              required: 
+                - format
+            visible: 
+              type: boolean
+        commentary: 
+          type: object
+          properties: 
+            showAsHint: 
+              type: boolean
+            text: 
+              type: object
+              properties: 
+                value: 
+                  example: Example text
+                  type: string
+                format: 
+                  example: plain
+                  type: string
+                  enum: 
+                  - html
+                  - plain
+              required: 
+                - format
+        diagramLink: 
+          type: object
+          properties: 
+            targetMapId: 
+              example: 0:78F866504937477297A5E2A7F49543A5
+              type: string
+            targetDiagramId: 
+              example: 969A1D5315494B5C965E9DA6708A6CAC
+              type: string
+            isValid: 
+              readOnly: true
+              example: True
+              type: boolean
+          required: 
+            - targetMapId
+            - targetDiagramId
+        resources: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              resourceId: 
+                example: 1
+                type: integer
+                format: int32
+              mapId: 
+                example: #
+                type: string
+                format: map-id
+              resRefId: 
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: Developer
+                type: string
+              displayName: 
+                readOnly: true
+                example: Software Engineer
+                type: string
+              infoField1: 
+                readOnly: true
+                example: Additional Info 1
+                type: string
+              infoField2: 
+                readOnly: true
+                example: Additional Info 2
+                type: string
+              status: 
+                readOnly: true
+                example: central
+                type: string
+                enum: 
+                - unknown
+                - central
+                - local
+                - override
+              visible: 
+                type: boolean
+              type: 
+                example: people
+                type: string
+                enum: 
+                - none
+                - people
+                - system
+                - other
+            required: 
+              - resourceId
+        statementLinks: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              linkId: 
+                example: 43
+                type: integer
+                format: int32
+              statementId: 
+                example: 2
+                type: integer
+                format: int32
+              statementName: 
+                readOnly: true
+                example: Example statement
+                type: string
+              setName: 
+                readOnly: true
+                example: Example statement set
+                type: string
+        style: 
+          type: object
+          properties: 
+            rounded: 
+              type: boolean
+            visibleBorder: 
+              example: True
+              type: boolean
+            pen: 
+              type: object
+              properties: 
+                color: 
+                  example: '#000000'
+                  type: string
+                  format: html-color
+                width: 
+                  example: 2
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 4
+            background: 
+              type: object
+              properties: 
+                color: 
+                  example: '#FFFFFF'
+                  type: string
+                  format: html-color
+        tag: 
+          example: important
+          type: string
+          enum: 
+          - unknown
+          - none
+          - control
+          - external
+          - important
+          - other
+        displayId: 
+          example: 1
+          type: integer
+          format: int32
+        displayIdVisible: 
+          example: True
+          type: boolean
+        text: 
+          type: object
+          properties: 
+            value: 
+              example: Example text
+              type: string
+            format: 
+              example: plain
+              type: string
+              enum: 
+              - html
+              - plain
+          required: 
+            - format
+        childDiagrams: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              diagramId: 
+                readOnly: true
+                example: E7907909713A428BAA950EC56DC1FF29
+                type: string
+              level: 
+                readOnly: true
+                example: 1.1
+                type: string
+              title: 
+                readOnly: true
+                example: Child Diagram Title
+                type: string
+              type: 
+                readOnly: true
+                example: standard
+                type: string
+                enum: 
+                - standard
+                - variant
+        attachments: 
+          type: array
+          items: 
+            anyOf: 
+              - $ref: '#/components/schemas/EmailAttachment'
+              - $ref: '#/components/schemas/TibbrAttachment'
+              - $ref: '#/components/schemas/ExcelDataLinkAttachment'
+              - $ref: '#/components/schemas/DataTableAttachment'
+              - $ref: '#/components/schemas/DirectFileAttachment'
+              - $ref: '#/components/schemas/AmxBpmAttachment'
+              - $ref: '#/components/schemas/SAPAttachment'
+              - $ref: '#/components/schemas/ScorecardAttachment'
+              - $ref: '#/components/schemas/IntImageAttachment'
+              - $ref: '#/components/schemas/FormvineAttachment'
+              - $ref: '#/components/schemas/MenuFuncAttachment'
+              - $ref: '#/components/schemas/SpotfireAttachment'
+              - $ref: '#/components/schemas/StoryboardAttachment'
+              - $ref: '#/components/schemas/IntWPAttachment'
+              - $ref: '#/components/schemas/DiagramAttachment'
+              - $ref: '#/components/schemas/SalesforceAttachment'
+              - $ref: '#/components/schemas/OracleAttachment'
+              - $ref: '#/components/schemas/DocRegistryAttachment'
+              - $ref: '#/components/schemas/URLAttachment'
+            discriminator: 
+              propertyName: type
+              mapping: 
+                email: '#/components/schemas/EmailAttachment'
+                tibbr: '#/components/schemas/TibbrAttachment'
+                excelDataLink: '#/components/schemas/ExcelDataLinkAttachment'
+                dataTable: '#/components/schemas/DataTableAttachment'
+                directFile: '#/components/schemas/DirectFileAttachment'
+                amxBpm: '#/components/schemas/AmxBpmAttachment'
+                sapTransaction: '#/components/schemas/SAPAttachment'
+                scorecard: '#/components/schemas/ScorecardAttachment'
+                intImage: '#/components/schemas/IntImageAttachment'
+                formvine: '#/components/schemas/FormvineAttachment'
+                menuFunc: '#/components/schemas/MenuFuncAttachment'
+                spotfire: '#/components/schemas/SpotfireAttachment'
+                storyboardLink: '#/components/schemas/StoryboardAttachment'
+                intWP: '#/components/schemas/IntWPAttachment'
+                diagram: '#/components/schemas/DiagramAttachment'
+                salesforce: '#/components/schemas/SalesforceAttachment'
+                oracle: '#/components/schemas/OracleAttachment'
+                docRegistry: '#/components/schemas/DocRegistryAttachment'
+                url: '#/components/schemas/URLAttachment'
+        objectId: 
+          example: 19C2ADDFB81648C48EDACDB36BA66708
+          type: string
+          format: guid
+        position: 
+          type: object
+          properties: 
+            top: 
+              type: integer
+              format: int32
+            left: 
+              type: integer
+              format: int32
+            bottom: 
+              type: integer
+              format: int32
+            right: 
+              type: integer
+              format: int32
+        objectType: 
+          type: string
+          enum: 
+          - activity
+      required: 
+        - objectType
+    EmailAttachment: 
+      type: object
+      properties: 
+        addrTo: 
+          example: user1@test.com
+          type: string
+        addrCc: 
+          example: user2@test.com
+          type: string
+        subject: 
+          example: Sample email subject
+          type: string
+        body: 
+          example: Sample email
+          type: string
+        id: 
+          example: 9FB1C95C69FB48A6A98256B17ADCC184
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - email
+    TibbrAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: 56264B6A1BCE461099CFAE6A4F3E1312
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - tibbr
+      required: 
+        - url
+    ExcelDataLinkAttachment: 
+      type: object
+      properties: 
+        id: 
+          example: 569C1B8FA3A240089C4DC7B0AB2B8BD2
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - excelDataLink
+    DataTableAttachment: 
+      type: object
+      properties: 
+        tableDefinitionId: 
+          example: 1
+          type: integer
+          format: int32
+        tableLinkId: 
+          readOnly: true
+          example: 2
+          type: integer
+          format: int32
+        tableName: 
+          readOnly: true
+          example: RACI
+          type: string
+        id: 
+          example: FAE2EAE3F707448FB4A269B013A1AFCB
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - dataTable
+      required: 
+        - tableDefinitionId
+    DirectFileAttachment: 
+      type: object
+      properties: 
+        filename: 
+          readOnly: true
+          example: readme.txt
+          type: string
+        id: 
+          example: BE422F95043C495492031467FE2D8B6B
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - directFile
+    AmxBpmAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: 82520B8B60D046D8A5EE4687612885BD
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - amxBpm
+      required: 
+        - url
+    SAPAttachment: 
+      type: object
+      properties: 
+        transactionId: 
+          readOnly: true
+          type: string
+        activated: 
+          readOnly: true
+          type: boolean
+        frequency: 
+          readOnly: true
+          type: number
+          format: double
+        id: 
+          example: 6DDB826ADD5F455A86D0D80B1A21D334
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - sapTransaction
+    ScorecardAttachment: 
+      type: object
+      properties: 
+        scorecardId: 
+          example: 1
+          type: integer
+          format: int32
+        id: 
+          example: F3A339552C6C40F3920631A001758EBF
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - scorecard
+    IntImageAttachment: 
+      type: object
+      properties: 
+        imageId: 
+          type: string
+        id: 
+          example: 5AA874BDEE6B47509BC6D4D07ABF2BA5
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - intImage
+    FormvineAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: 724EBC0DF8E84A1DA494A76AF0085549
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - formvine
+      required: 
+        - url
+    MenuFuncAttachment: 
+      type: object
+      properties: 
+        menuFunctionId: 
+          readOnly: true
+          example: 1
+          type: integer
+          format: int32
+        id: 
+          example: 710E5F66FE664B8CAFD355B6C542912E
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - menuFunc
+    SpotfireAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: FD9FC9FC080E424FABB044891B5EB8A5
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - spotfire
+      required: 
+        - url
+    StoryboardAttachment: 
+      type: object
+      properties: 
+        storyboardId: 
+          example: 1
+          type: integer
+          format: int32
+        stepIndex: 
+          example: 2
+          type: integer
+          format: int32
+        id: 
+          example: 33DE919F9F0743F084C47DFA49B193AC
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - storyboardLink
+    IntWPAttachment: 
+      type: object
+      properties: 
+        documentId: 
+          example: 13408ACB7E3545428F9D3F359A230349
+          type: string
+        id: 
+          example: 876062596AE9496E9172B8546002FF7B
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - intWP
+    DiagramAttachment: 
+      type: object
+      properties: 
+        targetMapId: 
+          readOnly: true
+          example: 0:78F866504937477297A5E2A7F49543A5
+          type: string
+        targetDiagramId: 
+          readOnly: true
+          example: 3DF5D46780DE4088838EB052F34553F1
+          type: string
+        isValid: 
+          readOnly: true
+          example: True
+          type: boolean
+        id: 
+          example: 3CFA8C2D188145269400EEC3C8A0939E
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - diagram
+    SalesforceAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: 2628F88FE91E4516A0BB7C36BE729CF0
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - salesforce
+      required: 
+        - url
+    OracleAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: 1E43D5E7774C4DC3ADA11BE3A2794F69
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - oracle
+      required: 
+        - url
+    DocRegistryAttachment: 
+      type: object
+      properties: 
+        documentId: 
+          example: 81784D98DB994339AD4BBD3223412E3A
+          type: string
+          format: guid
+        documentNumber: 
+          readOnly: true
+          example: 23
+          type: integer
+          format: int32
+        hasMaster: 
+          readOnly: true
+          example: True
+          type: boolean
+        registryItemType: 
+          readOnly: true
+          example: document
+          type: string
+        id: 
+          example: 578444D3C03B431C97E5677F23A39E95
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - docRegistry
+      required: 
+        - documentId
+    URLAttachment: 
+      type: object
+      properties: 
+        url: 
+          example: example.url.com
+          type: string
+        id: 
+          example: 7BCC6E1B4D434AFF9BB0AA1F7F9D0B71
+          type: string
+        title: 
+          example: Attachment title
+          type: string
+        type: 
+          type: string
+          enum: 
+          - url
+      required: 
+        - url
+    ImageBoxModel: 
+      type: object
+      properties: 
+        hint: 
+          type: object
+          properties: 
+            text: 
+              example: example hint text
+              type: string
+            visible: 
+              example: True
+              type: boolean
+        imageId: 
+          example: 0EDB18921A4B4421A57664C721477ED0
+          type: string
+          format: guid
+        imageUrl: 
+          readOnly: true
+          example: /path/to/a/diagram/url
+          type: string
+        flipHorizontal: 
+          type: boolean
+        flipVertical: 
+          type: boolean
+        displayId: 
+          example: #
+          type: integer
+          format: int32
+        displayIdVisible: 
+          example: False
+          type: boolean
+        childDiagrams: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              diagramId: 
+                readOnly: true
+                example: E7907909713A428BAA950EC56DC1FF29
+                type: string
+              level: 
+                readOnly: true
+                example: 1.1
+                type: string
+              title: 
+                readOnly: true
+                example: Child Diagram Title
+                type: string
+              type: 
+                readOnly: true
+                example: standard
+                type: string
+                enum: 
+                - standard
+                - variant
+        attachments: 
+          type: array
+          items: 
+            anyOf: 
+              - $ref: '#/components/schemas/EmailAttachment'
+              - $ref: '#/components/schemas/TibbrAttachment'
+              - $ref: '#/components/schemas/ExcelDataLinkAttachment'
+              - $ref: '#/components/schemas/DataTableAttachment'
+              - $ref: '#/components/schemas/DirectFileAttachment'
+              - $ref: '#/components/schemas/AmxBpmAttachment'
+              - $ref: '#/components/schemas/SAPAttachment'
+              - $ref: '#/components/schemas/ScorecardAttachment'
+              - $ref: '#/components/schemas/IntImageAttachment'
+              - $ref: '#/components/schemas/FormvineAttachment'
+              - $ref: '#/components/schemas/MenuFuncAttachment'
+              - $ref: '#/components/schemas/SpotfireAttachment'
+              - $ref: '#/components/schemas/StoryboardAttachment'
+              - $ref: '#/components/schemas/IntWPAttachment'
+              - $ref: '#/components/schemas/DiagramAttachment'
+              - $ref: '#/components/schemas/SalesforceAttachment'
+              - $ref: '#/components/schemas/OracleAttachment'
+              - $ref: '#/components/schemas/DocRegistryAttachment'
+              - $ref: '#/components/schemas/URLAttachment'
+            discriminator: 
+              propertyName: type
+              mapping: 
+                email: '#/components/schemas/EmailAttachment'
+                tibbr: '#/components/schemas/TibbrAttachment'
+                excelDataLink: '#/components/schemas/ExcelDataLinkAttachment'
+                dataTable: '#/components/schemas/DataTableAttachment'
+                directFile: '#/components/schemas/DirectFileAttachment'
+                amxBpm: '#/components/schemas/AmxBpmAttachment'
+                sapTransaction: '#/components/schemas/SAPAttachment'
+                scorecard: '#/components/schemas/ScorecardAttachment'
+                intImage: '#/components/schemas/IntImageAttachment'
+                formvine: '#/components/schemas/FormvineAttachment'
+                menuFunc: '#/components/schemas/MenuFuncAttachment'
+                spotfire: '#/components/schemas/SpotfireAttachment'
+                storyboardLink: '#/components/schemas/StoryboardAttachment'
+                intWP: '#/components/schemas/IntWPAttachment'
+                diagram: '#/components/schemas/DiagramAttachment'
+                salesforce: '#/components/schemas/SalesforceAttachment'
+                oracle: '#/components/schemas/OracleAttachment'
+                docRegistry: '#/components/schemas/DocRegistryAttachment'
+                url: '#/components/schemas/URLAttachment'
+        objectId: 
+          example: 64AB20984E54490A81BA40B2B9DB66FA
+          type: string
+          format: guid
+        position: 
+          type: object
+          properties: 
+            top: 
+              type: integer
+              format: int32
+            left: 
+              type: integer
+              format: int32
+            bottom: 
+              type: integer
+              format: int32
+            right: 
+              type: integer
+              format: int32
+        objectType: 
+          type: string
+          enum: 
+          - image
+      required: 
+        - objectType
+    TextboxModel: 
+      type: object
+      properties: 
+        hint: 
+          type: object
+          properties: 
+            text: 
+              example: example hint text
+              type: string
+            visible: 
+              example: True
+              type: boolean
+        style: 
+          type: object
+          properties: 
+            visibleBorder: 
+              example: True
+              type: boolean
+            pen: 
+              type: object
+              properties: 
+                color: 
+                  example: '#000000'
+                  type: string
+                  format: html-color
+                width: 
+                  example: 2
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 4
+            background: 
+              type: object
+              properties: 
+                color: 
+                  example: '#FFFFFF'
+                  type: string
+                  format: html-color
+        displayId: 
+          example: #
+          type: integer
+          format: int32
+        displayIdVisible: 
+          example: False
+          type: boolean
+        text: 
+          type: object
+          properties: 
+            value: 
+              example: Example text
+              type: string
+            format: 
+              example: plain
+              type: string
+              enum: 
+              - html
+              - plain
+          required: 
+            - format
+        childDiagrams: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              diagramId: 
+                readOnly: true
+                example: E7907909713A428BAA950EC56DC1FF29
+                type: string
+              level: 
+                readOnly: true
+                example: 1.1
+                type: string
+              title: 
+                readOnly: true
+                example: Child Diagram Title
+                type: string
+              type: 
+                readOnly: true
+                example: standard
+                type: string
+                enum: 
+                - standard
+                - variant
+        attachments: 
+          type: array
+          items: 
+            anyOf: 
+              - $ref: '#/components/schemas/EmailAttachment'
+              - $ref: '#/components/schemas/TibbrAttachment'
+              - $ref: '#/components/schemas/ExcelDataLinkAttachment'
+              - $ref: '#/components/schemas/DataTableAttachment'
+              - $ref: '#/components/schemas/DirectFileAttachment'
+              - $ref: '#/components/schemas/AmxBpmAttachment'
+              - $ref: '#/components/schemas/SAPAttachment'
+              - $ref: '#/components/schemas/ScorecardAttachment'
+              - $ref: '#/components/schemas/IntImageAttachment'
+              - $ref: '#/components/schemas/FormvineAttachment'
+              - $ref: '#/components/schemas/MenuFuncAttachment'
+              - $ref: '#/components/schemas/SpotfireAttachment'
+              - $ref: '#/components/schemas/StoryboardAttachment'
+              - $ref: '#/components/schemas/IntWPAttachment'
+              - $ref: '#/components/schemas/DiagramAttachment'
+              - $ref: '#/components/schemas/SalesforceAttachment'
+              - $ref: '#/components/schemas/OracleAttachment'
+              - $ref: '#/components/schemas/DocRegistryAttachment'
+              - $ref: '#/components/schemas/URLAttachment'
+            discriminator: 
+              propertyName: type
+              mapping: 
+                email: '#/components/schemas/EmailAttachment'
+                tibbr: '#/components/schemas/TibbrAttachment'
+                excelDataLink: '#/components/schemas/ExcelDataLinkAttachment'
+                dataTable: '#/components/schemas/DataTableAttachment'
+                directFile: '#/components/schemas/DirectFileAttachment'
+                amxBpm: '#/components/schemas/AmxBpmAttachment'
+                sapTransaction: '#/components/schemas/SAPAttachment'
+                scorecard: '#/components/schemas/ScorecardAttachment'
+                intImage: '#/components/schemas/IntImageAttachment'
+                formvine: '#/components/schemas/FormvineAttachment'
+                menuFunc: '#/components/schemas/MenuFuncAttachment'
+                spotfire: '#/components/schemas/SpotfireAttachment'
+                storyboardLink: '#/components/schemas/StoryboardAttachment'
+                intWP: '#/components/schemas/IntWPAttachment'
+                diagram: '#/components/schemas/DiagramAttachment'
+                salesforce: '#/components/schemas/SalesforceAttachment'
+                oracle: '#/components/schemas/OracleAttachment'
+                docRegistry: '#/components/schemas/DocRegistryAttachment'
+                url: '#/components/schemas/URLAttachment'
+        objectId: 
+          example: E14B457EAE2744EA951E8B083DC77B3B
+          type: string
+          format: guid
+        position: 
+          type: object
+          properties: 
+            top: 
+              type: integer
+              format: int32
+            left: 
+              type: integer
+              format: int32
+            bottom: 
+              type: integer
+              format: int32
+            right: 
+              type: integer
+              format: int32
+        objectType: 
+          type: string
+          enum: 
+          - textbox
+      required: 
+        - objectType
+    FlowlineModel: 
+      type: object
+      properties: 
+        commentary: 
+          type: object
+          properties: 
+            showAsHint: 
+              type: boolean
+            text: 
+              type: object
+              properties: 
+                value: 
+                  example: Example text
+                  type: string
+                format: 
+                  example: plain
+                  type: string
+                  enum: 
+                  - html
+                  - plain
+              required: 
+                - format
+        connections: 
+          type: object
+          properties: 
+            externallyConnected: 
+              example: False
+              type: boolean
+            internalConnections: 
+              type: array
+              items: 
+                type: object
+                properties: 
+                  targetFlowlineId: 
+                    example: B2CB207A5F874B45955B262BD0C5069E
+                    type: string
+                    format: guid
+                  diagramId: 
+                    example: 8991F7C5CF8A464BA59F4FA141D48BE5
+                    type: string
+                    format: guid
+                  mapId: 
+                    example: 0:61F6D986D01A452FBC880EFAE39B25C5
+                    type: string
+                    format: map-id
+                  text: 
+                    example: Connects to another map
+                    type: string
+                  integrityStatus: 
+                    readOnly: true
+                    example: ok
+                    type: string
+                    enum: 
+                    - ok
+                    - needBuild
+                required: 
+                  - targetFlowlineId
+                  - diagramId
+                  - mapId
+            style: 
+              type: object
+              properties: 
+                displaySize: 
+                  example: 16
+                  type: integer
+                  format: int32
+                  minimum: 8
+                  maximum: 32
+                displayAtEnd: 
+                  example: True
+                  type: boolean
+                visible: 
+                  example: True
+                  type: boolean
+        destObject: 
+          type: object
+          properties: 
+            objectId: 
+              example: #
+              type: string
+              format: guid
+            objectDisplayId: 
+              example: 1
+              type: integer
+              format: int32
+            edge: 
+              example: right
+              type: string
+              enum: 
+              - none
+              - left
+              - top
+              - right
+              - bottom
+        flowlineId: 
+          readOnly: true
+          type: string
+        linePoints: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              x: 
+                example: 100
+                type: integer
+                format: int32
+              y: 
+                example: 200
+                type: integer
+                format: int32
+        sourceObject: 
+          type: object
+          properties: 
+            objectId: 
+              example: #
+              type: string
+              format: guid
+            objectDisplayId: 
+              example: 1
+              type: integer
+              format: int32
+            edge: 
+              example: right
+              type: string
+              enum: 
+              - none
+              - left
+              - top
+              - right
+              - bottom
+        straight: 
+          type: boolean
+        style: 
+          type: object
+          properties: 
+            pen: 
+              type: object
+              properties: 
+                color: 
+                  example: '#000000'
+                  type: string
+                  format: html-color
+                width: 
+                  example: 2
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 4
+            background: 
+              type: object
+              properties: 
+                color: 
+                  example: '#FFFFFF'
+                  type: string
+                  format: html-color
+        text: 
+          type: object
+          properties: 
+            value: 
+              example: Example text
+              type: string
+            format: 
+              example: plain
+              type: string
+              enum: 
+              - html
+              - plain
+          required: 
+            - format
+        textPosition: 
+          type: object
+          properties: 
+            top: 
+              type: integer
+              format: int32
+            left: 
+              type: integer
+              format: int32
+            bottom: 
+              type: integer
+              format: int32
+            right: 
+              type: integer
+              format: int32
+        attachments: 
+          type: array
+          items: 
+            anyOf: 
+              - $ref: '#/components/schemas/EmailAttachment'
+              - $ref: '#/components/schemas/TibbrAttachment'
+              - $ref: '#/components/schemas/ExcelDataLinkAttachment'
+              - $ref: '#/components/schemas/DataTableAttachment'
+              - $ref: '#/components/schemas/DirectFileAttachment'
+              - $ref: '#/components/schemas/AmxBpmAttachment'
+              - $ref: '#/components/schemas/SAPAttachment'
+              - $ref: '#/components/schemas/ScorecardAttachment'
+              - $ref: '#/components/schemas/IntImageAttachment'
+              - $ref: '#/components/schemas/FormvineAttachment'
+              - $ref: '#/components/schemas/MenuFuncAttachment'
+              - $ref: '#/components/schemas/SpotfireAttachment'
+              - $ref: '#/components/schemas/StoryboardAttachment'
+              - $ref: '#/components/schemas/IntWPAttachment'
+              - $ref: '#/components/schemas/DiagramAttachment'
+              - $ref: '#/components/schemas/SalesforceAttachment'
+              - $ref: '#/components/schemas/OracleAttachment'
+              - $ref: '#/components/schemas/DocRegistryAttachment'
+              - $ref: '#/components/schemas/URLAttachment'
+            discriminator: 
+              propertyName: type
+              mapping: 
+                email: '#/components/schemas/EmailAttachment'
+                tibbr: '#/components/schemas/TibbrAttachment'
+                excelDataLink: '#/components/schemas/ExcelDataLinkAttachment'
+                dataTable: '#/components/schemas/DataTableAttachment'
+                directFile: '#/components/schemas/DirectFileAttachment'
+                amxBpm: '#/components/schemas/AmxBpmAttachment'
+                sapTransaction: '#/components/schemas/SAPAttachment'
+                scorecard: '#/components/schemas/ScorecardAttachment'
+                intImage: '#/components/schemas/IntImageAttachment'
+                formvine: '#/components/schemas/FormvineAttachment'
+                menuFunc: '#/components/schemas/MenuFuncAttachment'
+                spotfire: '#/components/schemas/SpotfireAttachment'
+                storyboardLink: '#/components/schemas/StoryboardAttachment'
+                intWP: '#/components/schemas/IntWPAttachment'
+                diagram: '#/components/schemas/DiagramAttachment'
+                salesforce: '#/components/schemas/SalesforceAttachment'
+                oracle: '#/components/schemas/OracleAttachment'
+                docRegistry: '#/components/schemas/DocRegistryAttachment'
+                url: '#/components/schemas/URLAttachment'
+        objectId: 
+          example: 8A75C7A67D194575BD703363B9B06DCA
+          type: string
+          format: guid
+        position: 
+          type: object
+          properties: 
+            top: 
+              type: integer
+              format: int32
+            left: 
+              type: integer
+              format: int32
+            bottom: 
+              type: integer
+              format: int32
+            right: 
+              type: integer
+              format: int32
+        objectType: 
+          type: string
+          enum: 
+          - line
+      required: 
+        - objectType
+    ImageUploadResult: 
+      type: object
+      properties: 
+        imageId: 
+          readOnly: true
+          type: string
+        width: 
+          readOnly: true
+          type: integer
+          format: int32
+        height: 
+          readOnly: true
+          type: integer
+          format: int32
+    MapCollection: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/MapModel'
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                readOnly: true
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                type: string
+    MapModel: 
+      type: object
+      properties: 
+        processId: 
+          example: DDFFE68646C24A3ABCF36CC9E2C0B328
+          type: string
+        mapFolderId: 
+          type: integer
+          format: int32
+        name: 
+          example: Sample Map
+          type: string
+          minLength: 1
+          maxLength: 100
+        draft: 
+          readOnly: true
+          type: object
+          properties: 
+            mapId: 
+              readOnly: true
+              example: 0:8D846A11E20144E38359DB1EA04E94A2
+              type: string
+            name: 
+              readOnly: true
+              example: Draft
+              type: string
+            owner: 
+              readOnly: true
+              type: object
+              properties: 
+                id: 
+                  example: 5
+                  type: integer
+                  format: int32
+                name: 
+                  readOnly: true
+                  example: John Doe
+                  type: string
+        master: 
+          readOnly: true
+          type: object
+          properties: 
+            mapId: 
+              readOnly: true
+              example: 0:8D846A11E20144E38359DB1EA04E94A2
+              type: string
+            name: 
+              readOnly: true
+              example: Draft
+              type: string
+            owner: 
+              readOnly: true
+              type: object
+              properties: 
+                id: 
+                  example: 5
+                  type: integer
+                  format: int32
+                name: 
+                  readOnly: true
+                  example: John Doe
+                  type: string
+        archives: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapId: 
+                readOnly: true
+                example: 0:8D846A11E20144E38359DB1EA04E94A2
+                type: string
+              name: 
+                readOnly: true
+                example: Draft
+                type: string
+              owner: 
+                readOnly: true
+                type: object
+                properties: 
+                  id: 
+                    example: 5
+                    type: integer
+                    format: int32
+                  name: 
+                    readOnly: true
+                    example: John Doe
+                    type: string
+        scenarios: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapId: 
+                readOnly: true
+                example: 0:8D846A11E20144E38359DB1EA04E94A2
+                type: string
+              name: 
+                readOnly: true
+                example: Draft
+                type: string
+              owner: 
+                readOnly: true
+                type: object
+                properties: 
+                  id: 
+                    example: 5
+                    type: integer
+                    format: int32
+                  name: 
+                    readOnly: true
+                    example: John Doe
+                    type: string
+      required: 
+        - name
+    MapFolderCollection: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/MapFolderModel'
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                readOnly: true
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                type: string
+    MapFolderModel: 
+      type: object
+      properties: 
+        mapFolderId: 
+          example: 1
+          type: integer
+          format: int32
+        parentMapFolderId: 
+          type: integer
+          format: int32
+        name: 
+          example: EMEA Maps
+          type: string
+          minLength: 1
+          maxLength: 100
+        accessRights: 
+          type: object
+          properties: 
+            default: 
+              example: allowed
+              type: string
+              enum: 
+              - allowed
+              - denied
+            specific: 
+              type: array
+              items: 
+                type: object
+                properties: 
+                  id: 
+                    example: 1
+                    type: integer
+                    format: int32
+                  type: 
+                    example: user
+                    type: string
+                    enum: 
+                    - user
+                    - group
+                  access: 
+                    example: allowed
+                    type: string
+                    enum: 
+                    - allowed
+                    - denied
+                  name: 
+                    readOnly: true
+                    example: John Doe
+                    type: string
+        maps: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              processId: 
+                readOnly: true
+                example: 83330BC7232E4465B05BF4AD8756EA13
+                type: string
+              name: 
+                readOnly: true
+                example: Sample Map
+                type: string
+        subFolders: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapFolderId: 
+                readOnly: true
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: EMEA Maps
+                type: string
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapFolderId: 
+                readOnly: true
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: EMEA Maps
+                type: string
+      required: 
+        - name
+    LanguageModelItems: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/LanguageModel'
+    LanguageModel: 
+      type: object
+      properties: 
+        languageId: 
+          readOnly: true
+          example: 1
+          type: integer
+          format: int32
+        name: 
+          readOnly: true
+          example: US English
+          type: string
+        code: 
+          readOnly: true
+          example: US-en
+          type: string
+        localeId: 
+          readOnly: true
+          example: 1033
+          type: integer
+          format: int32
+        isDefault: 
+          readOnly: true
+          example: True
+          type: boolean
+        deleted: 
+          readOnly: true
+          example: False
+          type: boolean
+    ResourceModelItems: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/ResourceModel'
+    ResourceModel: 
+      type: object
+      properties: 
+        resourceId: 
+          example: 1
+          type: integer
+          format: int32
+        name: 
+          example: Developer
+          type: string
+          minLength: 1
+          maxLength: 200
+        displayName: 
+          example: Software Engineer
+          type: string
+          maxLength: 200
+        infoField1: 
+          example: Additional Info 1
+          type: string
+          maxLength: 400
+        infoField2: 
+          example: Additional Info 2
+          type: string
+          maxLength: 400
+        resourceGroupId: 
+          type: integer
+          format: int32
+        status: 
+          readOnly: true
+          example: central
+          type: string
+          enum: 
+          - unknown
+          - central
+          - local
+          - override
+        type: 
+          example: people
+          type: string
+          enum: 
+          - none
+          - people
+          - system
+          - other
+        languageId: 
+          example: 1
+          type: integer
+          format: int32
+      required: 
+        - name
+    ResourceGroupModelItems: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/ResourceGroupModel'
+    ResourceGroupModel: 
+      type: object
+      properties: 
+        resourceGroupId: 
+          example: 2
+          type: integer
+          format: int32
+        parentGroupId: 
+          example: 1
+          type: integer
+          format: int32
+        name: 
+          example: Software Development
+          type: string
+          maxLength: 50
+        description: 
+          example: Software development resources
+          type: string
+          maxLength: 100
+        languageId: 
+          example: 1
+          type: integer
+          format: int32
+      required: 
+        - name
+    ResourceGroupMembers: 
+      type: object
+      properties: 
+        items: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              resourceId: 
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: Developer
+                type: string
+              displayName: 
+                readOnly: true
+                example: Software Engineer
+                type: string
+            required: 
+              - resourceId
+    UserAccountModelItems: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/UserAccountModel'
+        limit: 
+          readOnly: true
+          example: 25
+          type: integer
+          format: int32
+        offset: 
+          readOnly: true
+          type: integer
+          format: int32
+        count: 
+          readOnly: true
+          example: 1
+          type: integer
+          format: int32
+    UserAccountModel: 
+      type: object
+      properties: 
+        userId: 
+          readOnly: true
+          example: 1
+          type: integer
+          format: int32
+        accountName: 
+          readOnly: true
+          example: sample.user
+          type: string
+        firstName: 
+          readOnly: true
+          example: John
+          type: string
+        lastName: 
+          readOnly: true
+          example: Doe
+          type: string
+        fullName: 
+          readOnly: true
+          example: John Doe
+          type: string

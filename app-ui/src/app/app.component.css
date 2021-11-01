@@ -58,3 +58,12 @@ router-outlet + * {
   height: 40px;
 }
 
+::ng-deep .tTip {
+  white-space: pre-line;
+  font-size: 16px;
+  color: #FFF;
+  font-family: "Source Sans Pro";
+  letter-spacing: 0;
+  line-height: 18px;
+  text-align: center;
+}

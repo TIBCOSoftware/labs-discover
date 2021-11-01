@@ -1,5 +1,4 @@
 import { Inject, Injectable } from '@angular/core';
-import { LiveAppsService } from '@tibco-tcstk/tc-liveapps-lib';
 import { AuthInfo, TcCoreConfigService } from '@tibco-tcstk/tc-core-lib';
 import { AuthKeys, TokenResponse } from '../models_ui/oauth';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -22,7 +21,8 @@ export class OauthService {
   private APP_URL = '';
   private DOMAIN = '';
   private CLIENTID = '';
-  private SCOPE = 'securitycontext+internal.refresh-session+offline+openid+profile+email+openid+BPM+spotfire+offline_access';
+  private SCOPE = 'securitycontext+internal.refresh-session+offline+openid+profile+email+openid+BPM+nimbus+spotfire+offline_access';
+  // private SCOPE = 'securitycontext+internal.refresh-session+offline+openid+profile+email+openid+BPM+spotfire+offline_access';
   private VERIFIER;
   private MAX_TOKEN_EXPIRY_SECONDS = 1080;
 
@@ -30,7 +30,7 @@ export class OauthService {
   private _MODE: string;
   private _REGION: string;
 
-  constructor(@Inject(APP_BASE_HREF) baseHref: string, private http: HttpClient, private liveAppsService: LiveAppsService, @Inject(TcCoreConfigService) protected tcCoreConfig: TcCoreConfigService) {
+  constructor(@Inject(APP_BASE_HREF) baseHref: string, private http: HttpClient, @Inject(TcCoreConfigService) protected tcCoreConfig: TcCoreConfigService) {
     const auth = this.getKey();
     this.VERIFIER = auth?.verifier;
     const host = window.location.hostname.split('.');
@@ -65,8 +65,11 @@ export class OauthService {
   }
 
   public async initialize() {
-
-    return this.http.get('assets/config/clientConfig.json').toPromise().then(
+    const headers = new HttpHeaders()
+      .set('Cache-Control', 'no-cache, no-store, must-revalidate, post-check=0, pre-check=0')
+      .set('Pragma', 'no-cache')
+      .set('Expires', '0')
+    return this.http.get('assets/config/clientConfig.json', {headers}).toPromise().then(
       (config: any) => {
         this.CLIENTID = config.client_id;
         if (!this.CLIENTID) {

@@ -1,21 +1,21 @@
-<div class="select-template-top">
+<upload-file-dialog [display]="displayUploadDialog" (hide)="displayUploadDialog = false" (uploadFile)="onUploadFile($event)" ></upload-file-dialog>
+<div class="file-select-container">
   <uxpl-object-header [config]="objHeaderConfig" (back)="goDatasets()">
     <uxpl-button slot="navigation-content" class="icon-position" id="#refresh" type="no-border"
                  icon="assets/images/svg/pl-icon-refresh.svg" (clicked)="refreshFiles()">
-      Refresh
-    </uxpl-button>
-    <!--
-    <uxpl-button id="#upload" slot="navigation-content" type="no-border">
-      <div  class="upload-file-button-container">
-         TODO: Use a proper modal with the options from the dummyDataset
-        <csv-upload-button #csvUpload [dataset]="dummyDataset" [file]="file" [csvError]="csvError" *ngIf="showUpload"
-                           (uploadFile)="onUploadFile($event)"></csv-upload-button>
-
+      <div style="display: flex; align-items: center">
+        Refresh
       </div>
-    </uxpl-button> -->
+    </uxpl-button>
+    <uxpl-button slot="navigation-content" class="icon-position" id="#upload" icon-name="pl-icon-upload" type="no-border"
+                 (clicked)="displayUploadDialog = !displayUploadDialog">
+      <div style="display: flex; align-items: center">
+        Upload File
+      </div>
+    </uxpl-button>
   </uxpl-object-header>
   <div class="file-selector-wrapper">
     <csv-list [isStandAlone]="true" [files]="files" [dataset]="dummyDataset" [file]="file" [csvError]="csvError"
-              (updateFiles)="refreshFiles()"></csv-list>
+              (updateFiles)="refreshFiles()" (fileDownload)="downloadCsvFile($event)"></csv-list>
   </div>
 </div>

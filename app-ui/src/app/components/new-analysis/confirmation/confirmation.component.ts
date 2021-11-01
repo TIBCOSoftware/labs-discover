@@ -1,11 +1,10 @@
 import {Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges} from '@angular/core';
 import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
-import {AnalysisData} from 'src/app/model/analysisData';
+import {AnalysisData} from 'src/app/backend/model/analysisData';
 import {START_NAME, STOP_NAME} from '../../../functions/analysis';
-import {createReadableArrayString} from '../../../functions/templates';
-import {DatasetService} from '../../../service/dataset.service';
 import {Observable} from 'rxjs';
-import {Dataset} from '../../../models_ui/dataset';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
+import { Dataset } from 'src/app/backend/model/dataset';
 
 @Component({
   selector: 'confirmation',
@@ -29,12 +28,12 @@ export class ConfirmationComponent implements OnInit, OnChanges {
 
   otherFields: string[]
 
-  constructor(private datasetService: DatasetService) {
+  constructor(private catalogService: CatalogService) {
   }
 
   ngOnInit(): void {
     this.parseStartStop();
-    this.dataSet$ = this.datasetService.getDataset(this.data.datasetId);
+    this.dataSet$ = this.catalogService.getDataset(this.data.datasetId);
 
     this.dataSet$.subscribe(dataset => {
       this.otherFields = [];

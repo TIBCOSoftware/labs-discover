@@ -1,0 +1,186 @@
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-header {
+  height: 68px;
+  max-height: 68px;
+  min-height: 68px;
+  border-bottom: 1px solid #DEDEDE;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
+  border-radius: 3px 3px 0 0;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: row;
+}
+
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-footer {
+  border-top: 1px solid #DEDEDE;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,0.1);
+  padding: 1rem 1.5rem 1rem 1.5rem;
+}
+
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-header .p-dialog-title {
+  color: #212121;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 36px;
+  flex: 1;
+}
+
+::ng-deep .tibco-pm-dialog .p-dialog .p-dialog-header .p-dialog-header-icons {
+  display: none;
+}
+
+.pm-dialog-body {
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.pm-header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 24px;
+  max-height: 24px;
+  min-height: 24px;
+}
+
+.pm-column.header-column {
+  flex: 0;
+}
+
+.header-label-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.pm-header-row .header-label {
+  color: #212121;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 21px;
+}
+
+.pm-body-sections {
+  margin-top: 25px;
+  min-width: 160px;
+}
+
+.pm-column {
+  flex: 1;
+}
+
+.pm-header-row.data-column {
+  justify-content: flex-end;
+  padding-right: 25px;
+}
+
+.body-section.data-column .section-element-value {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding-left: 25px;
+  padding-right: 50px;
+}
+
+.section-element {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #DEDEDE;
+  color: #727272;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 21px;
+  height: 52px;
+  max-height: 52px;
+  min-height: 52px;
+}
+
+.body-section-data {
+  padding-top: 12px;
+  padding-left: 4px;
+}
+
+.body-section-header {
+  color: #212121;
+  font-weight: 600;
+  height: 34px;
+  padding-top: 12px;
+}
+
+.body-section-data.section-element {
+  align-items: center;
+  flex-direction: row;
+  display: flex;
+}
+
+.body-section-data.section-element uxpl-icon {
+  margin-right: 10px;
+}
+
+.section-element-value {
+  color: #212121;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 27px;
+}
+
+.pm-dialog-footer-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pm-dialog-footer-content uxpl-button::part(button) {
+  min-width: 70px;
+}
+
+.close-button-label {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 24px;
+}
+
+.header-label-container uxpl-select-input::part(optional-label) {
+  display: none;
+}
+
+.body-section-data.section-element.section-element-value .analysis-metric-value, .body-section-data.section-element.section-element-value metric-comparison {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+  text-align: end;
+}
+
+.body-section-data.section-element.section-element-value .analysis-metric-value {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.metric-comparison-options {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.metric-comparison-options uxpl-radio {
+  margin-right: 15px;
+}
+
+.disabled {
+  color: #212121;
+}
+
+.difference {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.close-icon :hover {
+  cursor: pointer;
+}

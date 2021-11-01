@@ -1,14 +1,11 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
-import {DatePipe} from '@angular/common';
-import {CaseConfig, CaseEvent, CaseField} from '../../models_ui/configuration';
-import {CaseInfo} from '@tibco-tcstk/tc-liveapps-lib';
-import {CaseService} from '../../service/custom-case.service';
-import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
-import {ActivatedRoute} from '@angular/router';
+import { CaseEvent, CaseField} from '../../models_ui/configuration';
 import _ from 'lodash';
-import { InvestigationDetails } from 'src/app/model/investigationDetails';
-import { InvestigationMetadata } from 'src/app/model/investigationMetadata';
-import { InvestigationApplication } from 'src/app/model/investigationApplication';
+import { InvestigationDetails } from 'src/app/backend/model/investigationDetails';
+import { InvestigationMetadata } from 'src/app/backend/model/investigationMetadata';
+import { InvestigationApplication } from 'src/app/backend/model/investigationApplication';
+import { DatePipe } from '@angular/common';
+import { RelativeTimePipe } from 'src/app/pipes/relative-time.pipe';
 
 @Component({
   selector: 'custom-case-table',
@@ -43,11 +40,13 @@ export class CustomCaseTableComponent implements OnInit, OnChanges {
   // TODO: Move this to config
   protected DATE_OPTIONS = {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
 
-  constructor() {
-  }
+  constructor(
+    private datePipe: DatePipe,
+    protected relativeTime: RelativeTimePipe
+  ) {}
 
   ngOnInit() {
-    this.cols = this.cConfig.headerFields.map((el:CaseField) => {return {field: el.field, header: el.label}});
+    this.cols = this.cConfig.headerFields.map((el:CaseField) => {return {field: el.field, header: el.label, format: el.format}});
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -120,13 +119,23 @@ export class CustomCaseTableComponent implements OnInit, OnChanges {
     return icon ? icon : 'assets/images/states' + state + '.svg';
   }
 
-  public obtainData = (rowData: InvestigationDetails, col: string): string => {
-    if (col.indexOf('META:') == -1) {
-      return _.get(rowData.data, col);
+  public obtainData = (rowData: InvestigationDetails, column: any): string => {
+    let col = column.field;
+    let value: string;
+    if (col.indexOf('META:') === -1) {
+      value = _.get(rowData.data, col);
     } else {
       col =  col.substring(col.indexOf(':') + 1);
-      return rowData.metadata.filter((el: InvestigationMetadata) => el.name === col)[0].value;
+      value = rowData.metadata.filter((el: InvestigationMetadata) => el.name === col)[0].value;
     }
+    if (column.format === 'DATE') {
+      const date = new Date(value);
+      if (date && date.getTime) {
+        //value = getRelativeTime(date.getTime());
+        value = this.relativeTime.transform(date.getTime());
+      }
+    }
+    return value;
   }
 
   caseEventClicked(data:CaseEvent){

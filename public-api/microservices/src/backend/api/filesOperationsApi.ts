@@ -22,7 +22,6 @@ import { RedisContent } from '../model/redisContent';
 import { S3Content } from '../model/s3Content';
 
 import { ObjectSerializer, Authentication, VoidAuth, Interceptor } from '../model/models';
-import { HttpBasicAuth, HttpBearerAuth, ApiKeyAuth, OAuth } from '../model/models';
 
 import { HttpError, RequestFile } from './apis';
 
@@ -42,7 +41,6 @@ export class FilesOperationsApi {
 
     protected authentications = {
         'default': <Authentication>new VoidAuth(),
-        'bearer': new HttpBearerAuth(),
     }
 
     protected interceptors: Interceptor[] = [];
@@ -86,10 +84,6 @@ export class FilesOperationsApi {
 
     public setApiKey(key: FilesOperationsApiApiKeys, value: string) {
         (this.authentications as any)[FilesOperationsApiApiKeys[key]].apiKey = value;
-    }
-
-    set accessToken(accessToken: string | (() => string)) {
-        this.authentications.bearer.accessToken = accessToken;
     }
 
     public addInterceptor(interceptor: Interceptor) {
@@ -321,10 +315,12 @@ export class FilesOperationsApi {
      * Return list of files stored in this org
      * @summary return signed url for 1 h to get you file from
      * @param filename filename
+     * @param orgId orgId
      */
-    public async getRouteFileContent (filename: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ActionPerformedFilesUrl;  }> {
-        const localVarPath = this.basePath + '/files/download/{filename}'
-            .replace('{' + 'filename' + '}', encodeURIComponent(String(filename)));
+    public async getRouteFileContent (filename: string, orgId: string, options: {headers: {[name: string]: string}} = {headers: {}}) : Promise<{ response: http.IncomingMessage; body: ActionPerformedFilesUrl;  }> {
+        const localVarPath = this.basePath + '/files/download/{orgId}/{filename}'
+            .replace('{' + 'filename' + '}', encodeURIComponent(String(filename)))
+            .replace('{' + 'orgId' + '}', encodeURIComponent(String(orgId)));
         let localVarQueryParameters: any = {};
         let localVarHeaderParams: any = (<any>Object).assign({}, this._defaultHeaders);
         const produces = ['application/json'];
@@ -341,6 +337,11 @@ export class FilesOperationsApi {
             throw new Error('Required parameter filename was null or undefined when calling getRouteFileContent.');
         }
 
+        // verify required parameter 'orgId' is not null or undefined
+        if (orgId === null || orgId === undefined) {
+            throw new Error('Required parameter orgId was null or undefined when calling getRouteFileContent.');
+        }
+
         (<any>Object).assign(localVarHeaderParams, options.headers);
 
         let localVarUseFormData = false;
@@ -355,9 +356,6 @@ export class FilesOperationsApi {
         };
 
         let authenticationPromise = Promise.resolve();
-        if (this.authentications.bearer.accessToken) {
-            authenticationPromise = authenticationPromise.then(() => this.authentications.bearer.applyToRequest(localVarRequestOptions));
-        }
         authenticationPromise = authenticationPromise.then(() => this.authentications.default.applyToRequest(localVarRequestOptions));
 
         let interceptorPromise = authenticationPromise;

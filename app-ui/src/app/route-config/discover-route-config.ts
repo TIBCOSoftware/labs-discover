@@ -1,18 +1,16 @@
 import { ProcessAnalysisComponent } from '../routes/process-analysis/process-analysis.component';
 import { AnalyticsComponent } from '../routes/analytics/analytics.component';
-import { SettingsComponent } from '../routes/settings/settings.component';
 import { CasesComponent } from '../routes/cases/cases.component';
-import { CONFIGURATION_ROUTE_CONFIG, CONFIGURATION_PROVIDERS } from './configuration-route-config';
 import { ADMIN_ROUTE_CONFIG, ADMIN_PROVIDERS } from './admin-route-config';
 import { AccessGuard } from '../guards/access.guard';
 import { DatasetComponent } from '../routes/dataset/dataset.component';
-import {AnalyticsTemplatesComponent} from '../components/analytics-templates/analytics-templates.component';
+import { AnalyticsTemplatesComponent } from '../components/analytics-templates/analytics-templates.component';
 import { NewAnalysisComponent } from '../routes/new-analysis/new-analysis.component';
 import { TemplateManageComponent } from '../routes/template-manage/template-manage.component';
 import { TemplateSelectComponent } from '../routes/template-select/template-select.component';
 import { AdminComponent } from '../routes/admin/admin.component';
 import { TemplateEditorComponent } from '../routes/template-editor/template-editor.component';
-import {FileManageComponent} from "../routes/file-manage/file-manage.component";
+import { FileManageComponent } from "../routes/file-manage/file-manage.component";
 
 export const DISCOVER_ROUTE_CONFIG = [
   {
@@ -107,14 +105,6 @@ export const DISCOVER_ROUTE_CONFIG = [
     ]
   },
   {
-    path: 'settings',
-    component: SettingsComponent,
-    canActivate: [
-      AccessGuard
-    ],
-    children: CONFIGURATION_ROUTE_CONFIG
-  },
-  {
     path: 'admin',
     component: AdminComponent,
     canActivate: [
@@ -125,6 +115,5 @@ export const DISCOVER_ROUTE_CONFIG = [
 ];
 
 export const DISCOVER_PROVIDERS = [
-  CONFIGURATION_PROVIDERS,
   ADMIN_PROVIDERS
 ]

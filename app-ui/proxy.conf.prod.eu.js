@@ -436,8 +436,53 @@ const PROXY_CONFIG = {
     },
     "onProxyReq": addOauthHeader
   },
-
+  
   "/catalog": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
+  "/configuration": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
+  "/login": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
+  "/tdv": {
     "target": {
       "host": "discover.labs.tibcocloud.com",
       "protocol": "https:",

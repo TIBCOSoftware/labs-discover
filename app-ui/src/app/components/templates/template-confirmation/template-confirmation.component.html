@@ -125,8 +125,8 @@
           <div class="item-header">Cases selector</div>
         </td>
         <td>
-          <div class="item-detail">{{template.marking.casesSelector}} <span style="color: grey; font-size: 14px"
-                                                                            [innerText]="'<Marking Name>.<Table Name>.<Column Name>'"></span>
+          <div class="item-detail" matTooltip="<Marking Name>.<Table Name>.<Column Name>"
+               matTooltipClass="tTip">{{template.marking.casesSelector}}
           </div>
         </td>
       </tr>
@@ -135,8 +135,8 @@
           <div class="item-header">Variant selector</div>
         </td>
         <td>
-          <div class="item-detail">{{template.marking.variantSelector}} <span style="color: grey; font-size: 14px"
-                                                                              [innerText]="'<Marking Name>.<Table Name>.<Column Name>'"></span>
+          <div class="item-detail" matTooltip="<Marking Name>.<Table Name>.<Column Name>"
+               matTooltipClass="tTip">{{template.marking.variantSelector}}
           </div>
         </td>
       </tr>

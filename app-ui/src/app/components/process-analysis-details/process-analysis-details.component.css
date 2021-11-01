@@ -71,12 +71,16 @@
 }
 
 .error-container {
-  margin-top: 15px;
-  margin-left: 50px;
-  margin-right: 80px;
+  margin-top: 24px;
   width: 100%;
   display: flex;
   flex-direction: row;
+}
+
+.error-details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .error-details-pane {
@@ -85,4 +89,98 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+.data-points {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-evenly;
+  padding-bottom: 7px;
+}
+
+.data-point-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+uxpl-data-point {
+  min-height: 40px;
+  display: flex;
+  flex: 1;
+}
+
+uxpl-data-widget {
+  flex: 1;
+}
+
+uxpl-data-widget::part(widget-container) {
+  height: 100%;
+}
+
+uxpl-detail-pane::part(detail-pane-container) {
+  padding-bottom: 24px;
+}
+
+.bottom-slot-content-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.slot-button {
+  color: #1774E5;
+  font-family: 'Source Sans Pro';
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-right: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.metrics-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.chart-container {
+  display: flex;
+  height: 100%;
+  align-items: flex-end;
+}
+
+.chart-container-wrapper {
+  display: flex;
+  width: calc(100vw /3);
+}
+
+.disabled {
+  color: #212121;
+}
+
+uxpl-data-point::part(data-point-value) {
+  font-size: 20px;
+}
+
+uxpl-data-point::part(data-point-icon) {
+  min-width: 1em;
+}
+
+.metrics-not-available {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}
+
+.no-metrics-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #727272;
+  font-size: 14px;
+  letter-spacing: 0;
+  line-height: 18px;
 }

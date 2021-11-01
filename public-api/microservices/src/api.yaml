@@ -14,6 +14,8 @@ servers:
     description: The remote api servers
   - url: https://discover.labs.tibcocloud.com
     description: The production api server
+  - url: http://localhost:8080
+    description: The local Dev api server
 security:
   - bearerAuth: []
 tags:
@@ -25,6 +27,10 @@ tags:
     description: The templates API to create, update, delete templates for Discover app.
   - name: Configuration
     description: The configuration API to create, update, delete configuration for Discover app.
+  - name: Investigations
+    description: The Investigation API to create, update, delete investigations for Discover app.
+  - name: Documentations
+    description: The documentation API to export, import Graphs from Nimbus with Discover app.
 paths:
   /catalog/datasets:
     get:
@@ -126,6 +132,29 @@ paths:
           description: Unauthorized. The auth token is not valid.
         '409':
           description: The dataset with the same name is already exist.
+  /catalog/dataset/{id}/preview:
+    get:
+      tags:
+        - Catalog
+      description: Get the dataset preview for a given dataset id.
+      summary: Get dataset preview.
+      operationId: getPreview
+      parameters:
+        - name: id
+          description: dataset id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the dataset preview.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preview'
+        '400':
+          description: Bad request. The auth token is missing
   /catalog/dataset/exist:
     post:
       tags:
@@ -291,6 +320,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CsvFile"
+    post:
+      tags:
+        - Catalog
+      summary: Upload files to backend storage
+      description: Upload files to backend storage
+      operationId: uploadCsvFile
+      requestBody:
+        description: csv
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileUpload'
+      responses:
+        '200':
+          description: Add response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionPerformedFiles'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionPerformedFiles'
   /catalog/files/{filename}:
     delete:
       tags:
@@ -344,11 +398,41 @@ paths:
           description: Unauthorized. The auth token is not valid.
         '404':
           description: The csv file is not found.
+  /catalog/files/download/{filename}:
+    get:
+      tags:
+        - Catalog
+      description: Download the csv file
+      summary: Download teh uploaded csv file.
+      operationId: downloadCsvFile
+      parameters:
+        - name: filename
+          description: The csv file name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the csv file preview data in string.
+          content:
+            "text/csv":
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Bad request. The auth token is missing
+        '401':
+          description: Unauthorized. The auth token is not valid.
+        '404':
+          description: The csv file is not found.
+        '500':
+          description: Internal server error.
   /catalog/tdv/data/{id}:
     get:
       tags:
         - Catalog
-      description: Get the preview data of managed csv file using the dataset id.
+      description: Get the preview data of managed csv file using the dataset id. The Discover backend return the data in string, in this api, the string is parsed to JSON before return.
       summary: Get the preview data of the managed csv file.
       operationId: getManagedCsvData
       parameters:
@@ -373,6 +457,78 @@ paths:
           description: Unauthorized. The auth token is not valid.
         '404':
           description: The dataset is not found.
+        '500':
+          description: The dataset cannot be parsed to JSON.
+  /catalog/tdv/metadata/{id}:
+    get:
+      tags:
+        - Catalog
+      summary: Get Schema of a TDV
+      description: Get Schema of a specified DataSource
+      operationId: getTdvMetaData
+      parameters:
+        - name: id
+          in: path
+          description: The dataset id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SchemaTdv'
+        '500':
+          description: Internal server error
+  /catalog/tdv/unmanaged/view:
+    get:
+      tags:
+        - Catalog
+      summary: Get List of customer published views in unmanaged TDV
+      description: Get List of published views
+      operationId: getUnmanagedTdv
+      responses:
+        '200':
+          description: response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublishedViews'
+        '500':
+          description: Internal server error
+  /catalog/tdv/unmanaged/copy:
+    post:
+      tags:
+        - Catalog
+      summary: Copy an unmanaged views into our system
+      description: Copy an unmanaged views into our system
+      operationId: copyUnmanagedTdv
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnManageDataSetCopy'
+            example:
+              DatasetName: CallCenter
+              Annotation: Some Call center logs
+              DatasetPath: /somewhere/in/dark/path
+              Organization: 01dxjp1rpa35bzcv1kvem9ffyk
+      responses:
+        '200':
+          description: response
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+
   /repository/analysis:
     get:
       description: Get all analysis.
@@ -787,7 +943,89 @@ paths:
                 $ref: '#/components/schemas/LandingPage'
         400:
           description: Bad request. The auth token is missing
-      
+  /configuration/messages:
+    get:
+      description: Get the messages configuration for the app
+      tags: [Configuration]
+      summary: Get the messages configuration for TIBCO Labs Discover.
+      operationId: getMessagesConfiguration
+      responses:
+        '200':
+          description: Messages configuration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Message'
+        400:
+          description: Bad request. The auth token is missing
+    post:
+      description: Modify the messages configuration for the app
+      tags: [Configuration]
+      summary: Modify the messages configuration
+      operationId: postMessagesConfiguration
+      requestBody:
+        description: Messages configuration to update.
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/Message'
+      responses:
+        200:
+          description: Messages configuration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Message'
+        400:
+          description: Bad request. The auth token is missing
+  /configuration/formats:
+    get:
+      description: Get the formats configuration for the app
+      tags: [Configuration]
+      summary: Get the formats configuration for TIBCO Labs Discover.
+      operationId: getFormatsConfiguration
+      responses:
+        '200':
+          description: Formats configuration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/FieldFormats'
+        400:
+          description: Bad request. The auth token is missing
+    post:
+      description: Modify the formats configuration for the app
+      tags: [Configuration]
+      summary: Modify the formats configuration
+      operationId: postFormatsConfiguration
+      requestBody:
+        description: Formats configuration to update.
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/FieldFormats'
+      responses:
+        200:
+          description: Formats configuration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/FieldFormats'
+        400:
+          description: Bad request. The auth token is missing
+    
   /configuration/investigations:
     get:
       description: Get the investigations configuration for the app
@@ -903,6 +1141,21 @@ paths:
                   $ref: '#/components/schemas/Automapping'
         400:
           description: Bad request. The auth token is missing
+  /configuration/whoami:
+    get:
+      description: Get the user configuration
+      tags: [Configuration]
+      summary: Get the user configuration for TIBCO Labs Discover.
+      operationId: getWhoAmI
+      responses:
+        200:
+          description: Automap configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhoAmI'
+        400:
+          description: Bad request. The auth token is missing
   /investigation/{appId}:
     get:
       description: Get the investiation cases for an id
@@ -1002,7 +1255,132 @@ paths:
                 $ref: '#/components/schemas/InvestigationApplicationDefinition'
         400:
           description: Bad request. The auth token is missing
-
+  /investigation/{appId}/{creatorId}/start:
+    post:
+      description: Create an investigation
+      tags: [Investigations]
+      summary: Create an investigation
+      operationId: postStartCaseForInvestigation
+      parameters:
+        - name: appId
+          description: application id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: creatorId
+          description: creator Id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Data to create a new investigation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestigationCreateRequest'
+      responses:
+        200:
+          description: Analytics configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestigationCreateResponse'
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/folders/{folderId}:
+    get:
+      description: list all available folders as structured JSON
+      tags: [Documentations]
+      summary: get all available folders
+      operationId: getFolders
+      parameters:
+        - name: folderId
+          description: folder Id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        200:
+          description: Feedback from Documentation System, containing Structure of all folders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapFolderCollection' 
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/folders:
+    get:
+      description: list all available root folders as structured JSON
+      tags: [Documentations]
+      summary: get all available root folders
+      operationId: getRootFolders
+      responses:
+        200:
+          description: Feedback from Documentation System, containing Structure of all folders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapFolderCollection' 
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/folder:
+    post:
+      description: create new folder in structure at given parent folder ID
+      tags: [Documentations]
+      summary: create new folder
+      operationId: postFolder
+      requestBody:
+        description: create new folder in structure, under given parent folder ID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolderModel'
+      responses:
+        200:
+          description: Feedback from Documentation System, as MapFolderModel.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapFolderModel'
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/exportGraph/{folderId}/{graphname}:
+    post:
+      description: export Discover graph JSON into given Documenation folder ID
+      tags: [Documentations]
+      summary: export Discover Graph into Documentation folder
+      operationId: postExport
+      parameters:
+        - name: folderId
+          description: folder Id
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: graphname
+          description: graph name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Graph JSON Data for export function
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: Feedback from Documentation System, JSON of the created Map.
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Bad request. The auth token is missing
 components:
   securitySchemes:
     bearerAuth:
@@ -1022,6 +1400,9 @@ components:
         fileName:
           type: string
           description: The csv file name.
+        filePath:
+          type: string
+          description: The csv full path.
         description:
           type: string
           description: The dataset description.
@@ -1156,6 +1537,51 @@ components:
         id:
           type: integer
           description: The asset id of the column in TIBCO Cloud Metadata.
+    PreviewColumn:
+      type: object
+      properties:
+        position:
+          type: number
+        columnName:
+          type: string
+        type:
+          type: string
+    PreviewRow:
+      type: object
+      example: '[{
+        "case Spend area text": "Specialty Resins",
+        "event org resource": "user_121",
+        "event concept name": "Create Purchase Order Item",
+        "case Item Category": "3-way match, invoice before GR",
+        "event Cumulative net worth": "55694.0",
+        "case GR-Based Inv Verif": false,
+        "case Sub spend area text": "Area",
+        "case Purchasing Document": 00000000,
+        "case Name": "vendor_0252",
+        "event time timestamp": "16-07-2018 11:15:00.000",
+        "case Company": "companyID_0000",
+        "case Goods Receipt": true,
+        "case Spend classification text": "PR",
+        "case Item": 10,
+        "event User": "user_121",
+        "eventID ": 08324823428342834,
+        "case Item Type": "Standard",
+        "case Document Type": "Standard PO",
+        "case Purch Doc Category name": "Purchase order",
+        "case Vendor": "vendorID_0259",
+        "case concept:name": "0342842834h2834",
+        "case Source": "sourceSystemID_0000"}]'  
+    Preview:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:   
+            $ref: '#/components/schemas/PreviewColumn'
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/PreviewRow'
     PreviewStatus:
       type: object
       properties:
@@ -1276,6 +1702,77 @@ components:
         beingUsed:
           type: boolean
           description: Whether it is used by any dataset.
+    FileUpload:
+      required:
+        - csv
+        - encoding
+        - escapeChar
+        - newline
+        - quoteChar
+        - separator
+      type: object
+      properties:
+        newline:
+          type: string
+        separator:
+          type: string
+        quoteChar:
+          type: string
+        encoding:
+          type: string
+        escapeChar:
+          type: string
+        csv:
+          type: string
+          format: binary
+    ActionPerformedFiles:
+      required:
+        - code
+        - file
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+        file:
+          type: string
+        code:
+          type: integer
+    SchemaTdv:
+      required:
+        - COLUMN_NAME
+        - DATA_TYPE
+        - JDBC_DATA_TYPE
+        - ORDINAL_POSITION
+      type: object
+      properties:
+        COLUMN_NAME:
+          type: string
+        DATA_TYPE:
+          type: string
+        ORDINAL_POSITION:
+          type: number
+          format: double
+        JDBC_DATA_TYPE:
+          type: number
+          format: double
+    UnManageDataSetCopy:
+      required:
+        - DatasetName
+        - DatasetPath
+        - Organization
+      type: object
+      properties:
+        DatasetName:
+          type: string
+        Annotation:
+          type: string
+        DatasetPath:
+          type: string
+        Organization:
+          type: string
+
+
 
     Analysis:
       type: object
@@ -1288,6 +1785,8 @@ components:
           $ref: "#/components/schemas/AnalysisData"
         metadata: 
           $ref: "#/components/schemas/AnalysisMetadata"
+        metrics: 
+          $ref: "#/components/schemas/AnalysisMetrics"
         actions:
           type: array
           items:
@@ -1315,6 +1814,9 @@ components:
           description: TBD
           type: string
           example: 
+        templateLabel:
+          description: Template label
+          type: string
         mappings:
           $ref: "#/components/schemas/Mapping"
         filters:
@@ -1503,6 +2005,46 @@ components:
           description: TBD
           type: string
           example: 
+    AnalysisMetrics: 
+      type: object
+      properties:
+        numEvents: 
+          type: number
+        numCases:
+          type: number
+        numActivities:
+          type: number
+        numVariants:
+          type: number
+        numResources:
+          type: number
+        avgTime:
+          type: number
+        medianTime:
+          type: number
+        minTime:
+          type: number
+        maxTime:
+          type: number
+        avgActivities:
+          type: number
+        minActivities:
+          type: number
+        maxActivities:
+          type: number
+        avgResourcesPerCases:
+          type: number
+        minResourcesPerCases:
+          type: number
+        maxResourcesPerCases:
+          type: number
+        minTimestamp:
+          type: string
+          format: date-time 
+        maxTimestamp:
+          type: string
+          format: date-time 
+
     TemplateRequest:
       type: object
       properties:
@@ -1858,6 +2400,8 @@ components:
           type: string
         previewTableName:
           type: string
+        customUserFolder:
+          type: string
     InvestigationDetails:
       type: object
       properties:
@@ -1925,3 +2469,174 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvestigationState'
+    InvestigationCreateRequest:
+      type: object
+      properties:
+        type:
+          type: string
+        ids:
+          type: string
+        details:
+          type: string
+        summary:
+          type: string
+        analysisId:
+          type: string
+        analysisName:
+          type: string
+        templateId:
+          type: string
+        templateName:
+          type: string
+    InvestigationCreateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+    WhoAmI:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName: 
+          type: string
+        lastName: 
+          type: string
+        email:
+          type: string
+        subscriptionId: 
+          type: string
+        isUser:
+          type: boolean
+        isAdmin:
+          type: boolean
+        isAnalyst:
+          type: boolean
+        isResolver:
+          type: boolean
+          
+    FolderModel:
+      type: object
+      properties:
+        parentFolderId: 
+          type: number
+        name:
+          type: string
+          
+    MapFolderCollection: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/MapFolderModel'
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                readOnly: true
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                type: string
+    MapFolderModel: 
+      type: object
+      properties: 
+        mapFolderId: 
+          example: 1
+          type: integer
+          format: int32
+        parentMapFolderId: 
+          type: integer
+          format: int32
+        name: 
+          example: EMEA Maps
+          type: string
+          minLength: 1
+          maxLength: 100
+        accessRights: 
+          type: object
+          properties: 
+            default: 
+              example: allowed
+              type: string
+              enum: 
+              - allowed
+              - denied
+            specific: 
+              type: array
+              items: 
+                type: object
+                properties: 
+                  id: 
+                    example: 1
+                    type: integer
+                    format: int32
+                  type: 
+                    example: user
+                    type: string
+                    enum: 
+                    - user
+                    - group
+                  access: 
+                    example: allowed
+                    type: string
+                    enum: 
+                    - allowed
+                    - denied
+                  name: 
+                    readOnly: true
+                    example: John Doe
+                    type: string
+        maps: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              processId: 
+                readOnly: true
+                example: 83330BC7232E4465B05BF4AD8756EA13
+                type: string
+              name: 
+                readOnly: true
+                example: Sample Map
+                type: string
+        subFolders: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapFolderId: 
+                readOnly: true
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: EMEA Maps
+                type: string
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapFolderId: 
+                readOnly: true
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: EMEA Maps
+                type: string
+      required: 
+        - name
+        

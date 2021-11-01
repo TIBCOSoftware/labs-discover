@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 import {CaseConfig, CaseEvent, CaseField} from '../../models_ui/configuration';
 import { CaseInfo } from '@tibco-tcstk/tc-liveapps-lib';
 import _ from 'lodash';
-import { InvestigationDetails } from 'src/app/model/investigationDetails';
-import { InvestigationMetadata } from 'src/app/model/investigationMetadata';
+import { InvestigationDetails } from 'src/app/backend/model/investigationDetails';
+import { InvestigationMetadata } from 'src/app/backend/model/investigationMetadata';
 
 @Component({
   selector: 'custom-case-details',
@@ -46,7 +46,7 @@ export class CustomCaseDetailsComponent implements OnInit, OnChanges {
       return _.get(this.caseDetail.data, fieldV);
     } else {
       fieldV =  fieldV.substring(fieldV.indexOf(':') + 1);
-      return this.caseDetail.metadata?.filter((el: InvestigationMetadata) => el.name === fieldV)[0].value;
+      return this.caseDetail.metadata.filter((el: InvestigationMetadata) => el.name === fieldV)[0].value;
     }
   }
 

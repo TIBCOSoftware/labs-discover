@@ -13,7 +13,7 @@ import {getSFLink} from '../../../functions/templates';
 import {SpotfireDocument, SpotfireViewerComponent} from '@tibco/spotfire-wrapper';
 import {OauthService} from '../../../service/oauth.service';
 import {ConfigurationService} from '../../../service/configuration.service';
-import {TemplateMenuConfig} from 'src/app/model/templateMenuConfig';
+import {TemplateMenuConfig} from 'src/app/backend/model/templateMenuConfig';
 import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
 
 @Component({

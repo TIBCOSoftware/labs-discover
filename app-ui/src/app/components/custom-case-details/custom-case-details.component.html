@@ -5,8 +5,10 @@
         <mat-card-title>{{getFieldValue(cConfig.detailTitle.field)}}</mat-card-title>
         <mat-card-subtitle>{{cConfig.customTitle}}</mat-card-subtitle>  <!--USE THIS TO SHOW THE SOURCE-->
       </div>
-      <div *ngIf="cConfig.showMilestones">
-        <uxpl-milestone-trailer small="true" [config]="milestone"></uxpl-milestone-trailer>
+      <div *ngIf="cConfig.showMilestone">
+        <div class="milestone-container">
+          <uxpl-milestone-trailer small="true" [config]="milestone"></uxpl-milestone-trailer>
+        </div>
       </div>
     </div>
   </mat-card-header>
@@ -16,9 +18,11 @@
         <td *ngFor="let field of row" class="case-details-cell">
           <div class="case-details-cell-wrappr" *ngIf="field">
             <div class="cell-header-main">{{field.label}}</div>
-            <div *ngIf="field.format == 'EVENT-LINK'" class="cont-detail-link cont-detail" matTooltip="{{getToolTip(field.field, field.format)}}" matTooltipClass="tTip"
+            <div *ngIf="field.format == 'EVENT-LINK'" class="cont-detail-link cont-detail"
+                 matTooltip="{{getToolTip(field.field, field.format)}}" matTooltipClass="tTip"
                  [innerHTML]="getFieldValue(field.field, field.format)" (click)="eventClicked(field)"></div>
-            <div *ngIf="field.format != 'EVENT-LINK'" class="cont-detail" matTooltip="{{getToolTip(field.field, field.format)}}" matTooltipClass="tTip"
+            <div *ngIf="field.format != 'EVENT-LINK'" class="cont-detail"
+                 matTooltip="{{getToolTip(field.field, field.format)}}" matTooltipClass="tTip"
                  [innerHTML]="getFieldValue(field.field, field.format)"></div>
           </div>
           <div *ngIf="!field">

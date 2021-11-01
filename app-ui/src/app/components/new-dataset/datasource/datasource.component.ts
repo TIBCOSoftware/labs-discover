@@ -1,15 +1,14 @@
 import { Location } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
-import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
-import { concatMap } from 'rxjs/operators';
-import { PublishedViews } from 'src/app/models_ui/backend';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
+import { CsvFile } from 'src/app/backend/model/csvFile';
+import { Dataset } from 'src/app/backend/model/dataset';
+import { DatasetSource } from 'src/app/backend/model/datasetSource';
+import { PublishedViews } from 'src/app/backend/model/publishedViews';
 import { CsvService } from 'src/app/service/csv.service';
-import { DatasetService } from 'src/app/service/dataset.service';
-import { DiscoverBackendService } from 'src/app/service/discover-backend.service';
-import { CsvFile, Dataset, DatasetDataSource, DatasetWizard } from '../../../models_ui/dataset';
+import { DatasetWizard } from '../../../models_ui/dataset';
 import { NewAnalysisStepStatus } from '../../../models_ui/discover';
-import { ConfigurationService } from '../../../service/configuration.service';
 
 @Component({
   selector: 'dataset-datasource',
@@ -31,7 +30,7 @@ export class NewDatasetDatasourceComponent implements OnInit {
 
   public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
 
-  public dataSource: DatasetDataSource;
+  public dataSource: DatasetSource;
 
   public isError = false;
   public csvError: string;
@@ -46,10 +45,8 @@ export class NewDatasetDatasourceComponent implements OnInit {
   public files: CsvFile[];
 
   constructor(
-    private configService: ConfigurationService,
     private csvService: CsvService,
-    private datasetService: DatasetService,
-    private backendService: DiscoverBackendService,
+    protected catalogService: CatalogService,
     private location: Location) { }
 
   ngOnInit(): void {
@@ -63,21 +60,13 @@ export class NewDatasetDatasourceComponent implements OnInit {
   }
 
   private getCsvFiles() {
-    this.datasetService.getCsvFiles().subscribe(list => {
-      this.files = list.map(file => {
-        file.fileSize = parseInt(file.redisFileInfo.FileSize);
-        return file;
-      });
+    this.catalogService.getUnmanagedCsvFiles().subscribe(list => {
+      this.files = list
     });
   }
 
   private getUnmanagedTdvView() {
-    this.backendService.login().pipe(
-      concatMap(response => {
-        this.orgId = response.orgId;
-        return this.backendService.getUnmanagedTdvView(response.orgId);
-      })
-    ).subscribe((response: PublishedViews[]) => {
+    this.catalogService.getUnmanagedTdv().subscribe((response: PublishedViews[]) => {
       this.tdvViews = response;
     });
   }

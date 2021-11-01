@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Dataset } from '../../../models_ui/dataset';
+import { Dataset } from '../../../backend/model/dataset';
 import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 
 @Component({

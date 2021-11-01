@@ -1,8 +1,11 @@
+import { group } from 'console';
 import { Response } from 'koa';
 import { Param, Body, Get, Post, Put, Delete, HeaderParam, QueryParam, JsonController, Res } from 'routing-controllers';
 import { Service } from 'typedi';
+import { DiscoverCache } from '../cache/DiscoverCache';
 import { logger } from '../common/logging';
-import { Analytics, Automapping, DiscoverConfiguration, FieldFormats, GeneralInformation, InvestigationApplication, Investigations, LandingPage, Message } from '../models/configuration.model';
+import { ClaimsApi, ClaimsGroup, ClaimsSandbox, Group, GroupsApi } from '../liveapps/authorization/api';
+import { Analytics, Automapping, DiscoverConfiguration, FieldFormats, GeneralInformation, InvestigationApplication, Investigations, LandingPage, Message, WhoAmI } from '../models/configuration.model';
 import { ConfigurationService } from '../services/configuration.service';
 
 @Service()
@@ -10,9 +13,15 @@ import { ConfigurationService } from '../services/configuration.service';
 export class ConfigurationController {
   
   private configurationService: ConfigurationService;
+  private groupsService: GroupsApi;
+  private claimsService: ClaimsApi;
   
-  constructor (){
+  constructor (
+    protected cache: DiscoverCache
+  ){
     this.configurationService = new ConfigurationService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
+    this.groupsService = new GroupsApi(process.env.LIVEAPPS +'/organisation/v1');
+    this.claimsService = new ClaimsApi(process.env.LIVEAPPS +'/organisation/v1');
   }
 
   public static getName = (): string => {
@@ -39,7 +48,7 @@ export class ConfigurationController {
       this.getGeneralConfiguration(token, response),
       this.getLandingPagesConfiguration(token, response),
       this.getMessagesConfiguration(token, response),
-      this.getFormats(token, 'ALL', response),
+      this.getFormatsConfiguration(token, 'ALL', response),
       this.getAutomap(token, response),
       this.getInvestigations(token.replace('Bearer ',''), response),
       this.getAnalytics(token.replace('Bearer ',''), response)
@@ -113,9 +122,20 @@ export class ConfigurationController {
     subscriptionMessages = subscriptionMessages.map(el => { return { id: el.id, scope: 'LOCAL', message: el.message, persistClose: el.persistClose }});
     return [...generalMessages, ...subscriptionMessages ]
   }
-  
+
+  @Post('/messages')
+  async postMessagesConfiguration(@HeaderParam("authorization") token: string, @Body() messages: Message[], @Res() response: Response): Promise< Message[] | Response > {
+    const check = this.preflightCheck(token, response);
+    if (check !== true) {
+      return check as Response;
+    }
+
+    const output = await this.configurationService.postConfiguration(token.replace('Bearer ', ''), 'MESSAGES', JSON.stringify(messages));
+    return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'MESSAGES')) as Message[];
+  }
+
   @Get('/formats')
-  async getFormats(@HeaderParam("authorization") token: string, @QueryParam('field') field: string, @Res() response: Response): Promise< FieldFormats[] | Response > {
+  async getFormatsConfiguration(@HeaderParam("authorization") token: string, @QueryParam('field') field: string, @Res() response: Response): Promise< FieldFormats[] | Response > {
     const check = this.preflightCheck(token, response);
     if (check !== true) {
       return check as Response;
@@ -126,6 +146,17 @@ export class ConfigurationController {
       formats = formats.filter((el: FieldFormats) =>  el.fieldName.toUpperCase() === field.toUpperCase());
     }
     return formats;
+  }
+
+  @Post('/formats')
+  async postFormatsConfiguration(@HeaderParam("authorization") token: string,  @Body() format: FieldFormats[], @Res() response: Response): Promise< FieldFormats[] | Response > {
+    const check = this.preflightCheck(token, response);
+    if (check !== true) {
+      return check as Response;
+    }
+
+    const output = await this.configurationService.postConfiguration(token.replace('Bearer ', ''), 'FORMATS', JSON.stringify(format));
+    return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'FORMATS')) as FieldFormats[];
   }
 
   @Get('/automap')
@@ -144,9 +175,9 @@ export class ConfigurationController {
     if (check !== true) {
       return check as Response;
     }
-
+    
     const output = await this.configurationService.postConfiguration(token.replace('Bearer ', ''), 'AUTOMAP', JSON.stringify(automap));
-    return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'AUTOMAP')).applications as Automapping[];
+    return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'AUTOMAP')) as Automapping[];
   }
 
   @Get('/investigations')
@@ -172,6 +203,17 @@ export class ConfigurationController {
     return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'INVESTIGATIONS')).applications as InvestigationApplication[];
   }
 
+  @Post('/investigations/init')
+  async postInvestigationsInit(@HeaderParam("authorization") token: string, @Body() investigations: Investigations, @Res() response: Response): Promise< Investigations | Response > {
+    const check = this.preflightCheck(token, response);
+    if (check !== true) {
+      return check as Response;
+    }
+
+    await this.configurationService.postConfiguration(token.replace('Bearer ', ''), 'INVESTIGATIONS', JSON.stringify(investigations));
+    return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'INVESTIGATIONS')) as Investigations;
+  }
+
   @Get('/analytics')
   async getAnalytics(@HeaderParam("authorization") token: string, @Res() response: Response): Promise< Analytics | Response > {
     const check = this.preflightCheck(token, response);
@@ -180,5 +222,44 @@ export class ConfigurationController {
     }
     
     return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'ANALYTICS')) as Analytics;
+  }
+
+  @Post('/analytics')
+  async postAnalytics(@HeaderParam("authorization") token: string, @Body() analytics: Analytics, @Res() response: Response): Promise< Analytics | Response > {
+    const check = this.preflightCheck(token, response);
+    if (check !== true) {
+      return check as Response;
+    }
+
+    const output = await this.configurationService.postConfiguration(token.replace('Bearer ', ''), 'ANALYTICS', JSON.stringify(analytics));
+    return JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'ANALYTICS')) as Analytics;
+  }
+
+  @Get('/whoami')
+  async getWhoAmI(@HeaderParam("authorization") token: string, @Res() response: Response): Promise< WhoAmI | Response > {
+    const check = this.preflightCheck(token, response);
+    if (check !== true) {
+      return check as Response;
+    }
+
+    const header = { headers: { 'Authorization': token}};
+
+    const claims = (await this.claimsService.getClaims(header)).body;
+    const userMembership = claims.sandboxes?.find((el: ClaimsSandbox) => el.type === ClaimsSandbox.TypeEnum.Production)?.groups.map((el: ClaimsGroup) => el.id) || [];
+    const discoverGroups = (await this.groupsService.getGroups(0, 100, "contains(name,'Discover')", header)).body;
+    const groups = discoverGroups.filter((discoverGroup: Group) => userMembership.includes(discoverGroup.id)).map((group: Group) => group.name);
+    
+    const output = {
+      id: claims.id,
+      firstName: claims.firstName,
+      lastName: claims.lastName,
+      email: claims.email,
+      subscriptionId: claims.globalSubcriptionId,
+      isUser: groups.includes('Discover Users'),
+      isAdmin: groups.includes('Discover Administrators'),
+      isAnalyst: groups.includes('Discover Analysts'),
+      isResolver: groups.includes('Discover Case Resolvers')
+    } as WhoAmI;
+    return output;
   }
 }

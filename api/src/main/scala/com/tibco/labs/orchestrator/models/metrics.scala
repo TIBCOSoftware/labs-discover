@@ -38,4 +38,36 @@ case class MetricsDS(
                     TimeStamp: Long
                   )
 
+case class MetricsAnalysis(
+                            Organisation: String,
+                            jobName: String,
+                            analysisID: String,
+                            Metrics: analysisMetrics,
+                            durationDB: Long,
+                            durationJob: Long,
+                            timeStamp: Long
+                          )
+
+case class analysisMetrics(
+                            numEvents: Double,
+                            numCases: Double,
+                            numActivities: Double,
+                            avgTime: Double,
+                            medianTime: Double,
+                            minTime: Double,
+                            maxTime: Double,
+                            numVariants: Double,
+                            maxActivities: Double,
+                            minActivities: Double,
+                            avgActivities: Double,
+                            numResources: Double,
+                            avgResourcesPerCase: Double,
+                            maxResourcesPerCase: Double,
+                            minResourcesPerCase: Double,
+                            minTimestamp: String,
+                            maxTimestamp: String//,
+                            //analysis_id: String
+                          )
+
+
 case class MetricsTable(numOfEvents: Option[Long] = None, numOfCases: Option[Long] = None, numOfActivities: Option[Long] = None, avgtime: Option[Double] = None, mediantime: Option[Double] = None, numOfVariants: Option[Long] = None, maxActivities: Option[Long] = None, minActivities: Option[Long] = None, analysisId: Option[String] = None)

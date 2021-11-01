@@ -1,0 +1,14 @@
+{
+    "name": "@types/node-cache",
+    "version": "4.2.5",
+    "typings": null,
+    "description": "Stub TypeScript definitions entry for node-cache, which provides its own types definitions",
+    "main": "",
+    "scripts": {},
+    "author": "",
+    "repository": "https://github.com/mpneuried/nodecache",
+    "license": "MIT",
+    "dependencies": {
+        "node-cache": "*"
+    }
+}

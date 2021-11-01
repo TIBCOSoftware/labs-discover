@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { VisualisationService } from 'src/app/api/visualisation.service';
+import { VisualisationService } from 'src/app/backend/api/visualisation.service';
 import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { Location } from '@angular/common';
 import { checkIfTemplateNameExists, TEMPLATE_EXISTS_MESSAGE } from '../../../functions/templates';
-import { Template } from 'src/app/model/models';
+import { Template } from 'src/app/backend/model/models';
 import { cloneDeep } from 'lodash-es';
 import {StepStatus} from '../../../models_ui/analyticTemplate';
 

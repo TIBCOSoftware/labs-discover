@@ -18,16 +18,19 @@ export * from './actionPerformedGetData';
 export * from './actionPerformedGetReference';
 export * from './actionPerformedLoginValidate';
 export * from './actionPerformedPreview';
-export * from './actionPerformedRenderedAnalysisMetrics';
 export * from './actionPerformedRenderedMetrics';
+export * from './actionPerformedRenderedMetricsAS';
 export * from './actionPerformedSchedules';
 export * from './actionPerformedSparkSingle';
 export * from './actionPerformedStoreMetrics';
 export * from './actionPerformedTDVCreate';
+export * from './actionPerformedUIAssets';
+export * from './actionPerformedUIAssetsUrl';
 export * from './actionPerformedUnmanagedPublishedViews';
 export * from './actionPerformedUpdate';
 export * from './activitiesTable';
 export * from './analysisList';
+export * from './analysisMetrics';
 export * from './datasetSource';
 export * from './datasetSourceTdv';
 export * from './filter';
@@ -48,8 +51,8 @@ export * from './listVariantsTable';
 export * from './loginCredentials';
 export * from './managedDatasetsInfo';
 export * from './mapping';
+export * from './metricsAnalysis';
 export * from './metricsDS';
-export * from './metricsTable';
 export * from './pmConfigLiveApps';
 export * from './previewConfigFile';
 export * from './profiles';
@@ -98,16 +101,19 @@ import { ActionPerformedGetData } from './actionPerformedGetData';
 import { ActionPerformedGetReference } from './actionPerformedGetReference';
 import { ActionPerformedLoginValidate } from './actionPerformedLoginValidate';
 import { ActionPerformedPreview } from './actionPerformedPreview';
-import { ActionPerformedRenderedAnalysisMetrics } from './actionPerformedRenderedAnalysisMetrics';
 import { ActionPerformedRenderedMetrics } from './actionPerformedRenderedMetrics';
+import { ActionPerformedRenderedMetricsAS } from './actionPerformedRenderedMetricsAS';
 import { ActionPerformedSchedules } from './actionPerformedSchedules';
 import { ActionPerformedSparkSingle } from './actionPerformedSparkSingle';
 import { ActionPerformedStoreMetrics } from './actionPerformedStoreMetrics';
 import { ActionPerformedTDVCreate } from './actionPerformedTDVCreate';
+import { ActionPerformedUIAssets } from './actionPerformedUIAssets';
+import { ActionPerformedUIAssetsUrl } from './actionPerformedUIAssetsUrl';
 import { ActionPerformedUnmanagedPublishedViews } from './actionPerformedUnmanagedPublishedViews';
 import { ActionPerformedUpdate } from './actionPerformedUpdate';
 import { ActivitiesTable } from './activitiesTable';
 import { AnalysisList } from './analysisList';
+import { AnalysisMetrics } from './analysisMetrics';
 import { DatasetSource } from './datasetSource';
 import { DatasetSourceTdv } from './datasetSourceTdv';
 import { Filter } from './filter';
@@ -128,8 +134,8 @@ import { ListVariantsTable } from './listVariantsTable';
 import { LoginCredentials } from './loginCredentials';
 import { ManagedDatasetsInfo } from './managedDatasetsInfo';
 import { Mapping } from './mapping';
+import { MetricsAnalysis } from './metricsAnalysis';
 import { MetricsDS } from './metricsDS';
-import { MetricsTable } from './metricsTable';
 import { PmConfigLiveApps } from './pmConfigLiveApps';
 import { PreviewConfigFile } from './previewConfigFile';
 import { Profiles } from './profiles';
@@ -181,16 +187,19 @@ let typeMap: {[index: string]: any} = {
     "ActionPerformedGetReference": ActionPerformedGetReference,
     "ActionPerformedLoginValidate": ActionPerformedLoginValidate,
     "ActionPerformedPreview": ActionPerformedPreview,
-    "ActionPerformedRenderedAnalysisMetrics": ActionPerformedRenderedAnalysisMetrics,
     "ActionPerformedRenderedMetrics": ActionPerformedRenderedMetrics,
+    "ActionPerformedRenderedMetricsAS": ActionPerformedRenderedMetricsAS,
     "ActionPerformedSchedules": ActionPerformedSchedules,
     "ActionPerformedSparkSingle": ActionPerformedSparkSingle,
     "ActionPerformedStoreMetrics": ActionPerformedStoreMetrics,
     "ActionPerformedTDVCreate": ActionPerformedTDVCreate,
+    "ActionPerformedUIAssets": ActionPerformedUIAssets,
+    "ActionPerformedUIAssetsUrl": ActionPerformedUIAssetsUrl,
     "ActionPerformedUnmanagedPublishedViews": ActionPerformedUnmanagedPublishedViews,
     "ActionPerformedUpdate": ActionPerformedUpdate,
     "ActivitiesTable": ActivitiesTable,
     "AnalysisList": AnalysisList,
+    "AnalysisMetrics": AnalysisMetrics,
     "DatasetSource": DatasetSource,
     "DatasetSourceTdv": DatasetSourceTdv,
     "Filter": Filter,
@@ -211,8 +220,8 @@ let typeMap: {[index: string]: any} = {
     "LoginCredentials": LoginCredentials,
     "ManagedDatasetsInfo": ManagedDatasetsInfo,
     "Mapping": Mapping,
+    "MetricsAnalysis": MetricsAnalysis,
     "MetricsDS": MetricsDS,
-    "MetricsTable": MetricsTable,
     "PmConfigLiveApps": PmConfigLiveApps,
     "PreviewConfigFile": PreviewConfigFile,
     "Profiles": Profiles,

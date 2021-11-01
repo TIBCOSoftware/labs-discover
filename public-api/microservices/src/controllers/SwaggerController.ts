@@ -4,6 +4,7 @@ import { logger } from '../common/logging';
 import swaggerJsdoc from 'swagger-jsdoc';
 import yaml from 'js-yaml';
 import fs from 'fs';
+import path from 'path';
 
 @Service()
 @JsonController('/docs')
@@ -25,8 +26,7 @@ export class SwaggerController {
     // Get document, or throw exception on error
     let doc: any;
     try {
-      doc = yaml.load(fs.readFileSync('./src/api.yaml', 'utf8'));
-      logger.info(doc);
+      doc = yaml.load(fs.readFileSync(path.join(__dirname, '../api.yaml'), 'utf8'));
     } catch (e) {
       doc = null;
       console.log(e);

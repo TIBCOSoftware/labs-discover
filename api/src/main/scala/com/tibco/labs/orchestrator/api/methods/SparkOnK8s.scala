@@ -144,6 +144,9 @@ class SparkOnK8s() {
     val modSecret2: Json => Json = Jsonroot.spec.executor.envFrom(0).secretRef.name.string.modify(_ => s"${_secret}")
     val modArgs: Json => Json = Jsonroot.spec.arguments(1).string.modify(_ => s"${pmConfigFile.canonicalPath}")
 
+    val modOpts1: Json => Json = Jsonroot.spec.sparkConf.`spark.driver.extraJavaOptions`.string.modify(_ => s"-Dlog4j.configuration=file:///log4j.properties -Dlogfile.name=spark-pm-${meta_name}")
+    val modOpts2: Json => Json = Jsonroot.spec.sparkConf.`spark.executor.extraJavaOptions`.string.modify(_ => s"-Dlog4j.configuration=file:///log4j.properties -Dlogfile.name=spark-pm-${meta_name}")
+
 
     jsonk8s = modName(jsonk8s)
     jsonk8s = modArg(jsonk8s)
@@ -151,6 +154,9 @@ class SparkOnK8s() {
     jsonk8s = modSecret(jsonk8s)
     jsonk8s = modSecret2(jsonk8s)
     jsonk8s = modArgs(jsonk8s)
+
+    jsonk8s = modOpts1(jsonk8s)
+    jsonk8s = modOpts2(jsonk8s)
 
     //logger.info(jsonk8s.spaces2)
 

@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.slf4j.LoggerFactory
 
 import java.lang.annotation.Annotation
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import scala.concurrent.Future

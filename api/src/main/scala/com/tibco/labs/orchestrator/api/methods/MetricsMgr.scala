@@ -6,7 +6,7 @@
 
 package com.tibco.labs.orchestrator.api.methods
 
-import com.tibco.labs.orchestrator.models.{MetricsDS, MetricsTable, profiles}
+import com.tibco.labs.orchestrator.models.{MetricsAnalysis, MetricsDS, MetricsTable, analysisMetrics, profiles}
 import doobie.Fragment
 import io.circe.generic.auto._
 import org.slf4j.LoggerFactory
@@ -62,6 +62,36 @@ class MetricsMgr {
 
   }
 
+  def storeASMetrics(config: MetricsAnalysis): (String, Int, String) = {
+
+    import io.circe.generic.auto._
+    import io.circe.syntax._
+    log.info(s"Storing Metrics for Analysis : ${config.analysisID}")
+
+    Try {
+      withRedis { jedis =>
+
+        jedis.select(9)
+        jedis.hmset(s"metrics:analysis:${config.Organisation}:${config.analysisID}", Map(
+          "Organisation" -> config.Organisation,
+          "AnalysisID" -> config.analysisID,
+          "JobName" -> config.jobName,
+          "Metrics" -> config.Metrics.asJson.spaces2,
+          "DatabaseInsertionPerformance" -> config.durationDB.toString,
+          "SparkJobTime" -> config.durationJob.toString,
+          "TimeStamp" -> config.timeStamp.toString,
+          "rawMessage" -> config.asJson.spaces2
+        ).asJava)
+        jedis.close()
+
+      }
+    } match {
+      case Failure(exception) => ("Stored Metrics failed", 10, config.Organisation)
+      case Success(value) => ("Stored Metrics", 0, config.Organisation)
+    }
+
+  }
+
   def getDetailsDSMetrics(assetId: String, OrgId: String): (String, Int, MetricsDS) = {
 
 
@@ -93,7 +123,7 @@ class MetricsMgr {
       io.circe.parser.decode[MetricsDS](fetchRes) match {
         case Left(value) => {
           log.error("Error in parsing")
-          return ("Key found but parsing in error", 404, emptyMetrics)
+          return ("Key found but parsing in error", 120, emptyMetrics)
         }
         case Right(value) => {
           log.info("Yipicai")
@@ -102,7 +132,69 @@ class MetricsMgr {
       }
 
     } else {
-      return ("Key not found", 120, emptyMetrics)
+      return ("Key not found", 404, emptyMetrics)
+    }
+
+
+  }
+
+  def getDetailsASMetrics(analysisid: String, OrgId: String): (String, Int, MetricsAnalysis) = {
+
+
+    log.info("Retrieving key from REDIS")
+    val emptyMetrics = new MetricsAnalysis(
+      OrgId,
+      "None",
+      "None",
+      new analysisMetrics(
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        0L,
+        "None",
+        "None"
+        ),
+      0,
+      0,
+      0
+    )
+
+    val key = s"metrics:analysis:$OrgId:$analysisid"
+    var fetchRes: String = ""
+    withRedis { jedis =>
+      jedis.select(9)
+      if (jedis.exists(key)) {
+        fetchRes = jedis.hget(key, "rawMessage")
+      }
+    }
+
+    log.info(fetchRes)
+    if (!fetchRes.isEmpty) {
+      log.info(":::key Found:::")
+      io.circe.parser.decode[MetricsAnalysis](fetchRes) match {
+        case Left(value) => {
+          log.error("Error in parsing")
+          return ("Key found but parsing in error", 120, emptyMetrics)
+        }
+        case Right(value) => {
+          log.info("Yipicai")
+          return ("Key found", 0, value)
+        }
+      }
+
+    } else {
+      return ("Key not found", 404, emptyMetrics)
     }
 
 
@@ -127,7 +219,26 @@ class MetricsMgr {
 
   }
 
+  def deleteASMetrics(analysisid: String, OrgId: String): (String, Int, String) = {
 
+
+    log.info("Retrieving key from REDIS")
+
+    val key = s"metrics:analysis:$OrgId:$analysisid"
+    withRedis { jedis =>
+      jedis.select(9)
+      if (jedis.exists(key)) {
+        jedis.del(key)
+        jedis.close()
+      } else {
+        return ("Key not found", 404, "Skipped")
+      }
+    }
+    (s"$key is deleted", 0, "OK")
+
+  }
+
+/*
   //returns All variants from a given analysis. can be huge
   def findMetricsById(analysidId: String, orgId:String): doobie.Query0[MetricsTable] = {
     (Fragment.const(
@@ -159,5 +270,7 @@ class MetricsMgr {
 
       }
     }
-  }
+  }*/
+
+
 }

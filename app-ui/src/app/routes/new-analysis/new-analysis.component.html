@@ -12,13 +12,12 @@
       <uxpl-button type="primary" width="80px" [hidden]="hide('finish')" [disabled]="disableSave"
                    (clicked)="createAnalysis()">Finish
       </uxpl-button>
-      <uxpl-button type="primary" width="80px" [hidden]="hide('save')" [disabled]="disableSave"
+      <uxpl-button type="primary" width="80px" [hidden]="hide('save')" [disabled]="handleSaveButton()"
                    (clicked)="updateAnalysis(false)">Save
       </uxpl-button>
-      <uxpl-button type="primary" width="80px" [hidden]="hide('save')" [disabled]="disableSave"
+      <uxpl-button type="primary" width="80px" [hidden]="hide('save')" [disabled]="handleSaveButton()"
                    (clicked)="updateAnalysis(true)">Save & Rerun
-      </uxpl-button>
-    </div>
+      </uxpl-button>    </div>
     <div *ngIf="showResult" slot="navigation-content">
       <uxpl-button type="secondary" (clicked)="goToAnalysis()">Go to Process Analysis</uxpl-button>
       <uxpl-button *ngIf="newAnalysisId" (clicked)="goToTemplate()">Select Template</uxpl-button>
@@ -27,7 +26,7 @@
   <uxpl-stepper [config]="config" (stepClickedIdx)="handleStepClick($event)" [hideNumbers]="mode !== 'create'"
                 style="padding: 24px 32px 24px 32px; height: calc( 100% - 93px)">
     <div *ngIf="display('basic-info')" class="new-analysis-tab-container" slot="basic-info">
-      <basic-info [name]="newAnalysis.name" [description]="newAnalysis.description" [originalName]="originalName"
+      <basic-info [name]="newAnalysis.name" [description]="newAnalysis.description" [analysisId]="analysisId"
                   (changed)="handleData($event)" (status)="handleStatus($event)"></basic-info>
     </div>
     <div *ngIf="display('dataset')" class="new-analysis-tab-container" slot="dataset">

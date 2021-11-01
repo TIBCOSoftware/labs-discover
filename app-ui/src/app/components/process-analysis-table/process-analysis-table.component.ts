@@ -10,9 +10,9 @@ import {
   ViewChild
 } from '@angular/core';
 import {get} from 'lodash-es';
-import {Analysis} from 'src/app/model/models';
-import {getRelativeTime} from '../../functions/analysis';
+import {Analysis} from 'src/app/backend/model/models';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'process-analysis-table',
@@ -43,7 +43,10 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   popupX: string;
   popupY: string;
 
-  expandedRows = {}
+  expandedRows = {};
+
+  showCompare = false;
+  selectedAnalysis: Analysis[] = [undefined];
 
 
   private paToDelete: { action: string, analysisId: string, name: string };
@@ -70,8 +73,6 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // console.log('Change: ', changes)
-    // console.log(JSON.stringify(this.processAnalyses))
     if (!changes.searchTerm?.firstChange) {
       this.dt.filterGlobal(changes.searchTerm?.currentValue, 'contains');
     }
@@ -81,7 +82,6 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
         this.showPagination = true;
       }
     }
-
   }
 
   public buttonClicked(rowData) {
@@ -97,16 +97,7 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   public obtainData(rowData: any, col: any): string {
     // console.log('Get data.... ')
     // this.callCounter++;
-    if (col === 'metadata.modifiedOn') {
-      const date = new Date(get(rowData, col));
-      if (date && date.getTime) {
-        return getRelativeTime(date.getTime());
-      } else {
-        return '';
-      }
-    } else {
-      return get(rowData, col);
-    }
+    return get(rowData, col);
   }
 
   public getToolTip(field: any, data: any) {
@@ -254,4 +245,14 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
   handleOptionClick(mEvent: MouseEvent) {
     this.latestMouseEvent = mEvent;
   }
+
+  handleDoCompare(analysis: Analysis) {
+    this.selectedAnalysis = [ analysis, undefined ];
+    this.toggleCompare();
+  }
+
+  toggleCompare() {
+    this.showCompare = !this.showCompare;
+  }
+
 }

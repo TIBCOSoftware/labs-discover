@@ -1,24 +1,27 @@
 import { Response } from 'koa';
-import { Param, Body, Get, Post, Put, Delete, HeaderParam, JsonController, Res } from 'routing-controllers';
+import { Param, Body, Get, Post, Put, Delete, HeaderParam, JsonController, Res, QueryParam } from 'routing-controllers';
 import { Service } from 'typedi';
 import { logger } from '../common/logging';
-import { PmConfigLiveApps, SparkOneTimeJobApi } from '../backend/api'
+import { MetricsApi, PmConfigLiveApps, SparkOneTimeJobApi } from '../backend/api'
 import { AnalysisRedisService } from '../services/analysis-redis.service';
 import { Analysis, AnalysisData, AnalysisRequest, AnalysisStatus } from '../models/analysis-redis.model';
 import { DiscoverCache } from '../cache/DiscoverCache';
-import { version } from 'bluebird';
+import { TemplatesService } from '../services/templates.service';
+import { Template } from '../models/templates.model';
 
 @Service()
 @JsonController('/repository')
 export class AnalysisController {
 
-  private sparkService: SparkOneTimeJobApi;
+  protected templatesService: TemplatesService
 
   constructor(
     protected analysisService: AnalysisRedisService,
-    protected cache: DiscoverCache
+    protected cache: DiscoverCache,
+    protected sparkService: SparkOneTimeJobApi,
+    protected metricsService: MetricsApi   
   ) {
-    this.sparkService = new SparkOneTimeJobApi();
+    this.templatesService = new TemplatesService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
   }
 
   private preflightCheck = (token: string, response: Response): boolean | Response => {
@@ -40,7 +43,12 @@ export class AnalysisController {
       return check as Response;
     }
 
-    return await this.analysisService.getAnalysis(token.replace('Bearer ', ''));
+    const analysisData = await this.addTemplateLabel(
+      token.replace('Bearer ', ''),
+      (await this.analysisService.getAnalysis(token.replace('Bearer ', '')))
+    );
+
+    return this.addMetricsInformation(token.replace('Bearer ', ''), analysisData);
   }
 
   @Post('/analysis')
@@ -65,13 +73,12 @@ export class AnalysisController {
       return check as Response;
     }
 
-    const analysisDetail = await this.analysisService.getAnalysisDetails(token.replace('Bearer ', ''), id.slice(0, id.lastIndexOf('-')), id.slice(id.lastIndexOf('-') +1));
-    if (!analysisDetail) {
-      response.status = 404;
-      return response;
-    }
+    const analysisDetail = (await this.addTemplateLabel(
+      token.replace('Bearer ', ''),
+      [await this.analysisService.getAnalysisDetails(token.replace('Bearer ', ''), id.slice(0, id.lastIndexOf('-')), id.slice(id.lastIndexOf('-') +1))]
+    ))[0];
 
-    return analysisDetail;
+    return (await this.addMetricsInformation(token.replace('Bearer ', ''), [analysisDetail]))[0];
   }
 
   @Put('/analysis/:id')
@@ -95,6 +102,7 @@ export class AnalysisController {
     }
     const version = id.slice(id.lastIndexOf('-') +1);
     id = id.slice(0, id.lastIndexOf('-'));
+
     return this.analysisService.deleteAnalysis(token.replace('Bearer ', ''), id, version);
   }
 
@@ -271,5 +279,32 @@ export class AnalysisController {
 
     const output = await this.sparkService.deleteJobRoute(jobName);
     await this.analysisService.deleteAnalysisStatus(token, id);  
+  }
+
+  private async addTemplateLabel(token: string, analysis: Analysis[]): Promise<Analysis[]> {
+
+    const templates = await this.templatesService.getTemplates(token);
+
+    return analysis.map((analysis: Analysis) => {
+      const templateName = templates.find((template: Template) => template.id === analysis.data.templateId) as Template;
+      analysis.data.templateLabel = templateName?.name;
+      return analysis;
+    });
+  }
+
+  private async addMetricsInformation(token: string, analysis: Analysis[]): Promise<Analysis[]> {
+    const orgId = (await this.cache.getTokenInformation(token)).globalSubscriptionId;
+    const analysisForReportData = analysis.filter((analysis: Analysis) => analysis.metadata.state === 'Ready').map((analysis: Analysis) => analysis.id.substring(0, analysis.id.lastIndexOf('-')));
+    const analysisPromises = analysisForReportData.map((el:string) => this.metricsService.getAnalysisMetricsRoute(orgId, el));
+    const results = ( await Promise.all(analysisPromises.map(p => p.catch(e => e)))) as any[];
+    const validResults = results.filter(result => !(result instanceof Error));
+
+    return analysis.map((analysis: Analysis) => {
+      const metrics = validResults.find((vr => analysis.id.includes(vr.response.body.data.analysisID)));
+      if (metrics) {
+        analysis.metrics = metrics.response.body.data.Metrics;
+      };
+      return analysis;
+    });
   }
 }

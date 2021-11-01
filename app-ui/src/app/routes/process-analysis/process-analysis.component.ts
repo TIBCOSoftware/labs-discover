@@ -5,9 +5,9 @@ import {MatDialog} from '@angular/material/dialog';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {DatePipe, Location} from '@angular/common';
 import {NoFormComponent} from '../../components/forms/no-form/no-form.component';
-import {RepositoryService} from 'src/app/api/repository.service';
+import {RepositoryService} from 'src/app/backend/api/repository.service';
 import {Observable} from 'rxjs';
-import {Analysis} from 'src/app/model/analysis';
+import {Analysis} from 'src/app/backend/model/analysis';
 import {notifyUser} from '../../functions/message';
 import {ProcessAnalysisTableComponent} from '../../components/process-analysis-table/process-analysis-table.component';
 

@@ -15,6 +15,7 @@ import {OauthService} from '../service/oauth.service';
 import { catchError, filter, switchAll, switchMap, take } from 'rxjs/operators';
 import { BehaviorSubject, from, throwError } from 'rxjs';
 import { exit } from 'process';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable()
@@ -41,9 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
     if (url.startsWith('https://eu.spotfire-next.cloud.tibco.com')) { return true };
     if (url.startsWith('https://au.spotfire-next.cloud.tibco.com')) { return true };
     if (url.startsWith('https://eu-west-1.integration.cloud.tibcoapps.com')) { return true };
-    if (url.startsWith('https://api.labs.tibcocloud.com')) { return true };
-    if (url.startsWith('https://discover.labs.tibcocloud.com')) { return true };
-    if (url.startsWith('https://discover.cloud.tibco.com')) { return true };
+    if (url.startsWith(environment.apiURL)) { return true };
   };
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {

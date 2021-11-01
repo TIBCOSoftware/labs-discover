@@ -1,0 +1,1 @@
+{"version":3,"file":"RoleChecker.js","sourceRoot":"","sources":["../../src/RoleChecker.ts"],"names":[],"mappings":"","sourcesContent":["import { Action } from './Action';\n\nexport interface RoleChecker {\n  check(action: Action): boolean | Promise<boolean>;\n}\n"]}

@@ -1,7 +1,9 @@
-import {Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges} from '@angular/core';
-import {map} from 'rxjs/operators';
-import {RepositoryService} from 'src/app/api/repository.service';
-import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { RepositoryService } from 'src/app/backend/api/repository.service';
+import { Analysis } from 'src/app/backend/model/analysis';
+import { NewAnalysisStepStatus } from 'src/app/models_ui/discover';
 
 @Component({
   selector: 'basic-info',
@@ -12,62 +14,79 @@ export class BasicInfoComponent implements OnInit, OnChanges {
 
   @Input() name: string;
   @Input() description: string;
-  @Input() originalName: string;
+  @Input() analysisId: string;
   @Output() status: EventEmitter<NewAnalysisStepStatus> = new EventEmitter<NewAnalysisStepStatus>();
   @Output() changed: EventEmitter<string[]> = new EventEmitter<string[]>();
 
+  public nameChanged: Subject<any> = new Subject<any>();
+
   private analysisNames: string[] = [];
-  public differentName: boolean;
+  public sameName: boolean = false;
 
   public nameHint = '';
 
   constructor(
     protected repositoryService: RepositoryService
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.getAnalysisNames();
+    this.nameChanged
+      .pipe(debounceTime(500), distinctUntilChanged())
+      .pipe(
+        map((newValue: any) => {
+          return this.analysisNames.includes(newValue.value);
+        })
+      ).subscribe((re: any) => {
+        if (re ) {
+          this.sameName = true;
+        } else {
+          this.sameName = false;
+        }
+        this.updateStatus();
+      });  
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.originalName) {
+    if (changes.analysisId?.currentValue != undefined){
       this.getAnalysisNames();
     }
-    this.updateStatus();
   }
 
   private getAnalysisNames() {
-    this.repositoryService.getAnalysis().pipe(
-      map(analysisList => {
-        this.analysisNames = analysisList.map(el => el.data.name);
-        if (this.originalName !== '') {
-          const index = this.analysisNames.indexOf(this.originalName, 0);
-          if (index > -1) {
-            this.analysisNames.splice(index, 1);
-          }
-        }
-        this.updateStatus();
+    return this.repositoryService.getAnalysis().pipe(
+      map((analysisList: Analysis[]) => {
+        this.analysisNames = analysisList.filter(
+          (el: Analysis) => el.id !== this.analysisId
+        ).map(
+          (el: Analysis) => el.data.name
+        );
       })
-    ).subscribe();
+    ).toPromise();
   }
 
   handleUpdate = (event, fieldName) => {
+    const value = event.detail.value;
     this.changed.emit([fieldName, event.detail.value]);
+    if (fieldName === 'name' && value && value.trim() !== '') {
+      this.nameChanged.next({
+        value
+      });
+    } else {
+      this.updateStatus();
+    }
   }
 
   public isValidName = (): boolean => {
-    return this.differentName;
+    return !this.sameName;
   }
 
   private updateStatus = (): void => {
-    this.differentName = this.name ? !this.analysisNames.includes(this.name) : true;
-    if (!this.differentName) {
+    if (this.sameName) {
       this.nameHint = 'A Process Analysis with this name already exists...';
     } else {
       this.nameHint = '';
     }
-    const status = this.differentName && !(this.name === undefined || this.description === undefined || this.name === '' || this.description === '');
+    const status = !this.sameName && !(this.name === undefined || this.description === undefined || this.name === '' || this.description === '');
     const stepStatus = {
       step: 'basic-info',
       completed: status

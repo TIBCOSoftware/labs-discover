@@ -1,5 +1,5 @@
 import {DateTime} from 'luxon';
-import {Mapping} from '../model/mapping';
+import {Mapping} from '../backend/model/mapping';
 
 export const START_NAME = 'Starting Activities';
 export const STOP_NAME = 'Stopping Activities';
@@ -26,12 +26,11 @@ export function transformMapping(mapping: Mapping) {
   return colMappObj;
 }
 
-
 export function calculateColumns(columns: any[]): any[] {
   return columns.map(column => {
     let name = column
-    if (column.COLUMN_NAME) {
-      name = column.COLUMN_NAME
+    if (column.columnName) {
+      name = column.columnName
     }
     const newColumn = {
       headerName: name,
@@ -42,14 +41,6 @@ export function calculateColumns(columns: any[]): any[] {
     };
     return newColumn;
   })
-}
-
-export function getRelativeTime(millisec: number) {
-  const diff = new Date().getTime() - new Date(millisec).getTime();
-  if (diff < 60000) {
-    return 'Less than a minute ago...'
-  }
-  return millisec ? DateTime.fromMillis(millisec).toRelative() : '';
 }
 
 export function stripOrgFolder(dxpLocation): string {
@@ -71,9 +62,6 @@ export function stripOrgFolder(dxpLocation): string {
 
 
 export function convertDateFromLocale(date: string): string {
-
-  // 3/13/2010 2:16:20 PM
-  console.log('convertDateFromLocale: ', date)
   const locale = window.navigator.language;
   const newDateLocale = Intl.DateTimeFormat(locale).formatToParts(new Date());
   let format = '';
@@ -105,7 +93,7 @@ export function convertDateFromLocale(date: string): string {
   // format = format + ' hh:mm:ss';
 
   const newDate = DateTime.fromFormat(date, format, {locale}).toISO();
-  console.log('OLD DATE: ' + date + ' NEW DATE: ' + newDate);
+  // console.log('OLD DATE: ' + date + ' NEW DATE: ' + newDate);
   return newDate;
 }
 

@@ -21,9 +21,13 @@ import akka.http.scaladsl.server.directives.CachingDirectives._
 import com.tibco.labs.orchestrator.api.registry.LoginRegistry
 
 import scala.concurrent.duration._
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import scala.concurrent.Future
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
 
 
 //#import-json-formats
@@ -35,7 +39,6 @@ class LoginRoutes(loginRegistry: ActorRef[LoginRegistry.Command])(implicit val s
   //#user-routes-class
 
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-  import com.tibco.labs.orchestrator.models.JsonFormatsLiveApps._
   //#import-json-formats
 
   // If ask takes more time than this to complete the request is failed

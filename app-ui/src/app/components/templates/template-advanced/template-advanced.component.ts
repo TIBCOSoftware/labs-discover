@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MConfig, StepStatus} from '../../../models_ui/analyticTemplate';
 import { createMConfig } from '../../../functions/templates';
-import { Template } from 'src/app/model/models';
+import { Template } from 'src/app/backend/model/models';
 
 @Component({
   selector: 'template-advanced',

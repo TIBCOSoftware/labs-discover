@@ -12,13 +12,11 @@ import {Location} from '@angular/common';
 })
 export class HelpContainerComponent implements OnInit {
 
-  // assets/help/discover/config.json
-
   @Input() showHelp: boolean;
 
   @Input() helpSource: string;
 
-  readonly CLOUD_STARTER_DESCRIPTOR = 'assets/cloudstarter.json';
+  readonly CLOUD_STARTER_DESCRIPTOR = 'assets/cloud_app_descriptor.json';
 
   public csDescriptor: any;
 

@@ -1,0 +1,19 @@
+<div class="metric-container">
+  <div class="increase difference" *ngIf="showIncrease && percentageIncrease">
+    <div class="metric-detail">
+      <div class="numeric-value"> +&nbsp;{{difference | number}}</div>
+      <div class="percent-value">({{percentageIncrease | number : '1.0-0'}}%)</div>
+    </div>
+    <uxpl-icon icon="ic-up-trend" size="24px"></uxpl-icon>
+  </div>
+  <div class="decrease difference" *ngIf="showDecrease && percentageDecrease">
+    <div class="metric-detail">
+      <div class="numeric-value"> -&nbsp;{{difference | number: 0}}</div>
+      <div class="percent-value">({{percentageDecrease | number: '1.0-0'}}%)</div>
+    </div>
+    <uxpl-icon icon="ic-down-trend" size="24px"></uxpl-icon>
+  </div>
+  <div class="analysis-metric-value">{{comparisonMetric | number}}</div>
+</div>
+
+

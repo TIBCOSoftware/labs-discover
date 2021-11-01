@@ -3,9 +3,9 @@ import { Location } from '@angular/common'
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import {AnalyticTemplateUI} from '../../models_ui/analyticTemplate';
-import { RepositoryService } from 'src/app/api/repository.service';
-import { Analysis } from 'src/app/model/analysis';
-import { VisualisationService } from 'src/app/api/visualisation.service';
+import { RepositoryService } from 'src/app/backend/api/repository.service';
+import { Analysis } from 'src/app/backend/model/analysis';
+import { VisualisationService } from 'src/app/backend/api/visualisation.service';
 import {compareTemplates} from '../../functions/templates';
 
 @Component({
@@ -42,16 +42,17 @@ export class TemplateSelectComponent implements OnInit {
       const template$ = this.templates;
       const analysis$ = this.repositoryService.getAnalysisDetails(this.route.snapshot.paramMap.get('name'));
       forkJoin([template$, analysis$]).subscribe(async results => {
-        /*
-        if (!this.templates){
-          this.templates = results[0];
-        }*/
         this.analysis = results[1];
         const formatDate = new Date(this.analysis.metadata.createdOn).toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
         let tempText = 'No template selected';
         if(this.analysis?.data?.templateId){
-          const templateDetails = await this.visualisationService.getTemplate(this.analysis.data.templateId).toPromise();
-          tempText = 'Template: ' + templateDetails.name
+          try {
+            const templateDetails = await this.visualisationService.getTemplate(this.analysis.data.templateId).toPromise();
+            tempText = 'Template: ' + templateDetails.name
+          } catch (e) {
+            // TODO: Specifically check for a 404 when the backend is updated
+            console.error('TEMPLATE ERROR ', e);
+          }
         }
         this.objHeaderConfig = {
           title: {

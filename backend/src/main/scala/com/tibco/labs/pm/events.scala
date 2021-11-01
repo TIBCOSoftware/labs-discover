@@ -10,6 +10,7 @@ import com.tibco.labs.utils.DataFrameUtils
 import com.tibco.labs.utils.DataFrameUtils.joinByColumn
 import com.tibco.labs.utils.Status.sendBottleToTheSea
 import com.tibco.labs.utils.commons._
+import org.apache.spark.SparkException
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
@@ -17,6 +18,7 @@ import org.apache.spark.sql.types.{IntegerType, LongType, StructField, StructTyp
 import org.apache.spark.sql.{Column, DataFrame, Row, SparkSession}
 
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeParseException
 import java.util
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.asScalaBufferConverter
@@ -26,7 +28,7 @@ import scala.util.{Failure, Success, Try}
 // scalastyle:off println
 object events {
 
-  def transformEvents(df: DataFrame): tFEvents  = {
+  def transformEvents(df: DataFrame): tFEvents = {
     var df_events = spark.emptyDataFrame
     var df_attributes_binary = spark.emptyDataFrame
     var df_events_casefilter = spark.emptyDataFrame
@@ -41,7 +43,6 @@ object events {
       //val replacingColumns = _columns.map(NormalizationRegexColName.r.replaceAllIn(_, "_"))
       //val df2: DataFrame = replacingColumns.zip(_columns).foldLeft(df) { (tempdf, name) => tempdf.withColumnRenamed(name._2, name._1) }
       val dftmp: DataFrame = df.toDF(normalizer(df.columns): _*)
-
 
 
       val renamedColumns = dftmp.columns.map(c => dftmp(c).as(s"$prefixColsInternal$c"))
@@ -113,31 +114,31 @@ object events {
       // filtering events table if any
 
       df_events.printSchema()
-      println ("################# Filtering events with Events:Col  type timestamp && range filters...")
-      var eventsRangeFilterList: mutable.Seq[(String,  String, String)] = collection.mutable.Seq[(String, String, String)]()
-      if(!eventsRange.isEmpty) {
+      println("################# Filtering events with Events:Col  type timestamp && range filters...")
+      var eventsRangeFilterList: mutable.Seq[(String, String, String)] = collection.mutable.Seq[(String, String, String)]()
+      if (!eventsRange.isEmpty) {
         //filter on time cols
-       eventsRange.filter(l => l._2.equalsIgnoreCase("timestamp")).foreach{ er =>
-         val collookup = normalizerString(er._1)
-         val minVal = er._4
-         val maxVal =  er._5
-         if(s"${prefixColsInternal}$collookup".equals(s"${prefixColsInternal}$columnCaseStart")) {
-           logger.info("Filtering events on activity_start_time")
-           eventsRangeFilterList :+= (("activity_start_timestamp", minVal, maxVal))
-           //df_events = df_events.where(col("activity_start_timestamp") >= changeDateFormat(er._4, er._3) && col("activity_start_timestamp") <= changeDateFormat(er._5, er._3))
-         } else if (s"${prefixColsInternal}$collookup".equals(s"${prefixColsInternal}$columnCaseStart")) {
-           logger.info("Filtering events on activity_end_time")
-           eventsRangeFilterList :+= (("activity_end_timestamp", minVal, maxVal))
-           //df_events = df_events.where(col("activity_end_timestamp") >= changeDateFormat(er._4, er._3) && col("activity_end_timestamp") <= changeDateFormat(er._5, er._3))
-         } else {
-           logger.info(s"Filtering events on ${prefixColsInternal}$collookup")
-           eventsRangeFilterList :+= ((s"${prefixColsInternal}$collookup", minVal, maxVal))
-           //df_events = df_events.where(col(s"${prefixColsInternal}$collookup") >= changeDateFormat(er._4, er._3) && col(s"${prefixColsInternal}$collookup") <= changeDateFormat(er._5, er._3))
-         }
+        eventsRange.filter(l => l._2.equalsIgnoreCase("timestamp")).foreach { er =>
+          val collookup = normalizerString(er._1)
+          val minVal = er._4
+          val maxVal = er._5
+          if (s"${prefixColsInternal}$collookup".equals(s"${prefixColsInternal}$columnCaseStart")) {
+            logger.info("Filtering events on activity_start_time")
+            eventsRangeFilterList :+= (("activity_start_timestamp", minVal, maxVal))
+            //df_events = df_events.where(col("activity_start_timestamp") >= changeDateFormat(er._4, er._3) && col("activity_start_timestamp") <= changeDateFormat(er._5, er._3))
+          } else if (s"${prefixColsInternal}$collookup".equals(s"${prefixColsInternal}$columnCaseStart")) {
+            logger.info("Filtering events on activity_end_time")
+            eventsRangeFilterList :+= (("activity_end_timestamp", minVal, maxVal))
+            //df_events = df_events.where(col("activity_end_timestamp") >= changeDateFormat(er._4, er._3) && col("activity_end_timestamp") <= changeDateFormat(er._5, er._3))
+          } else {
+            logger.info(s"Filtering events on ${prefixColsInternal}$collookup")
+            eventsRangeFilterList :+= ((s"${prefixColsInternal}$collookup", minVal, maxVal))
+            //df_events = df_events.where(col(s"${prefixColsInternal}$collookup") >= changeDateFormat(er._4, er._3) && col(s"${prefixColsInternal}$collookup") <= changeDateFormat(er._5, er._3))
+          }
 
-       }
+        }
 
-        val filterCylc: Column = eventsRangeFilterList.map(v => col(v._1).geq(to_timestamp(lit(v._2), isoSpotPattern)) && col(v._1).leq(to_timestamp(lit(v._3), isoSpotPattern))).reduce(_&&_)
+        val filterCylc: Column = eventsRangeFilterList.map(v => col(v._1).geq(to_timestamp(lit(v._2), isoSpotPattern)) && col(v._1).leq(to_timestamp(lit(v._3), isoSpotPattern))).reduce(_ && _)
         logger.info("Filters conditions ")
         logger.info(filterCylc)
         logger.info("filtering...")
@@ -149,16 +150,15 @@ object events {
       }
 
 
-
-      println ("################# Filtering events with Events:Col   values filters...")
+      println("################# Filtering events with Events:Col   values filters...")
       var eventsFilterList: mutable.Seq[(String, List[String])] = collection.mutable.Seq[(String, List[String])]()
-      if(eventsValues.nonEmpty) {
+      if (eventsValues.nonEmpty) {
         logger.info(eventsValues)
-        eventsValues.foreach{ ev =>
+        eventsValues.foreach { ev =>
           val collookup = normalizerString(ev._1)
           val list: List[String] = (ev._4)
           logger.info(s"Filtering on values for ${prefixColsInternal}$collookup")
-          if ( df_events.columns.exists(_.equals(s"${prefixColsInternal}$collookup"))) {
+          if (df_events.columns.exists(_.equals(s"${prefixColsInternal}$collookup"))) {
             logger.info(s"Filtering on values for $collookup")
             //df_events_tmp = df_events_tmp.filter(col(s"${prefixColsInternal}$collookup").isin(ev._4: _*))
             eventsFilterList :+= ((s"${prefixColsInternal}$collookup", list))
@@ -168,8 +168,7 @@ object events {
             //df_events_tmp =  df_events_tmp.filter(col(s"case_id").isin(ev._4: _*))
             //df_events_casefilter = df_events_tmp.select(s"case_id").distinct()
             eventsFilterList :+= ((s"case_id", list))
-          } else if(s"$collookup".equals(columnActivityId))
-          {
+          } else if (s"$collookup".equals(columnActivityId)) {
             logger.info(s"Filtering on values for activity_id")
             //df_events_tmp =  df_events_tmp.filter(col(s"activity_id").isin(ev._4: _*))
             //df_events_casefilter = df_events_tmp.select(s"case_id").distinct()
@@ -183,28 +182,28 @@ object events {
             logger.info(s"Nothing to filter for $collookup")
           }
         }
-        val filterCylc: Column = eventsFilterList.map(v => col(v._1).isin(v._2: _*)).reduce(_&&_)
+        val filterCylc: Column = eventsFilterList.map(v => col(v._1).isin(v._2: _*)).reduce(_ && _)
         logger.info("Filters conditions ")
         logger.info(filterCylc)
         logger.info("filtering...")
         df_events = df_events.filter(filterCylc)
-      }else {
+      } else {
         logger.info("##### no filters sets######")
       }
 
       // filtering on Case...1first pass
 
-      println ("################# Filtering events with Case:Col filters...")
+      println("################# Filtering events with Case:Col filters...")
       df_events.printSchema()
 
       var colsFilterList: mutable.Seq[(String, List[String])] = collection.mutable.Seq[(String, List[String])]()
-      if(casesValues.nonEmpty) {
+      if (casesValues.nonEmpty) {
         logger.info(casesValues)
-        casesValues.foreach{ ev =>
+        casesValues.foreach { ev =>
           val collookup = normalizerString(ev._1)
           val list: List[String] = (ev._4)
-          logger.info("look up for col : "+ collookup)
-          if ( df_events.columns.exists(_.equals(s"${prefixColsInternal}$collookup"))) {
+          logger.info("look up for col : " + collookup)
+          if (df_events.columns.exists(_.equals(s"${prefixColsInternal}$collookup"))) {
             logger.info(s"Filtering on values for $collookup")
             //df_events_tmp = df_events_tmp.filter(col(s"${prefixColsInternal}$collookup").isin(ev._4: _*))
             colsFilterList :+= ((s"${prefixColsInternal}$collookup", list))
@@ -214,8 +213,7 @@ object events {
             //df_events_tmp =  df_events_tmp.filter(col(s"case_id").isin(ev._4: _*))
             //df_events_casefilter = df_events_tmp.select(s"case_id").distinct()
             colsFilterList :+= ((s"case_id", list))
-          } else if(s"$collookup".equals(columnActivityId))
-          {
+          } else if (s"$collookup".equals(columnActivityId)) {
             logger.info(s"Filtering on values for activity_id")
             //df_events_tmp =  df_events_tmp.filter(col(s"activity_id").isin(ev._4: _*))
             //df_events_casefilter = df_events_tmp.select(s"case_id").distinct()
@@ -230,13 +228,13 @@ object events {
           }
         }
         import org.apache.spark.sql.functions.{filter}
-        val filterCylc: Column = colsFilterList.map(v => col(v._1).isin(v._2: _*)).reduce(_&&_)
+        val filterCylc: Column = colsFilterList.map(v => col(v._1).isin(v._2: _*)).reduce(_ && _)
         logger.info("Filters conditions ")
         logger.info(filterCylc)
         logger.info("filtering...")
         df_events_casefilter = df_events.filter(filterCylc).select(s"case_id").distinct()
 
-        println (s"Size of case id filtered ${df_events_casefilter.rdd.count()}")
+        println(s"Size of case id filtered ${df_events_casefilter.rdd.count()}")
       } else {
         logger.info("##### no filters sets######")
       }
@@ -448,19 +446,60 @@ CREATE TABLE IF NOT EXISTS events
 
     } match {
       case Success(_) => tFEvents(df_events, df_attributes_binary, df_events_casefilter)
-      case Failure(exception) => exception.getCause.getMessage match {
-        case parse if parse.matches(".*DateTimeFormatter.*") => {
-          logger.error("Error in events for time parsing : " + parse)
-          sendBottleToTheSea(s"$analysisId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html or send an email to our Pattern Master nmarzin@tibco.com", 0, organisation)
-          tFEvents(spark.emptyDataFrame,spark.emptyDataFrame ,spark.emptyDataFrame)
-        }
-        case x => {
-          logger.error("Error in events : " + x)
-          //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
-          sendBottleToTheSea(s"$analysisId", "error", s"Undefined error yet, ${x}", 0, organisation)
-          tFEvents(spark.emptyDataFrame,spark.emptyDataFrame,spark.emptyDataFrame)
+      case Failure(exception) => {
+        println(s"ERRRRRRROOOOORRR  ${exception.getClass.toString}")
+        println(s"ERRRRRRROOOOORRR  ${exception.getCause.getMessage}")
+        exception match {
+          //java.time.format.DateTimeParseException
+          case errorDate if exception.isInstanceOf[DateTimeParseException] => {
+            println("Error in events for DateTimeParseException : " + errorDate.getCause.getMessage)
+            sendBottleToTheSea(s"$analysisId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organisation)
+            tFEvents(spark.emptyDataFrame, spark.emptyDataFrame, spark.emptyDataFrame)
+          }
+          case sparkError if exception.isInstanceOf[SparkException] => sparkError.getCause.getMessage match {
+            case date if date contains ("You may get a different result due to the upgrading of Spark 3.0") => {
+              println("Error in events for SparkException/DateTimeParseException : " + date)
+              sendBottleToTheSea(s"$analysisId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organisation)
+              tFEvents(spark.emptyDataFrame, spark.emptyDataFrame, spark.emptyDataFrame)
+            }
+            case x => {
+              println("Error in events for SparkException/Unknown : " + x)
+              sendBottleToTheSea(s"$analysisId", "error", s"Undefined SparkException , ${x}", 0, organisation)
+              tFEvents(spark.emptyDataFrame, spark.emptyDataFrame, spark.emptyDataFrame)
+            }
+          }
+          case x => {
+            println("Error in events : " + x)
+            sendBottleToTheSea(s"$analysisId", "error", s"Undefined error yet, ${x}", 0, organisation)
+            tFEvents(spark.emptyDataFrame, spark.emptyDataFrame, spark.emptyDataFrame)
+          }
+
+
+          /*          case y => y.getCause.getMessage match {
+                      case parse if parse.matches(".*DateTimeFormatter.*") || parse.matches(".*DateTimeParseException.*") || parse.matches(".*SparkUpgradeException.*") => {
+                        println("Error in events for time parsing : " + parse)
+                        sendBottleToTheSea(s"$assetId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organization)
+                      }
+                      case x => {
+                        println("Error in events : " + x)
+                        sendBottleToTheSea(s"$assetId", "error", s"Undefined error yet, ${x}", 0, organization)
+                      }
+                    }*/
         }
       }
+      /*      case Failure(exception) => exception.getCause.getMessage match {
+              case parse if parse.matches(".*DateTimeFormatter.*") => {
+                logger.error("Error in events for time parsing : " + parse)
+                sendBottleToTheSea(s"$analysisId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html or send an email to our Pattern Master nmarzin@tibco.com", 0, organisation)
+                tFEvents(spark.emptyDataFrame,spark.emptyDataFrame ,spark.emptyDataFrame)
+              }
+              case x => {
+                logger.error("Error in events : " + x)
+                //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
+                sendBottleToTheSea(s"$analysisId", "error", s"Undefined error yet, ${x}", 0, organisation)
+                tFEvents(spark.emptyDataFrame,spark.emptyDataFrame,spark.emptyDataFrame)
+              }
+            }*/
     }
   }
 
@@ -503,7 +542,7 @@ CREATE TABLE IF NOT EXISTS events
       case Success(_) => df_eventsF
       case Failure(e) => logger.error("Error in events : " + e.getMessage)
         //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
-        sendBottleToTheSea(s"$analysisId","error",e.getMessage,0, organisation)
+        sendBottleToTheSea(s"$analysisId", "error", e.getMessage, 0, organisation)
         spark.emptyDataFrame
     }
 
@@ -548,7 +587,7 @@ CREATE TABLE IF NOT EXISTS events
       case Success(_) => df_eventsF
       case Failure(e) => logger.error("Error in events : " + e.getMessage)
         //sendTCMMessage(s"$analysisId", s"$caseRef", "error", s"${e.getMessage}", 0, databaseName, LocalDateTime.now().toString)
-        sendBottleToTheSea(s"$analysisId","error",e.getMessage,0, organisation)
+        sendBottleToTheSea(s"$analysisId", "error", e.getMessage, 0, organisation)
         spark.emptyDataFrame
     }
   }

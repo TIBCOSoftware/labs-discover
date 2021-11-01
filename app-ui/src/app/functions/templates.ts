@@ -1,12 +1,11 @@
 import {cloneDeep} from 'lodash-es';
 import {AnalyticTemplateUI, MConfig} from '../models_ui/analyticTemplate';
-import {TemplateMenuConfig} from '../model/templateMenuConfig';
-import {AnalyticsConfigSF, AnalyticsMenuConfigUI} from '../models_ui/configuration';
-import {VisualisationService} from '../api/visualisation.service';
-import {Visualisation} from '../model/visualisation';
+import {TemplateMenuConfig} from '../backend/model/templateMenuConfig';
+import {VisualisationService} from '../backend/api/visualisation.service';
+import {Visualisation} from '../backend/model/visualisation';
 import {map} from 'rxjs/operators';
-import { Analytics } from '../model/models';
-import {Template} from '../model/template';
+import { Analytics } from '../backend/model/models';
+import {Template} from '../backend/model/template';
 
 export const DXP_EXISTS_MESSAGE = 'A DXP with this name already exists...';
 export const TEMPLATE_EXISTS_MESSAGE = 'A TEMPLATE with this name already exists...';
@@ -27,7 +26,6 @@ export function stripDisabledMenuItems(menu: TemplateMenuConfig[]): TemplateMenu
   }
   return re;
 }
-
 
 export function createReadableArrayString(array: string[], maxLength: number) {
   let moreChars = true;

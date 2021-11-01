@@ -1,6 +1,6 @@
 <div>
     <div *ngIf="data.type=='csv' && data.csvMethod=='upload' && file!=null">
-        <parse-csv [data]="data" [wizard]="wizard" [file]="file" (handlePreviewData)="refreshCSVPreview($event)"></parse-csv>
+        <parse-csv [dataSource]="data.Dataset_Source" [numberRowsForPreview]="wizard.numberRowsForPreview" [file]="file" (handlePreviewData)="refreshCSVPreview($event)" (updateNumberRowsForPreview)="updateNumberRowsForPreview($event)"></parse-csv>
     </div>
     <div *ngIf="previewData ; else loadingData">
         <div class="parse-preview-container">

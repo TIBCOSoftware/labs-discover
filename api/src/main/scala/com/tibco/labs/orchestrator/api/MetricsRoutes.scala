@@ -11,7 +11,7 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.tibco.labs.orchestrator.api.registry.MetricsRegistry._
 import com.tibco.labs.orchestrator.api.registry.TdvMgmtRegistry.ActionPerformedGetData
 import com.tibco.labs.orchestrator.api.registry.MetricsRegistry
-import com.tibco.labs.orchestrator.models.MetricsDS
+import com.tibco.labs.orchestrator.models.{MetricsAnalysis, MetricsDS}
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import io.swagger.v3.oas.annotations.media.{Content, ExampleObject, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -20,6 +20,8 @@ import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import scala.concurrent.Future
@@ -52,9 +54,19 @@ class MetricsRoutes(metricsRegistry: ActorRef[MetricsRegistry.Command])(implicit
     metricsRegistry.ask(deleteMetricsRegistry(orgId, assetId, _))
   }
 
-  def getMetricsAnalysis(orgId: String, analysisId: String): Future[ActionPerformedRenderedAnalysisMetrics] = {
-    metricsRegistry.ask(getDetailsMetricsAnalysisRegistry(orgId, analysisId, _))
+  def storeMetricsAS(data: MetricsAnalysis): Future[ActionPerformedStoreMetrics] = {
+    metricsRegistry.ask(storeMetricsASRegistry(data, _))
   }
+  def getMetricsAS(orgId: String, assetId: String): Future[ActionPerformedRenderedMetricsAS] = {
+    metricsRegistry.ask(getDetailsMetricsASRegistry(orgId, assetId, _))
+  }
+  def deleteMetricsAS(orgId: String, assetId: String): Future[ActionPerformedDeleteMetrics] = {
+    metricsRegistry.ask(deleteMetricsASRegistry(orgId, assetId, _))
+  }
+
+/*  def getMetricsAnalysis(orgId: String, analysisId: String): Future[ActionPerformedRenderedAnalysisMetrics] = {
+    metricsRegistry.ask(getDetailsMetricsAnalysisRegistry(orgId, analysisId, _))
+  }*/
 
 
   //#all-routes
@@ -78,7 +90,13 @@ class MetricsRoutes(metricsRegistry: ActorRef[MetricsRegistry.Command])(implicit
   }
 
 
-  val MetricsRoutes: Route = postDatasetsMetricsRoute ~ deleteDatasetsMetricsRoute ~ getDatasetsMetricsRoute ~ getAnalysisMetricsRoute
+  val MetricsRoutes: Route =
+    postDatasetsMetricsRoute ~
+    deleteDatasetsMetricsRoute ~
+      getDatasetsMetricsRoute ~
+      getAnalysisMetricsRoute ~
+      postAnalysisMetricsRoute ~
+      deleteAnalysisMetricsRoute
 
   @POST
   @Path("/datasets")
@@ -122,6 +140,50 @@ class MetricsRoutes(metricsRegistry: ActorRef[MetricsRegistry.Command])(implicit
     //}
     }
   }
+
+  @POST
+  @Path("/analysis")
+  @Consumes(Array(MediaType.APPLICATION_JSON))
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  @Operation(summary = "Store Metrics for analysis", description = "Store Metrics for analysis", tags = Array("Metrics"),
+    requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[MetricsAnalysis]),
+      examples = Array(new ExampleObject(value =
+        """{
+          "credentials": "CIC~azertyuiopqldlcnc"
+    }"""))
+    ))),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "ok",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedStoreMetrics])))),
+      new ApiResponse(responseCode = "404", description = "Not Found",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedStoreMetrics]))))))
+  def postAnalysisMetricsRoute: Route = {
+    cors() {
+      //cache(lfuCache, keyerFunction) {
+      path("metrics" / "analysis") {
+        concat(
+          //#post-sparkapp
+          pathEnd {
+            concat(
+              post {
+                entity(as[MetricsAnalysis]) { config =>
+                  onSuccess(storeMetricsAS(config)) { performed =>
+                    if (performed.code == 0) {
+                      complete((StatusCodes.OK, performed))
+                    } else {
+                      complete((StatusCodes.NotFound, performed))
+                    }
+                  }
+                }
+              })
+            //#post-sparkapp
+          }
+        )
+      }
+      //}
+    }
+  }
+
   @DELETE
   @Path("/datasets/{orgId}/{DatasetID}")
   //@QueryParam("dataViewName") dataViewName: String
@@ -208,7 +270,93 @@ class MetricsRoutes(metricsRegistry: ActorRef[MetricsRegistry.Command])(implicit
     }
   }
 
+  @DELETE
+  @Path("/analysis/{orgId}/{AnalysisID}")
+  //@QueryParam("dataViewName") dataViewName: String
+  //@QueryParam("publishedDataViewName")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  @Operation(summary = "Delete Datasets metrics ", description = "Delete Datasets metrics", tags = Array("Metrics"),
+    parameters = Array(
+      new Parameter(name = "orgId", in = ParameterIn.PATH, description = "orgId where the datasource is stored"),
+      new Parameter(name = "AnalysisID", in = ParameterIn.PATH, description = "AnalysisID to be retrieve")
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "response",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedDeleteMetrics])))),
+      new ApiResponse(responseCode = "404", description = "response",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedDeleteMetrics])))),
+      new ApiResponse(responseCode = "500", description = "Internal server error",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedDeleteMetrics]))))
+    )
+  )
+  def deleteAnalysisMetricsRoute: Route = {
+    cors() {
+      path("metrics" / "analysis" / Segment / Segment) { (orgid, analysisId) =>
+        delete {
+          //parameters("dataview", "publishedview") { (dataview, publishedview) =>
+          //#delete-sparkapp
+          onSuccess(deleteMetricsAS(orgid.toLowerCase, analysisId)) { performed =>
+            if (performed.code == 0) {
+              complete((StatusCodes.OK, performed))
+            } else if (performed.code == 404) {
+              complete((StatusCodes.NotFound, performed))
+            } else {
+              complete((StatusCodes.BadGateway, performed))
+            }
+
+            //delete-onsuccess
+          }
+          //}
+          //#delete-sparkapp
+        }
+      }
+    }
+  }
+
   @GET
+  @Path("/analysis/{orgId}/{AnalysisID}")
+  //@QueryParam("dataViewName") dataViewName: String
+  //@QueryParam("publishedDataViewName")
+  @Produces(Array(MediaType.APPLICATION_JSON))
+  @Operation(summary = "Get Datasets metrics", description = "Get Datasets metrics", tags = Array("Metrics"),
+    parameters = Array(
+      new Parameter(name = "orgId", in = ParameterIn.PATH, description = "orgId where the datasource is stored"),
+      new Parameter(name = "AnalysisID", in = ParameterIn.PATH, description = "dataSourceName to be retrieve")
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "response",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedRenderedMetricsAS])))),
+      new ApiResponse(responseCode = "404", description = "response",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedRenderedMetricsAS])))),
+      new ApiResponse(responseCode = "500", description = "Internal server error",
+        content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedRenderedMetricsAS]))))
+    )
+  )
+  def getAnalysisMetricsRoute: Route = {
+    cors() {
+      path("metrics" / "analysis" / Segment / Segment) { (orgid, analysisId) =>
+        get {
+          //parameters("dataview", "publishedview") { (dataview, publishedview) =>
+          //#delete-sparkapp
+          onSuccess(getMetricsAS(orgid.toLowerCase, analysisId)) { performed =>
+            if (performed.code == 0) {
+              complete((StatusCodes.OK, performed))
+            } else if (performed.code == 404) {
+              complete((StatusCodes.NotFound, performed))
+            } else {
+              complete((StatusCodes.BadGateway, performed))
+            }
+
+            //delete-onsuccess
+          }
+          //}
+          //#delete-sparkapp
+        }
+      }
+    }
+  }
+
+ /* @GET
   @Path("/analysis/{orgId}/{AnalysisID}")
   @Produces(Array(MediaType.APPLICATION_JSON))
   @Operation(summary = "Get Analysis metrics", description = "Get Analysis metrics", tags = Array("Metrics"),
@@ -245,7 +393,7 @@ class MetricsRoutes(metricsRegistry: ActorRef[MetricsRegistry.Command])(implicit
         }
       }
     }
-  }
+  }*/
 
 
 }

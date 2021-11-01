@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Dataset, DatasetDataSource, DatasetWizard } from 'src/app/models_ui/dataset';
+import { DatasetSource } from 'src/app/backend/model/datasetSource';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
 import { ParsingService } from 'src/app/service/parsing.service';
@@ -11,17 +11,17 @@ import { ParsingService } from 'src/app/service/parsing.service';
 })
 
 export class DatasetParseCsvComponent implements OnInit {
-  @Input() data: Dataset;
-  @Input() wizard: DatasetWizard;
+
+  @Input() dataSource: DatasetSource;
+  @Input() numberRowsForPreview: number;
   @Input() file: File;
   @Output() handlePreviewData: EventEmitter<any> = new EventEmitter<any>();
+  @Output() updateNumberRowsForPreview: EventEmitter<any> = new EventEmitter<any>();
 
   public encodingOptions;
 
   public columnSeparator: string;
   public customColumnSeparator = '';
-
-  public dataSource: DatasetDataSource;
 
   constructor(
     protected datasetService: DatasetService,
@@ -29,34 +29,29 @@ export class DatasetParseCsvComponent implements OnInit {
     protected csvService: CsvService) { }
 
   ngOnInit(): void {
-    this.dataSource = this.data.Dataset_Source;
     const supportedEncoding = this.parsingService.getSupportEncoding();
     this.encodingOptions = supportedEncoding.map(ec => {return {label: ec, value: ec}});
     this.initColumnSeparator();
   }
 
-  public onChecked = (field, event): void => {
-    this.data[field]=event.checked;
-  }
-
   handleUpdate = (event, fieldName) => {
-    this.data.Dataset_Source[fieldName] = event.detail.value;
+    this.dataSource[fieldName] = event.detail.value;
+    this.clickedRefresh()
   }
 
-  handleUpdateWizard = (event, fieldName) => {
-    this.wizard[fieldName] = event.detail.value;
+  updateNumForRowsPreview = (event) => {
+    const value = event.detail.value;
+    this.updateNumberRowsForPreview.emit(value);
   }
 
   public clickedRefresh = (): void => {
-
     /**
      * Confirmed with Florent. The form of editing parsing option only shows if a csv file is uploaded when create/update dataset.
      * Even for a dataset created by uploading a csv file, when edit it, since in web UI that file handler is not there, so I cannot
      * let the user to change csv parsing options and refresh
      */
-
     if (this.file) {
-      const lines = this.wizard.numberRowsForPreview;
+      const lines = this.numberRowsForPreview;
       const config = {
         quoteChar: this.dataSource.FileQuoteChar,
         escapeChar: this.dataSource.FileEscapeChar,
@@ -91,6 +86,7 @@ export class DatasetParseCsvComponent implements OnInit {
       this.customColumnSeparator = value === 'other' ? this.customColumnSeparator: value;
       this.dataSource.FileSeparator = this.customColumnSeparator;
     }
+    this.clickedRefresh()
   }
 
   public handleEncodingSelection = ($event): void => {

@@ -1,13 +1,13 @@
-import { HttpClient, HttpEventType } from '@angular/common/http';
+import { HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { parse } from 'papaparse';
 import { forkJoin, Observable, of } from 'rxjs';
 import { concatMap, delay, filter, last, map, repeatWhen, take } from 'rxjs/operators';
-import { ActionPerformedLoginValidate, Schema } from '../models_ui/backend';
-import { Dataset, DatasetListItem, DatasetListItemArray } from '../models_ui/dataset';
-import { DiscoverBackendService } from './discover-backend.service';
-import { OauthService } from './oauth.service';
-
+import { CatalogService } from '../backend/api/catalog.service';
+import { Dataset } from '../backend/model/dataset';
+import { DatasetSource } from '../backend/model/datasetSource';
+import { SchemaTdv } from '../backend/model/schemaTdv';
+import { UnManageDataSetCopy } from '../backend/model/unManageDataSetCopy';
+import { DiscoverBackendService } from '../service/discover-backend.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,157 +15,39 @@ import { OauthService } from './oauth.service';
 
 export class DatasetService {
 
-  private baseUrl = 'https://discover.labs.tibcocloud.com/catalog';
-
   constructor(
-    private http: HttpClient,
-    private oService: OauthService,
-    protected backendService: DiscoverBackendService
+    protected backendService: DiscoverBackendService,
+    protected catalogService: CatalogService
   ) {
-    if (!oService.isCloud()) {
-      this.baseUrl = '/catalog';
-    }
   }
 
-  public getDatasets(): Observable<DatasetListItem[]> {
-    const url = '/datasets';
-    return this.callApi(url, 'get', null)
-      .pipe(
-        map(resp => {
-          return new DatasetListItemArray().deserialize(resp).listItems;
-        })
-      );
-  }
-
-  public getPreview = (id: string): Observable<any> => {
-    const url = '/dataset/preview/' + id;
-    return this.callApi(url, 'get', null).pipe(
-      map((resp: any) => {
-        return parse(resp.content, {header: true});
+  public uploadFileReturnProgress(dataSource: DatasetSource, file: File) {
+    return this.backendService.login().pipe(
+      concatMap((response: any) => {
+        if (file) {
+          // return this.catalogService.uploadCsvFile('\\r\\n', dataSource.FileSeparator, dataSource.FileQuoteChar, dataSource.Encoding, dataSource.FileEscapeChar, file, 'events', true).pipe(
+          return this.backendService.uploadFile(response.orgId, file, dataSource).pipe(
+            map((resp: any) => {
+              return {uploadFileResponse: resp};
+            })
+          );
+        } else {
+          return of({
+            uploadFileResponse: null
+          })
+        }
       })
-    );
+    )
   }
-
-  public createDataset(dataset: Dataset): Observable<any> {
-    const url = '/dataset';
-    return this.callApi(url, 'post', dataset);
-  }
-
-  public updateDataset(dataset: Dataset): Observable<any> {
-    const url = `/dataset/${dataset.Dataset_Id}`;
-    return this.callApi(url, 'put', dataset);
-
-  }
-
-  public getDataset(id: string): Observable<Dataset> {
-    const url = '/dataset/' + id;
-    return this.callApi(url, 'get', null)
-      .pipe(
-        map(resp => {
-          return new Dataset().deserialize(resp);
-        })
-      );
-  }
-
-  public deleteDataset(id: string) {
-    const url = `/dataset/${id}`;
-    return this.callApi(url, 'delete', null)
-      .pipe(
-        map(resp => {
-          return resp;
-        })
-      );
-  }
-
-  public isExist(name: string, id: string | null): Observable<any> {
-    const url = '/dataset/exist';
-    const body = {
-      Dataset_Name: name
-    };
-    if (id) {
-      body['Dataset_Id'] = id;
-    }
-    return this.callApi(url, 'post', body);
-  }
-
-  private callApi(url: string, method: string = 'GET', body: any = null) {
-    url = this.baseUrl + url;
-    const options = this.generateOptions();
-    if (method.toUpperCase() === 'POST') {
-      return this.http.post(url, body, options);
-    } else if (method.toUpperCase() === 'PUT') {
-      return this.http.put(url, body, options);
-    } else if (method.toUpperCase() === 'DELETE') {
-      return this.http.delete(url, options);
-    } else {
-      return this.http.get(url, options);
-    }
-  }
-
-  private generateOptions = () => {
-    return {
-      withCredentials: true
-    };
-  }
-
-  public localizeUrl(url: string): string {
-    url = url.replace(/\s/g, '');
-    url = url.replace(/^(http:\/\/|https:\/\/)/, '');
-    const p = url.indexOf('/');
-    if (p !== -1) {
-      url = url.substr(p + 1);
-    }
-    if (url.indexOf('/') !== 0) {
-      url = '/' + url;
-    }
-    return url;
-  }
-
-  public getStatus(id: string): Observable<any> {
-    const url = `/status/${id}`;
-    return this.callApi(url, 'get', null);
-  }
-
-  public saveDatasetAndPreview(dataset: Dataset): Observable<any> {
-    const url= '/dataset/preview';
-    return this.callApi(url, 'post', dataset);
-  }
-
-  public refreshPreview(datasetId: string): Observable<any> {
-    const url = `/preview/${datasetId}`;
-    return this.callApi(url, 'post', null);
-  }
-
-  public getCsvFiles(): Observable<any> {
-    const url = '/files';
-    return this.callApi(url, 'get');
-  }
-
-  public deleteCsvFile(filename: string): Observable<any> {
-    const url = `/files/${filename}`;
-    return this.callApi(url, 'delete');
-  }
-
-  public getCsvFilePreview(filename: string): Observable<any> {
-    const url = `/files/preview/${filename}`;
-    return this.callApi(url, 'get');
-  }
-
-  public getTdvData(id: string): Observable<any> {
-    const url = `/tdv/data/${id}`;
-    return this.callApi(url, 'get');
-  }
-
-  /* some service orchestration  */
 
   public uploadFile(dataset: Dataset, progress: any, file: File) {
     return this.backendService.login().pipe(
-      concatMap((response: ActionPerformedLoginValidate) => {
+      concatMap((response: any) => {
         if (file) {
           // upload file
           progress.status = 'Uploading csv file. Please don\'t close browser or refresh page';
           progress.percentage += 10;
-          return this.backendService.uploadFile(response.orgId, file, dataset.Dataset_Source).pipe(
+          return this.backendService.uploadFile(response.orgId, file, dataset.Dataset_Source as any).pipe(
             map((resp: any) => {
               if (resp.type === HttpEventType.Response && resp.ok) {
                 return {uploadFileResponse: resp.body, orgId: response.orgId.toLowerCase()};
@@ -184,22 +66,22 @@ export class DatasetService {
     )
   }
 
-  public uploadFileAndSaveDatasetAndPreview(dataset: Dataset, progress: any, file: File): Observable<Dataset> {
+
+  public uploadFileAndSaveDatasetAndPreview(dataset: Dataset, progress: any, file: File): Observable<any> {
     return this.uploadFile(dataset, progress, file).pipe(
       concatMap(resp => {
-        const orgId = resp.orgId;
         if (resp.uploadFileResponse) {
           dataset.Dataset_Source.FilePath = resp.uploadFileResponse.file;
         }
         const action = dataset.Dataset_Id ? 'Updating' : 'Creating';
         progress.status = `${action} data virtualization. Please don't close browser or refresh page`;
         progress.percentage += 10;
-        return this.saveDatasetAndPreview(dataset);
+        return this.catalogService.saveDatasetAndStartPreview(dataset);
       })
     ).pipe(
       concatMap(resp => {
         const datasetId = resp.datasetId;
-        return this.getStatus(datasetId).pipe(
+        return this.catalogService.getStatus(datasetId).pipe(
           repeatWhen(obs => obs.pipe(delay(1000))),
           filter(data => {
             if (data.Progression !== 0) {
@@ -214,7 +96,7 @@ export class DatasetService {
     ).pipe(
       concatMap((resp) => {
         const datasetId = resp.DatasetID;
-        return this.getDataset(datasetId).pipe(
+        return this.catalogService.getDataset(datasetId).pipe(
           repeatWhen(obs => obs.pipe(delay(1000))),
           filter(data => data.status === 'COMPLETED' || data.status === 'FAILED' || data.status === 'SUBMISSION_FAILED'),
           take(1)
@@ -224,7 +106,7 @@ export class DatasetService {
   }
 
   public pollPreviewStatus(datasetId: string, progress: any): Observable<any> {
-    return this.getStatus(datasetId).pipe(
+    return this.catalogService.getStatus(datasetId).pipe(
       repeatWhen(obs => obs.pipe(delay(2000))),
       filter(data => {
         if (data.Progression !== 0) {
@@ -239,9 +121,9 @@ export class DatasetService {
         const sparkAppName = resp.JobName;
         if (sparkAppName) {
           // the preview is already deleted, so no way to check final status from it, should check dataset detail to get final status
-          return this.getDataset(datasetId).pipe(
+          return this.catalogService.getDataset(datasetId).pipe(
             repeatWhen(obs => obs.pipe(delay(1000))),
-            filter(data => progress.stop===true || (data.status==='COMPLETED' || data.status==='FAILED' || data.status==='SUBMISSION_FAILED')),
+            filter(data => progress.stop === true || (data.status === 'COMPLETED' || data.status === 'FAILED' || data.status === 'SUBMISSION_FAILED')),
             take(1)
           );
         } else {
@@ -255,7 +137,7 @@ export class DatasetService {
   }
 
   public refresh(datasetId: string, progress: any): Observable<any> {
-    return this.refreshPreview(datasetId).pipe(
+    return this.catalogService.refreshPreview(datasetId).pipe(
       concatMap(resp => {
         return of({});
       })
@@ -266,53 +148,49 @@ export class DatasetService {
     );
   }
 
+  private getPreviewDatasetId(dataset: Dataset): Observable<string> {
+    if (dataset.Dataset_Id) {
+      return of(dataset.Dataset_Id);
+    } else {
+      return this.catalogService.copyUnmanagedTdv({
+        DatasetName: dataset.TdvView.DatasetName,
+        Annotation: dataset.TdvView.Annotation,
+        DatasetPath: dataset.TdvView.DatasetPath
+      } as UnManageDataSetCopy).pipe(
+        map(datasetId => {
+          return datasetId
+        })
+      );
+    }
+  }
+
   public pullPreviewData(dataset: Dataset): Observable<any> {
-    if (dataset.type==='tdv') {
+    if (dataset.type === 'tdv') {
       if (dataset.TdvView) {
         // create from tdv view
-        return this.backendService.login().pipe(
+        return this.getPreviewDatasetId(dataset).pipe(
           concatMap(resp => {
-            const orgId = resp.orgId;
-            if (dataset.Dataset_Id) {
-              return of({
-                orgId,
-                datasetId: dataset.Dataset_Id
-              });
-            } else {
-              return this.backendService.copyUnmanagedTdv(orgId, dataset.TdvView).pipe(
-                map(copyResp => {
-                  return {
-                    orgId,
-                    datasetId: copyResp.DatasetId
-                  }
-                })
-              );
-            }
-          })
-        ).pipe(
-          concatMap(resp => {
-            const datasetId = resp.datasetId;
+            const datasetId = resp;
             dataset.Dataset_Id = datasetId;
-            const orgId = resp.orgId;
             return forkJoin([
-              this.backendService.getTdvData(orgId, datasetId),
-              this.backendService.getTdvMetaData(orgId, datasetId)
+              this.catalogService.getManagedCsvData(datasetId),
+              this.catalogService.getTdvMetaData(datasetId)
             ])
           })
         ).pipe(
           map(resp => {
             const dataResp = resp[0];
-            const schemas: Schema[] = resp[1];
+            const schemas: SchemaTdv[] = resp[1];
             const columns = this.convertTdvSchemaToColumns(schemas);
             return {
-              jsonData: dataResp.Data,
+              previewData: dataResp,
               columns
             }
           })
         );
       }
-    } else if (dataset.type==='csv') {
-      if (dataset.csvMethod==='file' && dataset.CsvFile) {
+    } else if (dataset.type === 'csv') {
+      if (dataset.csvMethod === 'file' && dataset.CsvFile) {
         dataset.Dataset_Source.Encoding = dataset.CsvFile.Encoding;
         dataset.Dataset_Source.FileEscapeChar = dataset.CsvFile.EscapeChar;
         dataset.Dataset_Source.FileName = dataset.CsvFile.OriginalFilename;
@@ -320,7 +198,7 @@ export class DatasetService {
         dataset.Dataset_Source.FileQuoteChar = dataset.CsvFile.QuoteChar;
         dataset.Dataset_Source.FileSeparator = dataset.CsvFile.Separator;
 
-        return this.getCsvFilePreview(dataset.CsvFile.OriginalFilename).pipe(
+        return this.catalogService.getUnmanagedCsvData(dataset.CsvFile.OriginalFilename).pipe(
           map(data => {
             if (data && data.length > 0) {
               return {
@@ -332,10 +210,9 @@ export class DatasetService {
             }
           })
         );
-      } else if (dataset.csvMethod==='upload' && dataset.Dataset_Id && dataset.Dataset_Source.FilePath) {
-        return this.getTdvData(dataset.Dataset_Id).pipe(
+      } else if (dataset.csvMethod === 'upload' && dataset.Dataset_Id && dataset.Dataset_Source.FilePath) {
+        return this.catalogService.getManagedCsvData(dataset.Dataset_Id).pipe(
           map(data => {
-            console.log(data);
             if (data && data.length > 0) {
               return {
                 previewData: data,
@@ -355,7 +232,7 @@ export class DatasetService {
     }
   }
 
-  private convertTdvSchemaToColumns(schema: Schema[]) {
+  private convertTdvSchemaToColumns(schema: SchemaTdv[]) {
     return schema.map(s => s.COLUMN_NAME);
   }
 
@@ -363,19 +240,19 @@ export class DatasetService {
   private getColumnsFromRowData(rowData: string): any[] {
     try {
       let jsonRowData;
-      if (typeof rowData==='string') {
+      if (typeof rowData === 'string') {
         jsonRowData = JSON.parse(rowData);
       } else {
         jsonRowData = rowData;
       }
       const cols = [];
-      for(const col in jsonRowData) {
-        if(col) {
+      for (const col in jsonRowData) {
+        if (col) {
           cols.push(col);
         }
       }
       return cols;
-    } catch(error) {
+    } catch (error) {
       console.error('The data of csv is invalid JSON string');
       return [];
     }

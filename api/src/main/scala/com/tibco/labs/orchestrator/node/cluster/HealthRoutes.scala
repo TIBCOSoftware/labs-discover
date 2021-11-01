@@ -8,7 +8,8 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 
-import javax.ws.rs._
+import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 
 
 //#import-json-formats

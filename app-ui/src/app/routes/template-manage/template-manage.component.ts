@@ -6,9 +6,9 @@ import {CardMode} from '../../models_ui/configuration';
 import {MatDialogRef} from '@angular/material/dialog';
 import {YesnoConfirmationComponent} from 'src/app/components/yesno-confirmation/yesno-confirmation.component';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
-import {RepositoryService} from 'src/app/api/repository.service';
-import {VisualisationService} from 'src/app/api/visualisation.service';
-import {Template} from 'src/app/model/template';
+import {RepositoryService} from 'src/app/backend/api/repository.service';
+import {VisualisationService} from 'src/app/backend/api/visualisation.service';
+import {Template} from 'src/app/backend/model/template';
 import {compareTemplates} from '../../functions/templates';
 
 @Component({

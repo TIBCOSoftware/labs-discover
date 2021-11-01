@@ -20,12 +20,12 @@
 }
 
 .banner-float, .banner-float > * {
-  z-index: 1500;
+  /*z-index: 1500;*/
 }
 
 ::ng-deep uxpl-notification::part(notification) {
   width: auto;
-  
+
 }
 
 /* :host ::ng-deep .tc-notifications-message {

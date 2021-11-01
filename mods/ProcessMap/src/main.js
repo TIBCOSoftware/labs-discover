@@ -6,6 +6,11 @@
 
 //@ts-check - Get type warnings from the TypeScript language server. Remove if not wanted.
 
+let previousCy = null;
+let previousElements = null;
+let markedRows = [];
+let markingColor = "#B73EAB";
+
 /**
  * Get access to the Spotfire Mod API by providing a callback to the initialize method.
  * @param {Spotfire.Mod} mod - mod api
@@ -13,13 +18,11 @@
 Spotfire.initialize(async mod => {
 
     const context = mod.getRenderContext();
-    const { tooltip, popout } = mod.controls;
-    const section = popout.section;
-    const { radioButton, checkbox } = popout.components;
+    const { tooltip } = mod.controls;
 
-    let previousElements = null;
+
     /** @type {{cy: cytoscape.Core, layout: cytoscape.Layouts}} */
-    let previousCy = null;
+
 
     /**
      * Wrap a reader with an additional method called `hasChanged`.
@@ -58,7 +61,6 @@ Spotfire.initialize(async mod => {
      */
     const configChangeReader = readerWithChangeChecker(
         mod.createReader(
-            mod.property("labelConfig"),
             mod.property("layout"),
             mod.property("nodeShape")
         )
@@ -70,7 +72,8 @@ Spotfire.initialize(async mod => {
             mod.visualization.axis("Source"),
             mod.visualization.axis("Target"),
             mod.visualization.axis("Color"),
-            mod.visualization.axis("Tooltip"),
+            mod.visualization.axis("Labels"),
+            mod.visualization.axis("Size by"),
             mod.visualization.axis("Column Names"),
             mod.visualization.axis("Datasets")
         )
@@ -99,17 +102,14 @@ Spotfire.initialize(async mod => {
 
     /**
      * On Config change
-     * @param {Spotfire.ModProperty<string>} labelConfig
      * @param {Spotfire.ModProperty<string>} selectedLayout
      * @param {Spotfire.ModProperty<string>} nodeShape
      */
-    function onConfigChange(labelConfig, selectedLayout, nodeShape) {
+    function onConfigChange(selectedLayout, nodeShape) {
         if (!previousCy) {
             return;
         }
-        if (configChangeReader.hasValueChanged(labelConfig)) {
-            updateLabels(labelConfig.value().split(";"));
-        }
+
         if (configChangeReader.hasValueChanged(selectedLayout)) {
             let layout = previousCy.cy.layout(getCytoscapeLayout(selectedLayout.value()));
             layout.run();
@@ -127,30 +127,35 @@ Spotfire.initialize(async mod => {
      * @param {Spotfire.Axis} srcAxis
      * @param {Spotfire.Axis} tgtAxis
      * @param {Spotfire.Axis} colorAxis
+     * @param {Spotfire.Axis} labelsAxis
+     * @param {Spotfire.Axis} sizeByAxis
      * @param {Spotfire.Axis} colNamesAxis
      * @param {Spotfire.Axis} subsetsAxis
-     * @param {Spotfire.Axis} tooltipAxis
      */
-    async function onDataChange(dataView, srcAxis, tgtAxis, colorAxis, tooltipAxis, colNamesAxis, subsetsAxis) {
-            try {
-                // Check if any error
-                let errors = await dataView.getErrors();
-                if (errors && errors.length > 0) {
-                    onError(errors);
-                    return;
-                }
-
-                let isAxisConfigOK = checkInputs(srcAxis, tgtAxis, colorAxis, tooltipAxis, colNamesAxis, subsetsAxis);
-                if (isAxisConfigOK) {
-                    await renderCore(dataView);
-                }
-
-                mod.controls.errorOverlay.hide("DataView");
-
-            } catch (error) {
-                //mod.controls.errorOverlay.show(["Graph rendering failed.", error.message || error], "DataView");
-                console.error(error);
+    async function onDataChange(dataView, srcAxis, tgtAxis, colorAxis, labelsAxis, sizeByAxis, colNamesAxis, subsetsAxis) {
+        try {
+            // Check if any error
+            let errors = await dataView.getErrors();
+            if (errors && errors.length > 0) {
+                onError(errors);
+                checkInputs(srcAxis, tgtAxis, colorAxis, labelsAxis, sizeByAxis, colNamesAxis, subsetsAxis);
+                return;
             }
+
+            // Set marking color 
+            markingColor = (await dataView.marking()).colorHexCode;
+
+            let isAxisConfigOK = checkInputs(srcAxis, tgtAxis, colorAxis, labelsAxis, sizeByAxis, colNamesAxis, subsetsAxis);
+            if (isAxisConfigOK) {
+                await renderCore(dataView);
+            }
+
+            mod.controls.errorOverlay.hide("DataView");
+
+        } catch (error) {
+            mod.controls.errorOverlay.show(["Graph rendering failed." /*, error.message || error*/], "DataView");
+            console.error(error);
+        }
 
 
 
@@ -170,36 +175,37 @@ Spotfire.initialize(async mod => {
         previousCy = null;
         previousElements = null;
 
-        // If error is relevant to subsets or Column Names, then fix axis expression 
-        // TODO : should i call checkInputs directly instead?
-        let resetSubsets = false;
-        let resetColNames = false;
-        errorMessages.forEach(errorMessage => {
-            if (errorMessage.includes("(Subsets) must be selected on a categorical axis.")) {
-                resetSubsets = true;
-            } else if (errorMessage.includes("'(Column Names)' must be used on a categorical axis")) {
-                resetColNames = true;
-            }
-        });
+        mod.controls.errorOverlay.show(errorMessages, "dataView");
 
-        if (resetSubsets || resetColNames) {
-            mod.transaction(() => {
-                if (resetSubsets) {
-                    console.log("Resetting Datasets axis.");
-                    // Setting "(Subsets)" on the Datasets axis
-                    const subsetsAxis = mod.visualization.axis("Datasets");
-                    subsetsAxis.setExpression("<[Axis.Subsets.Names]>");
-                }
-                if (resetColNames) {
-                    console.log("Resetting Column Names axis.");
-                    // Setting "(Column Names)" on the Column Names axis
-                    const colNamesAxis = mod.visualization.axis("Column Names");
-                    colNamesAxis.setExpression("<[Axis.Default.Names]>");
-                }
-            });
-        } else {
-            mod.controls.errorOverlay.show(errorMessages, "DataView");
-        }
+        // If error is relevant to subsets or Column Names, then fix axis expression 
+        // let resetSubsets = false;
+        // let resetColNames = false;
+        // errorMessages.forEach(errorMessage => {
+        //     if (errorMessage.includes("(Subsets) must be selected on a categorical axis.")) {
+        //         resetSubsets = true;
+        //     } else if (errorMessage.includes("'(Column Names)' must be used on a categorical axis")) {
+        //         resetColNames = true;
+        //     }
+        // });
+
+        // if (resetSubsets || resetColNames) {
+        //     mod.transaction(() => {
+        //         if (resetSubsets) {
+        //             console.log("Resetting Datasets axis.");
+        //             // Setting "(Subsets)" on the Datasets axis
+        //             const subsetsAxis = mod.visualization.axis("Datasets");
+        //             subsetsAxis.setExpression("<[Axis.Subsets.Names]>");
+        //         }
+        //         if (resetColNames) {
+        //             console.log("Resetting Column Names axis.");
+        //             // Setting "(Column Names)" on the Column Names axis
+        //             const colNamesAxis = mod.visualization.axis("Column Names");
+        //             colNamesAxis.setExpression("<[Axis.Default.Names]>");
+        //         }
+        //     });
+        // } else {
+        //     mod.controls.errorOverlay.show(errorMessages, "DataView");
+        // }
     }
 
     /**
@@ -211,7 +217,8 @@ Spotfire.initialize(async mod => {
      */
     function checkInputs(...axes) {
         let resetSubsetsAxis = false;
-        let resetColNamesAxis = false;
+        let isSetColNames = true;
+        let isReqColNames = false;
 
         /** @type {Spotfire.Axis[]} */
         let axesToModify = [];
@@ -219,7 +226,7 @@ Spotfire.initialize(async mod => {
             switch (axis.name) {
                 case "Column Names": //TODO: use variable for axis names?
                     if (axis.expression !== "<[Axis.Default.Names]>") {
-                        resetColNamesAxis = true;
+                        isSetColNames = false;
                     }
                     break;
                 case "Datasets":
@@ -228,26 +235,41 @@ Spotfire.initialize(async mod => {
                     }
                     break;
                 default:
-                    // Find axes that contain "[Axis.Default.Names]" or "[Axis.Subsets.Names]"
-                    if (axis.expression.includes("[Axis.Default.Names]")
-                        || axis.expression.includes("[Axis.Subsets.Names]")) {
-                        axesToModify.push(axis);
+                    if (axis.isCategorical) {
+                        // Find axes that contain "[Axis.Default.Names]" or "[Axis.Subsets.Names]"
+                        if (axis.expression.includes("[Axis.Default.Names]")
+                            || axis.expression.includes("[Axis.Subsets.Names]")) {
+                            axesToModify.push(axis);
+                        }
+                    } else { // Continuous axis
+                        if(axis.parts.length > 1){
+                            isReqColNames = true;
+                        }
                     }
+
             }
         });
 
+
         // Modify axes expressions outside of the loop
+        let isAxisConfigOK = true;
         mod.transaction(() => {
             if (resetSubsetsAxis) {
                 console.warn("Resetting Datasets axis.");
-                let subsetsAxis = axes.find(axis => axis.name === "Datasets");
-                subsetsAxis.setExpression("<[Axis.Subsets.Names]>");
+                mod.visualization.axis("Datasets").setExpression("<[Axis.Subsets.Names]>");
+                isAxisConfigOK = false;
             }
-            if (resetColNamesAxis) {
+            if (isReqColNames && !isSetColNames) {
                 console.warn("Resetting Column Names axis.");
-                let colNamesAxis = axes.find(axis => axis.name === "Column Names");
-                colNamesAxis.setExpression("<[Axis.Default.Names]>");
+                mod.visualization.axis("Column Names").setExpression("<[Axis.Default.Names]>");
+                isAxisConfigOK = false;
+            } else {
+                if(!isReqColNames && isSetColNames){
+                    mod.visualization.axis("Column Names").setExpression("<>");
+                    isAxisConfigOK = false;
+                }
             }
+
             axesToModify.forEach(axis => {
                 console.warn("Axis " + axis.name + " contains either (Subsets) or (Column Names). Resetting it.");
                 let expression = axis.expression;
@@ -257,14 +279,11 @@ Spotfire.initialize(async mod => {
                 expression = expression.replace(" NEST >", ">");
 
                 axis.setExpression(expression);
+                isAxisConfigOK = false;
             });
         });
 
-        if (resetSubsetsAxis || resetColNamesAxis || axesToModify.length > 0) {
-            return false;
-        }
-
-        return true;
+        return isAxisConfigOK;
 
         // TODO: Check number of columns in Source & Target Axes ?
         // TODO: Check for empty axis? 
@@ -281,9 +300,6 @@ Spotfire.initialize(async mod => {
      */
     async function renderCore(dataView) {
 
-        let tooltipAxis = await mod.visualization.axis("Tooltip");
-        /** @type string */
-        let labelConfig = (await mod.property("labelConfig")).value();
         /** @type string */
         let selectedLayout = (await mod.property("layout")).value();
         /** @type string */
@@ -291,7 +307,7 @@ Spotfire.initialize(async mod => {
 
 
         // Get nodes & edges from rows
-        let allElements = await getElements(dataView, labelConfig.split(";"));
+        let allElements = await getElements(dataView);
 
         let subsets = Object.keys(allElements);
         let elements;
@@ -309,9 +325,9 @@ Spotfire.initialize(async mod => {
         } else if (allElements["Compliance"]) {
             elements = allElements["Compliance"];
         } else {
-            if(subsets.includes("Current Filtering")){
+            if (subsets.includes("Current Filtering")) {
                 elements = allElements["Current Filtering"];
-            }else{
+            } else {
                 elements = allElements[subsets[0]];
             }
         }
@@ -319,7 +335,7 @@ Spotfire.initialize(async mod => {
         if (!Array.isArray(elements) || elements.length == 0) {
             // Empty visualization
             document.getElementById("visualization").innerHTML = "";
-            previousElements = elements;
+            previousElements = null;
             return;
         }
 
@@ -334,18 +350,21 @@ Spotfire.initialize(async mod => {
             newElements = elements;
         }
 
-        if (sameGraph(newElements, previousElements) && previousCy) {
-            // Try to update current graph 
-            if(updateGraph(previousCy.cy, elements, dataView, selectedLayout, nodeShape)){
-                refCy = previousCy;
-            }else{
-                refCy = renderGraph(elements, dataView, tooltipAxis, labelConfig, selectedLayout, nodeShape, allElements["Not in Current Filtering"]);
-            }
-            
-        } else {
-            // recreate graph
-            refCy = renderGraph(elements, dataView, tooltipAxis, labelConfig, selectedLayout, nodeShape, allElements["Not in Current Filtering"]);
-        }
+        // TODO : Check if grouping is same
+        // if (sameGraph(newElements, previousElements) && previousCy) {
+        //     // Try to update current graph 
+        //     if(updateGraph(previousCy.cy, elements, dataView, selectedLayout, nodeShape)){
+        //         refCy = previousCy;
+        //     }else{
+        //         refCy = renderGraph(elements, dataView, tooltipAxis, labelConfig, selectedLayout, nodeShape, allElements["Not in Current Filtering"]);
+        //     }
+
+        // } else {
+        //     // recreate graph
+        //     refCy = renderGraph(elements, dataView, tooltipAxis, labelConfig, selectedLayout, nodeShape, allElements["Not in Current Filtering"]);
+        // }
+
+        refCy = renderGraph(elements, dataView, selectedLayout, nodeShape, allElements["Not in Current Filtering"]);
 
         previousCy = refCy;
         previousElements = newElements;
@@ -367,32 +386,32 @@ Spotfire.initialize(async mod => {
      * Update edge labels
      * @param {string[]} selectedLabels
      */
-    function updateLabels(selectedLabels) {
-        if (!previousCy) {
-            return;
-        }
+    // function updateLabels(selectedLabels) {
+    //     if (!previousCy) {
+    //         return;
+    //     }
 
-        previousCy.cy.edges().forEach(edge => {
-            let tooltip = edge.data("tooltip");
-            let rows = tooltip.split("\n");
-            let label = "";
-            for (let j = 0, nbTokens = rows.length; j < nbTokens; j++) {
-                let index = rows[j].indexOf(":");
-                if (index === -1) {
-                    continue;
-                }
-                let key = rows[j].substring(0, index);
-                if (selectedLabels.includes(key.trim())) {
-                    let value = rows[j].substring(index + 1).trim();
-                    label = "" ? label = value : label += "\n" + value;
-                }
-            }
+    //     previousCy.cy.edges().forEach(edge => {
+    //         let tooltip = edge.data("tooltip");
+    //         let rows = tooltip.split("\n");
+    //         let label = "";
+    //         for (let j = 0, nbTokens = rows.length; j < nbTokens; j++) {
+    //             let index = rows[j].indexOf(":");
+    //             if (index === -1) {
+    //                 continue;
+    //             }
+    //             let key = rows[j].substring(0, index);
+    //             if (selectedLabels.includes(key.trim())) {
+    //                 let value = rows[j].substring(index + 1).trim();
+    //                 label = "" ? label = value : label += "\n" + value;
+    //             }
+    //         }
 
-            if (label.length > 0) {
-                edge.data("label", label);
-            }
-        });
-    }
+    //         if (label.length > 0) {
+    //             edge.data("label", label);
+    //         }
+    //     });
+    // }
 
     /**
      * @param {cytoscape.Core} cy
@@ -406,14 +425,14 @@ Spotfire.initialize(async mod => {
             if (ele && ele.group && ele.data) {
                 if (ele.group === "nodes") {
                     let node = cy.nodes('[id = "' + ele.data.id + '"]')[0];
-                    if(!node){ // node not found
+                    if (!node) { // node not found
                         return false; // Update aborted
                     }
                     node.data(ele.data);
                     node.scratch("_spotfire", ele.scratch._spotfire);
                 } else {
                     let edge = cy.edges('[source = "' + ele.data.source + '"][target = "' + ele.data.target + '"]')[0];
-                    if(!edge){ // edge not found
+                    if (!edge) { // edge not found
                         return false; // Update aborted
                     }
                     edge.data(ele.data);
@@ -499,14 +518,12 @@ Spotfire.initialize(async mod => {
      * 
      * @param {any[]} elements
      * @param {Spotfire.DataView} dataView 
-     * @param {Spotfire.Axis} tooltipAxis
-     * @param {string} labelConfig
      * @param {string} selectedLayout
      * @param {string} nodeShape
      * @param {any[]} filteredElements
      * @returns {{cy: cytoscape.Core, layout: cytoscape.Layouts}}
      */
-    function renderGraph(elements, dataView, tooltipAxis, labelConfig, selectedLayout, nodeShape, filteredElements = null) {
+    function renderGraph(elements, dataView, selectedLayout, nodeShape, filteredElements = null) {
 
         elements = filterValidElements(elements, filteredElements);
         normalizeSizeBy(elements);
@@ -556,200 +573,354 @@ Spotfire.initialize(async mod => {
         /** @ts-ignore */
         cy.panzoom(panzoomConfig);
 
+        var options = {
+            layoutBy: getCytoscapeLayout(selectedLayout), // to rearrange after expand/collapse. It's just layout options or whole layout function. Choose your side!
+            // recommended usage: use cose-bilkent layout with randomize: false to preserve mental map upon expand/collapse
+            fisheye: true, // whether to perform fisheye view after expand/collapse you can specify a function too
+            animate: false, // whether to animate on drawing changes you can specify a function too
+            animationDuration: 500, // when animate is true, the duration in milliseconds of the animation
+            ready: function () { }, // callback when expand/collapse initialized
+            undoable: false, // and if undoRedoExtension exists,
 
-        // Init drag and drop 
-        // const options = {
-        //     grabbedNode: node => true, // filter function to specify which nodes are valid to grab and drop into other nodes
-        //     dropTarget: node => true, // filter function to specify which parent nodes are valid drop targets
-        //     dropSibling: node => true, // filter function to specify which orphan nodes are valid drop siblings
-        //     newParentNode: (grabbedNode, dropSibling) => ({}), // specifies element json for parent nodes added by dropping an orphan node on another orphan (a drop sibling)
-        //     overThreshold: 10, // make dragging over a drop target easier by expanding the hit area by this amount on all sides
-        //     outThreshold: 10 // make dragging out of a drop target a bit harder by expanding the hit area by this amount on all sides
-        //   };
+            cueEnabled: false, // Whether cues are enabled
+            expandCollapseCuePosition: 'top-left', // default cue position is top left you can specify a function per node too
+            expandCollapseCueSize: 12, // size of expand-collapse cue
+            expandCollapseCueLineSize: 8, // size of lines used for drawing plus-minus icons
+            expandCueImage: undefined, // image of expand icon if undefined draw regular expand cue
+            collapseCueImage: undefined, // image of collapse icon if undefined draw regular collapse cue
+            expandCollapseCueSensitivity: 1, // sensitivity of expand-collapse cues
+            edgeTypeInfo: "edgeType", // the name of the field that has the edge type, retrieved from edge.data(), can be a function, if reading the field returns undefined the collapsed edge type will be "unknown"
+            groupEdgesOfSameTypeOnCollapse: true, // if true, the edges to be collapsed will be grouped according to their types, and the created collapsed edges will have same type as their group. if false the collapased edge will have "unknown" type.
+            allowNestedEdgeCollapse: true, // when you want to collapse a compound edge (edge which contains other edges) and normal edge, should it collapse without expanding the compound first
+            zIndex: 999 // z-index value of the canvas in which cue ımages are drawn
+        };
+        // @ts-ignore
+        var collapseExpandApi = cy.expandCollapse(options)
+        collapseExpandApi.collapseAll();
+        // collapseExpandApi.collapseAllEdges();
 
-        // // @ts-ignore
-        // const cdnd = cy.compoundDragAndDrop(options);
-
-        // var isParentOfOneChild = function(node){
-        //     return node.isParent() && node.children().length === 1;
-        //   };
-  
-        //   var removeParent = function(parent){
-        //     parent.children().move({ parent: null });
-        //     parent.remove();
-        //   };
-
-        // cy.on('cdndout', function(event, dropTarget){
-        //     if( isParentOfOneChild(dropTarget) ){
-        //       removeParent(dropTarget);
-        //     }
-        // });
-
-        /******** Event Handlers ********/
-        // Selection or de-selection of elements in the graph
-        cy.on('select unselect', function (evt) {
-            // elements selected
-            let eles = cy.elements(':selected');
-            if (eles.length > 0) {
-                mod.transaction(() => {
-                    eles.forEach(element => {
-                        let scratch = element.scratch("_spotfire");
-                        if(scratch && scratch.row){
-                            scratch.row.mark();
+        // Adds the context menu
+        // @ts-ignore
+        var contextMenu = cy.contextMenus({
+            menuItems: [
+                {
+                    id: 'filtering',
+                    content: 'Filtering',
+                    tooltipText: 'Apply filters',
+                    selector: 'node, edge',
+                    coreAsWell: true,
+                    show: true,
+                    submenu: [
+                        {
+                            id: 'filter-events',
+                            content: 'Filter cases',
+                            //tooltipText: 'Filter cases',
+                            submenu: [
+                                {
+                                    id: 'filter-in-events',
+                                    content: 'Filter in',
+                                    //tooltipText: 'Filter in',
+                                    onClickFunction: function (event) {
+                                        applyFilter("cases", "in");
+                                    }
+                                },
+                                {
+                                    id: 'filter-out-events',
+                                    content: 'Filter out',
+                                    //tooltipText: 'Filter out',
+                                    onClickFunction: function (event) {
+                                        applyFilter("cases", "out");
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            id: 'filter-cases',
+                            content: 'Filter events',
+                            //tooltipText: 'Filter events',
+                            submenu: [
+                                {
+                                    id: 'filter-in-events',
+                                    content: 'Filter in',
+                                    //tooltipText: 'Filter in',
+                                    onClickFunction: function (event) {
+                                        applyFilter("events", "in");
+                                    }
+                                },
+                                {
+                                    id: 'filter-out-events',
+                                    content: 'Filter out',
+                                    //tooltipText: 'Filter out',
+                                    onClickFunction: function (event) {
+                                        applyFilter("events", "out");
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            id: 'filter-reset',
+                            content: 'Reset filters',
+                            //tooltipText: 'Reset filters',
+                            onClickFunction: function (event) {
+                                previousCy.cy.scratch("_spotfire").clearMarking();
+                            }
                         }
-                    });
-                });
-            }
-
+                    ]
+                },
+                {
+                    id: 'grouping',
+                    content: 'Grouping',
+                    tooltipText: 'Expend or collapse groups',
+                    selector: 'node, edge',
+                    coreAsWell: true,
+                    show: true,
+                    submenu: [
+                        {
+                            id: 'expand-all',
+                            content: 'Expand all',
+                            onClickFunction: function (event) {
+                                let api = previousCy.cy.expandCollapse('get');
+                                api.expandAllEdges();
+                                api.expandAll();
+                            }
+                        },
+                        {
+                            id: 'collapse-all',
+                            content: 'Collapse all',
+                            onClickFunction: function (event) {
+                                let api = previousCy.cy.expandCollapse('get');
+                                api.collapseAll();
+                                api.collapseAllEdges();
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 'layout',
+                    content: 'Layout',
+                    tooltipText: 'Select layout',
+                    selector: 'node, edge',
+                    coreAsWell: true,
+                    show: true,
+                    submenu: [ // TODO : auto generate based on output of getCytoscapeLayouts() function
+                        {
+                            id: 'layout-cose',
+                            content: 'Cose',
+                            tooltipText: 'Cose layout',
+                            onClickFunction: function (event) {
+                                mod.property("layout").set("cose");
+                            }
+                        },
+                        {
+                            id: 'layout-dagre',
+                            content: 'Dagre',
+                            tooltipText: 'Dagre layout',
+                            onClickFunction: function (event) {
+                                mod.property("layout").set("dagre");
+                            }
+                        },
+                        {
+                            id: 'layout-breadthfirst',
+                            content: 'Breadthfirst',
+                            tooltipText: 'Breadthfirst layout',
+                            onClickFunction: function (event) {
+                                mod.property("layout").set("breadthfirst");
+                            }
+                        },
+                        {
+                            id: 'layout-elk',
+                            content: 'ELK',
+                            tooltipText: 'ELK layout',
+                            onClickFunction: function (event) {
+                                mod.property("layout").set("elk");
+                            }
+                        },
+                        {
+                            id: 'layout-concentric',
+                            content: 'Concentric',
+                            tooltipText: 'Concentric layout',
+                            onClickFunction: function (event) {
+                                mod.property("layout").set("concentric");
+                            }
+                        }
+                    ]
+                },
+                {
+                    id: 'node-shape',
+                    content: 'Node shape',
+                    tooltipText: 'Select node shape',
+                    selector: 'node, edge',
+                    coreAsWell: true,
+                    show: true,
+                    submenu: [
+                        {
+                            id: 'shape-rectangle',
+                            content: 'Round rectangle',
+                            tooltipText: 'Round rectangle',
+                            onClickFunction: function (event) {
+                                mod.property("nodeShape").set("round-rectangle");
+                            }
+                        },
+                        {
+                            id: 'shape-ellipse',
+                            content: 'Ellipse',
+                            tooltipText: 'Ellipse layout',
+                            onClickFunction: function (event) {
+                                mod.property("nodeShape").set("ellipse");
+                            }
+                        }
+                    ],
+                    hasTrailingDivider: true
+                },
+                //   {
+                //     id: 'export',
+                //     content: 'Export',
+                //     tooltipText: 'Export graph',
+                //     selector: 'node, edge',
+                //     coreAsWell: true,
+                //     show: true,
+                //       submenu: [
+                //           {
+                //               id: 'json',
+                //               content: 'JSON',
+                //               tooltipText: 'Round rectangle',
+                //               onClickFunction: function (event) {
+                //                   mod.property("nodeShape").set("round-rectangle");
+                //               }
+                //           },
+                //           {
+                //               id: 'xml',
+                //               content: 'XML',
+                //               tooltipText: 'Ellipse layout',
+                //               onClickFunction: function (event) {
+                //                     mod.property("nodeShape").set("ellipse");
+                //               }
+                //           }
+                //       ],
+                //       hasTrailingDivider: true
+                //   },
+                {
+                    id: 'spotfire-contextmenu',
+                    content: 'Show Spotfire context menu',
+                    tooltipText: 'Show Spotfire context menu',
+                    selector: 'node, edge',
+                    coreAsWell: true,
+                    show: true,
+                    onClickFunction: function (event) {
+                        // @ts-ignore
+                        showSpotfireCntxtMenu();
+                    }
+                }
+            ],
+            // Indicates that the menu item has a submenu. If not provided default one will be used
+            submenuIndicator: { src: 'pl-icon-caret-right.svg', width: 12, height: 12 }
         });
 
-        // Clear marking & hide tooltip when background is clicked
-        cy.on('tap', function (evt) {
-            if (evt.target === cy) {
-                // clicked on background
-                // dataView.clearMarking();
-                cy.scratch("_spotfire").clearMarking();
-                tooltip.hide(); // TODO : This was added because tooltips were sometimes not hidden just with mouseout 
+        /******** Event Handlers ********/
+        cy.on('click', 'node:parent, node.cy-expand-collapse-collapsed-node', function (evt) {
+            let node = evt.target;
+
+            // Check if click is on collapse / expand icon
+            let offset = 1; // TODO: check if we can get that from the css of node:parent (background-position-x attribute)
+            let iconSize = 12; // TODO: get that from styling 
+            let position = node.position();
+            let x = position.x - node.outerWidth() / 2 + offset;
+            let y = position.y - node.outerHeight() / 2 + offset;
+
+            if ((evt.position.x < x + iconSize) && (evt.position.y < y + iconSize)) {
+                // @ts-ignore
+                let expandCollapse = cy.expandCollapse('get');
+
+                // Click is on collapse / expand icon
+                if (node.hasClass('cy-expand-collapse-collapsed-node')) { // node is collapsed
+                    let collapsedEdges = node.connectedEdges(".cy-expand-collapse-collapsed-edge");
+                    expandCollapse.expandEdges(collapsedEdges);
+                    expandCollapse.expand(node);
+                } else {
+                    let collaspedNode = expandCollapse.collapse(node);
+                    let connectedNodes = collaspedNode.neighbourhood("node");
+                    connectedNodes.forEach( nd => {
+                        expandCollapse.collapseEdgesBetweenNodes([collaspedNode, nd]);
+                    });
+
+                }
             }
         });
 
         // Display tooltip when mouseover an element
         cy.on('mouseover', 'node, edge', function (evt) {
-            let ele = evt.target;
-            tooltip.show(ele.data("tooltip"));
+            let scratch = evt.target.scratch("_spotfire");
+            if (scratch && scratch.row) {
+                tooltip.show(scratch.row);
+            }
         });
 
-        // Hide tooltip when mouseover an element
+        // Hide tooltip when mouseout an element
         cy.on('mouseout', 'node, edge', function () {
             tooltip.hide();
         });
 
-        cy.on('cxttapstart taphold', function (e) {
-            popout.show(
-                {
-                    x: e.renderedPosition.x,
-                    y: e.renderedPosition.y,
-                    autoClose: false,
-                    alignment: "Bottom",
-                    onChange: popoutChangeHandler,
-                    onClosed: onPopoutClose
-                },
-                popoutContent
-            );
+        cy.on('cxttap', '*', function () {
+            tooltip.hide();
         });
-
-        const popoutContent = () => {
-            let content = [];
-            /** Label content */
-            content.push(section({
-                heading: "Label content",
-                children: tooltipAxis.parts.map(part => {
-                    return (checkbox({
-                        name: "labelConfig-" + part.displayName,
-                        text: part.displayName,
-                        checked: newSettings.labelConfig.has(part.displayName),
-                        enabled: true
-                    }));
-                })
-            }));
-
-            /** Layout */
-            content.push(section({
-                heading: "Layout",
-                children: [
-                    radioButton({
-                        name: "selectedLayout",
-                        text: "cose",
-                        checked: newSettings.selectedLayout === "cose",
-                        value: "cose"
-                    }),
-                    radioButton({
-                        name: "selectedLayout",
-                        text: "dagre",
-                        checked: newSettings.selectedLayout === "dagre",
-                        value: "dagre"
-                    }),
-                    radioButton({
-                        name: "selectedLayout",
-                        text: "breadthfirst",
-                        checked: newSettings.selectedLayout === "breadthfirst",
-                        value: "breadthfirst"
-                    }),
-                    radioButton({
-                        name: "selectedLayout",
-                        text: "elk",
-                        checked: newSettings.selectedLayout === "elk",
-                        value: "elk"
-                    }),
-                    radioButton({
-                        name: "selectedLayout",
-                        text: "concentric",
-                        checked: newSettings.selectedLayout === "concentric",
-                        value: "concentric"
-                    })
-                ]
-            }));
-
-            content.push(section({
-                heading: "Node shape",
-                children: [
-                    radioButton({
-                        name: "nodeShape",
-                        text: "rectangle",
-                        checked: newSettings.nodeShape === "round-rectangle",
-                        value: "round-rectangle"
-                    }),
-                    radioButton({
-                        name: "nodeShape",
-                        text: "ellipse",
-                        checked: newSettings.nodeShape === "ellipse",
-                        value: "ellipse"
-                    })
-                ]
-            }));
-
-            return content;
-        };
-
-        let selectedLabels = new Set(labelConfig.split(";"));
-        // remove unused columns from labelConfig
-        let validValues = tooltipAxis.parts.map(part => part.displayName);
-        selectedLabels.forEach(label => {
-            if (!validValues.includes(label)) {
-                selectedLabels.delete(label);
-            }
-        });
-
-        let newSettings = {
-            labelConfig: selectedLabels,
-            selectedLayout: selectedLayout,
-            nodeShape: nodeShape
-        };
-
-        function popoutChangeHandler({ name, value }) {
-            if (name.startsWith("labelConfig-")) {
-                let label = name.substring(12); // removes "labelConfig-" from name
-                if (value) {
-                    newSettings.labelConfig.add(label);
-                } else {
-                    newSettings.labelConfig.delete(label);
-                }
-            } else {
-                newSettings[name] = value;
-            }
-        }
-
-        function onPopoutClose() {
-            mod.transaction(() => {
-                mod.property("labelConfig").set(Array.from(newSettings.labelConfig).join(";"));
-                mod.property("layout").set(newSettings.selectedLayout);
-                mod.property("nodeShape").set(newSettings.nodeShape);
-            });
-        }
+        // cy.on('mouseover', 'cy', function (evt) {
+        //     let ele = evt.target;
+        //     tooltip.hide();
+        // });
 
         /******** End Event Handlers ********/
 
         return { cy, layout };
+    }
+
+    /**
+     * Saves filter settings and mark data
+     * @param {string} filterOn 
+     * @param {string} direction
+     */
+    async function applyFilter(filterOn, direction) {
+        let fltrStgsDocProp = await mod.document.property("FilterSettings").catch(() => undefined);
+
+        // TODO : put the code below in the onComplete callback of previous transaction (which clears marking)
+        let eles = previousCy.cy.elements(':selected');
+        if (eles.length > 0) { // if elements are selected
+
+            if (markedRows.length > 0) {
+                mod.transaction(() => {
+                    markedRows.forEach(row => {
+                        row.mark("Subtract");
+                    });
+                    markedRows = [];
+                });
+            }
+
+            mod.transaction(() => {
+                previousCy.cy.elements(':selected').forEach(element => {
+                    if (element.isNode() && element.isParent()) { // if compound node, mark all descendants
+                        let descendants = element.descendants();
+                        descendants.forEach(child => {
+                            let scratch = child.scratch("_spotfire");
+                            if (scratch && scratch.row) {
+                                scratch.row.mark();
+                                markedRows.push(scratch.row);
+                            }
+                        });
+                    } else {
+                        let scratch = element.scratch("_spotfire");
+                        if (scratch && scratch.row) {
+                            scratch.row.mark();
+                            markedRows.push(scratch.row);
+                        }
+                    }
+                });
+
+                if (fltrStgsDocProp) {
+                    //{"origin": "graph|panel", "filterOn": "cases|events", "direction": "in|out"}
+                    fltrStgsDocProp.set('{"origin": "graph", "filterOn": "' + filterOn + '", "direction": "' + direction + '"}');
+                }
+            });
+
+        }
     }
 
     /**
@@ -783,18 +954,26 @@ Spotfire.initialize(async mod => {
      */
     function filterValidElements(elements, filteredElements = null) {
         // Check if start & stop nodes are filtered out, if so, add them back 
-        if(filteredElements){
-            for(let i = filteredElements.length - 1; i >= 0; i -= 1) {
-                let ele = filteredElements[i];
-                if (ele.group === "nodes"){
-                    if((ele.data.id === "START") || (ele.data.id === "STOP")){
-                        elements.push(ele);
-                        filteredElements.splice(i, 1); // Remove node from filteredElements
+        if (filteredElements) {
+            let hasStart = false, hasStop = false;
+            for (let i = 0, len = elements.length; i < len; i++) {
+                let ele = elements[i];
+                if (ele.group === "nodes") {
+                    if (elements[i].data.id === "START") {
+                        hasStart = true;
+                    } else if (elements[i].data.id === "STOP") {
+                        hasStop = true;
                     }
-                }else{
-                    if((ele.data.source === "START") || (ele.data.target === "STOP")){
-                        elements.push(ele);
-                        filteredElements.splice(i, 1); // Remove node from filteredElements
+                }
+            }
+            if (!hasStart || !hasStop) {
+                for (let i = filteredElements.length - 1; i >= 0; i -= 1) {
+                    let ele = filteredElements[i];
+                    if (ele.group === "nodes") {
+                        if ((!hasStart && (ele.data.id === "START")) || (!hasStop && (ele.data.id === "STOP"))) {
+                            elements.push(ele);
+                            filteredElements.splice(i, 1); // Remove node from filteredElements
+                        }
                     }
                 }
             }
@@ -806,25 +985,24 @@ Spotfire.initialize(async mod => {
         elements.forEach(ele => {
             if (ele.group === "nodes") {
                 nodeIds.add(ele.data.id);
-                if(ele.data.parent){
+                if (ele.data.parent) {
                     parentIds.add(ele.data.parent);
                 }
             }
         });
 
         let validEdges = [];
-        if(filteredElements){
-
+        if (filteredElements) {
             let graph = new FilteredGraph(elements, filteredElements);
-            for(let i = 0, len = elements.length; i < len; i++){
+            for (let i = 0, len = elements.length; i < len; i++) {
                 let ele = elements[i];
-                if(ele.group === "edges"){
-                    if(!nodeIds.has(ele.data.target)){
+                if (ele.group === "edges") {
+                    if (!nodeIds.has(ele.data.target)) {
                         let targetEdges = graph.findValidTargets(ele);
                         validEdges.push(...targetEdges);
-                    } else if(!nodeIds.has(ele.data.source)){
-                        let sourceEdges = graph.findValidSources(ele.data.source);
-                        for(let i = 0, len = sourceEdges.length ; i < len ; i++){
+                    } else if (!nodeIds.has(ele.data.source)) { // source of edge does not exist in elements (has been filtered out)
+                        let sourceEdges = graph.findValidSources(ele); // TODO fix error
+                        for (let i = 0, len = sourceEdges.length; i < len; i++) {
                             let newEdge = sourceEdges[i];
                             //let newEdge = JSON.parse(JSON.stringify(ele))
                             newEdge.data.target = ele.data.target;
@@ -838,7 +1016,7 @@ Spotfire.initialize(async mod => {
                     }
                 }
             }
-        }else{
+        } else {
             validEdges = elements.filter(ele => ((ele.group === "edges") && (nodeIds.has(ele.data.source)) && (nodeIds.has(ele.data.target))));
         }
         nodeIds.clear();
@@ -882,41 +1060,51 @@ Spotfire.initialize(async mod => {
      * Aggregates incoming data and renders the graph
      *
      * @param {Spotfire.DataView} dataView
-     * @param {string[]} selectedLabels
      * @returns {Promise} - object with one property per subset. eg : {subsetA : [{group: 'nodes', data: {id: 'a'}}, {group: 'nodes', data: {id: 'b'}}], subsetB: []}
      */
-    async function getElements(dataView, selectedLabels) {
+    async function getElements(dataView) {
 
         let allElements = {};
         const isColorCategorical = await dataView.categoricalAxis("Color") ? true : false;
         const rows = await dataView.allRows();
 
+        // TODO : check that axis contains expression for all axis
         const hasParent = await dataView.continuousAxis("Parent") != null;
+        // const hasColNames = await dataView.continuousAxis("Column Names") != null;
+        const hasLabels = await dataView.continuousAxis("Labels") != null;
+        const hasSizeBy = await dataView.continuousAxis("Size by") != null;
+        const hasColor = isColorCategorical ? await dataView.categoricalAxis("Color") != null : await dataView.continuousAxis("Color") != null ;
 
-        rows.forEach( row => {
+
+
+        /** @type {Map<string, any>} */
+        let allParents = new Map();
+
+        rows.forEach(row => {
 
             // TODO use a variable instead of hardcoded axis name
             let subset = row.categorical("Datasets").value()[0].key;
-            let colName = row.categorical("Column Names").formattedValue("");
+            // let colName = hasColNames ? row.categorical("Column Names").formattedValue("") : null;
             let source = row.categorical("Source").value()[0].key;
             let target = row.categorical("Target").value()[0].key;
+            let parent = hasParent && row.continuous("Parent").value() ? "" + row.continuous("Parent").value() : null;
 
-            if(!source){
+            if (!source) {
                 console.warn("Null values are not supported on Source axis.");
             }
-
-            let parent = hasParent ? row.continuous("Parent").value() : null;
 
             if (!allElements[subset]) {
                 allElements[subset] = new Map();
             }
+
             /** @type {Map<string, any>} */
             let elements = allElements[subset];
 
             let nodeLabel = source;
             // If Color axis is categorical, we create one graph per category
-            if (isColorCategorical) {
-                let category = row.categorical("Color").formattedValue("");
+            let category = "";
+            if (isColorCategorical && hasColor) {
+                category = row.categorical("Color").formattedValue("");
                 source = source + "_" + category;
                 if (target) {
                     target = target + "_" + category;
@@ -929,16 +1117,16 @@ Spotfire.initialize(async mod => {
             if (!target) { // An empty value means the row corresponds to a node, not an edge
                 let id = source;
                 let node = elements.get(id); // if multiple measures are set on a continous axis, data for a single node may take multiple rows in the dataview
-                if (typeof node === "undefined") {
+                if (typeof node === "undefined") { // New node
                     node = {
                         group: 'nodes',
                         data: {
                             id: id,
-                            parent: parent != null ? "" + parent : null,
+                            // parent: parent != null && !id.startsWith("START") && !id.startsWith("STOP") ? "" + parent : null,
                             label: nodeLabel,
-                            tooltip: "",
                             color: row.color().hexCode,
-                            category: isColorCategorical ? row.categorical("Color").formattedValue("") : ""
+                            category: category,
+                            colorByValue: !isColorCategorical && hasColor  ? row.continuous("Color").value() : 0
                         },
                         selected: row.isMarked(),
                         // TODO : replace selector in spotfire-cytoscape-style.js to "Node which id equals to START or STOP"
@@ -948,15 +1136,16 @@ Spotfire.initialize(async mod => {
                     elements.set(id, node);
                 }
 
-                /** @type {Spotfire.DataViewContinuousValue} */
-                let tooltip = row.continuous("Tooltip");
-                node.data.tooltip += colName + ": " + tooltip.formattedValue() + "\n";
                 // TODO : review code
-                if(parent){
-                    elements.set("" + parent, {data: {id: "" + parent, isParent: true}});
-                    if(!node.data.parent){
-                        node.data.parent = "" + parent;
-                    } 
+                if (parent && !id.startsWith("START") && !id.startsWith("STOP")) {
+                    let parentNode = allParents.get(subset + parent);
+                    if (parentNode) {
+                        if (!parentNode.children.includes(node)) {
+                            parentNode.children.push(node);
+                        }
+                    } else {
+                        allParents.set(subset + parent, { subset: subset, id: parent, children: [node] });
+                    }
                 }
 
             } else {
@@ -971,8 +1160,7 @@ Spotfire.initialize(async mod => {
                             target: target,
                             color: row.color().hexCode,
                             category: isColorCategorical ? row.categorical("Color").formattedValue("") : "",
-                            sizeBy: row.continuous("Size by").value(),
-                            tooltip: "",
+                            sizeBy: hasSizeBy ? row.continuous("Size by").value() : 0,
                             label: ""
                         },
                         selected: row.isMarked(),
@@ -981,18 +1169,43 @@ Spotfire.initialize(async mod => {
                     elements.set(id, edge);
                 }
 
-                let tooltip = row.continuous("Tooltip");
-                edge.data.tooltip += colName + ": " + tooltip.formattedValue() + "\n";
-
-                if (selectedLabels.includes(colName)) {
-                    let value = tooltip.formattedValue();
-                    /** @ts-ignore */
-                    if (!isNaN(value)) {
-                        value = (Math.round((Number.parseFloat(value) + Number.EPSILON) * 100) / 100).toString();
-                    }
-
-                    edge.data.label === "" ? edge.data.label = value : edge.data.label += "\n" + value;
+                let label = hasLabels ? row.continuous("Labels").formattedValue() : null;
+                if (label) {
+                    edge.data.label === "" ? edge.data.label = label : edge.data.label += "\n" + label;
                 }
+            }
+        });
+
+        // Create parent nodes and add them to children 'parent' property
+        allParents.forEach((value, key) => {
+            // key of type {subset : string, id: string, children: [{}]}
+            if (value.children.length > 1) {
+                let newNode = {
+                    group: 'nodes',
+                    data: {
+                        id: key,
+                        label: value.id
+                        // TODO: add color
+                    }
+                };
+                allElements[value.subset].set(key, newNode);
+
+                let parentColor = { value: null, hexColor: null };
+                value.children.forEach(node => {
+                    node.data.parent = key;
+
+                    if (!parentColor.value) {
+                        parentColor.value = node.data.colorByValue
+                        parentColor.hexColor = node.data.color;
+                    } else {
+                        if (parentColor.value < node.data.colorByValue) {
+                            parentColor.value = node.data.colorByValue;
+                            parentColor.hexColor = node.data.color;
+                        }
+                    }
+                });
+
+                newNode.data.groupColor = parentColor.hexColor;
             }
         });
 
@@ -1016,8 +1229,6 @@ Spotfire.initialize(async mod => {
             //         element.data.sizeBy = normalizeNumber(element.data.sizeBy, min, max);
             //     }
             // });
-
-
         }
 
         return allElements;

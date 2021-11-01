@@ -26,7 +26,8 @@ class SparkPreviewOnK8s() {
   val k8sSparkVersion = "v1beta2"
   val k8sSparkKind = "sparkapplications"
 
-  val namespace: String = sys.env.getOrElse("NAMESPACE", "spark-operator")
+  val namespace: String = sys.env.get("NAMESPACE").getOrElse("spark-operator")
+  log.info(s"Namespace from env: $namespace")
   //val secretName = "testAPISecret".toLowerCase
 
   // set the global default api-client to the in-cluster one from above

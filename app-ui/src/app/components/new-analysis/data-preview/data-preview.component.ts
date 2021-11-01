@@ -8,8 +8,6 @@ import {
 } from '@tibco/spotfire-wrapper';
 import {map} from 'rxjs/operators';
 import {ConfigurationService} from 'src/app/service/configuration.service';
-import {DiscoverBackendService} from 'src/app/service/discover-backend.service';
-import {DatasetService} from 'src/app/service/dataset.service';
 import {OauthService} from 'src/app/service/oauth.service';
 import {getSFLink} from '../../../functions/templates';
 import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
@@ -21,9 +19,10 @@ import {
   STOP_NAME,
   transformMapping
 } from '../../../functions/analysis';
-import {Mapping, TypeValue} from 'src/app/model/models';
+import {Mapping, TypeValue} from 'src/app/backend/model/models';
 import {StartStop} from 'src/app/models_ui/analysis';
 import {DateTime} from 'luxon';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
 
 // TODO: Use these interfaces till nicolas de roche has changed his component
 export interface MySpotfireFilter {
@@ -67,8 +66,7 @@ export class DataPreviewComponent implements OnInit {
   private previewDataTable: string;
 
   constructor(
-    private dataserService: DatasetService,
-    private backendService: DiscoverBackendService,
+    private catalogService: CatalogService,
     private configService: ConfigurationService,
     private oService: OauthService
   ) {
@@ -96,7 +94,7 @@ export class DataPreviewComponent implements OnInit {
       this.leftNav.nativeElement.setTab(this.leftNavTabs[0], true);
     }, 100);
     this.analysisParameters = 'DatasetId="' + this.selectedDataset + '";&Token="' + this.oService.token + '";';
-    this.backendService.getColumnsFromSpark(this.selectedDataset, this.configService.config.claims.globalSubcriptionId).pipe(
+    this.catalogService.getTdvMetaData(this.selectedDataset).pipe(
       map(response => {
         this.availableColumns = response.map(column => column.COLUMN_NAME);
       })
@@ -252,4 +250,36 @@ export class DataPreviewComponent implements OnInit {
     }
   }
 
+  private convertDateFromLocale = (date: string): string => {
+    const locale = window.navigator.language;
+    const newDateLocale = Intl.DateTimeFormat(locale).formatToParts(new Date());
+    let format = '';
+    newDateLocale.forEach((element: Intl.DateTimeFormatPart) => {
+      switch (element.type) {
+        case 'day':
+          format = format + 'd';
+          break;
+        case 'month':
+          format = format + 'M';
+          break;
+        case 'year':
+          format = format + (element.value.length ==2 ? 'yy' : 'yyyy');
+          break;
+        case 'literal':
+          format = format + element.value;
+        default:
+          break;
+      }
+    })
+    format = format + ' hh:mm:ss';
+    const newDate = DateTime.fromFormat(date, format, { locale: locale }).toISO();
+    console.log('OLD DATE: ' + date + ' NEW DATE: ' + newDate + ' Returning: ');
+    return newDate;
+  }
+
+  private convertDateToLocale = (date: string): string => {
+    const currentDate = new Date(date);
+    const locale = window.navigator.language;
+    return currentDate.toLocaleDateString(locale) + ' ' + currentDate.toLocaleTimeString(locale)
+  }
 }

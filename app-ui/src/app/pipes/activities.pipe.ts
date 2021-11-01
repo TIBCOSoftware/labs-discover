@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { TypeValue } from '../model/models';
+import { TypeValue } from '../backend/model/models';
 
 @Pipe({
   name: 'activities',

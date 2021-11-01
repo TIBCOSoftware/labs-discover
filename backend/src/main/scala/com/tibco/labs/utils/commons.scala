@@ -46,6 +46,8 @@ object commons {
   val jdbcUsername: String = sys.env.getOrElse("BackendJdbcUsername", config.getString("aurora.jdbcUsername"))
   val jdbcPassword: String = sys.env.getOrElse("BackendJdbcPassword", config.getString("aurora.jdbcPassword"))
 
+  var time_spark_job: Long = 0
+  var time_jdbc_destination: Long = 0
   // auth needed to get access to liveapps
 
   //val liveAppTenantId: String = sys.env.getOrElse("liveAppTenantId", config.getString("liveapps.TenantId"))

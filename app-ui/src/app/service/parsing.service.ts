@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { DateTime } from 'luxon';
 import { ConfigurationService } from './configuration.service';
 import { DateParseRecord, DateParsingResult } from '../models_ui/parsing';
-import { FieldFormats } from '../model/models';
+import { FieldFormats } from '../backend/model/models';
 
 
 @Injectable({

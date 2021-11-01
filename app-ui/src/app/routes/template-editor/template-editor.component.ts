@@ -1,10 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
-import {VisualisationService} from 'src/app/api/visualisation.service';
-import {Template, TemplateMenuConfig, TemplateRequest, Visualisation} from 'src/app/model/models';
+import {VisualisationService} from 'src/app/backend/api/visualisation.service';
+import {DiscoverConfiguration, Template, TemplateMenuConfig, TemplateRequest, Visualisation} from 'src/app/backend/model/models';
 import {ConfigurationService} from '../../service/configuration.service';
-import {DiscoverConfiguration} from '../../models_ui/configuration';
 import {cloneDeep} from 'lodash-es';
 import {notifyUser} from '../../functions/message';
 import {stripUiIdFromTemplate} from '../../functions/templates';
@@ -200,7 +199,7 @@ export class TemplateEditorComponent implements OnInit {
   private setFDestinationId(sourceId) {
     if (sourceId) {
       for (const fol of this.folders) {
-        if (fol.Path === this.discover.analyticsSF.customUserDXPFolder) {
+        if (fol.Path === this.discover.analytics.customUserFolder) {
           this.request.visualisation = {
             sourceId,
             destinationFolderId: fol.Id

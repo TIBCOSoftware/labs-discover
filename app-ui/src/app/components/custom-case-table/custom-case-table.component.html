@@ -1,7 +1,7 @@
 <p-table #dt [columns]="cols" [value]="investigations" [(selection)]="selectedCasesTable"
          dataKey="id" id="pTable" styleClass="custom-table-css"
          [rowHover]="false"
-         [rows]="NUMBER_OF_ITEMS_BEFORE_PAGINATION" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,20,50]" 
+         [rows]="NUMBER_OF_ITEMS_BEFORE_PAGINATION" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,20,50]"
          [paginator]="showPagination" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
          [filterDelay]="0" [(first)]="first" (selectionChange)="handleSelection()">
   <ng-template pTemplate="header" let-columns>
@@ -15,7 +15,6 @@
       </th>
       <th style="width: 3em" class="top-row-empty"></th>
     </tr>
-
   </ng-template>
   <ng-template pTemplate="body" let-rowData let-expanded="expanded" let-columns="columns">
     <tr class="rowhover">
@@ -24,27 +23,21 @@
       </td>
       <td *ngFor="let col of columns" class="data-row hovereffect" [ngClass]="getNgClass(col.field, rowData)"
           (dblclick)="dt.toggleRow(rowData, $event)" (click)="onRowClick(rowData, $event)">
-        <div *ngIf="!cConfig.states">{{obtainData(rowData, col.field) | date:'fullDate' }}</div>
+        <div *ngIf="!cConfig.states">{{obtainData(rowData, col)}}</div>
         <div *ngIf="cConfig.states" >
-          <div *ngIf="col.field != 'state'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div>
-          <div *ngIf="col.field == 'state'">
-            <uxpl-tag icon="{{getStateIcon(obtainData(rowData, col.field))}}" class="uxpl-tag"
-                      color="{{getStateColor(obtainData(rowData, col.field))}}">{{obtainData(rowData, col.field)}}</uxpl-tag>
+          <div *ngIf="col.field !== 'state'" [innerHTML]="obtainData(rowData, col) | highlight: searchTerm : 'Multi-Match'"></div>
+          <div *ngIf="col.field === 'state'" class="state-column">
+            <uxpl-tag icon="{{getStateIcon(obtainData(rowData, col))}}" class="uxpl-tag"
+                      color="{{getStateColor(obtainData(rowData, col))}}">{{obtainData(rowData, col)}}</uxpl-tag>
           </div>
         </div>
       </td>
-
       <td style="width: 30px !important;">
         <a href="#" [pRowToggler]="rowData">
-          <!--<i [ngClass]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>-->
           <img *ngIf="!expanded" src="assets/images/svg/ic_caretdown.svg" class="hover-icon">
           <img *ngIf="expanded" src="assets/images/svg/ic_caretup.svg" class="hover-icon">
         </a>
-      </td><!--
-        <a href="#" [pRowToggler]="rowData">
-          <i [ngClass]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
-        </a>-->
-
+      </td>
     </tr>
   </ng-template>
   <ng-template pTemplate="rowexpansion" let-rowData let-columns="columns">

@@ -1,37 +1,23 @@
 package com.tibco.labs.orchestrator.api.registry
 
-//#user-registry-actor
-//import akka.actor.TypedActor.context
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
+import akka.actor.typed.{ActorRef, Behavior, DispatcherSelector}
+
 import akka.http.scaladsl.server.directives.FileInfo
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
-import com.tibco.labs.orchestrator.api.methods.S3Mgr
-import com.tibco.labs.orchestrator.models.JsonFormatsS3.redisFileInfo
-import org.slf4j.LoggerFactory
+import com.tibco.labs.orchestrator.Server.materializer.system
+import com.tibco.labs.orchestrator.models.{ListBucket, RedisContent, S3Content, redisFileInfo}
+import org.slf4j.{Logger, LoggerFactory}
+import com.tibco.labs.orchestrator.api.methods.csvUploadS3
 
-//
-
-final case class ListBucket(
-                             bucketName: String,
-                             key: String,
-                             eTag: String,
-                             size: Long,
-                             lastModified: String,
-                             storageClass: String
-                           )
-
-final case class S3Content(list: List[ListBucket])
-
-final case class RedisContent(message: String, code: Int , list: List[redisFileInfo])
-
+import scala.concurrent.ExecutionContextExecutor
 //#user-case-classes
 
 object FilesRegistry {
 
-  val log = LoggerFactory.getLogger(this.getClass.getName)
+  val log: Logger = LoggerFactory.getLogger(this.getClass.getName)
 
   // actor protocol
   sealed trait Command
@@ -41,7 +27,7 @@ object FilesRegistry {
   final case class getListFilesV2Registry(orgID: String, replyTo: ActorRef[RedisContent]) extends Command
 
   final case class getPreviewFileRegistry(orgID: String, fileName: String,  replyTo: ActorRef[ActionPerformedFilesPreview]) extends Command
-  final case class getS3FileContentRegistry(token: String, fileName: String,  replyTo: ActorRef[ActionPerformedFilesUrl]) extends Command
+  final case class getS3FileContentRegistry(orgID: String, fileName: String,  replyTo: ActorRef[ActionPerformedFilesUrl]) extends Command
 
 
   final case class uploadFileRegistry(orgID: String, fileMetadata: FileInfo, fileData: Source[ByteString, Any], forms: Map[String, String], replyTo: ActorRef[ActionPerformedFiles]) extends Command
@@ -64,15 +50,15 @@ object FilesRegistry {
         Behaviors.same
       case getListFilesV2Registry(id, replyTo) =>
         log.info("getListFilesRegistry called")
-        replyTo ! uploadJob().listv2(id)
+        replyTo.!(uploadJob().listv2(id))
         Behaviors.same
       case getPreviewFileRegistry(id, filename, replyTo) =>
         log.info("getPreviewFileRegistry called")
         replyTo ! uploadJob().preview(id, filename)
         Behaviors.same
-      case getS3FileContentRegistry(token, filename, replyTo) =>
+      case getS3FileContentRegistry(orgID, filename, replyTo) =>
         log.info("getS3FileContentRegistry called")
-        replyTo ! uploadJob().getS3(token, filename)
+        replyTo ! uploadJob().getS3(orgID, filename)
         Behaviors.same
       case uploadFileRegistry(id, fileInf, fileBodyData,forms, replyTo) =>
         log.info("uploadFileRegistry called")
@@ -90,35 +76,35 @@ object FilesRegistry {
 
     //val bucketName = DiscoverConfig.config.backend.storage.filesystem.s3_bucket
     def list(id: String): S3Content = {
-      val slist: S3Content = new S3Mgr().list(id)
+      val slist: S3Content = new csvUploadS3().list(id)
       slist
     }
 
     def listv2(id: String): RedisContent = {
-      val slist: (String, Int, List[redisFileInfo]) = new S3Mgr().listInRedis(id)
+      val slist: (String, Int, List[redisFileInfo]) = new csvUploadS3().listInRedis(id)
       RedisContent(slist._1, slist._2, slist._3)
     }
 
     def preview(id: String, filename: String): ActionPerformedFilesPreview = {
-      val prev: (String, Int, List[String]) = new S3Mgr().previewS3Files(id, filename)
+      val prev: (String, Int, List[String]) = new csvUploadS3().previewS3Files(id, filename)
       ActionPerformedFilesPreview(prev._1, prev._2, prev._3)
     }
 
 
     def delete(id: String, file: String): ActionPerformedFiles = {
 
-      val job: (String, String, Int) = new S3Mgr().delete(id, file)
+      val job: (String, String, Int) = new csvUploadS3().delete(id, file)
       ActionPerformedFiles(job._1, job._2, job._3)
     }
 
     def uploadS3(id: String, fileInfo: FileInfo, body: Source[ByteString, Any], forms: Map[String, String]): ActionPerformedFiles = {
 
-      val job: (String, String, Int) = new S3Mgr().uploadS3(id, fileInfo, body, forms)
+      val job: (String, String, Int) = new csvUploadS3().uploadS3(id, fileInfo, body, forms)
       ActionPerformedFiles(job._1, job._2, job._3)
     }
 
-    def getS3(token: String, filename: String): ActionPerformedFilesUrl = {
-      val job: (String, Int, String) = new S3Mgr().getFileContent(token, filename)
+    def getS3(orgID: String, filename: String): ActionPerformedFilesUrl = {
+      val job: (String, Int, String) = new csvUploadS3().getFileContent(orgID, filename)
       ActionPerformedFilesUrl(job._1, job._2, job._3)
     }
 

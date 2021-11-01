@@ -1,24 +1,45 @@
 import {Injectable} from '@angular/core';
 import * as STSim from 'string-similarity';
-import {AutoMapResult, AutomapConfig, AutomapWord, SSResult, AllAutoMapResults, DiscoverConfiguration} from '../models_ui/configuration';
-import {ConfigurationService} from './configuration.service';
-import {MessageTopicService} from '@tibco-tcstk/tc-core-lib';
-import {Mapping} from '../model/mapping';
-import {cloneDeep} from 'lodash-es';
+import {
+  AutoMapResult,
+  AutomapWord,
+  SSResult,
+  AllAutoMapResults,
+} from '../models_ui/configuration';
+import {ConfigurationService} from 'src/app/backend/api/configuration.service';
+import {Mapping} from '../backend/model/mapping';
 import {MapDef} from '../models_ui/analysis';
-import { Automapping } from '../model/models';
+import {Automapping} from '../backend/model/models';
+import {map} from 'rxjs/operators';
+import {DEFAULT_AUTOMAPPING_THRESHOLD} from '../app.settings';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutoMappingService {
 
-  private autoMapConfig: Automapping[];
+  public autoMapConfig: Automapping[] = [];
   private MAX_DOUBLE_MAPPING_ITERATIONS = 1000;
 
-  constructor(private configService: ConfigurationService,
-              private messageService: MessageTopicService) {
-    this.autoMapConfig = this.configService.config.discover.automap;
+  constructor(private configurationService: ConfigurationService) {
+    (async () => {
+     this.autoMapConfig = await this.getAutoMapConfig()
+    })();
+  }
+
+  public async getAutoMapConfig() {
+    return new Promise<Automapping[]>(resolve => {
+      this.configurationService.getAutomap().pipe(map( res => {
+        this.autoMapConfig = res;
+        return res
+      })).subscribe(result => resolve(result));
+    })
+  }
+
+  public async saveAutoMapConfig(AMConfig: Automapping[] ) {
+    return new Promise<void>(resolve => {
+      this.configurationService.postAutomap(AMConfig).subscribe(_ => resolve());
+    })
   }
 
   public compare(string1, string2): number {
@@ -37,40 +58,32 @@ export class AutoMappingService {
     }
   }
 
-  /*
-  public autoMap = (fieldName: string, candidates: string[]): string => {
-    const columns = this.autoMapConfig[fieldName] as string[];
-    const possibleMap = columns?.map(element => {
-      return this.findBestMatch(element, candidates);
-    }).sort((a, b) => (a?.bestMatch.rating > b?.bestMatch.rating) ? -1 : 1);
-    if (possibleMap && possibleMap.length > 0 && possibleMap[0]?.bestMatch.rating > this.autoMapConfig.threshold) {
-      return candidates[possibleMap[0].bestMatchIndex];
-    } else {
-      return null;
+  public autoMapOccurrence = (fieldName: string, candidates: string[], customConfig?: Automapping[]): AutoMapResult => {
+    let amConfig = this.autoMapConfig.find(v => v.fieldName === fieldName);
+    if(customConfig) {
+      amConfig = customConfig.find(v => v.fieldName === fieldName);
     }
-  }*/
-
-  public autoMapOccurrence = (fieldName: string, candidates: string[]): AutoMapResult => {
-    const columns = this.autoMapConfig[fieldName] as AutomapWord[];
-    const possibleMap = columns?.map(element => {
-      return {result: this.findBestMatch(element.word, candidates), occurrences: element.occurrence};
-    }).sort((a, b) => (a?.result?.bestMatch?.rating > b?.result?.bestMatch?.rating) ? -1 : 1);
-    if (possibleMap && possibleMap.length > 0 && possibleMap[0]?.result?.bestMatch?.rating > 0.8){ // this.autoMapConfig.threshold) {
-      return {
-        columnName: candidates[possibleMap[0].result.bestMatchIndex],
-        likelihood: possibleMap[0]?.result.bestMatch.rating,
-        occurrences: possibleMap[0]?.occurrences
-      };
-    } else {
-      return null;
+    if (amConfig) {
+      const columns = amConfig.values as AutomapWord[];
+      const possibleMap = columns?.map(element => {
+        return {result: this.findBestMatch(element.word, candidates), occurrences: element.occurrence};
+      }).sort((a, b) => (a?.result?.bestMatch?.rating > b?.result?.bestMatch?.rating) ? -1 : 1);
+      if (possibleMap && possibleMap.length > 0 && possibleMap[0]?.result?.bestMatch?.rating > amConfig.threshold) {
+        return {
+          columnName: candidates[possibleMap[0].result.bestMatchIndex],
+          likelihood: possibleMap[0]?.result.bestMatch.rating,
+          occurrences: possibleMap[0]?.occurrences
+        };
+      }
     }
+    return null;
   }
 
-  public autoMapAll(allFields: string[], candidates: string[]): AllAutoMapResults {
+  public autoMapAll(allFields: string[], candidates: string[], customConfig?: Automapping[]): AllAutoMapResults {
     // console.log('AUTO MAP ALL] Fields: ', allFields , ' candidates: ', candidates);
     const re = {}
     // First mapping
-    allFields.forEach(field => re[field] = this.autoMapOccurrence(field, candidates));
+    allFields.forEach(field => re[field] = this.autoMapOccurrence(field, candidates, customConfig));
     // Check if there are double mappings
     let it = 0;
     while (this.areThereDoubleMappings(re) && it < this.MAX_DOUBLE_MAPPING_ITERATIONS) {
@@ -92,7 +105,7 @@ export class AutoMappingService {
             // If likelyhoods are the same look at occurence
             if (firstMapResult.likelihood === secondMapResult.likelihood) {
               // console.log('Likelyhoods are the same...');
-              if(firstMapResult.occurrences > secondMapResult.occurrences){
+              if (firstMapResult.occurrences > secondMapResult.occurrences) {
                 re[val] = this.autoMapOccurrence(val, candidates)
               } else {
                 re[firstMapVal] = this.autoMapOccurrence(firstMapVal, candidates)
@@ -138,18 +151,22 @@ export class AutoMappingService {
     return re;
   }
 
-  storeMappings(mapping: Mapping){
-    this.configService.readConfig().then( config => {
-      const discover: DiscoverConfiguration = cloneDeep(config.discover);
+  async storeMappings(mapping: Mapping) {
+    this.autoMapConfig = await this.getAutoMapConfig()
       let changeMade = false;
       const FIELD_NAMES = MapDef.PROP_NAMES.concat(MapDef.PROP_NAMES_TIME);
-      FIELD_NAMES.forEach( field => {
+      FIELD_NAMES.forEach(field => {
         let fieldExist = false;
-        if(!discover.autoMapConfig[field]){
-          discover.autoMapConfig[field] = []
+        if (!this.autoMapConfig.find(v => v.fieldName === field)) {
+          this.autoMapConfig.push({
+            fieldName: field,
+            values: [],
+            threshold: DEFAULT_AUTOMAPPING_THRESHOLD
+          })
         }
-        if(mapping[field]) {
-          for (const word of discover.autoMapConfig[field]) {
+        if (mapping[field]) {
+          const words = this.autoMapConfig.find(v => v.fieldName === field).values
+          for (const word of words) {
             if (word.word === mapping[field]) {
               word.occurrence++
               changeMade = true;
@@ -157,7 +174,7 @@ export class AutoMappingService {
             }
           }
           if (!fieldExist) {
-            discover.autoMapConfig[field].push({
+            words.push({
               word: mapping[field],
               occurrence: 1
             });
@@ -165,16 +182,8 @@ export class AutoMappingService {
           }
         }
       })
-      if(changeMade) {
-        this.configService.updateDiscoverConfig(this.configService.config.sandboxId, this.configService.config.uiAppId, discover, discover.id).subscribe(
-          async (_) => {
-            this.messageService.sendMessage('news-banner.topic.message', 'Mappings saved...');
-            await this.configService.refresh();
-            this.autoMapConfig = this.configService.config.discover.automap;
-          }
-        );
+      if (changeMade) {
+        await this.saveAutoMapConfig(this.autoMapConfig)
       }
-    })
   }
-
 }

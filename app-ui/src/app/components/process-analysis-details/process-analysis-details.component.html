@@ -1,108 +1,86 @@
-<mat-card class="cont-card" *ngIf="processAnalysis">
-  <mat-card-header>
-    <mat-card-title>{{processAnalysis.data.name}} ({{processAnalysis.metadata.state}})</mat-card-title>
-    <mat-card-subtitle>{{processAnalysis.data.description}}</mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-    <table style="width:100%;">
-      <tr class="cell-row">
-        <td class="cell-header-main">Created By</td>
-        <td class="cont-detail">{{processAnalysis.metadata.createdBy}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Case ID</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.caseId}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Start time</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.startTime}}</td>
-      </tr>
-      <tr class="cell-row">
-        <td class="cell-header-main">Created On</td>
-        <td class="cont-detail">{{processAnalysis.metadata.createdOn | date: 'short'}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Activity</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.activity}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">End time</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.endTime}}</td>
-      </tr>
-      <tr class="cell-row">
-        <td class="cell-header-main">Template</td>
-        <td class="cont-detail">{{templateName}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Resource</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.resource}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Scheduled start time</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.scheduledStart}}</td>
-      </tr>
-      <tr class="cell-row">
-        <td class="cell-header-main">ID</td>
-        <td class="cont-detail">
-          <div class="detail-cell">
-            <div [matTooltip]="paId" matTooltipClass="tTip">{{getShortMessage(paId)}} </div>
-            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
-                       matTooltip="copy id to clipboard" matTooltipClass="tTip"
-                       (click)="copyToClipBoard('Id', paId, msService)"></uxpl-icon>
-          </div>
-        </td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Department</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.resourceGroup}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Scheduled end time</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.scheduledEnd}}</td>
-      </tr>
-      <tr class="cell-row">
-        <td class="cell-header-main">Version</td>
-        <td class="cont-detail">
-          <div class="detail-cell">
-            <div [matTooltip]="paVersion" matTooltipClass="tTip">{{getShortMessage(paVersion)}} </div>
-            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
-                       matTooltip="copy version to clipboard" matTooltipClass="tTip"
-                       (click)="copyToClipBoard('Version', paVersion, msService)"></uxpl-icon>
-          </div>
-        </td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Requester</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.requester}}</td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main">Other attributes</td>
-        <td class="cont-detail">{{processAnalysis.data.mappings.otherAttributes}}</td>
-      </tr>
-      <tr class="cell-row" *ngIf="processAnalysis.metadata.message">
-        <td class="cell-header-main">Error</td>
-        <td class="cont-detail">
-          <div class="detail-cell">{{getShortMessage(processAnalysis.metadata.message)}}
-            <uxpl-icon *ngIf="!showError" class="error-icon" height="18px" width="18px" icon="pl-icon-caret-down"
-                       matTooltip="show error details" matTooltipClass="tTip" (click)="showError = true;"></uxpl-icon>
-            <uxpl-icon *ngIf="showError" class="error-icon" height="18px" width="18px" icon="pl-icon-caret-up"
-                       matTooltip="hide error details" matTooltipClass="tTip" (click)="showError = false"></uxpl-icon>
-            <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
-                       matTooltip="copy error to clipboard" matTooltipClass="tTip"
-                       (click)="copyToClipBoard('Error',processAnalysis.metadata.message, msService)"></uxpl-icon>
-          </div>
-        </td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main"></td>
-        <td class="cont-detail"></td>
-        <td class="cont-space"></td>
-        <td class="cell-header-main"></td>
-        <td class="cont-detail"></td>
-      </tr>
-    </table>
-    <div *ngIf="showError" class="error-container">
+<process-analysis-moreinfo *ngIf="processAnalysis !== undefined" [display]="moreInfo" (onHide)="handleMoreInfoToggle()" [selectedAnalysis]="processAnalysis"></process-analysis-moreinfo>
+<uxpl-detail-pane
+    [topSectionLabel]="label"
+    bottom-section-label='Key metrics'
+    [topSectionAttributes]="attributeDefs"
+    (uxplAttributeCopy)="handleDetailAttributeCopy($event?.detail)">
+  <div slot="topSectionLabelContent" class="bottom-slot-content-container">
+    <div class="slot-button" (click)="handleMoreInfoToggle()" >More Info</div>
+  </div>
+  <div slot="topSectionContent">
+    <progress-screen *ngIf="progress" [message1]="progress?.message" [showImageLeft]="true"
+                     [percentage]="progress?.percentage" [status]="progress?.status"></progress-screen>
+    <div *ngIf="processAnalysis.metadata.message" class="error-container">
       <img height=75 width=75 src="{{errorIcon}}" onerror="this.style.display='none'">
       <div class="error-details-pane">
-        <h3>Error Details:</h3>
+        <!--div class="error-details">
+          <h3>Error Details:</h3>
+          <uxpl-icon class="error-icon" height="15px" width="15px" icon="pl-icon-copy"
+          matTooltip="copy error to clipboard" matTooltipClass="tTip"
+          (click)="copyToClipBoard('Error',processAnalysis.metadata.message, msService)"></uxpl-icon>
+        </div-->
         <error-details [errorMessage]="processAnalysis.metadata.message"></error-details>
       </div>
     </div>
-    <!-- <pre>{{progress | json}}</pre> -->
-    <!-- <pre>{{processAnalysis | json}}</pre> -->
-    <progress-screen *ngIf="progress" [message1]="progress?.message" [showImageLeft]="true"
-                     [percentage]="progress?.percentage" [status]="progress?.status"></progress-screen>
-  </mat-card-content>
-</mat-card>
+  </div>
+  <div slot="bottomSectionLabelContent" class="bottom-slot-content-container">
+    <div *ngIf="this.processAnalysis?.metrics" [ngClass]="{'slot-button': true, 'disabled': !this.processAnalysis?.metrics}" (click)="handleCompareClick()">Compare KPIs</div>
+  </div>
+  <div slot="bottomSectionWidgets">
+    <div class="metrics-container" *ngIf="processAnalysis?.metadata?.state === 'Ready' && processAnalysis?.metrics; else notReady">
+      <uxpl-data-widget label="Quick look">
+        <div class="data-points" *ngIf="summaryConfig">
+          <div class="data-point-row" style="margin-top: 16px;">
+            <uxpl-data-point label="EVENTS" icon-name="pm-events-widget" icon-color="#FFFFFF" icon-size="32px"  [value]="summaryConfig.events | number"></uxpl-data-point>
+            <uxpl-data-point label="CASES" icon-name="pm-cases-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.cases | number"></uxpl-data-point>
+          </div>
+          <div class="data-point-row" style="margin-top: 23px;">
+            <uxpl-data-point label="VARIANTS" icon-name="pm-variants-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.variants | number"></uxpl-data-point>
+            <uxpl-data-point label="ACTIVITIES" icon-name="pm-activities-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.activities | number"></uxpl-data-point>
+          </div>
+          <div class="data-point-row" style="margin-top: 23px;">
+            <uxpl-data-point label="RESOURCES" icon-name="pm-resources-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.resources | number"></uxpl-data-point>
+            <uxpl-data-point label="TIMESPAN" icon-name="pm-timespan-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.timespan" [hint]="summaryConfig.timespanHint"></uxpl-data-point>
+          </div>
+        </div>
+      </uxpl-data-widget>
+      <uxpl-data-widget label="Activities (per case)">
+        <div class="chart-container">
+          <div class="chart-container-wrapper" *ngIf="activitiesChartConfig">
+            <canvas baseChart
+              [datasets]="activitiesChartConfig.chartData"
+              [labels]="activitiesChartConfig.labels"
+              [options]="activitiesChartConfig.options"
+              [plugins]="activitiesChartConfig.plugins"
+              [legend]="activitiesChartConfig.legend"
+              [type]="activitiesChartConfig.type">
+            </canvas>
+          </div>
+        </div>
+      </uxpl-data-widget>
+      <uxpl-data-widget label="Case Duration (days)">
+        <div class="chart-container">
+          <div class="chart-container-wrapper" *ngIf="durationChartConfig">
+            <canvas baseChart
+              [datasets]="durationChartConfig.chartData"
+              [labels]="durationChartConfig.labels"
+              [options]="durationChartConfig.options"
+              [plugins]="durationChartConfig.plugins"
+              [legend]="durationChartConfig.legend"
+              [type]="durationChartConfig.type">
+            </canvas>
+          </div>
+        </div>
+      </uxpl-data-widget>
 
-
-
+    </div>
+    <ng-template #notReady class="metrics-container">
+      <div class="metrics-not-available">
+        <div class="no-metrics-content">
+          <uxpl-icon icon="pm-metrics-empty-state" width="171px" height="120px"></uxpl-icon>
+          Metrics will be available when the process analysis is ready
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</uxpl-detail-pane>

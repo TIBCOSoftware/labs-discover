@@ -11,10 +11,12 @@ import com.tibco.labs.utils.MetricsSend.sendMetricsToRedis
 import com.tibco.labs.utils.Status.sendBottleToTheSea
 import com.tibco.labs.utils.{DataFrameProfile, previewConfigFile, profiles, schemaPreview}
 import org.apache.commons.io.FileUtils
+import org.apache.spark.SparkException
 import org.apache.spark.sql.functions.{col, date_format, to_timestamp}
 import org.apache.spark.sql.types.TimestampType
 
 import java.io.File
+import java.time.format.DateTimeParseException
 import scala.collection.mutable.ListBuffer
 
 object main extends App {
@@ -73,7 +75,7 @@ object main extends App {
         "fetchsize" -> "10000",
         "numPartitions" -> tdvNumPart,
         "user" -> tdvUsername,
-        "password" -> tdvPassword//,
+        "password" -> tdvPassword //,
         //"encoding" -> "UTF-8",
         //"characterEncoding" -> "UTF-8"
       )
@@ -99,7 +101,7 @@ object main extends App {
   //val replacingColumns = _columns.map(NormalizationRegexColName.r.replaceAllIn(_, "_"))
   //val df2: DataFrame = replacingColumns.zip(_columns).foldLeft(tmpDataFrame) { (tempdf, name) => tempdf.withColumnRenamed(name._2, name._1) }
   //tmpDataFrame = tmpDataFrame.toDF(DataFrameUtils.normalizeColNames(tmpDataFrame.columns):_*)
-  var df2 = tmpDataFrame.toDF(normalize(tmpDataFrame.columns):_*)
+  var df2 = tmpDataFrame.toDF(normalize(tmpDataFrame.columns): _*)
   sendBottleToTheSea(assetId, "info", "Data Normalize", 65, organization)
   // save the DF as parquet file, coalesce(1) with gzip compression
   // using daria for simplicity
@@ -113,13 +115,46 @@ object main extends App {
     timeStampMap += (normalizerString(u.columnName.getOrElse("")) -> u.format.getOrElse(""))
   })
 
-  timeStampMap.foreach{kv =>
-    val colName = kv._1
-    val colFormat = kv._2
 
-    df2 = df2.withColumn(s"tmp_$colName", date_format(to_timestamp(col(s"$colName"), colFormat), isoDatePattern).cast(TimestampType))
-      .drop(col(s"$colName"))
-      .withColumnRenamed(s"tmp_$colName", s"$colName")
+  println(timeStampMap)
+  timeStampMap.foreach { kv =>
+
+    Try {
+      val colName = kv._1
+      val colFormat = kv._2
+      println(s"Casting Column : $colName")
+      df2 = df2.withColumn(s"tmp_$colName", date_format(to_timestamp(col(s"$colName"), colFormat), isoDatePattern).cast(TimestampType))
+        .drop(col(s"$colName"))
+        .withColumnRenamed(s"tmp_$colName", s"$colName")
+    } match {
+      case Failure(exception) => {
+        println(s"ERRRRRRROOOOORRR  ${exception.getClass.toString}")
+        println(s"ERRRRRRROOOOORRR  ${exception.getCause.getMessage}")
+        exception match {
+          //java.time.format.DateTimeParseException
+          case errorDate if exception.isInstanceOf[DateTimeParseException] => {
+            println("Error in events for DateTimeParseException : " + errorDate.getCause.getMessage)
+            sendBottleToTheSea(s"$assetId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organization)
+          }
+          case sparkError if exception.isInstanceOf[SparkException] => sparkError.getCause.getMessage match {
+            case date if date contains ("You may get a different result due to the upgrading of Spark 3.0") => {
+              println("Error in events for SparkException/DateTimeParseException : " + date)
+              sendBottleToTheSea(s"$assetId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organization)
+            }
+            case x => {
+              println("Error in events for SparkException/Unknown : " + x)
+              sendBottleToTheSea(s"$assetId", "error", s"Undefined SparkException , ${x}", 0, organization)
+            }
+          }
+          case x => {
+            println("Error in events : " + x)
+            sendBottleToTheSea(s"$assetId", "error", s"Undefined error yet, ${x}", 0, organization)
+          }
+
+        }
+      }
+      case Success(value) => println("TimeStamp casting ok")
+    }
   }
 
   println("after :")
@@ -149,7 +184,32 @@ object main extends App {
     Try {
       df2.coalesce(1).write.format("com.tibco.labs.rds.RdsDataSource").option("rds.path", targetFile).mode("append").save()
     } match {
-      case Failure(exception) => sendBottleToTheSea(assetId, "error", exception.getMessage, 0, organization)
+      case Failure(exception) => {
+        println(s"ERRRRRRROOOOORRR  ${exception.getClass.toString}")
+        println(s"ERRRRRRROOOOORRR  ${exception.getCause.getMessage}")
+        exception match {
+          //java.time.format.DateTimeParseException
+          case errorDate if exception.isInstanceOf[DateTimeParseException] => {
+            println("Error in events for DateTimeParseException : " + errorDate.getCause.getMessage)
+            sendBottleToTheSea(s"$assetId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organization)
+          }
+          case sparkError if exception.isInstanceOf[SparkException] => sparkError.getCause.getMessage match {
+            case date if date contains ("You may get a different result due to the upgrading of Spark 3.0") => {
+              println("Error in events for SparkException/DateTimeParseException : " + date)
+              sendBottleToTheSea(s"$assetId", "error", s"Error while parsing date, check your formats in the Datasets section. You can form a valid datetime pattern with the guide from https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html", 0, organization)
+            }
+            case x => {
+              println("Error in events for SparkException/Unknown : " + x)
+              sendBottleToTheSea(s"$assetId", "error", s"Undefined SparkException , ${x}", 0, organization)
+            }
+          }
+          case x => {
+            println("Error in events : " + x)
+            sendBottleToTheSea(s"$assetId", "error", s"Undefined error yet, ${x}", 0, organization)
+          }
+
+        }
+      }
       case Success(value) => {
         sendBottleToTheSea(assetId, "info", "RDS file serialized", 70, organization)
       }
@@ -274,20 +334,18 @@ object main extends App {
   println("##### END JOB ####")
 
 
-
-   val profilesDf1 = DataFrameProfile(df2).toDataFrame
+  val profilesDf1 = DataFrameProfile(df2).toDataFrame
 
   import com.amazon.deequ.profiles.{ColumnProfilerRunner, NumericColumnProfile}
 
   /* Make deequ profile this data. It will execute the three passes over the data and avoid
          any shuffles. */
   val result = ColumnProfilerRunner().onData(df2).run()
-  var profileArray: Seq[(String, String, Int, String, String, String, String, String)] =  Seq[(String, String, Int, String, String, String, String, String)]()
+  var profileArray: Seq[(String, String, Int, String, String, String, String, String)] = Seq[(String, String, Int, String, String, String, String, String)]()
 
   result.profiles.foreach { case (columnName, profile) =>
 
-    val completeness = profile.completeness.toString
-    ;
+    val completeness = profile.completeness.toString;
     val approximateNumDistinctValues = profile.approximateNumDistinctValues.toString
     val dataType = profile.dataType.toString
     var stats = ""
@@ -296,42 +354,43 @@ object main extends App {
     var meanVal = ""
     var stdVal = ""
 
-    if(profile.dataType.toString.equalsIgnoreCase("Integral") || profile.dataType.toString.equalsIgnoreCase("Fractional")){
+    if (profile.dataType.toString.equalsIgnoreCase("Integral") || profile.dataType.toString.equalsIgnoreCase("Fractional")) {
       val numericProfile = result.profiles(columnName).asInstanceOf[NumericColumnProfile]
-       minVal = numericProfile.minimum.get.toString
-       maxVal = numericProfile.maximum.get.toString
-       meanVal = numericProfile.mean.get.toString
-       stdVal = numericProfile.stdDev.get.toString
-      stats = minVal+" / "+maxVal+" / "+meanVal+" / "+stdVal
+      minVal = numericProfile.minimum.get.toString
+      maxVal = numericProfile.maximum.get.toString
+      meanVal = numericProfile.mean.get.toString
+      stdVal = numericProfile.stdDev.get.toString
+      stats = minVal + " / " + maxVal + " / " + meanVal + " / " + stdVal
     }
-    profileArray :+= (s"$columnName",completeness, approximateNumDistinctValues.toInt, dataType, minVal, maxVal, meanVal, stdVal)
+    profileArray :+= (s"$columnName", completeness, approximateNumDistinctValues.toInt, dataType, minVal, maxVal, meanVal, stdVal)
   }
 
   import spark.implicits._
+
   val profileDf2: DataFrame = profileArray.toDF("ColumnName", "Completeness", "ApproxDistinctValues", "DataType", "StatsMin", "StatsMax", "StatsMean", "StatsStdDev")
 
-  var profilDf3 = profileDf2.join(profilesDf1,"ColumnName")
+  var profilDf3 = profileDf2.join(profilesDf1, "ColumnName")
 
 
   profilDf3.show()
-
 
 
   val data = new ListBuffer[profiles]()
 
 
   import io.circe.generic.auto._, io.circe.syntax._
+
   val out: Unit = profilDf3.as[profiles].collect().foreach((row => data += row))
   println(data.toList.asJson.spaces2)
   profilDf3.printSchema()
   val _stopJobTimer = System.nanoTime()
-  time_spark_job =  (_stopJobTimer - _startJobTimer) / 1000000000
+  time_spark_job = (_stopJobTimer - _startJobTimer) / 1000000000
   val totalRows = df2.count()
   val dupRows = df2.dropDuplicates.count
   println("TotalRows: " + totalRows)
   println("DistinctRows: " + dupRows)
 
-  sendMetricsToRedis(assetId,data.toList, time_ins_db, time_spark_job, organization, totalRows, dupRows )
+  sendMetricsToRedis(assetId, data.toList, time_ins_db, time_spark_job, organization, totalRows, dupRows)
   //Thread.sleep(10000)
 
 
@@ -379,11 +438,11 @@ object main extends App {
     }
   }
 
-  def normalizerStringDNS(aString : String): String = {
+  def normalizerStringDNS(aString: String): String = {
     val tmpString = org.apache.commons.lang3.StringUtils.stripAccents(aString.replaceAll("[ ,;{}()\n\t=._+]+", "-")).toLowerCase.take(63)
     val sClean: String = tmpString.takeRight(1) match {
       case "-" => tmpString.dropRight(1)
-      case _   => tmpString
+      case _ => tmpString
     }
     sClean
   }

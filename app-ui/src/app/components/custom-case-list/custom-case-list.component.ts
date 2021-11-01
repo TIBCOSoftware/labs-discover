@@ -1,16 +1,16 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {CaseEvent } from '../../models_ui/configuration';
-import { TButton } from '../../models_ui/buttons';
+import {CaseEvent} from '../../models_ui/configuration';
+import {TButton} from '../../models_ui/buttons';
 import {MatDialog} from '@angular/material/dialog';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {CustomFormDefs} from '@tibco-tcstk/tc-forms-lib';
 import {ActionDialogComponent} from '../action-dialog/action-dialog.component';
 import {Location} from '@angular/common';
-import { InvestigationDetails } from 'src/app/model/investigationDetails';
-import { InvestigationApplication } from 'src/app/model/investigationApplication';
-import { InvestigationsService } from 'src/app/api/investigations.service';
-import { InvestigationActions } from 'src/app/model/investigationActions';
-import { intersectionBy } from 'lodash-es'
+import {InvestigationDetails} from 'src/app/backend/model/investigationDetails';
+import {InvestigationApplication} from 'src/app/backend/model/investigationApplication';
+import {InvestigationsService} from 'src/app/backend/api/investigations.service';
+import {InvestigationActions} from 'src/app/backend/model/investigationActions';
+import {intersectionBy} from 'lodash-es'
 
 @Component({
   selector: 'custom-case-list',
@@ -39,9 +39,9 @@ export class CustomCaseListComponent implements OnInit {
   public selectedCases: InvestigationDetails[];
 
   constructor(private location: Location,
-              protected dialog: MatDialog,
-              protected messageService: MessageTopicService,
-              protected investigationService: InvestigationsService) {
+              private dialog: MatDialog,
+              private messageService: MessageTopicService,
+              private investigationService: InvestigationsService) {
   }
 
   public firstLoad = false;
@@ -113,18 +113,23 @@ export class CustomCaseListComponent implements OnInit {
       maxHeight: '100vh',
       panelClass: 'tcs-style-dialog',
       data: {
-        actionId: actionId,
+        actionId,
         caseReference,
         appId: this.cConfig.applicationId,
-        formData: formData
+        formData
       }
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        const messsage = result.detail.actionName + (result.detail.eventName === 'SUBMITTED' ? ' successful...' : ' has been cancelled...');
-        this.messageService.sendMessage('news-banner.topic.message', messsage);
+        if (result.detail.eventName === 'FORM_SUBMIT') {
+          this.messageService.sendMessage('news-banner.topic.message', result.detail.actionName + ' successful...');
+        }
         this.setActionButtons();
-      } 
+        // Refresh a little later till the case is updated
+        setTimeout(() => {
+          this.refreshEvent.emit(this.cConfig.applicationId)
+        }, 500)
+      }
     });
   }
 
@@ -145,7 +150,7 @@ export class CustomCaseListComponent implements OnInit {
         this.toolBarNotification = this.selectedCases.length + ' ' + this.cConfig.customTitle + ' cases selected...';
       } else {
         this.toolBarNotification = '';
-        const actions = await Promise.all(this.selectedCases.map((investigation: InvestigationDetails) => 
+        const actions = await Promise.all(this.selectedCases.map((investigation: InvestigationDetails) =>
           this.investigationService.getActionsForInvestigation(this.cConfig.applicationId, investigation.id, investigation.data.state).toPromise()
         ));
 

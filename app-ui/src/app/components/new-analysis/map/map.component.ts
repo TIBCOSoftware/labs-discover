@@ -1,6 +1,6 @@
 import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, OnChanges, SimpleChanges} from '@angular/core';
 import {NewAnalysisStepStatus} from '../../../models_ui/discover';
-import {Mapping} from 'src/app/model/mapping';
+import {Mapping} from 'src/app/backend/model/mapping';
 import {calculateColumns} from '../../../functions/analysis';
 import {ColumnUI, PreviewUI} from '../../../models_ui/analysis';
 

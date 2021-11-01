@@ -1,15 +1,14 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {GeneralConfig, MessageTopicService, NavBarConfig, TcCoreCommonFunctions, TibcoCloudNavbarComponent} from '@tibco-tcstk/tc-core-lib';
+import {MessageTopicService, NavBarConfig, TcCoreCommonFunctions, TibcoCloudNavbarComponent} from '@tibco-tcstk/tc-core-lib';
 import {Title} from '@angular/platform-browser';
 import {NavigationEnd, Router} from '@angular/router';
 import {ConfigurationService} from './service/configuration.service';
 import {OauthService} from './service/oauth.service';
 import {Location} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
-import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import {Components} from '@tibco-tcstk/tc-web-components';
 import UxplHelpSideBar = Components.UxplHelpSideBar;
-import { GeneralInformation } from './model/generalInformation';
+import { GeneralInformation } from './backend/model/generalInformation';
 
 @Component({
   selector: 'app-root',
@@ -35,22 +34,16 @@ export class AppComponent implements OnInit, AfterViewInit {
               private titleService: Title,
               private router: Router,
               private configService: ConfigurationService,
-              public oauthService: OauthService,
-              private messageService: MessageTopicService) {
-    this.messageService.getMessage('help').subscribe(data => {
-      if(data.text && !data.text.startsWith('/')){
-        data.text = '/' + data.text;
-      }
-      this.helpSource = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/help' + data.text + '/config.json');
-    });
+              public oauthService: OauthService) {
     router.events.subscribe(evt => {
       if (evt instanceof NavigationEnd) {
         if (evt?.url.startsWith('/login') || evt?.url.startsWith('/login-oauth')) {
           this.isLogin = true;
-
         } else {
           this.isLogin = false;
         }
+        // We need urlAfterRedirects, because of the initial landing (which redirects to welcome)
+        this.helpSource = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/help' + evt.urlAfterRedirects + '/config.json');
       }
     })
   }

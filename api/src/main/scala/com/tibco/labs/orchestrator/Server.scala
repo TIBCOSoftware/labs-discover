@@ -1,9 +1,10 @@
 package com.tibco.labs.orchestrator
 
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorRef, ActorSystem, DispatcherSelector}
 import akka.actor.typed.scaladsl.Behaviors
-import com.tibco.labs.orchestrator.api.registry.{FilesRegistry, LoginRegistry, MetricsRegistry, MiningDataRegistry, PreviewFileRegistry, ProcessMiningRegistry, ProcessMiningScheduledRegistry, TdvMgmtRegistry}
-import com.tibco.labs.orchestrator.api.{MetricsRoutes, MinerRoutes}
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
+import com.tibco.labs.orchestrator.api.registry.{FilesListRegistry, FilesRegistry, LoginRegistry, MetricsRegistry, MiningDataRegistry, PreviewFileRegistry, ProcessMiningRegistry, ProcessMiningScheduledRegistry, TdvMgmtRegistry, UIAssetsRegistry}
+import com.tibco.labs.orchestrator.api.{MetricsRoutes, MinerRoutes, UIAssetsRoutes}
 //import akka.cluster.ClusterEvent
 //import akka.cluster.typed.{Cluster, Subscribe}
 import akka.http.scaladsl.Http
@@ -13,15 +14,15 @@ import akka.http.scaladsl.server.Directives._
 //import akka.management.javadsl.AkkaManagement
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.{actor => classic}
-import com.tibco.labs.orchestrator.api.{FilesRoutes, LoginRoutes, PreviewFileRoutes, ProcessMiningRoutes, ProcessMiningScheduledRoutes, TdvMgmtRoutes}
-import com.tibco.labs.orchestrator.node.cluster.{SwaggerDocService, SwaggerSite, RedocSite}
+import com.tibco.labs.orchestrator.api.{FilesRoutes, FilesListRoutes, LoginRoutes, PreviewFileRoutes, ProcessMiningRoutes, ProcessMiningScheduledRoutes, TdvMgmtRoutes}
+import com.tibco.labs.orchestrator.node.cluster.{SwaggerDocService, RedocSite}
 import com.tibco.labs.orchestrator.node.cluster.HealthRoutes
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.Failure
 import scala.util.Success
 
-object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
+object Server extends App with HealthRoutes with RedocSite {
 
 
   val rootBehavior = Behaviors.setup[Nothing] { context =>
@@ -36,10 +37,14 @@ object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
     context.watch(pmRegistryActor)
     val pmRegistryScheduledActor = context.spawn(ProcessMiningScheduledRegistry(), "ProcessMiningScheduledRegistryActor")
     context.watch(pmRegistryScheduledActor)
-    val previewRegistryActor = context.spawn(PreviewFileRegistry(), "PreviewFileRegistryActor")
+    val previewRegistryActor: ActorRef[PreviewFileRegistry.Command] = context.spawn(PreviewFileRegistry(), "PreviewFileRegistryActor")
     context.watch(previewRegistryActor)
-    val fileRegistryActor = context.spawn(FilesRegistry(), "FileRegistryActor")
+    val fileRegistryActor = context.spawn(FilesRegistry(), "FileRegistryActor", DispatcherSelector.fromConfig("file-ops-blocking-dispatcher"))
     context.watch(fileRegistryActor)
+    val fileListRegistryActor = context.spawn(FilesListRegistry(), "FileListRegistryActor",DispatcherSelector.fromConfig("file-list-ops-blocking-dispatcher"))
+    context.watch(fileListRegistryActor)
+    val uiAssetsRegistryActor = context.spawn(UIAssetsRegistry(), "UIAssetsRegistryActor")
+    context.watch(uiAssetsRegistryActor)
     val tdvRegistryActor = context.spawn(TdvMgmtRegistry(), "TDVRegistryActor")
     context.watch(tdvRegistryActor)
     val loginRegistryActor = context.spawn(LoginRegistry(), "LoginRegistryActor")
@@ -63,6 +68,8 @@ object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
     //val internalRoutes = new InternalRoutes(internalRegistryActor)(context.system)
     val pmRoutes = new ProcessMiningRoutes(pmRegistryActor)(context.system)
     val fileRoutes = new FilesRoutes(fileRegistryActor)(context.system)
+    val fileListRoutes = new FilesListRoutes(fileListRegistryActor)(context.system)
+    val uiAssetsRoutes = new UIAssetsRoutes(uiAssetsRegistryActor)(context.system)
     val pmScheduledRoutes = new ProcessMiningScheduledRoutes(pmRegistryScheduledActor)(context.system)
     val prevRoutes = new PreviewFileRoutes(previewRegistryActor)(context.system)
     val tdvRoutes = new TdvMgmtRoutes(tdvRegistryActor)(context.system)
@@ -70,18 +77,15 @@ object Server extends App with SwaggerSite with RedocSite with HealthRoutes {
     val metricsRoutes = new MetricsRoutes(metricsRegistryActor)(context.system)
     val minerRoutes = new MinerRoutes(minerRegistryActor)(context.system)
 
-    lazy val routes: Route = //internalRoutes.InternalRoutes ~
+    lazy val routes: Route = cors() (//internalRoutes.InternalRoutes ~
       pmRoutes.ProcessMiningRoutes ~
       pmScheduledRoutes.ProcessMiningScheduledRoutes ~
-      tdvRoutes.TdvRoutes ~
+      tdvRoutes.TdvRoutes ~ uiAssetsRoutes.UiAssetsRoutes ~
       prevRoutes.PreviewRoutes ~
       fileRoutes.FilesRoutes ~
-      loginRoutes.LoginRoutes ~
-        metricsRoutes.MetricsRoutes ~
-        minerRoutes.MinerRoutes ~
-      SwaggerDocService.routes ~
-      swaggerSiteRoute ~
-      redocSiteRoute
+        fileListRoutes.FilesRoutes ~
+      loginRoutes.LoginRoutes ~ metricsRoutes.MetricsRoutes ~ minerRoutes.MinerRoutes ~
+      SwaggerDocService.routes ~ redocSiteRoute )
 
     lazy val mgmtRoutes = HealthCheckRoutes
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfigurationService } from 'src/app/api/configuration.service';
+import { ConfigurationService } from 'src/app/backend/api/configuration.service';
 import { MessageTopicService } from '@tibco-tcstk/tc-core-lib';
 import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
 import { set } from 'lodash-es';
@@ -7,10 +7,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { WelcomePreviewComponent } from 'src/app/components/welcome-preview/welcome-preview.component';
 import { HightlighEditComponent } from 'src/app/components/hightligh-edit/hightligh-edit.component';
 import { HttpEventType } from '@angular/common/http';
-import { GeneralInformation } from 'src/app/model/generalInformation';
-import { LandingPage } from 'src/app/model/landingPage';
+import { GeneralInformation } from 'src/app/backend/model/generalInformation';
+import { LandingPage } from 'src/app/backend/model/landingPage';
 import { map } from 'rxjs/operators';
-import { Analytics } from 'src/app/model/analytics';
+import { Analytics } from 'src/app/backend/model/analytics';
 
 @Component({
   selector: 'settings-branding',

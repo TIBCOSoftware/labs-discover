@@ -14,6 +14,33 @@
     
     
     <item>
+      <title>Blog: October 2021 release</title>
+      <link>https://tibcosoftware.github.io/labs-discover/blog/2021/11/01/october-2021-release/</link>
+      <pubDate>Mon, 01 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/blog/2021/11/01/october-2021-release/</guid>
+      <description>
+        
+        
+        &lt;p&gt;What’s new in the October 2021 release Project Discover™ ?
+This release contains the following new features&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Analysis KPI Overview: Quickly visualize an overview of the key metrics without having to open analytics&lt;/li&gt;
+&lt;li&gt;Analysis Compare: Quickly measure improvements from one analysis (before) to the other (after). Up to 3 simultaneous comparisons&lt;/li&gt;
+&lt;li&gt;Ability to Filter from the process graph, using a new contextual menu. Allowing more interactions.&lt;/li&gt;
+&lt;li&gt;Ability to Visually group activities using an attribute. Allowing to simplify the process graph to better understand it.&lt;/li&gt;
+&lt;li&gt;Some pre-processing filters&lt;/li&gt;
+&lt;li&gt;Updated templates and Spotfire report templates.&lt;/li&gt;
+&lt;li&gt;Bug fixes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;keep your feedbacks coming!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Blog: September 2021 release</title>
       <link>https://tibcosoftware.github.io/labs-discover/blog/2021/09/23/september-2021-release/</link>
       <pubDate>Thu, 23 Sep 2021 00:00:00 +0000</pubDate>

@@ -5,15 +5,13 @@ import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import {OptionsMenuConfig} from '@tibco-tcstk/tc-web-components/dist/types/models/optionsMenuConfig';
-import {Subject} from 'rxjs';
-import {RepositoryService} from 'src/app/api/repository.service';
+import {RepositoryService} from 'src/app/backend/api/repository.service';
 import {NewDatasetWizardComponent} from 'src/app/components/new-dataset/wizard/wizard.component';
-import {Dataset, DatasetListItem} from 'src/app/models_ui/dataset';
-import {getRelativeTime, transformMapping} from '../../functions/analysis';
 import {DatasetService} from '../../service/dataset.service';
 import {MatDrawer} from '@angular/material/sidenav';
-import {ConfigurationService} from '../../service/configuration.service';
-import {OauthService} from '../../service/oauth.service';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
+import { DatasetListItem } from 'src/app/backend/model/datasetListItem';
+import { Dataset } from 'src/app/backend/model/dataset';
 
 @Component({
   selector: 'app-dataset',
@@ -29,6 +27,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
     private location: Location,
     private repositoryService: RepositoryService,
     private messageService: MessageTopicService,
+    protected catalogService: CatalogService,
     private datasetService: DatasetService) {
     this.messageLength = this.MAX_MESSAGE_SIZE;
   }
@@ -68,7 +67,6 @@ export class DatasetComponent implements OnInit, OnDestroy {
   noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
   readyImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/states/Ready.svg');
   notReadyImage: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/states/Not ready.svg');
-  getRelTime = getRelativeTime;
   popupX: string;
   popupY: string;
   maxDeletePopupHeight = '162px';
@@ -86,7 +84,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('stop status polling when destroy the dataset component');
+    // stop status polling when destroy the dataset component
     this.stopPollingStatus();
   }
 
@@ -100,7 +98,9 @@ export class DatasetComponent implements OnInit, OnDestroy {
 
   listDataset = () => {
     this.loading = true;
-    this.datasetService.getDatasets().subscribe(
+    this.catalogService.getAllDatasets().subscribe(
+    // )
+    // this.datasetService.getDatasets().subscribe(
       datasetListItems => {
         this.datasets = datasetListItems;
         this.loading = false;
@@ -222,7 +222,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
           this.statusMap[datasetId].stop = true;
           this.statusMap[datasetId] = null;
         }
-        this.datasetService.deleteDataset(datasetId).subscribe(resp => {
+        this.catalogService.deleteDataset(datasetId).subscribe(resp => {
           this.refresh();
         }, error => {
           if (error.status === 409) {

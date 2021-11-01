@@ -1,5 +1,6 @@
 import {AutoMappingService} from './auto-mapping.service';
-import {ConfigurationService} from './configuration.service';
+import {ConfigurationService} from 'src/app/backend/api/configuration.service';
+import {Automapping} from '../backend/model/automapping';
 
 describe('AutoMappingService', () => {
   let AMService: AutoMappingService;
@@ -7,24 +8,36 @@ describe('AutoMappingService', () => {
 
   beforeEach(() => {
     // Set Stub Configurations
-    const stubConfig = {
-      config: {
-        discover: {
-          ssConfig: {
-            caseIdWords: ['case', 'id', 'instance'],
-            activityWords: ['activity', 'task', 'operation'],
-            resourceWords: ['user', 'agent', 'resource'],
-            startWords: ['start', 'begin', 'initial'],
-            endWords: ['end', 'finish', 'last'],
-            doAddAdditional: true,
-            debug: true,
-            threshold: 0.4
-          }
+    const stubConfig: { autoMapConfig: Automapping[] } = {
+      autoMapConfig: [{
+        threshold: 0.8,
+        fieldName: 'caseId',
+        values: [{word: 'case', occurrence: 1}, {word: 'id', occurrence: 1}, {word: 'instance', occurrence: 1}]
+      },
+        {
+          threshold: 0.8,
+          fieldName: 'activity',
+          values: [{word: 'activity', occurrence: 1}, {word: 'task', occurrence: 1}, {word: 'operation', occurrence: 1}]
+        },
+        {
+          threshold: 0.8,
+          fieldName: 'resource',
+          values: [{word: 'user', occurrence: 1}, {word: 'agent', occurrence: 1}, {word: 'resource', occurrence: 1}]
+        },
+        {
+          threshold: 0.8,
+          fieldName: 'startTime',
+          values: [{word: 'start', occurrence: 1}, {word: 'begin', occurrence: 1}, {word: 'initial', occurrence: 1}]
+        },
+        {
+          threshold: 0.8,
+          fieldName: 'endTime',
+          values: [{word: 'end', occurrence: 1}, {word: 'finish', occurrence: 1}, {word: 'last', occurrence: 1}]
         }
-      }
+      ]
     }
-    configServiceSpy = jasmine.createSpyObj('ConfigurationService', {}, stubConfig);
-    AMService = new AutoMappingService(configServiceSpy, null);
+    configServiceSpy = jasmine.createSpyObj('ConfigurationService', {getAutomap: {pipe: jasmine.createSpy().and.returnValue({subscribe: jasmine.createSpy().and.returnValue(stubConfig.autoMapConfig)}) }}, stubConfig);
+    AMService = new AutoMappingService(configServiceSpy);
   });
 
   it('String Similarity Service created', () => {
@@ -44,16 +57,28 @@ describe('AutoMappingService', () => {
   });
 
   it('Find Best Match', () => {
-    expect(AMService.findBestMatch('one', ['one', 'two', 'three'])).toEqual(jasmine.objectContaining({bestMatch: {target: 'one', rating: 1}}));
+    expect(AMService.findBestMatch('one', ['one', 'two', 'three'])).toEqual(jasmine.objectContaining({
+      bestMatch: {
+        target: 'one',
+        rating: 1
+      }
+    }));
   });
 
   it('Find Best Match Similar', () => {
-    expect(AMService.findBestMatch('twoS', ['one', 'two', 'three'])).toEqual(jasmine.objectContaining({bestMatch: {target: 'two', rating: 0.8}}));
+    expect(AMService.findBestMatch('twoS', ['one', 'two', 'three'])).toEqual(jasmine.objectContaining({
+      bestMatch: {
+        target: 'two',
+        rating: 0.8
+      }
+    }));
   });
   /* TODO: fix these testcases
 
     it('Auto Map Basic', () => {
-      expect(SSService.autoMap(['case', 'activity', 'user', 'start', 'end'])).toEqual(jasmine.objectContaining(
+      console.log('AMService.autoMapConfig: ' ,AMService.autoMapConfig)
+      console.log('TEST: ' , (AMService.autoMapOccurrence('caseId', ['case', 'activity', 'user', 'start', 'end'])))
+      expect(AMService.autoMapOccurrence('caseId', ['case', 'activity', 'user', 'start', 'end'])).toEqual(jasmine.objectContaining(
         {
           activityColumn: 'activity',
           activityRating: 1,

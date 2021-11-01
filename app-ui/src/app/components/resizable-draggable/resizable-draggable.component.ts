@@ -24,7 +24,7 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
 
   @Input('minHeight') public minHeight: number;
   @Input('minWidth') public minWidth: number;
-  @ViewChild("box") public box: ElementRef;
+  @ViewChild('box') public box: ElementRef;
 
   @Output() enableSFPointerEvents: EventEmitter<boolean> = new EventEmitter<boolean>();
   private boxPosition: { left: number, top: number };
@@ -47,7 +47,7 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
   private loadBox(){
     const {left, top} = this.box.nativeElement.getBoundingClientRect();
     this.boxPosition = {left, top};
-    console.log('this.boxPosition', this.boxPosition);
+    // console.log('this.boxPosition', this.boxPosition);
   }
 
   private loadContainer(){
@@ -58,7 +58,7 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
     const right = this.containerWidth + this.containerLeft;
     const bottom = this.containerHeight + this.containerTop;
     this.containerPos = { left, top, right, bottom };
-    console.log("[loadContainer] this.containerPos: ", this.containerPos);
+    // console.log('[loadContainer] this.containerPos: ', this.containerPos);
   }
 
   private initMinSize() {
@@ -76,7 +76,7 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
     const right = scope.width + left;
     const bottom = scope.height + top;
     this.containerPos = { left, top, right, bottom };
-    console.log("[setContainerScope] this.containerPos: ", this.containerPos);
+    // console.log('[setContainerScope] this.containerPos: ', this.containerPos);
   }
 
   public startDrag(event) {
@@ -86,22 +86,20 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
 
   @HostListener('window:mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
-    console.log('onMouseUp');
+    // console.log('onMouseUp');
     this.setStatus(event, 0);
-
     this.enableSFPointerEvents.emit(true);
   }
 
   setStatus(event: MouseEvent, status: number){
-    console.log('set status to ' + status);
-    if (status == 0) {
-      console.log('set status = 0, the mouse up');
+    // console.log('set status to ' + status);
+    if (status === 0) {
+      // console.log('set status = 0, the mouse up');
     }
-    if (status == Status.RESIZE || status == Status.MOVE) {
-      console.log('disable the pointer event for spotfire iframe');
+    if (status === Status.RESIZE || status === Status.MOVE) {
+      // console.log('disable the pointer event for spotfire iframe');
       this.enableSFPointerEvents.emit(false);
     }
-
     if(status === 1) {
       event.stopPropagation();
     }
@@ -160,10 +158,8 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
         this.top = this.containerPos.bottom - newHeight;
       }
     }
-
     return height;
   }
-
 
   private resizeCondMeet(){
     return (this.mouse.x < this.containerPos.right && this.mouse.y < this.containerPos.bottom);
@@ -177,11 +173,11 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
   }
 
   private moveCondMeet(){
-    const offsetLeft = this.mouseClick.x - this.boxPosition.left; 
-    const offsetRight = this.width - offsetLeft; 
+    const offsetLeft = this.mouseClick.x - this.boxPosition.left;
+    const offsetRight = this.width - offsetLeft;
     const offsetTop = this.mouseClick.y - this.boxPosition.top;
     const offsetBottom = this.height - offsetTop;
-    const meetMoveCond = (this.mouse.x > this.containerPos.left + offsetLeft && 
+    const meetMoveCond = (this.mouse.x > this.containerPos.left + offsetLeft &&
       this.mouse.x < this.containerPos.right - offsetRight &&
       this.mouse.y > this.containerPos.top + offsetTop &&
       this.mouse.y < this.containerPos.bottom - offsetBottom);
@@ -190,7 +186,7 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
     // console.log('this.boxPosition(left, top) = (' + [this.boxPosition.left, this.boxPosition.top].join(',') + ')');
     // console.log('this.containerPos(left, right, top, bottom) = (' + [this.containerPos.left, this.containerPos.right, this.containerPos.top, this.containerPos.bottom].join(',') + '); offset(left, right, top, bottom) = (', [offsetLeft, offsetRight, offsetTop, offsetBottom].join(',') + ')');
     return (
-      this.mouse.x > this.containerPos.left + offsetLeft && 
+      this.mouse.x > this.containerPos.left + offsetLeft &&
       this.mouse.x < this.containerPos.right - offsetRight &&
       this.mouse.y > this.containerPos.top + offsetTop &&
       this.mouse.y < this.containerPos.bottom - offsetBottom

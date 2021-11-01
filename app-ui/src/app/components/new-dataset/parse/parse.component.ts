@@ -1,11 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { forkJoin } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
-import { Schema } from 'src/app/models_ui/backend';
+import { Dataset } from 'src/app/backend/model/dataset';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
-import { DiscoverBackendService } from 'src/app/service/discover-backend.service';
-import { Dataset, DatasetDataSource, DatasetWizard } from '../../../models_ui/dataset';
+import { DatasetWizard } from '../../../models_ui/dataset';
 import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 
 @Component({
@@ -25,7 +22,6 @@ export class NewDatasetParseComponent implements OnInit {
 
   constructor(
     protected csvService: CsvService,
-    protected backendService: DiscoverBackendService,
     protected datasetService: DatasetService
   ) { }
 
@@ -45,6 +41,10 @@ export class NewDatasetParseComponent implements OnInit {
 
   public refreshCSVPreview = (event): void => {
     this.handlePreviewData.emit(event);
+  }
+
+  public updateNumberRowsForPreview = (event): void => {
+    this.wizard.numberRowsForPreview = event;
   }
 
   public refreshTDVPreview = (): void => {

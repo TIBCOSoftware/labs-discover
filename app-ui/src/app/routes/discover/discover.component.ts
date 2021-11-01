@@ -66,7 +66,7 @@ export class DiscoverComponent implements AfterViewInit {
 
   public generateMenu = (): any[] => {
     let tabs = [];
-    if (this.configService.groups.filter(element => element.name === 'Discover Analysts').length > 0) {
+    if (this.configService.config.user.isAnalyst) {
       tabs = [
         {id: 'process-analysis', label: 'Process Analysis'},
         {id: 'analytics', label: 'Analytics'},
@@ -74,10 +74,10 @@ export class DiscoverComponent implements AfterViewInit {
         {id: 'dataset', label: 'Datasets'}
       ];
     }
-    if (this.configService.groups.filter(element => element.name === 'Discover Case Resolvers').length > 0) {
+    if (this.configService.config.user.isResolver) {
       tabs = unionBy(tabs, [{id: 'cases', label: 'Investigations'}], 'id');
     }
-    if (this.configService.groups.filter(element => element.name === 'Discover Administrators').length > 0) {
+    if (this.configService.config.user.isAdmin) {
       /*tabs.push({id: 'settings', label: 'Settings'});*/
       tabs.push({id: 'admin', label: 'Admin'});
     }

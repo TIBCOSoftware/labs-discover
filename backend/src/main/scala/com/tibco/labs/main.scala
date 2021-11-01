@@ -7,7 +7,9 @@
 // scalastyle:off println
 package com.tibco.labs
 
+import com.tibco.labs.config.analysisMetrics
 import com.tibco.labs.utils.DataFrameUtils.{joinByColumn, joinByColumnGen}
+import com.tibco.labs.utils.MetricsSend.sendMetricsToRedis
 
 import java.io.File
 import com.tibco.labs.utils.Status._
@@ -26,10 +28,12 @@ import scala.util.matching.Regex
 object main extends App {
 
 
+  val _startJobTimer = System.nanoTime()
+
 
   import com.tibco.labs.utils.commons._
 
-
+  import spark.implicits._
 
   private val NPARAMS = 2
 
@@ -219,13 +223,15 @@ object main extends App {
     case (u, df) =>  logger.info(printDFSchema(df))
   }
   // writing
+  val _startDBInsert = System.nanoTime()
   logger.info("######### writing tables #######@")
-  DataFrameUtils.updateAnalysisJDBC("events", df_eventsFinalDB)
+  //DataFrameUtils.updateAnalysisJDBC("events", df_eventsFinalDB)
   // events in binary
   DataFrameUtils.updateAnalysisBinaryJDBC("events_binary", df_eventsFinalDB)
+  sendBottleToTheSea(s"$analysisId","info","Event Table Saved",60, organisation)
   // Attributes in binary
   DataFrameUtils.updateAnalysisBinaryJDBC("attributes_binary", df_attrib_bin)
-  sendBottleToTheSea(s"$analysisId","info","Event Table Saved",60, organisation)
+  sendBottleToTheSea(s"$analysisId","info","Attributes Table Saved",65, organisation)
   DataFrameUtils.updateAnalysisJDBC("activities", df_act)
   sendBottleToTheSea(s"$analysisId","info","Activities Table Saved",70, organisation)
   //DataFrameUtils.updateAnalysisJDBC("attributes",df_attrib)
@@ -236,6 +242,12 @@ object main extends App {
   sendBottleToTheSea(s"$analysisId","info","Cases Table Saved",85, organisation)
   DataFrameUtils.updateAnalysisJDBC("variants_status", df_var_status)
   sendBottleToTheSea(s"$analysisId","info","Variant Status Table Saved",90, organisation)
+  val _stopDBInsert = System.nanoTime()
+  time_jdbc_destination = (_stopDBInsert - _startDBInsert) / 1000000000
+  val _stopJobTimer = System.nanoTime()
+  time_spark_job = (_stopJobTimer - _startJobTimer) / 1000000000
+  import io.circe.generic.auto._, io.circe.syntax._
+  sendMetricsToRedis(analysisId, df_metricsFinal.drop("analysis_id").as[analysisMetrics].first(), time_jdbc_destination, time_spark_job, organisation)
   //DataFrameUtils.updateAnalysisJDBC("metrics", df_metricsFinal)
   //sendBottleToTheSea(s"$analysisId","info","Metrics Table Saved",95, organisation)
   //sendTCMMessage(s"$analysisId",s"$caseRef","progress","Write Compliance table",95, databaseName, LocalDateTime.now().toString)

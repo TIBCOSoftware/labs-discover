@@ -1,21 +1,34 @@
 
 class FilteredGraph {
 
-    constructor(filteredInElements, filtedOutElements) {
-        // 1st extract valid nodes
-        // let validNodes = [];
+    constructor(filteredInElements, filteredOutElements) {
+        // 1st clone the inputs to avoid modifying original elements
+        filteredInElements = JSON.parse(JSON.stringify(filteredInElements));
+        filteredOutElements = JSON.parse(JSON.stringify(filteredOutElements));
+
+        // Remove from filteredOutElements nodes that exist in filteredInElements
+        let filteredOutNodes = new Map();
+        let filteredOutEdges = new Set();
+        for(let i = 0, len = filteredOutElements.length; i < len; i++){
+            let ele = filteredOutElements[i];
+            if("nodes" === ele.group){
+                filteredOutNodes.set(ele.data.id, ele);
+            } else {
+                filteredOutEdges.add(ele);
+            }
+        }
+
         for (let i = 0, len = filteredInElements.length; i < len; i++) {
             let ele = filteredInElements[i];
             if (ele.group === "nodes") {
-                // ele = Object.assign({}, ele);
                 ele.data.isValid = true;
-                // validNodes.push(ele);
+
+                // If exists in filteredOutNodes, remove to avoid duplicates when we create the graph
+                filteredOutNodes.delete(ele.data.id);
             }
         }
         // add valid nodes to filtered out elements and construct a cy graph
-        // filtedOutElements.push(...validNodes);
-        filtedOutElements.push(...filteredInElements);
-        this.cy = cytoscape({ headless: true, elements: filtedOutElements });
+        this.cy = cytoscape({ headless: true, container: null, elements: [...filteredOutNodes.values(), ...filteredOutEdges, ...filteredInElements] });
     }
 
     /**
@@ -119,7 +132,9 @@ class FilteredGraph {
             return [JSON.parse(JSON.stringify(edge.json()))];
         }
 
-        let outgoers = edge.target().outgoers('edge:simple[target !="' + initialNodeId + '"]'); // Selecting outgoing edges whose target is not initial node to avoid loops
+        // Selecting outgoing edges whose target is not initial node to avoid loops (:simple matches edges with different source as target)
+        // outgoers selects edges coming out of a node
+        let outgoers = edge.target().outgoers('edge:simple[target !="' + initialNodeId + '"]');
         if (outgoers.length === 0) {
             return [];
         }

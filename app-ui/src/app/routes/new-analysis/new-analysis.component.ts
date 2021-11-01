@@ -4,19 +4,18 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {forkJoin, Observable, of} from 'rxjs';
 import {concatMap, delay, filter, map, repeatWhen, take, tap} from 'rxjs/operators';
-import {RepositoryService} from 'src/app/api/repository.service';
-import {AnalysisData} from 'src/app/model/analysisData';
-import {AnalysisRequest} from 'src/app/model/analysisRequest';
-import {DatasetListItem} from 'src/app/models_ui/dataset';
+import {RepositoryService} from 'src/app/backend/api/repository.service';
+import {AnalysisData} from 'src/app/backend/model/analysisData';
+import {AnalysisRequest} from 'src/app/backend/model/analysisRequest';
 import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
-import {ConfigurationService} from 'src/app/service/configuration.service';
-import {DatasetService} from 'src/app/service/dataset.service';
 import {DataPreviewComponent} from '../../components/new-analysis/data-preview/data-preview.component';
 import {AutoMappingService} from '../../service/auto-mapping.service';
-import {Mapping} from '../../model/mapping';
+import {Mapping} from '../../backend/model/mapping';
 import {MapDef, Option, PreviewUI} from '../../models_ui/analysis';
-import {DiscoverBackendService} from '../../service/discover-backend.service';
 import {calculateColumns} from '../../functions/analysis';
+import {CatalogService} from 'src/app/backend/api/catalog.service';
+import {DatasetListItem} from 'src/app/backend/model/datasetListItem';
+import { Preview } from 'src/app/backend/model/preview';
 
 @Component({
   selector: 'new-analysis',
@@ -27,9 +26,7 @@ export class NewAnalysisComponent implements OnInit {
 
   constructor(
     private messageService: MessageTopicService,
-    private datasetService: DatasetService,
-    private backendService: DiscoverBackendService,
-    private configService: ConfigurationService,
+    protected catalogService: CatalogService,
     private router: Router,
     private route: ActivatedRoute,
     private location: Location,
@@ -49,7 +46,7 @@ export class NewAnalysisComponent implements OnInit {
   datasetName: string;
   showDataPreview: boolean;
   progress: any = {};
-  originalName = '';
+  analysisId = '';
 
   private previousStep = 0;
   readonly ADVANCED_STEP_NUMBER = 3;
@@ -83,7 +80,7 @@ export class NewAnalysisComponent implements OnInit {
     this.getStepperConfiguration(this.advancedMode);
     this.disableSave = false;
 
-    this.datasetOption$ = this.datasetService.getDatasets().pipe(
+    this.datasetOption$ = this.catalogService.getAllDatasets().pipe(
       map((datasets: DatasetListItem[]) => {
         return datasets
           .filter(dataset => dataset.status === 'COMPLETED')
@@ -103,7 +100,7 @@ export class NewAnalysisComponent implements OnInit {
       this.repositoryService.getAnalysisDetails(this.route.snapshot.paramMap.get('id')).subscribe(
         res => {
           this.newAnalysis = res.data;
-          this.originalName = this.newAnalysis.name;
+          this.analysisId = this.route.snapshot.paramMap.get('id');
           this.createObjectHeader();
           this.datasetOption$.pipe(
             map((datasets: Option[]) => {
@@ -130,22 +127,19 @@ export class NewAnalysisComponent implements OnInit {
   }
 
   private getPreviewData(datasetId: string) {
-    const columns$ = this.backendService.getColumnsFromSpark(datasetId, this.configService.config.claims.globalSubcriptionId);
-    const preview$ = this.backendService.getPreviewFromSpark(datasetId, this.configService.config.claims.globalSubcriptionId);
-    forkJoin([columns$, preview$]).subscribe(results => {
-        const avCol = results[0].map(column => column.COLUMN_NAME);
-        const col = calculateColumns(results[0]);
+    this.catalogService.getPreview(datasetId).pipe(
+      map((preview: Preview) => {
+        const avCol = preview.columns.map(column => column.columnName);
+        const col = calculateColumns(preview.columns);
         this.previewD = {
           availableColumns: avCol,
           columns: col,
-          data: JSON.parse(results[1])
+          data: preview.data
         }
         this.isDataPreviewError = false;
-      },
-      error => {
-        console.log('Error: ', error);
-        this.isDataPreviewError = true;
-      });
+
+      })
+    ).subscribe();
   }
 
 
@@ -281,6 +275,10 @@ export class NewAnalysisComponent implements OnInit {
     return !this.config.steps[this.config.currentStepIdx].completed;
   }
 
+  public handleSaveButton() {
+    return this.disableSave || !this.config.steps[this.config.currentStepIdx].completed;
+  }
+
   public goToAnalysis() {
     this.router.navigate(['/discover/process-analysis']);
   }
@@ -291,7 +289,7 @@ export class NewAnalysisComponent implements OnInit {
     }
   }
 
-  createAnalysis = (): void => {
+  createAnalysis() {
     // Disable the save button
     this.disableSave = true;
     this.progress = {
@@ -300,9 +298,12 @@ export class NewAnalysisComponent implements OnInit {
       percentage: 0,
       status: '',
       enabled: false
-    }
+    };
     // Store the mappings
-    this.autoMapService.storeMappings(this.newAnalysis.mappings);
+    (async () => {
+      await this.autoMapService.storeMappings(this.newAnalysis.mappings);
+      this.messageService.sendMessage('news-banner.topic.message', 'Mappings saved...');
+    })();
     // Create the analysis
     this.repositoryService.createAnalysis(this.newAnalysis).pipe(
       concatMap(resp => {
@@ -365,6 +366,7 @@ export class NewAnalysisComponent implements OnInit {
       if (mappingChanged) {
         // Store the mappings
         this.autoMapService.storeMappings(this.newAnalysis.mappings);
+        this.messageService.sendMessage('news-banner.topic.message', 'Mappings saved...');
       }
       this.repositoryService.updateAnalysis(this.route.snapshot.paramMap.get('id'), this.newAnalysis).subscribe(
         analysis => {

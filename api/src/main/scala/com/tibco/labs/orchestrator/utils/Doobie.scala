@@ -8,7 +8,7 @@ import doobie.util.ExecutionContexts
 import doobie.implicits._
 import doobie.hikari._
 import cats.effect._
-import monix.eval.Task
+
 
 import java.util.concurrent.Executors
 import scala.concurrent.duration._

@@ -8,7 +8,7 @@
                     max-height="450px">
           <create-case-menu #createcase id="my-popup-content" [caseMarking]="markedCases"
                             [variantMarking]="markedVariants" [investigationConfig]="investigationConfig"
-                            (createInvestigation)="createInv($event)"></create-case-menu>
+                            (createInvestigationEvent)="createInv($event)"></create-case-menu>
         </uxpl-popup>
       </uxpl-button>
       <uxpl-button slot="navigation-content" id="#refresh" type="no-border" (click)="loadAnalytic()"

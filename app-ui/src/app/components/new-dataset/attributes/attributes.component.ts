@@ -1,9 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { SelectItem } from 'primeng/api';
+import { Dataset } from 'src/app/backend/model/dataset';
+import { DatasetSource } from 'src/app/backend/model/datasetSource';
+import { Schema } from 'src/app/backend/model/schema';
 import { CsvService } from 'src/app/service/csv.service';
 import { DatasetService } from 'src/app/service/dataset.service';
 import { ParsingService } from 'src/app/service/parsing.service';
-import { Dataset, DatasetDataSource, DatasetSchema, DatasetWizard } from '../../../models_ui/dataset';
+import { DatasetWizard } from '../../../models_ui/dataset';
 import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 @Component({
   selector: 'dataset-attributes',
@@ -16,8 +19,8 @@ export class NewDatasetAttributesComponent implements OnInit {
 
   readonly datatypeValue: string[] = ['string', 'int', 'numeric', 'timestamp'];
   datatypeOptions: SelectItem[];
-  schema: DatasetSchema[];
-  dataSource: DatasetDataSource;
+  schema: Schema[];
+  dataSource: DatasetSource;
 
   @Input() data: Dataset;
   @Input() backupDataset: Dataset;
@@ -96,14 +99,14 @@ export class NewDatasetAttributesComponent implements OnInit {
     }
   }
 
-  public onSelectDatatype(event: any, column: DatasetSchema) {
+  public onSelectDatatype(event: any, column: Schema) {
     if (event) {
       column.type = event.detail.value;
       this.updateStatus();
     }
   }
 
-  public onSelectImportance(event: string, column: DatasetSchema) {
+  public onSelectImportance(event: string, column: Schema) {
     if (event) {
       column.importance = event;
     }

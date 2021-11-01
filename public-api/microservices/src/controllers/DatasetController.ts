@@ -1,13 +1,13 @@
 import { Response } from 'koa';
-import { Body, Delete, Get, HeaderParam, JsonController, Param, Post, Put, Res } from 'routing-controllers';
+import { Body, Delete, Get, HeaderParam, JsonController, Param, Post, Put, Res, UploadedFile } from 'routing-controllers';
 import { Service } from 'typedi';
-import { FilesOperationsApi, LoginApi, LoginCredentials, RedisFileInfo, TibcoDataVirtualizationApi } from '../backend/api';
+import { FilesOperationsApi, LoginApi, LoginCredentials, PublishedViews, RedisFileInfo, RequestFile, SchemaTdv, TibcoDataVirtualizationApi, UnManageDataSetCopy } from '../backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
-import { CsvFile, Dataset, DatasetListItem, DatasetUpdated, PreviewStatus } from '../models/datasets.model';
+import { CsvFile, CsvUploadMetadata, Dataset, DatasetListItem, DatasetUpdated, Preview, PreviewColumn, PreviewStatus } from '../models/datasets.model';
 import { AnalysisService } from '../services/analysis.service';
 import { DatasetService } from '../services/dataset.service';
 
-
+import axios from 'axios';
 
 @Service()
 @JsonController('/catalog')
@@ -230,6 +230,33 @@ export class DatasetController {
     return response;
   }
 
+  @Get('/dataset/:id/preview')
+  async getPreview(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | Preview> {
+    const check = await this.preflightCheck(token, response);
+
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getOrgId(oauthToken);
+
+    const preview$ = this.tdvApi.getDataJobTdvRoute(orgId, id);
+    const metadata$ = this.tdvApi.getSchemaJobTdvRoute(orgId, id);
+
+    const [preview, metadata] = await Promise.all([preview$, metadata$]);
+    const columnResponse = metadata.body.tdv.schema.map((column: SchemaTdv) => { 
+      return {
+        position: column.ORDINAL_POSITION,
+        columnName: column.COLUMN_NAME,
+        type: column.DATA_TYPE
+      } as PreviewColumn 
+    });
+    const previewResponse = JSON.parse(preview.body.Data)
+
+    return {columns: columnResponse, data: previewResponse} as Preview;
+  }
+
   @Post('/status')
   async saveStatus(@HeaderParam("Authorization") token: string, @Res() response: Response, @Body() body: PreviewStatus) {
     const check = await this.preflightCheck(token, response);
@@ -358,8 +385,68 @@ export class DatasetController {
     }
   }
 
+  @Post('/files')
+  async uploadCsvFile(@HeaderParam("authorization")token: string, @Body() body: CsvUploadMetadata, @UploadedFile("csv") file: any, @Res() response: Response): Promise<Response | any> {
+    const check = await this.preflightCheck(token, response);
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getOrgId(oauthToken);
+
+    const csvFile: RequestFile = {
+      value: file.buffer,
+      options: {
+        filename: file.originalname,
+        contentType: undefined
+      }
+    }
+    try {
+      const resp = await this.fileApi.postRouteFile(orgId, body.newline, body.separator, body.quoteChar, body.encoding, body.escapeChar, csvFile);
+      return resp.body;
+    } catch(error: any) {
+      response.status = error.statusCode;
+      return response;
+    }
+    
+  }
+
+  @Get('/files/download/:filename')
+  async downloadCsvFile(@HeaderParam("authorization")token: string, @Param('filename') filename: string, @Res() response: Response): Promise<Response | any> {
+    const check = await this.preflightCheck(token, response);
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getOrgId(oauthToken);
+
+    try {
+      const resp = await this.fileApi.getRouteFileContent(filename, orgId);
+      if (resp.body.code === 0 && resp.body.url) {
+        // download
+        return axios.get(resp.body.url).then(resp => {
+          return resp.data;
+        }).catch(error => {
+          console.log(error);
+          response.status = 500;
+          return response;
+        });
+      } else {
+        response.status = resp.body.code;
+        response.body = resp.body.message || '';
+        return response;
+      }
+    } catch(error: any) {
+      response.status = error.statusCode;
+      return response;
+    }
+    
+  }
+
   @Get('/tdv/data/:id')
-  async getTdvData(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | string> {
+  async getTdvData(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | Object[]> {
     const check = await this.preflightCheck(token, response);
 
     if (check !== true) {
@@ -371,7 +458,45 @@ export class DatasetController {
 
     try {
       const resp = await this.tdvApi.getDataJobTdvRoute(orgId, id);
-      return resp.body.Data;
+      // parse the data to string
+      if (resp.body.code === 0) {
+        try {
+          return JSON.parse(resp.body.Data);
+        } catch (error) {
+          response.status = 500;
+          return response;
+        }
+      } else {
+        response.status = 500;
+        return response;
+      }
+      
+    } catch(error: any) {
+      response.status = error.statusCode;
+      return response;
+    }
+  }
+
+  @Get('/tdv/metadata/:id')
+  async getTdvMetaData(@HeaderParam("authorization")token: string, @Param("id")id: string, @Res() response: Response): Promise<Response | SchemaTdv[]> {
+    const check = await this.preflightCheck(token, response);
+
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getOrgId(oauthToken);
+
+    try {
+      const resp = await this.tdvApi.getSchemaJobTdvRoute(orgId, id);
+      if (resp.body.code === 0) {
+        return resp.body.tdv.schema;
+      } else {
+        response.status = 500;
+        response.body = resp.body.message;
+        return response;
+      }
     } catch(error: any) {
       response.status = error.statusCode;
       return response;
@@ -379,4 +504,58 @@ export class DatasetController {
     
   }
 
+  @Get('/tdv/unmanaged/view')
+  async getUnmanagedTdv(@HeaderParam("authorization")token: string, @Res() response: Response): Promise<Response | PublishedViews[]> {
+    const check = await this.preflightCheck(token, response);
+
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getOrgId(oauthToken);
+
+    try {
+      const resp = await this.tdvApi.getDatasetsPublishedRoute(orgId);
+      if (resp.body.code === 0) {
+        return resp.body.Datasets;
+      } else {
+        response.status = 500;
+        response.body = resp.body.message;
+        return response;
+      }
+    } catch(error: any) {
+      response.status = error.statusCode;
+      return response;
+    }
+    
+  }
+
+  @Post('/tdv/unmanaged/copy')
+  async copyUnmanagedTdv(@HeaderParam("authorization")token: string, @Body() body: UnManageDataSetCopy, @Res() response: Response): Promise<Response | string> {
+    const check = await this.preflightCheck(token, response);
+
+    if (check !== true) {
+      return check;
+    }
+
+    const oauthToken = this.getToken(token);
+    const orgId = await this.cache.getOrgId(oauthToken);
+
+    try {
+      body.Organization = orgId;
+      const resp = await this.tdvApi.postUnManagedJobTdvRoute(body);
+      if (resp.body.code === 0) {
+        return resp.body.DatasetId;
+      } else {
+        response.status = 500;
+        response.body = resp.body.message;
+        return response;
+      }
+    } catch(error: any) {
+      response.status = error.statusCode;
+      return response;
+    }
+    
+  }
 }

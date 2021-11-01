@@ -1,0 +1,36 @@
+<p-dialog class="tibco-pm-dialog"
+          [modal]=true
+          [(visible)]="display"
+          [closable]=true
+          [closeOnEscape]=true
+          [breakpoints]="{'960px': '90vw', '640px': '100vw'}" [style]="{width: '75vw'}" (onHide)="toggleDisplay()">
+  <ng-template pTemplate="header">
+    <div class="p-dialog-title">
+      <span>{{selectedAnalysis?.data?.name}}&nbsp;<span *ngIf="selectedAnalysis?.data?.name.toUpperCase() !== selectedAnalysis?.data?.description.toUpperCase()">-&nbsp;{{selectedAnalysis?.data?.description}}</span></span>
+    </div>
+    <div class="close-icon">
+      <uxpl-icon icon="pl-icon-close" size="20px" color="#727272" (click)="handleDialogClose()"></uxpl-icon>
+    </div>
+  </ng-template>
+  <p-body>
+    <div class="pm-dialog-body">
+      <div class="pm-dialog-attributes pm-dialog-attributes--2cols">
+        <div class="dialog-attribute-container" *ngFor="let attr of displayAttributes">
+          <div class="attr-label">{{attr.label.toUpperCase()}}</div>
+        <div class="attr-label-container">
+          <div class="attr-value">{{attr.value ? attr.value : '—'}}</div>
+          <uxpl-icon *ngIf="attr.copy" class="error-icon" size="15px" icon="pl-icon-copy" color="#1774e5"
+                       (click)="copyToClipBoard(attr.label, attr.value, msService)"></uxpl-icon>
+        </div>
+        </div>
+      </div>
+    </div>
+  </p-body>
+  <p-footer>
+    <div class="pm-dialog-footer-content">
+      <uxpl-button type="primary" width="70px" (clicked)="handleDialogClose()">
+        <div class="close-button-label">Close</div>
+      </uxpl-button>
+    </div>
+  </p-footer>
+</p-dialog>

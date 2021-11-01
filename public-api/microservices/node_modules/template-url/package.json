@@ -1,0 +1,28 @@
+{
+  "name": "template-url",
+  "version": "1.0.0",
+  "description": "Super simple no fluff rest URL style formatting for node.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saintedlama/template-url.git"
+  },
+  "keywords": [
+    "rest",
+    "url",
+    "template"
+  ],
+  "author": "Christoph Walcher <christoph.walcher@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saintedlama/template-url/issues"
+  },
+  "homepage": "https://github.com/saintedlama/template-url#readme",
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "mocha": "^2.2.5"
+  }
+}

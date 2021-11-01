@@ -14,6 +14,8 @@ const FILTER_EXPR_PROPERTY = "FilterExpression";
 const FILTER_TYPE_PROPERTY = "FilterOn";
 const FILTER_COUNT_PROPERTY = "FilterCount";
 
+const FILTER_SETTINGS_PROPERTY = "FilterSettings";
+
 export class FilterControls {
     private readonly mod: Spotfire.Mod;
     private readonly tooltip: Spotfire.Tooltip;
@@ -110,10 +112,17 @@ export class FilterControls {
         });
 
         // Initialize buttons
-        let filterBtn = <HTMLElement>document.getElementById("apply-filter-btn");
-        if(filterBtn){
-            filterBtn.onclick = () => {
-                this.applyFilter();
+        let filterInBtn = <HTMLElement>document.getElementById("filter-in-btn");
+        if(filterInBtn){
+            filterInBtn.onclick = () => {
+                this.applyFilter("in");
+            };
+        }
+
+        let filterOutBtn = <HTMLElement>document.getElementById("filter-out-btn");
+        if(filterOutBtn){
+            filterOutBtn.onclick = () => {
+                this.applyFilter("out");
             };
         }
 
@@ -441,7 +450,7 @@ export class FilterControls {
         this.filteredRows = rows;
     }
 
-    private async applyFilter(){
+    private async applyFilter(direction : string){
         // Persist current StartTS and EndTS
         if(!this.config.initStartTS && !this.config.initEndTS){ // if a filter has already been applied, we don't overwrite dates
             this.config.initStartTS = this.startTS!;
@@ -451,6 +460,8 @@ export class FilterControls {
 
         let dataView = await this.mod.visualization.data();
         // Removes previous selection
+        // Looks like clearmarking is not synchronous, that's why we're using "substract" instead
+        // TODO : check if that's still the case
         if(this.markedRows.length > 0){
             this.mod.transaction(() => {
                 dataView.mark(this.markedRows, "Subtract");
@@ -459,7 +470,15 @@ export class FilterControls {
 
         // Add new one
         let filterCountDocProp = await this.mod.document.property<number>(FILTER_COUNT_PROPERTY).catch(() => undefined);
+        let fltrStgsDocProp = await this.mod.document.property<string>(FILTER_SETTINGS_PROPERTY).catch(() => undefined);
+
         this.mod.transaction( () => {
+
+            if(fltrStgsDocProp){
+                //{"origin": "graph|panel", "filterOn": "cases|events", "direction": "in|out"}
+                fltrStgsDocProp.set('{"origin": "panel", "filterOn": "'+this.filterOn.toLowerCase()+'", "direction": "'+direction+'"}');
+            }
+
             dataView.mark(this.filteredRows, "Add"); // should trigger TERR script
             this.markedRows = this.filteredRows;
             this.filterCount++;

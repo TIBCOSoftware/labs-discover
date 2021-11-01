@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { PublishedViews } from '../../../models_ui/backend';
-import { getRelativeTime } from '../../../functions/analysis';
 import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { Location } from '@angular/common';
+import { PublishedViews } from 'src/app/backend/model/publishedViews';
 
 @Component({
   selector: 'tdv-list',
@@ -25,8 +24,6 @@ export class TdvListComponent implements OnInit {
     {field: 'ModificationTime', header: 'Modified on'},
     {field: 'CreationTime', header: 'Created on'}
   ];
-
-  public getRelTime = getRelativeTime;
 
   public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
 

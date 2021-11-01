@@ -6,8 +6,10 @@ import { logger } from '../common/logging';
 import { ClaimsApi, ClaimsSandbox, User, UsersApi } from '../liveapps/authorization/api';
 import { CasesApi, GetCaseResponseItem, GetTypeResponseItem, GetTypeResponseItemAttribute, GetTypeResponseItemCreator, GetTypeResponseItemState, TypesApi } from '../liveapps/casemanagement/api';
 import { CaseAction, CaseActionsApi } from '../liveapps/pageflow/api';
-import { InvestigationField, InvestigationState } from '../models/configuration.model';
-import { Application, InvestigationActions, InvestigationApplicationDefinition, InvestigationDetails, InvestigationMetadata, InvestigationTrigger } from '../models/investigation.model';
+import { ProcessDetails, ProcessesApi } from '../liveapps/processmanagement/api';
+import { InvestigationApplication, InvestigationField, Investigations, InvestigationState } from '../models/configuration.model';
+import { Application, InvestigationActions, InvestigationApplicationDefinition, InvestigationCreateRequest, InvestigationCreateResponse, InvestigationDetails, InvestigationMetadata, InvestigationTrigger } from '../models/investigation.model';
+import { ConfigurationService } from '../services/configuration.service';
 
 @Service()
 @JsonController('/investigation')
@@ -18,8 +20,11 @@ export class InvestigationController {
   private typesService: TypesApi;
   private usersService: UsersApi;
   private actionsService: CaseActionsApi;
+  private processService: ProcessesApi;
+  private configurationService: ConfigurationService;
 
   private users: User[] = [];
+
 
   constructor (
     protected cache: DiscoverCache
@@ -29,6 +34,9 @@ export class InvestigationController {
     this.typesService = new TypesApi(process.env.LIVEAPPS + '/case/v1');
     this.usersService = new UsersApi(process.env.LIVEAPPS + '/organisation/v1');
     this.actionsService = new CaseActionsApi(process.env.LIVEAPPS + '/pageflow/v1');
+    this.processService = new ProcessesApi(process.env.LIVEAPPS + '/process/v1');
+    this.configurationService = new ConfigurationService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
+
   }
 
   public static getName = (): string => {
@@ -142,7 +150,6 @@ export class InvestigationController {
     const sandboxId = claims.sandboxes?.filter((sandbox:ClaimsSandbox) => sandbox.type === ClaimsSandbox.TypeEnum.Production)[0].id as string;
     const filter = 'applicationId eq ' + appId + ' and caseType eq 1 and caseState eq ' + state + ' and caseRef eq ' + investigationId;
     const actions = (await this.actionsService.listCaseActions(sandboxId, filter, header)).body;
-    logger.debug(actions);
     const investigationActions = actions.
       filter((action: CaseAction) => !action.label.startsWith('$')).
       map((action: CaseAction) => {
@@ -159,6 +166,54 @@ export class InvestigationController {
         ]            
         return {id: action.id, label: action.label, formData:  formData.join(':')}});
     return investigationActions;
+  }
+
+  @Post('/:appId/:creatorId/start')
+  async postStartCaseForInvestigation(@HeaderParam('authorization') token: string, @Param('appId') appId: string, @Param('creatorId') creatorId: string, @Body() requestBody: InvestigationCreateRequest, @Res() response: Response): Promise<InvestigationCreateResponse | Response> {
+    const check = this.preflightCheck(token, response);
+    if (check !== true) {
+      return check as Response;
+    }
+
+    const header = { headers: { 'Authorization': token}};
+    const sandboxId = (await this.cache.getClient(token.replace('Bearer ', ''))).sandboxId;
+    const select = 'b,c'; 
+    const filter = 'isCase eq TRUE and applicationId eq ' + appId;
+
+    const body = (await this.typesService.getTypes(sandboxId, select, filter, undefined, '1000', undefined, header)).body[0];
+    const creatorSchema = body.creators?.filter((element: GetTypeResponseItemCreator) => element.id === creatorId)[0].jsonSchema as any;
+    const properties = creatorSchema.definitions[body.applicationInternalName as string].properties;
+    const creatorBody= {} as any;
+
+    if (properties) {
+      const triggerMapping = (JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'INVESTIGATIONS')) as Investigations).applications.filter(
+        (element: InvestigationApplication) => element.applicationId === appId
+      )[0].creatorData;
+
+      // Add fixed fields
+      triggerMapping.push({ label: "analysisId", field: "AnalysisId"});
+      triggerMapping.push({ label: "analysisName", field: "AnalysisName"});
+      triggerMapping.push({ label: "templateId", field: "TemplateId"});
+      triggerMapping.push({ label: "templateName", field: "TemplateName"});
+      
+      creatorBody[body.applicationInternalName as string] = {};
+      Object.keys(properties).forEach((element) => {
+        const triggerElement = triggerMapping.find((el: any) => el.field === element);
+        if (triggerElement) {
+          creatorBody[body.applicationInternalName as string][element] = (requestBody as any)[triggerElement.label];  
+        }
+      });
+    }
+
+    const details = {
+      id: creatorId,
+      applicationId: appId,
+      sandboxId: sandboxId,
+      data: JSON.stringify(creatorBody)
+    } as ProcessDetails;
+    const createResponse = await this.processService.processCreate(details, header);
+
+    return { id: createResponse.body.caseIdentifier as string};
   }
 
   readonly metaFields = [

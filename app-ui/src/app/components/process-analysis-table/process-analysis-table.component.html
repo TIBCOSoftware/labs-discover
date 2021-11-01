@@ -1,4 +1,5 @@
 <!--<pre>{{callCounter}}</pre>-->
+<process-analysis-compare *ngIf="selectedAnalysis[0] !== undefined && selectedAnalysis[0].metrics" [display]="showCompare" (onHide)="toggleCompare()" [analysisOptions]="processAnalyses" [selectedAnalysis]="selectedAnalysis"></process-analysis-compare>
 <p-table #dt [columns]="cols" [value]="processAnalyses"
          dataKey="id" id="pTable" styleClass="custom-table-css"
          [rowHover]="false"
@@ -20,8 +21,10 @@
   <ng-template pTemplate="body" let-rowData let-i="rowIndex" let-expanded="expanded" let-columns="columns">
     <tr class="rowhover" id="toHightlight">
       <td *ngFor="let col of columns" class="no-padding data-row hovereffect" (click)="dt.toggleRow(rowData, $event)">
-        <div *ngIf="col.field != 'metadata.state'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div>
-        <div *ngIf="col.field == 'metadata.state'">
+        <!--div *ngIf="col.field != 'metadata.state'" [innerHTML]="obtainData(rowData, col.field) | highlight: searchTerm : 'Multi-Match'"></div-->
+        <div *ngIf="col.field === 'metadata.modifiedOn'">{{rowData?.metadata?.modifiedOn | relativeTime }}</div>
+        <div *ngIf="col.field !== 'metadata.state' && col.field !== 'metadata.modifiedOn'" [innerHTML]="obtainData(rowData, col.field)"></div>
+        <div *ngIf="col.field === 'metadata.state'">
           <uxpl-tag *ngIf="obtainData(rowData, col.field) !== 'Process mining'" matTooltip="{{getToolTip(col.field, rowData)}}" matTooltipClass="tTip" icon="{{'assets/images/states/' + getValue(rowData,col.field) + '.svg'}}" class="uxpl-tag"
                     color="{{getNgClass(col.field, rowData)}}">{{ obtainData(rowData, col.field)}}</uxpl-tag>
           <mini-progress-bar *ngIf="obtainData(rowData, col.field) === 'Process mining'" [percentage]="statusMap[rowData?.data?.name]?.percentage" [message]="obtainData(rowData, col.field)"></mini-progress-bar>
@@ -31,8 +34,8 @@
         <div class="button-container">
           <uxpl-options-menu style="margin-top: 5px" x-position="before" menu-height=“160px” y-position="after" icon-height="15px" icon-width="15px" [config]="actions[rowData.id]" (selected)="handleCaseActionSelect($event, i)"  (click)="handleOptionClick($event)"></uxpl-options-menu>
           <uxpl-button *ngIf="rowData.metadata.state == 'Ready' || rowData.metadata.state == 'Archived' " id="#openAnalysis" type="secondary"  (clicked)="buttonClicked(rowData)" [height]="'28px'">
-            <div *ngIf="rowData.data.templateId" class="analysis-button">View analytics  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
-            <div *ngIf="!rowData.data.templateId" class="analysis-button">Select Template  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
+            <div *ngIf="rowData.data.templateId && rowData.data.templateLabel && rowData.data.templateLabel !== 'Not assigned'" class="analysis-button">View analytics  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
+            <div *ngIf="!rowData.data.templateId || !rowData.data.templateLabel || rowData.data.templateLabel === 'Not assigned'" class="analysis-button">Select Template  <img src="assets/images/svg/Open.svg" class="hover-icon"></div>
           </uxpl-button>
         </div>
       </td>
@@ -48,7 +51,7 @@
     <tr style="background-color: #FFFFFF">
       <td [attr.colspan]="columns.length + 2">
         <div class="ui-g ui-fluid" style="font-size:16px;padding:20px; ">
-          <process-analysis-details [processAnalysis]="rowData" [progress]="statusMap[rowData?.data?.name]"></process-analysis-details>
+          <process-analysis-details [processAnalysis]="rowData" [progress]="statusMap[rowData?.data?.name]" (doCompare)="handleDoCompare($event)"></process-analysis-details>
         </div>
       </td>
     </tr>
@@ -63,4 +66,3 @@
 
   </uxpl-popup>
 </div>
-

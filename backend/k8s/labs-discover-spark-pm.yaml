@@ -16,7 +16,7 @@ spec:
   arguments:
     - "DIS_000014"
     - "discover"
-  sparkVersion: "3.1.2"
+  sparkVersion: "3.2.0"
   batchScheduler: "volcano"
   restartPolicy:
     type: Never
@@ -40,7 +40,7 @@ spec:
     cores: 2
     memory: "2048m"
     labels:
-      version: 3.1.2
+      version: 3.2.0
     serviceAccount: spark-operator-spark
     volumeMounts:
       - name: "persistent-storage"
@@ -59,7 +59,7 @@ spec:
     instances: 2
     memory: "4096m"
     labels:
-      version: 3.1.2
+      version: 3.2.0
     volumeMounts:
       - name: "persistent-storage"
         mountPath: "/data"

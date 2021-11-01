@@ -1,0 +1,1 @@
+export const DEFAULT_AUTOMAPPING_THRESHOLD = 0.8

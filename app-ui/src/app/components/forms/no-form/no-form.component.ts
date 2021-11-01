@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import { RepositoryService } from 'src/app/api/repository.service';
+import { RepositoryService } from 'src/app/backend/api/repository.service';
 
 @Component({
   templateUrl: './no-form.component.html',

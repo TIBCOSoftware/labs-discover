@@ -1,6 +1,5 @@
 import { Service } from "typedi";
 import { logger } from "../common/logging";
-import axios, { AxiosResponse } from "axios";
 import { Analysis, AnalysisRequest, AnalysisData, AnalysisMetadata, AnalysisStatus } from "../models/analysis-redis.model";
 import { DiscoverCache } from "../cache/DiscoverCache";
 import { cloneDeep } from 'lodash';

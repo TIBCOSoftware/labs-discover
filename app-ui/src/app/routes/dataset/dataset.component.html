@@ -50,7 +50,7 @@
               <div [innerHTML]="dataset.description | highlight: searchTerm : 'Multi-Match'"></div>
             </td>
             <td class="no-padding data-row hovereffect" (click)="dt.toggleRow(dataset, $event)">
-              <div>{{getRelTime(dataset.lastPreviewDate)}}</div>
+              <div>{{dataset.lastPreviewDate | relativeTime}}</div>
             </td>
             <td class="no-padding data-row hovereffect" (click)="dt.toggleRow(dataset, $event)">
               <uxpl-tag *ngIf="dataset?.status" [icon]="getStateIcon(dataset.status)" class="uxpl-tag"

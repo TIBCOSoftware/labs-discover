@@ -2,10 +2,10 @@ import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} f
 import {StepStatus} from '../../../models_ui/analyticTemplate';
 import {clearAllNodeFromDefault, stripDisabledMenuItems} from '../../../functions/templates';
 import {cloneDeep} from 'lodash-es';
-import {TemplateMenuConfig} from '../../../model/templateMenuConfig';
+import {TemplateMenuConfig} from '../../../backend/model/templateMenuConfig';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import {TemplateAnalyticsMenuDragdropComponent} from '../template-analytics-menu-dragdrop/template-analytics-menu-dragdrop.component';
-import {TemplateFilterConfig} from '../../../model/templateFilterConfig';
+import {TemplateFilterConfig} from '../../../backend/model/templateFilterConfig';
 
 @Component({
   selector: 'template-analytics-filters',

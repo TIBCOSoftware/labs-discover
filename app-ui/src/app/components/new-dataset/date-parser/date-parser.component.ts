@@ -3,7 +3,7 @@ import {SelectOption} from '@tibco-tcstk/tc-web-components/dist/types/models/sel
 import {Table} from 'primeng/table';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
-import {Dataset, DatasetDataSource, DatasetSchema, DatasetWizard} from 'src/app/models_ui/dataset';
+import {DatasetWizard} from 'src/app/models_ui/dataset';
 import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
 import {DateParseRecord, DateParsingResult} from 'src/app/models_ui/parsing';
 import {ConfigurationService} from 'src/app/service/configuration.service';
@@ -11,6 +11,9 @@ import {CsvNgpDataSource} from 'src/app/service/csv-ngp-datasource';
 import {DatasetService} from 'src/app/service/dataset.service';
 import {ParsingService} from 'src/app/service/parsing.service';
 import {cloneDeep} from 'lodash-es';
+import { Dataset } from 'src/app/backend/model/dataset';
+import { Schema } from 'src/app/backend/model/schema';
+import { DatasetSource } from 'src/app/backend/model/datasetSource';
 
 @Component({
   selector: 'dataset-date-parser',
@@ -43,8 +46,8 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
   public invalidDateColumnIdxs: number[] = [];
   public invalidDateColumns: string[] = [];
 
-  public datasetDataSource: DatasetDataSource;
-  public schema: DatasetSchema[];
+  public datasetDataSource: DatasetSource;
+  public schema: Schema[];
 
   public validRowsCount = -1;  // -1 means not all column has format and cannot count
 
@@ -153,7 +156,7 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
         if (dl) {
           let valid = true;
           for (let j = 0; j < this.dateFields.length; j++) {
-            const schema: DatasetSchema = this.getDatesetColumn(j);
+            const schema: Schema = this.getDatesetColumn(j);
             if (!schema.format || !this.parsingService.validateSingleDate(dl[schema.key], schema.format)) {
               valid = false;
               break;
@@ -383,7 +386,7 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
 
   }
 
-  private getDatesetColumn(dfIndex: number): DatasetSchema {
+  private getDatesetColumn(dfIndex: number): Schema {
     return this.schema[this.dateFields[dfIndex].index];
   }
 
@@ -420,7 +423,7 @@ export class NewDatesetDateParserComponent implements OnChanges, OnInit {
     ).length > 0;
   }
 
-  private getDatesetColumnByName(col: string): DatasetSchema {
+  private getDatesetColumnByName(col: string): Schema {
     let index = -1;
     for (const df of this.dateFields) {
       if (df.name === col) {

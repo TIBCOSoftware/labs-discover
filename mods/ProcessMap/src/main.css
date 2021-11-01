@@ -24,3 +24,36 @@ body {
     height: 100%;
     flex-grow: 1;
 }
+
+.cy-context-menus-cxt-menu {
+    padding: 8px 0;
+    border: 0px;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 3px 8px 2px rgba(0,0,0,0.2);
+}
+
+
+.cy-context-menus-cxt-menuitem {
+    background-color:#ffffff;
+    height: 14px;
+    color: #FFFFFF;
+    font-family: "Roboto";
+    font-size: 12px;
+    letter-spacing: 0;
+    line-height: 14px;
+    height: 32px;
+    padding: 9px 40px;
+}
+
+.cy-context-menus-cxt-menuitem:hover {
+    background-color: #91ADFF;
+}
+
+.cy-context-menus-divider {
+    border-bottom:1px solid #DEDEDE;
+}
+
+.cy-context-menus-submenu-indicator {
+    right : 13px;
+}

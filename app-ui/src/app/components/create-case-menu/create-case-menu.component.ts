@@ -1,78 +1,80 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
-import {NewInvestigation} from '../../models_ui/discover';
-import {UxplSelectInput} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-select-input/uxpl-select-input';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CaseConfig} from '../../models_ui/configuration';
 import {createReadableArrayString} from '../../functions/templates';
+import {InvestigationCreateRequest} from 'src/app/backend/model/investigationCreateRequest';
+import {InvestigationConfig} from "../../models_ui/investigations";
 
 @Component({
   selector: 'create-case-menu',
   templateUrl: './create-case-menu.component.html',
   styleUrls: ['./create-case-menu.component.css']
 })
-export class CreateCaseMenuComponent implements OnInit, AfterViewInit, OnChanges {
+export class CreateCaseMenuComponent implements OnInit, OnChanges {
 
   @Input() investigationConfig: CaseConfig[];
-
   @Input() caseMarking: string[];
-
   @Input() variantMarking: string[];
+  @Output() createInvestigationEvent: EventEmitter<InvestigationConfig> = new EventEmitter();
 
-  @Output() createInvestigation: EventEmitter<NewInvestigation> = new EventEmitter();
-
-  @ViewChild('selectInput', {static: false}) caseTypeInput: ElementRef<UxplSelectInput>;
-
-  public invInfo: NewInvestigation;
-  public caseAdditionalInfo: string;
-  public variantAdditionalInfo: string;
+  invInfo: InvestigationCreateRequest;
+  caseAdditionalInfo: string;
+  variantAdditionalInfo: string;
+  investigationApplicationId: string;
+  investigationType: string;
   private MAX_READ_LENGTH = 15;
 
-  constructor() {}
+  constructor() {
+  }
 
-  private invValues:{label:string, value:string}[];
+  public invValues: { label: string, value: string }[];
 
   ngOnInit(): void {
-    this.invValues = this.investigationConfig.map( con => { return {label: con.customTitle, value: con.customTitle}} )
-    if(this.invValues && this.invValues.length > 0){
+    this.invValues = this.investigationConfig.map((con: any) => {
+      return {label: con.customTitle, value: con.applicationId}
+    })
+    if (this.invValues && this.invValues.length > 0) {
+      this.investigationApplicationId = this.invValues[0].value;
+      this.investigationType = this.invValues[0].label;
       this.invInfo = {
-        type: this.invValues[0].value,
-        contextType: 'Case',
-        contextIds: [],
-        additionalDetails : '',
+        type: 'Case',
+        ids: '',
+        details: '',
         summary: ''
       }
       this.setupAdditionalInfo();
     }
   }
 
-  createInvestiagation(){
-    this.createInvestigation.emit(this.invInfo);
+  public createInvestigation(): void {
+    this.createInvestigationEvent.emit({
+      investigationType: this.investigationType,
+      investigationId: this.investigationApplicationId,
+      data: this.invInfo
+    });
   }
 
-  ngAfterViewInit(): void {
-    if(this.invValues && this.invValues.length > 0) {
-      this.caseTypeInput.nativeElement.options = this.invValues;
-      this.caseTypeInput.nativeElement.value = this.invValues[0].value;
-    }
+  public cancelCreateInvestigation(): void {
+    this.createInvestigationEvent.emit(null);
   }
 
-  contextTypeRadioChange(event){
-    if(this.invInfo){
-      this.invInfo.contextType = event.detail.value;
+  public contextTypeRadioChange(event): void {
+    if (this.invInfo) {
+      this.invInfo.type = event.detail.value;
       this.setupAdditionalInfo();
     }
   }
 
-  updateField(value, field) {
-    if(this.invInfo){
+  public updateField(value, field): void {
+    if (this.invInfo) {
       this.invInfo[field] = value;
     }
   }
 
-  public setupAdditionalInfo() {
+  public setupAdditionalInfo(): void {
     if (this.invInfo) {
-      if (this.invInfo.contextType === 'Case') {
+      if (this.invInfo.type === 'Case') {
         if (this.caseMarking) {
-          this.invInfo.contextIds = this.caseMarking;
+          this.invInfo.ids = this.caseMarking.toString();
           this.caseAdditionalInfo = '(' + createReadableArrayString(this.caseMarking, this.MAX_READ_LENGTH) + ')';
           this.variantAdditionalInfo = '';
         } else {
@@ -81,7 +83,7 @@ export class CreateCaseMenuComponent implements OnInit, AfterViewInit, OnChanges
         }
       } else {
         if (this.variantMarking) {
-          this.invInfo.contextIds = this.variantMarking;
+          this.invInfo.ids = this.variantMarking.toString();
           this.caseAdditionalInfo = '';
           this.variantAdditionalInfo = '(' + createReadableArrayString(this.variantMarking, this.MAX_READ_LENGTH) + ')';
         } else {
@@ -93,8 +95,15 @@ export class CreateCaseMenuComponent implements OnInit, AfterViewInit, OnChanges
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes?.caseMarking || changes?.variantMarking){
+    if (changes?.caseMarking || changes?.variantMarking) {
       this.setupAdditionalInfo();
+    }
+  }
+
+  public setInvestigationApp(event: any): void {
+    if (event?.detail?.value && event?.detail?.label) {
+      this.investigationApplicationId = event.detail.value;
+      this.investigationType = event.detail.label
     }
   }
 }

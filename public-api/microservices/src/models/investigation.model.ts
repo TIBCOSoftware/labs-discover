@@ -38,3 +38,18 @@ export interface InvestigationApplicationDefinition {
   creators: InvestigationTrigger[];
   states: InvestigationState[]
 }
+
+export interface InvestigationCreateRequest {
+  analysisId: string;
+  analysisName: string;
+  templateId: string;
+  templateName: string;
+  details: string;
+  ids: string;
+  summary: string;
+  type: string;
+}
+
+export interface InvestigationCreateResponse {
+  id: string;
+}

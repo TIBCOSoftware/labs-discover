@@ -15,7 +15,7 @@ import { Location } from '@angular/common';
 export class WelcomeComponent implements OnInit {
 
   landingPage: LandingPageConfig;
-  readonly CLOUD_STARTER_DESCRIPTOR = 'assets/cloudstarter.json';
+  readonly CLOUD_STARTER_DESCRIPTOR = 'assets/cloud_app_descriptor.json';
   public version: string;
 
   constructor(private router: Router, private configService: ConfigurationService, private http: HttpClient, private location: Location) {

@@ -108,6 +108,8 @@ export class DatasetService {
         dataset.previewStatus = Object.assign(dataset.previewStatus || {}, status);
         
         this._alwaysResolvePromise(this.updateDataset(token, datasetId, dataset));
+      } else {
+        logger.debug(`[DatasetService] The dataset [${datasetId}] is not exist when saving the status`);
       }
     }
   }
@@ -183,6 +185,15 @@ export class DatasetService {
       dataset.PublishedView = publishedView;
     }
 
+    let datasetUpdated: DatasetUpdated;
+    if (dataset.createdDate) {
+      datasetUpdated = await this.updateDataset(token, dataset.Dataset_Id, dataset);
+    } else {
+      datasetUpdated = await this.createDataset(token, dataset);
+    }
+
+    logger.debug(`[DatasetService] Create/Update dataset [${dataset.Dataset_Id}]`);
+
     await this.saveStatus(token, dataset.Dataset_Id, {
       DatasetID: dataset.Dataset_Id,
       Organisation: orgId,
@@ -190,12 +201,7 @@ export class DatasetService {
       Message: 'Update dataset...'
     } as PreviewStatus);
 
-    let datasetUpdated: DatasetUpdated;
-    if (dataset.createdDate) {
-      datasetUpdated = await this.updateDataset(token, dataset.Dataset_Id, dataset);
-    } else {
-      datasetUpdated = await this.createDataset(token, dataset);
-    }
+    logger.debug(`[DatasetService] Saved the first initial dummy preview status`);
 
     // sleep 2 sec to show the progress change
     await this.sleep(2000);

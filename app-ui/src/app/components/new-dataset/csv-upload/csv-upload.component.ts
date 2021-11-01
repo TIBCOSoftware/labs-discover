@@ -12,7 +12,7 @@ export class CsvUploadComponent implements OnInit {
   @Input() filesize: number;
   @Input() size: string;
   @Input() error: string;
-  @Output() uploadFile: EventEmitter<any> = new EventEmitter();
+  @Output() uploadFile: EventEmitter<File> = new EventEmitter();
 
   allowedTypes: string[];
   maxFileSize;
@@ -38,11 +38,9 @@ export class CsvUploadComponent implements OnInit {
   }
 
   onFileDrop($event: Event) {
-
     $event.preventDefault();
     $event.stopPropagation();
     this.fileover = false;
-    console.log('onFileDrop', $event);
     // @ts-ignore
     this.selectFile($event.dataTransfer.files);
   }
@@ -85,8 +83,6 @@ export class CsvUploadComponent implements OnInit {
     }
     return type.toLowerCase();
   }
-
-
 
   onDragover($event: Event) {
     $event.preventDefault();

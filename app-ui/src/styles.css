@@ -191,15 +191,7 @@ uxpl-left-nav-multi {
   height: 100%;
 }
 
-.tTip {
-  white-space: pre-line;
-  font-size: 16px;
-  color: #FFF;
-  font-family: "Source Sans Pro";
-  letter-spacing: 0;
-  line-height: 18px;
-  text-align: center;
-}
+
 
 .elink {
   color: #1774E5 !important;

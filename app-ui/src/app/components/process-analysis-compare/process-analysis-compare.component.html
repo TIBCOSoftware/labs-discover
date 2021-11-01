@@ -1,0 +1,206 @@
+<p-dialog class="tibco-pm-dialog"
+          [modal]=true
+          [(visible)]="display"
+          [closable]=true
+          [closeOnEscape]=true
+          [breakpoints]="{'960px': '90vw', '640px': '100vw'}" [style]="{width: '75vw'}" (onHide)="toggleDisplay()">
+  <ng-template pTemplate="header">
+    <div class="p-dialog-title">
+      <span>Compare key metrics to {{selectedAnalysis[0].data.name}}</span>
+    </div>
+    <div class="close-icon">
+      <uxpl-icon icon="pl-icon-close" size="20px" color="#727272" (click)="handleDialogClose()"></uxpl-icon>
+    </div>
+  </ng-template>
+  <p-body>
+    <div class="pm-dialog-body">
+      <div class="pm-column header-column">
+        <div class="pm-header-row">
+          <div class="header-label-container" (click)="addCompare()">
+            <div [ngClass]="{'header-label': true, 'disabled': selectedAnalysis?.length >= 3}">Analysis</div>
+            <uxpl-icon icon="pl-icon-add-circle" size="24px"
+                       [color]="selectedAnalysis?.length < 3 ? '#1774E5' : '#AECFF6'"></uxpl-icon>
+          </div>
+        </div>
+        <div class="pm-body-sections">
+          <div class="body-section">
+            <div class="body-section-header section-element">
+              Quick look
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-icon-calendar" size="19px"></uxpl-icon>
+              Events
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-cases" size="19px"></uxpl-icon>
+              Cases
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-variants" size="19px"></uxpl-icon>
+              Variants
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-activities" size="19px"></uxpl-icon>
+              Activities
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-resources" size="19px"></uxpl-icon>
+              Resources
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-timespan" size="19px"></uxpl-icon>
+              Timespan (days)
+            </div>
+          </div>
+          <div class="body-section">
+            <div class="body-section-header section-element">
+              Activities (per case)
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-avg-activities" size="19px"></uxpl-icon>
+              Average activities
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-max-activities" size="19px"></uxpl-icon>
+              Max activities
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-min-activities" size="19px"></uxpl-icon>
+              Min activities
+            </div>
+          </div>
+          <div class="body-section">
+            <div class="body-section-header section-element">
+              Case duration
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-time-avg" size="19px"></uxpl-icon>
+              Average time (days)
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-time-med" size="19px"></uxpl-icon>
+              Median time (days)
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-max-time" size="19px"></uxpl-icon>
+              Max time (days)
+            </div>
+            <div class="body-section-data section-element">
+              <uxpl-icon icon="pm-min-time" size="19px"></uxpl-icon>
+              Min time (days)
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="pm-column" *ngFor="let analysis of selectedAnalysis; let idx = index">
+        <div class="pm-header-row data-column">
+          <div class="header-label-container">
+            <div class="header-label-container">
+              <uxpl-select-input [disabled]="idx === 0" allow-input=true placeholder="Select analysis"
+                                 [value]="analysis?.id" [options]="options"
+                                 (uxplSelection)="handleSelectedAnalysis(idx, $event)"></uxpl-select-input>
+              <uxpl-icon *ngIf="idx !== 0" icon="pl-icon-remove-circle" size="19px" color="#1774E5"
+                         (click)="removeCompare(idx)"></uxpl-icon>
+            </div>
+          </div>
+        </div>
+        <div class="pm-body-sections">
+          <div class="body-section data-column">
+            <div class="body-section-header section-element section-element-value">
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.numEvents"
+                                 [comparisonMetric]="analysis?.metrics?.numEvents"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.numCases"
+                                 [comparisonMetric]="analysis?.metrics?.numCases"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.numVariants"
+                                 [comparisonMetric]="analysis?.metrics?.numVariants"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.numActivities"
+                                 [comparisonMetric]="analysis?.metrics?.numActivities"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.numResources"
+                                 [comparisonMetric]="analysis?.metrics?.numResources"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="calcTimespan(selectedAnalysis[0])"
+                                 [comparisonMetric]="calcTimespan(analysis)"></metric-comparison>
+            </div>
+          </div>
+          <div class="body-section data-column">
+            <div class="body-section-header section-element section-element-value">
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.avgActivities"
+                                 [comparisonMetric]="analysis?.metrics?.avgActivities"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.maxActivities"
+                                 [comparisonMetric]="analysis?.metrics?.maxActivities"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.minActivities"
+                                 [comparisonMetric]="analysis?.metrics?.minActivities"></metric-comparison>
+            </div>
+          </div>
+          <div class="body-section data-column">
+            <div class="body-section-header section-element section-element-value">
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.avgTime"
+                                 [comparisonMetric]="analysis?.metrics?.avgTime"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.medianTime"
+                                 [comparisonMetric]="analysis?.metrics?.medianTime"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.maxTime"
+                                 [comparisonMetric]="analysis?.metrics?.maxTime"></metric-comparison>
+            </div>
+            <div class="body-section-data section-element section-element-value">
+              <metric-comparison [showIncrease]="showIncrease" [showDecrease]="showDecrease"
+                                 [baseMetric]="selectedAnalysis[0]?.metrics?.minTime"
+                                 [comparisonMetric]="analysis?.metrics?.minTime"></metric-comparison>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </p-body>
+  <p-footer>
+    <div class="pm-dialog-footer-content">
+      <div class="footer-changes-option">
+        <!--uxpl-checkbox>Display changes in values</uxpl-checkbox-->
+        <uxpl-radio-group class="metric-comparison-options" [value]="metricToggle"
+                          (uxplChanged)="handleMetricOptionSelection($event)">
+          <uxpl-radio value="all">Display all changes in value</uxpl-radio>
+          <uxpl-radio value="increases">Display increases in value</uxpl-radio>
+          <uxpl-radio value="decreases">Display decreases in value</uxpl-radio>
+        </uxpl-radio-group>
+      </div>
+      <uxpl-button type="primary" width="70px" (clicked)="handleDialogClose()">
+        <div class="close-button-label">Close</div>
+      </uxpl-button>
+    </div>
+  </p-footer>
+</p-dialog>

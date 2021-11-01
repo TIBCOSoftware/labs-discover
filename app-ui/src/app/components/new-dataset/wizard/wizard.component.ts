@@ -4,14 +4,16 @@ import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {Router} from '@angular/router';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {cloneDeep, isEqual} from 'lodash-es';
-import {Dataset, DatasetListItem, DatasetSchema, DatasetWizard} from 'src/app/models_ui/dataset';
-import {DatasetService} from 'src/app/service/dataset.service';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
+import { Dataset } from 'src/app/backend/model/dataset';
+import { DatasetListItem } from 'src/app/backend/model/datasetListItem';
+import { DatasetSource } from 'src/app/backend/model/datasetSource';
+import { Schema } from 'src/app/backend/model/schema';
+import { DatasetWizard } from 'src/app/models_ui/dataset';
+import { DatasetService } from 'src/app/service/dataset.service';
 import {notifyUser} from '../../../functions/message';
 import {NewAnalysisStepStatus} from '../../../models_ui/discover';
-import {ConfigurationService} from '../../../service/configuration.service';
-import {CsvService} from '../../../service/csv.service';
-import {DiscoverBackendService} from '../../../service/discover-backend.service';
-import {TDVService} from '../../../service/tdv.service';
+import {calculateDatasetColumns, calculateDatasetData} from '../../../functions/dataset';
 
 @Component({
   templateUrl: './wizard.component.html',
@@ -46,13 +48,10 @@ export class NewDatasetWizardComponent implements OnInit {
   private statuses: NewAnalysisStepStatus[];
 
   constructor(
-    private configService: ConfigurationService,
     public dialogRef: MatDialogRef<NewDatasetWizardComponent>,
-    private csvService: CsvService,
-    private tdvService: TDVService,
-    private datasetService: DatasetService,
+    private catalogService: CatalogService,
+    protected datasetService: DatasetService,
     private messageService: MessageTopicService,
-    private backendService: DiscoverBackendService,
     private location: Location,
     private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -86,7 +85,7 @@ export class NewDatasetWizardComponent implements OnInit {
   }
 
   private initFromListItem(datasetListItem: DatasetListItem) {
-    this.datasetService.getDataset(datasetListItem.datasetid).subscribe(dataset => {
+    this.catalogService.getDataset(datasetListItem.datasetid).subscribe(dataset => {
       this.backupDataset = cloneDeep(dataset);
       this.initializeForm(dataset)
     });
@@ -221,14 +220,14 @@ export class NewDatasetWizardComponent implements OnInit {
 
     if (onlyEditDataset) {
       // only save dataset
-      this.datasetService.updateDataset(this.dataset).subscribe(resp => {
+      this.catalogService.updateDataset(this.dataset.Dataset_Id, this.dataset).subscribe(resp => {
         this.dialogRef.close();
         this.datasetSaved.emit();
       });
     } else {
-      this.datasetService.uploadFileAndSaveDatasetAndPreview(this.dataset, this.progress, this.file).subscribe(resp => {
+      this.datasetService.uploadFileAndSaveDatasetAndPreview(this.dataset as any, this.progress, this.file).subscribe(resp => {
+        console.log('File upload resp: ' , resp)
         const dataset = resp;
-
         if (dataset.previewStatus.Progression === 100) {
           this.success = true;
           this.progress.status = 'Success';
@@ -271,7 +270,7 @@ export class NewDatasetWizardComponent implements OnInit {
             FileHeaders: 'true',
             FileQuoteChar: '"',
             FileSeparator: ','
-          },
+          } as unknown as DatasetSource,
           schema: []
         } as Dataset;
     }
@@ -367,7 +366,6 @@ export class NewDatasetWizardComponent implements OnInit {
     if (event) {
       // clear the old data before setting the new data.
       this.resetPreviewData(undefined);
-
       if (event.jsonData) {
         try {
           const data = JSON.parse(event.jsonData);
@@ -388,11 +386,11 @@ export class NewDatasetWizardComponent implements OnInit {
       } else if (event.previewData) {
         this.previewData = event.previewData;
       } else if (event.preview) {
-        this.previewData = this.calculateData(event.columns, event.preview);
+        this.previewData = calculateDatasetData(event.columns, event.preview);
       }
 
       this.datasetWizard.numberRowsForPreview = this.previewData.length;
-      this.previewColumns = this.calculateColumns(event.columns);
+      this.previewColumns = calculateDatasetColumns(event.columns);
 
       if (this.previewColumns.length !== this.dataset.schema.length) {
         console.warn('The columns parsed from file are not same as the schema in dataset.');
@@ -419,7 +417,7 @@ export class NewDatasetWizardComponent implements OnInit {
   }
 
   // datesetColumn is about the column name and its attributes type
-  private calculateDatesetColumns = (columns: string[]): DatasetSchema[] => {
+  private calculateDatesetColumns = (columns: string[]): Schema[] => {
     return columns.map(column => {
       const newColumn = {
         key: column,
@@ -427,35 +425,9 @@ export class NewDatasetWizardComponent implements OnInit {
         importance: 'None',
         format: 'None',
         featureType: 'None'
-      } as DatasetSchema;
+      } as Schema;
       return newColumn;
     })
-  }
-
-  // previewColumn is the object array for displaying data preview
-  private calculateColumns = (columns: string[]): any[] => {
-    return columns.map(column => {
-      const newColumn = {
-        headerName: column,
-        field: column,
-        sortable: false,
-        filter: false,
-        resizable: false
-      };
-      return newColumn;
-    })
-  }
-
-  private calculateData = (columns: any[], data: any[]): any[] => {
-    const returnData = [];
-    data.forEach(element => {
-      const row = {};
-      for (let index = 0; index < columns.length; index++) {
-        row[columns[index]] = element[index];
-      }
-      returnData.push(row)
-    });
-    return returnData;
   }
 
   public uploadFile = (event) => {

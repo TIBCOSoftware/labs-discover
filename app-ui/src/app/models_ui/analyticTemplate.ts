@@ -1,6 +1,6 @@
-import { Template } from '../model/template';
+import { Template } from '../backend/model/template';
 import {AnalyticsMenuConfigUI} from './configuration';
-import {TemplateFilterConfig} from '../model/templateFilterConfig';
+import {TemplateFilterConfig} from '../backend/model/templateFilterConfig';
 
 export type anType = 'General' | 'Vertical' | 'User defined';
 

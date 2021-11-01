@@ -35,8 +35,8 @@
           <tr class="rowhover" id="toHightlight" [ngClass]="{selected: selectedTdv?.DatasetName==tdv.DatasetName}">
             <td class="no-padding data-row hovereffect"><div [innerHTML]="tdv.DatasetName | highlight: searchTerm : 'Multi-Match'"></div></td>
             <td class="no-padding data-row hovereffect"><div [innerHTML]="tdv.Annotation | highlight: searchTerm : 'Multi-Match'"></div></td>
-            <td class="no-padding data-row hovereffect"><div>{{getRelTime(tdv.ModificationTime)}}</div></td>
-            <td class="no-padding data-row hovereffect"><div>{{getRelTime(tdv.CreationTime)}}</div></td>
+            <td class="no-padding data-row hovereffect"><div>{{tdv.ModificationTime | relativeTime}}</div></td>
+            <td class="no-padding data-row hovereffect"><div>{{tdv.CreationTime | relativeTime}}</div></td>
             <td class="no-padding lastCol">
               <uxpl-button type="secondary" *ngIf="selectedTdv?.DatasetName!=tdv.DatasetName" height="24px" width="68px" (clicked)="selectTdv(tdv)">select</uxpl-button>
               <div *ngIf="selectedTdv?.DatasetName==tdv.DatasetName" class="selected-col">

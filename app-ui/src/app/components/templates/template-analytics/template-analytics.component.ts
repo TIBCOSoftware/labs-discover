@@ -2,9 +2,9 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {getSFLink} from '../../../functions/templates';
 import {AnalyticTemplateUI, StepStatus} from 'src/app/models_ui/analyticTemplate';
 import {ConfigurationService} from '../../../service/configuration.service';
-import {VisualisationService} from 'src/app/api/visualisation.service';
+import {VisualisationService} from 'src/app/backend/api/visualisation.service';
 import {map} from 'rxjs/operators';
-import {Visualisation} from 'src/app/model/visualisation';
+import {Visualisation} from 'src/app/backend/model/visualisation';
 import {stripOrgFolder} from '../../../functions/analysis';
 
 
@@ -113,8 +113,8 @@ export class TemplateAnalyticsComponent implements OnInit {
         }
         if (this.analyticsChoice === 'COPY') {
           // Add the target folder to the newLocation
-          if(this.configService.config?.discover?.analytics?.previewLocation) {
-            const folder = this.configService.config?.discover?.analytics?.previewLocation;
+          if(this.configService.config?.discover?.analytics?.customUserFolder) {
+            const folder = this.configService.config?.discover?.analytics?.customUserFolder;
             if(this.newLocation.lastIndexOf('/') > -1) {
               this.newLocation = folder + this.newLocation.substring(this.newLocation.lastIndexOf('/'), this.newLocation.length);
             } else {

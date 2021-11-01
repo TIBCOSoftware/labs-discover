@@ -33,14 +33,18 @@ services:
       - "80:80"
       - "443:443"
     network_mode: bridge
+    restart: on-failure
 
   microservice:
-    image: tibcosoftware/labs-discover-api-templates:0.5.0
+    image: public.ecr.aws/tibcolabs/labs-discover-api-analysis:0.9.2
     env_file: 
       - .env
     environment: 
       - LOGLEVEL=debug
+      - LOGGER_LEVEL=debug
+      - LOG_LEVEL=debug
       - LIVEAPPS=https://eu.liveapps.cloud.tibco.com
+      - NIMBUS=https://eu.nimbus.cloud.tibco.com
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CONTROLLER_ANALYSIS=ON
@@ -48,6 +52,7 @@ services:
       - CONTROLLER_DATASETS=ON
       - CONTROLLER_CONFIGURATION=OFF
       - CONTROLLER_INVESTIGATIONS=OFF
+      - CONTROLLER_DOCUMENTATION=ON
       - CONTROLLER_SWAGGER=ON
     ports:
       - "8080:8080"

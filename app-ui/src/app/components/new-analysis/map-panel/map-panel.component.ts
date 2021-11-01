@@ -1,12 +1,12 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Mapping} from 'src/app/model/mapping';
+import {Mapping} from 'src/app/backend/model/mapping';
 import {MapDef, MappingUI} from 'src/app/models_ui/analysis';
 import {NewAnalysisStepStatus} from 'src/app/models_ui/discover';
 import {AutoMappingService} from 'src/app/service/auto-mapping.service';
-import {DatasetService} from '../../../service/dataset.service';
 import {AutoMapResult} from '../../../models_ui/configuration';
 import {TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {Location} from '@angular/common';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
 
 type Options = { label: string, value: string, id: string }[];
 
@@ -21,7 +21,7 @@ export class MapPanelComponent implements OnInit, OnChanges {
   constructor(
     private location: Location,
     private autoMapService: AutoMappingService,
-    private datasetService: DatasetService
+    private catalogService: CatalogService
   ) {
   }
 
@@ -154,8 +154,6 @@ export class MapPanelComponent implements OnInit, OnChanges {
       this.autoMapResults['startTime'] = {message: 'Automapped) Only option for start time...'};
       this.setAutoMapped('startTime', true);
     }
-
-
     this.updateStatus();
   }
 
@@ -215,7 +213,7 @@ export class MapPanelComponent implements OnInit, OnChanges {
     if (this.datasetId) {
       this.availableTimeColumns = [];
       this.availableNonTimeColumns = [];
-      this.datasetService.getDataset(this.datasetId).subscribe(dataset => {
+      this.catalogService.getDataset(this.datasetId).subscribe(dataset => {
         this.timeColumns = dataset.schema.filter(v => v.type === 'timestamp').map(v => {
           this.availableTimeColumns.push(v.key);
           this.availableColumns = this.availableColumns.filter((value) => {

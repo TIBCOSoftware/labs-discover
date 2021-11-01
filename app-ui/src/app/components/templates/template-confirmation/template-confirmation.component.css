@@ -37,6 +37,7 @@
   line-height: 24px;
   /*max-width: 200px;*/
   word-break: break-word;
+  cursor: default;
 }
 
 .item-detail-dxp {

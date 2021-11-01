@@ -41,12 +41,17 @@ export class NewsBannerComponent {
     });
     if (document.getElementById('fadeout') != null) {
       document.getElementById('fadeout').style.opacity = '1';
+      document.getElementById('fadeout').style.zIndex = '1500';
       // If there is still another one cancel it
       if(this.displayTimeoutEvent > 0) {
         window.clearTimeout(this.displayTimeoutEvent);
       }
       this.displayTimeoutEvent = window.setTimeout(() => {
           document.getElementById('fadeout').style.opacity = '0';
+          window.setTimeout(() => {
+            document.getElementById('fadeout').style.zIndex = '0';
+          }, 1000);
+
           this.displayTimeoutEvent = 0;
       }, 3000);
     }

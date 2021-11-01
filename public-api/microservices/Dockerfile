@@ -29,6 +29,7 @@ CMD tsc
 
 # RUN ./node_modules/.bin/tsc --build tsconfig.json
 COPY dist ./
+COPY src/api.yaml ./
 RUN mkdir -p config
 COPY config ./config
 

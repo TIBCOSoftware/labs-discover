@@ -2,7 +2,7 @@
 # Main Spark Docker file code: https://github.com/apache/spark/blob/master/resource-managers/kubernetes/docker/src/main/dockerfiles/spark/Dockerfile
 
 #ARG SPARK_IMAGE=gcr.io/spark-operator/spark:v3.1.1-hadoop3
-ARG SPARK_IMAGE=public.ecr.aws/tibcolabs/labs-discover-spark/spark:v3.1.2
+ARG SPARK_IMAGE=public.ecr.aws/tibcolabs/labs-discover-spark:v3.2.0
 FROM ${SPARK_IMAGE}
 
 ARG VERSION
@@ -12,8 +12,8 @@ ARG BUILD_DATE
 ARG spark_uid=185
 
 ENV SCALA_VERSION 2.12
-ENV SPARK_VERSION 3.1.2
-ENV HADOOP_VERSION 3.2.0
+ENV SPARK_VERSION 3.2.0
+ENV HADOOP_VERSION 3.3.1
 #ENV KUBERNETES_CLIENT_VERSION 4.9.1
 #ENV KUBERNETES_MODEL_VERSION 4.9.1
 

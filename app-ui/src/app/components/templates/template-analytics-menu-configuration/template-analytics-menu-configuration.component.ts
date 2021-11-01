@@ -3,7 +3,7 @@ import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/ux
 import {TemplateAnalyticsMenuDragdropComponent} from '../template-analytics-menu-dragdrop/template-analytics-menu-dragdrop.component';
 import {cloneDeep} from 'lodash-es';
 import {clearAllNodeFromDefault, getNewID, stripDisabledMenuItems} from '../../../functions/templates';
-import {TemplateMenuConfig} from 'src/app/model/models';
+import {TemplateMenuConfig} from 'src/app/backend/model/models';
 import {StepStatus} from '../../../models_ui/analyticTemplate';
 
 @Component({

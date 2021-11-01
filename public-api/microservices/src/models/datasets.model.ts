@@ -1,4 +1,4 @@
-import { ListBucket, PublishedViews, RedisFileInfo } from "../backend/api";
+import { PublishedViews, RedisFileInfo } from "../backend/api";
 
 export interface DatasetListItem {
   datasetid: string;
@@ -70,4 +70,22 @@ export interface DatasetUpdated {
 export interface CsvFile {
   redisFileInfo: RedisFileInfo;
   beingUsed: boolean;
+}
+
+export interface CsvUploadMetadata {
+  newline: string;
+  encoding: string;
+  escapeChar: string;
+  quoteChar: string;
+  separator: string;
+}
+export interface PreviewColumn {
+  position: number;
+  columnName: string;
+  type: string;
+}
+
+export interface Preview {
+  columns: PreviewColumn[];
+  data: any[];
 }

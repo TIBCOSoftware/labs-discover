@@ -1,17 +1,17 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Location } from '@angular/common';
 import { Component, DoCheck, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
-import { MessageTopicService, TcCoreCommonFunctions } from "@tibco-tcstk/tc-core-lib";
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MessageTopicService, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { UxplPopup } from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import _, { cloneDeep, isEqual } from 'lodash-es';
 import { Observable } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
 import { CaseStateEditComponent } from 'src/app/components/case-state-edit/case-state-edit.component';
-import { Application, InvestigationApplication, InvestigationApplicationDefinition, InvestigationDetails, InvestigationField, InvestigationMetadata, Investigations, InvestigationState} from 'src/app/model/models';
+import { Application, InvestigationApplication, InvestigationApplicationDefinition, InvestigationDetails, InvestigationField, InvestigationMetadata, Investigations, InvestigationState} from 'src/app/backend/model/models';
 import { ConfigurationService } from 'src/app/service/configuration.service';
-import { ConfigurationService as KK } from 'src/app/api/configuration.service';
-import { InvestigationsService } from 'src/app/api/investigations.service';
+import { ConfigurationService as KK } from 'src/app/backend/api/configuration.service';
+import { InvestigationsService } from 'src/app/backend/api/investigations.service';
 
 
 @Component({
@@ -56,9 +56,9 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   public creatorSelectOptions: any = {};
   public creatorSelectOptions2: any[] = [];
 
-  public showResetConfirm: boolean = false;
-  public showMenuConfirm: boolean = false;
-  public showDeleteConfirm: boolean = false;
+  public showResetConfirm = false;
+  public showMenuConfirm = false;
+  public showDeleteConfirm = false;
   public newMenuIndex: number;
 
   public showEditTableField = false;
@@ -79,7 +79,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   public noDetailFieldsSvgLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/svg/empty-state-case-fields.svg');
   public noDataIconLocation: string = TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, 'assets/images/png/no-data.png');
 
-  public loading: boolean = false;
+  public loading = false;
 
   public unsavedChange = false;
 
@@ -102,11 +102,11 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       if (this.activeCaseConfig.customTitle === '') return false;
       if (!this.activeCaseConfig.applicationId) return false;
       if (!this.activeCaseConfig.creatorId) return false;
-      if ( this.activeCaseConfig.headerFields.length == 0) return false;
-      if ( this.activeCaseConfig.detailFields[0].length == 0 && 
-           this.activeCaseConfig.detailFields[1].length == 0 &&
-           this.activeCaseConfig.detailFields[2].length == 0) return false;
-      if (this.activeCaseConfig.creatorData.length < 4) return false;  
+      if ( this.activeCaseConfig.headerFields.length === 0) return false;
+      if ( this.activeCaseConfig.detailFields[0].length === 0 &&
+           this.activeCaseConfig.detailFields[1].length === 0 &&
+           this.activeCaseConfig.detailFields[2].length === 0) return false;
+      if (this.activeCaseConfig.creatorData.length < 4) return false;
     }
 
     return true;
@@ -126,24 +126,11 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     }
   }
 
-  private addCreatorConfig(fields: {[key: string]: string}, config: any) {
-    for (const name in config) {
-      const value = config[name];
-      if (typeof value == 'string') {
-        if (value.indexOf('@@') == 0 && value.lastIndexOf('@@') == value.length - 2) {
-          fields[value.replace(/@@/ig, '')] = name;
-        }
-      } else if (typeof value == 'object') {
-        this.addCreatorConfig(fields, value);
-      }
-    }
-  }
-
   private initAvailableApps() {
     this.availableApps = [];
-    for (let i = 0; i < this.allAppsOptions.length; i++) {
+    for (const i in this.allAppsOptions) {
       if (!this.caseConfig.find((c, index) => {
-        return c.applicationId == this.allAppsOptions[i].id && index != this.activeCaseConfigIndex
+        return c.applicationId === this.allAppsOptions[i].id && index !== this.activeCaseConfigIndex
       })) {
         this.availableApps.push({ label: this.allAppsOptions[i].label, value: this.allAppsOptions[i].id } );
       }
@@ -200,7 +187,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   public handleAdd = (): void => {
     this.loading = true;
     const caseConfig = {
-      customTitle: "menu item",
+      customTitle: 'menu item',
       headerFields: [],
       detailFields: [[], [], []],
       creatorData: [],
@@ -223,15 +210,15 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     this.configurationService.postInvestigations(this.caseConfig).subscribe(
       _ => {
         this.messageService.sendMessage('news-banner.topic.message', 'Settings saved ...');
-        this.configService.refresh(); 
+        this.configService.refresh();
       }
     );
   }
 
   public onClickReset() {
-    // if (this.checkUnsavedChange()) {
-    //   this.showResetConfirm = true;
-    // }
+    if (!isEqual(this.activeCaseConfig, this.originalData[this.activeCaseConfigIndex])) {
+      this.showResetConfirm = true;
+    }
   }
 
   public handleReset = (event): void => {
@@ -254,7 +241,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
             this.activeCaseConfigIndex = 0;
             this.switchMenu(this.activeCaseConfigIndex);
           })
-        );    
+        );
       })
     ).subscribe(() => {
       this.loading = false;
@@ -302,11 +289,11 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   public handleCreatorConfigSelection = ($event, key): void => {
     if ($event.detail) {
       const field = $event.detail.value;
-      let entry = this.activeCaseConfig.creatorData.find((element: InvestigationField) => element.label === key);
+      const entry = this.activeCaseConfig.creatorData.find((element: InvestigationField) => element.label === key);
       if (entry) {
         entry.field = field;
       } else {
-        this.activeCaseConfig.creatorData.push({ label: key, field: field});
+        this.activeCaseConfig.creatorData.push({ label: key, field});
       }
     }
   }
@@ -321,7 +308,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public selectMenu(index: number) {
-    if (isEqual(this.activeCaseConfig, this.originalData[this.activeCaseConfigIndex])) {
+    if (!isEqual(this.activeCaseConfig, this.originalData[this.activeCaseConfigIndex])) {
       this.showMenuConfirm = true;
       this.newMenuIndex = index;
     } else {
@@ -346,7 +333,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       this.initTableFields();
       this.getCaseAppInfoToInit(this.activeCaseConfig.applicationId).subscribe(() => {
         this.loading = false;
-      });        
+      });
     }
   }
 
@@ -365,7 +352,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   private deleteMenu(index: number) {
     const caseConfig = this.caseConfig[index];
-    if (this.caseConfig.find(cf => cf.applicationId == caseConfig.applicationId)) {
+    if (this.caseConfig.find(cf => cf.applicationId === caseConfig.applicationId)) {
       // the caseConfig to be deleted is stored in the shared state already, need to call
       // api to save
       this.caseConfig.splice(index, 1);
@@ -407,7 +394,8 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       this.activeCaseConfig.headerFields.push(
         {
           label: this.inputTableLabel,
-          field: this.inputTableField
+          field: this.inputTableField,
+          format: fieldToAdd.format
         }
       );
       this.assembleTableAvailableOption();
@@ -419,9 +407,10 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       this.activeCaseConfig.headerFields.push(
         {
           label: el.label,
-          field: el.value
+          field: el.value,
+          format: el.format
         }
-      );      
+      );
     });
     this.assembleTableAvailableOption();
   }
@@ -438,10 +427,10 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   private convertFieldsToSelectOptions(caseFields: InvestigationField[]) {
     return caseFields.map(field => {
-      return {"label": field.label, "value": field.field}
+      return {label: field.label, value: field.field}
     }).sort((a,b) => {
       if (a.label < b.label) {return -1}
-      else if (a.label == b.label) {return 0}
+      else if (a.label === b.label) {return 0}
       else {return 1}
     });
   }
@@ -467,7 +456,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       filter(ar => !this.activeCaseConfig.detailFields[1].find(rm => (rm.field === ar.field))).
       filter(ar => !this.activeCaseConfig.detailFields[2].find(rm => (rm.field === ar.field)));
     this.detailAvailableOptions = this.convertFieldsToSelectOptions(possibleFields);
-    
+
     if (this.detailAvailableFields.length > 0) {
       const firstField = this.detailAvailableOptions[0];
       this.detailField = firstField.field;
@@ -495,7 +484,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       this.fieldsArrayInEdit = fieldsArray;
 
       const clickEvent = event.event;
-      
+
       const target = clickEvent.target;
       const button = target.parentNode;
       const domRect = button.getBoundingClientRect();
@@ -504,7 +493,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
       this.editPopupY = domRect.y - settingsRect.y ;
       this.editPopupX = domRect.x - settingsRect.x;
-      this.showEditTableField = true;  
+      this.showEditTableField = true;
       this.editPopup.nativeElement.show = true;
     }, 0);
   }
@@ -516,10 +505,10 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   /**
    * Save the field label edit
-   * @param event {label, field} 
+   * @param event {label, field}
    */
   public saveEditTableField(event) {
-    const field = this.fieldsArrayInEdit.find(ele => ele.field == event.field);
+    const field = this.fieldsArrayInEdit.find(ele => ele.field === event.field);
     if (field) {
       field.label = event.label;
     }
@@ -551,7 +540,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       if (value) {
         this.activeCaseConfig.detailTitle.field = value;
         if (!this.caseConfig[this.activeCaseConfigIndex].detailTitle
-          || (this.caseConfig[this.activeCaseConfigIndex].detailTitle && this.caseConfig[this.activeCaseConfigIndex].detailTitle.field != this.detailTitle.field)) {
+          || (this.caseConfig[this.activeCaseConfigIndex].detailTitle && this.caseConfig[this.activeCaseConfigIndex].detailTitle.field !== this.detailTitle.field)) {
             this.caseConfig[this.activeCaseConfigIndex].detailTitle = this.detailTitle;
         }
       }
@@ -559,7 +548,9 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public checkStatesMilestone(event) {
-    this.showStatesMilestone = !!event.detail;
+    if (event.detail.checked) {
+      this.activeCaseConfig.showMilestone = event.detail.checked;
+    }
   }
 
   public deleteDetailField(event, col) {
@@ -601,7 +592,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
 
   private assignDetailFieldToColumn(addedField: InvestigationField) {
     // special process
-    if (addedField.field == 'DataSourceName') {
+    if (addedField.field === 'DataSourceName') {
       addedField.format = 'EVENT-LINK';
     }
 
@@ -625,14 +616,12 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   }
 
   public addAllDetailFields() {
-
-    for(let i = 0; i < this.detailAvailableFields.length; i++) {
-      const field = this.detailAvailableFields[i];
+    for(let i = 0; i < this.detailAvailableOptions.length; i++) {
+      const field = this.detailAvailableOptions[i];
       this.assignDetailFieldToColumn(field);
     }
-    this.detailAvailableFields.length = 0;
+    // this.detailAvailableFields.length = 0;
     this.assembleDetailAvailableOption();
-
   }
 
   public deleteAllDetailFields() {
@@ -640,11 +629,9 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
     for (let i = 0; i < this.activeCaseConfig.detailFields.length; i++) {
       this.activeCaseConfig.detailFields[i].length = 0;
     }
-
-    for(let i = 0; i < this.allFieldsArray.length; i++) {
-      this.detailAvailableFields.push(this.allFieldsArray[i]);
-    }
-
+    // for(let i = 0; i < this.allFieldsArray.length; i++) {
+    //   this.detailAvailableFields.push(this.allFieldsArray[i]);
+    // }
     this.assembleDetailAvailableOption();
   }
 
@@ -657,15 +644,12 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
         label: ''
       }
     }
-    configCopy.showMilestone = false;
-    // @ts-ignore
-    configCopy.showMilestones = true;
     return configCopy;
   }
 
   public getDummyDetailData(): InvestigationDetails {
-    let metadata: InvestigationMetadata[] = [];
-    const untaggedCasedataObj = {};
+    const metadata: InvestigationMetadata[] = [];
+    const untaggedCasedataObj:any = {};
     for(let i = 0; i < this.activeCaseConfig.detailFields.length; i++) {
       const col = this.activeCaseConfig.detailFields[i];
       for (let j = 0; j < col.length; j ++) {
@@ -674,7 +658,7 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
           if (field === '') {
             untaggedCasedataObj[field] = '';
           } else {
-            if (field.indexOf('.') != -1) {
+            if (field.indexOf('.') !== -1) {
               const names = field.split('.');
               let obj = untaggedCasedataObj;
               while (names.length > 1) {
@@ -684,25 +668,27 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
                 }
                 obj = obj[n];
               }
-              if (col[j].format == 'ARRAY') {
+              if (col[j].format === 'ARRAY') {
                 obj[names[0]] = ['Sample ' + col[j].label];
-              } else if (col[j].format == 'DATE') {
+              } else if (col[j].format === 'DATE') {
                 obj[names[0]] = new Date().toISOString();
               } else {
                 obj[names[0]] = 'Sample ' + col[j].label;
               }
             } else {
-              if (field.indexOf('CUSTOM:') == 0) {
+              if (field.indexOf('CUSTOM:') === 0) {
                 field = field.substr(7);
-              } else if (field.indexOf('META:') == 0) {
+              } else if (field.indexOf('META:') === 0) {
                 field = field.substr(5);
-                if (col[j].format == 'DATE') {
+                if (col[j].format === 'DATE') {
                   metadata.push({ name: field, value: new Date().toISOString()} as InvestigationMetadata);
+                } else {
+                  metadata.push({ name: field, value: 'Sample ' + col[j].label} as InvestigationMetadata);
                 }
               }
-              if (col[j].format == 'ARRAY') {
+              if (col[j].format === 'ARRAY') {
                 untaggedCasedataObj[field] = ['Sample ' + col[j].label];
-              } else if (col[j].format == 'DATE') {
+              } else if (col[j].format === 'DATE') {
                 untaggedCasedataObj[field] = new Date().toISOString();
               } else {
                 untaggedCasedataObj[field] = 'Sample ' + col[j].label;
@@ -713,12 +699,12 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
       }
     }
     // Set state to first state
-    untaggedCasedataObj['state'] = this.activeCaseConfig.states[0].name;
+    untaggedCasedataObj.state = this.activeCaseConfig.states[0].name;
 
     const dummyData: InvestigationDetails = {
       id: '1234567',
       data: untaggedCasedataObj,
-      metadata: metadata
+      metadata
     }
     return dummyData;
   }
@@ -731,12 +717,12 @@ export class SettingsInvestigationsComponent implements OnInit, DoCheck {
   public isEmptyDetailGroups = (): boolean => {
     let elements: number;
     elements = 0;
-    this.activeCaseConfig.detailFields.forEach((el: InvestigationField[]) => { 
-      elements = elements + el.length 
+    this.activeCaseConfig.detailFields.forEach((el: InvestigationField[]) => {
+      elements = elements + el.length
     });
 
     return elements > 0;
-  } 
+  }
 
   public showCreateNewInvestigation = (): boolean => {
     return this.caseConfig?.length < this.maxInvestigations;

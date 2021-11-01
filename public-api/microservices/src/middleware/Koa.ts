@@ -20,11 +20,11 @@ import { SwaggerController } from '../controllers/SwaggerController';
 import { AnalysisController } from '../controllers/AnalysisController';
 import { TemplatesController } from '../controllers/TemplatesController';
 import { DatasetController } from '../controllers/DatasetController';
-import { FilesOperationsApi, LoginApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi } from '../backend/api';
+import { FilesOperationsApi, LoginApi, MetricsApi, SparkOneTimeJobApi, SparkPreviewJobApi, SparkScheduledJobApi, TibcoDataVirtualizationApi } from '../backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
 import { ConfigurationController } from '../controllers/ConfigurationController';
 import { InvestigationController } from '../controllers/InvestigationsController';
-
+import { DocumentationController } from '../controllers/DocumentationController';
 
 export class KoaConfig {
 
@@ -49,22 +49,29 @@ export class KoaConfig {
   // Use Container.set to register service
   setServiceInstance() {
     const backend_domain = process.env.BACKEND_DOMAIN;
+    logger.debug('Setting backend endpoint to ' + backend_domain);
     Container.set(LoginApi, new LoginApi(backend_domain));
     Container.set(FilesOperationsApi, new FilesOperationsApi(backend_domain));
     Container.set(SparkPreviewJobApi, new SparkPreviewJobApi(backend_domain));
+    Container.set(SparkOneTimeJobApi, new SparkOneTimeJobApi(backend_domain));
     Container.set(SparkScheduledJobApi, new SparkScheduledJobApi(backend_domain));
     Container.set(TibcoDataVirtualizationApi, new TibcoDataVirtualizationApi(backend_domain));
+    Container.set(MetricsApi, new MetricsApi(backend_domain));
 
     const redisHost = process.env.REDIS_HOST as string;
     const redisPort = Number(process.env.REDIS_PORT as string);
     const liveappsUrl = process.env.LIVEAPPS as string;
+    const nimbusUrl = process.env.NIMBUS as string;
 
     logger.info('Set service instance in container ');
     logger.info('    Liveapps: ' + liveappsUrl);
+    logger.info('    Nimbus: ' + nimbusUrl);
     logger.info('    Redis host: ' + redisHost);
     logger.info('    Redis port: ' + redisPort);
+
     Container.set(DiscoverCache, new DiscoverCache(redisHost, redisPort, liveappsUrl));
     Container.set('liveappsURL', liveappsUrl);
+    Container.set('nimbusURL', nimbusUrl);
   }
 
   setupControllers() {
@@ -89,19 +96,26 @@ export class KoaConfig {
         if (process.env.CONTROLLER_INVESTIGATIONS && process.env.CONTROLLER_INVESTIGATIONS === 'ON'){
           controllers = [ ...controllers, InvestigationController ]
         }
+        if (process.env.CONTROLLER_DOCUMENTATION && process.env.CONTROLLER_DOCUMENTATION === 'ON'){
+          controllers = [ ...controllers, DocumentationController ]
+        }
         if (process.env.CONTROLLER_SWAGGER && process.env.CONTROLLER_SWAGGER === 'ON'){
           controllers = [ SwaggerController, ...controllers ];
         }
       } else {
         // Running locally. Therefore, enable all controllers
-        controllers = [ SwaggerController, AnalysisController, TemplatesController, DatasetController, ConfigurationController, InvestigationController];
+        controllers = [ SwaggerController, AnalysisController, TemplatesController, DatasetController, ConfigurationController, InvestigationController, DocumentationController];
+        // controllers = [ SwaggerController, DocumentationController];
       }
     } catch(err) {
       console.error(err)
     }
-    const controllersText = controllers.map(el => el.getName());
-    logger.info('Controllers enabled: ' + controllersText);
-
+    if (controllers.length !== 0) {
+      const controllersText = controllers.map(el => el.getName());
+      logger.info('Controllers enabled: ' + controllersText);
+    } else {
+      logger.error('No controller has been enabled.');
+    }
     this.setServiceInstance();
 
     useContainer(Container);

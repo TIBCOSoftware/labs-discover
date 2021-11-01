@@ -15,9 +15,13 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import scala.concurrent.Future
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
 
 
 //#import-json-formats
@@ -29,7 +33,6 @@ class ProcessMiningRoutes(processMiningRegistry: ActorRef[ProcessMiningRegistry.
   //#user-routes-class
 
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-  import com.tibco.labs.orchestrator.models.JsonFormatsPM._
   //#import-json-formats
 
   // If ask takes more time than this to complete the request is failed

@@ -3,7 +3,7 @@ import {Upload} from '../models_ui/fileUpload';
 import {HttpEventType} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {DatasetService} from './dataset.service';
-import {Dataset} from '../models_ui/dataset';
+import {DatasetSource} from '../backend/model/datasetSource';
 
 @Injectable({
   providedIn: 'root'
@@ -19,12 +19,13 @@ export class FileUploadService {
     return this._Uploads;
   }
 
-  private async addUpload(type: string, folderName: string, file: File, name: string, description: string): Promise<string> {
+  // private async addUpload(type: string, folderName: string, file: File, name: string, description: string): Promise<string> {
+  private async addUpload(file: File, dataSource: DatasetSource): Promise<string> {
     return new Promise((resolve, reject) => {
       const newUpload: Upload = {
-        name,
-        type,
-        folderName,
+        name: file.name,
+        type: dataSource.DatasourceType,
+        folderName: '',
         fileSize: file.size,
         uploaded: 0,
         prevUploaded: 0,
@@ -34,7 +35,7 @@ export class FileUploadService {
         timeStamp: Date.now()
       };
       this._Uploads = [...this._Uploads, newUpload];
-      this.doUploadFile(type, folderName, file, name, description).subscribe(
+      this.doUploadFile(file, dataSource).subscribe(
         (resp: any) => {
           const response = resp.uploadFileResponse;
           if (response.type === HttpEventType.UploadProgress) {
@@ -45,7 +46,7 @@ export class FileUploadService {
             newUpload.progress = Math.round(100 * response.loaded / response.total);
             if (newUpload.progress === 100) {
               newUpload.status = 'finalizing';
-              resolve(name + ' Uploaded successfully...')
+              resolve(file.name + ' Uploaded successfully...')
             }
             this._Uploads = [...this.uploads];
           }
@@ -61,27 +62,14 @@ export class FileUploadService {
     });
   }
 
-  public async uploadFile(type: string, folderName: string, file: File, name: string, description: string, replace: boolean): Promise<string> {
-    return await this.addUpload(type, folderName, file, name, description);
+  // public async uploadFile(type: string, folderName: string, file: File, name: string, description: string, replace: boolean): Promise<string> {
+  public async uploadFile(file: File, dataSource: DatasetSource): Promise<string> {
+    return await this.addUpload(file, dataSource);
   }
 
-  public doUploadFile(type: string, folderName: string, file: File, name: string, description: string): Observable<any> {
-    const dummyDataset = new Dataset().deserialize({
-      Dataset_Source: {
-        DatasourceType: 'File-Delimited',
-        Encoding: 'UTF-8',
-        FileEscapeChar: '\\',
-        FileHeaders: 'true',
-        FileQuoteChar: '"',
-        FileSeparator: ','
-      },
-      Dataset_Description: '',
-      Dataset_Id: '',
-      Dataset_Name: '',
-      type: '',
-      csvMethod: 'upload'
-    })
-    return this.datasetService.uploadFile(dummyDataset, {}, file);
+  // public doUploadFile(type: string, folderName: string, file: File, name: string, description: string): Observable<any> {
+  public doUploadFile(file: File, dataSource: DatasetSource): Observable<any> {
+    return this.datasetService.uploadFileReturnProgress(dataSource, file);
   }
 
   public clearUploads() {

@@ -11,6 +11,7 @@ export interface Analysis {
   id: string;
   data: AnalysisData;
   metadata: AnalysisMetadata;
+  metrics?: AnalysisMetrics;
   actions: String[];
 }
 
@@ -19,6 +20,7 @@ export interface AnalysisData {
   description: string;
   datasetId: string;
   templateId: string;
+  templateLabel?: string;
   mappings: Mapping;
   filters: TypeValue[];
   groups: TypeValue[];
@@ -68,4 +70,22 @@ export interface AnalysisStatus {
   timeStamp?: string;
 }
 
-  
+ export interface AnalysisMetrics {
+  numEvents: number;
+  numCases: number;
+  numActivities: number;
+  numVariants: number;
+  numResources: number;
+  avgTime: number;
+  medianTime: number;
+  minTime: number;
+  maxTime: number;
+  avgActivities: number;
+  minActivities: number;
+  maxActivities: number;
+  avgResourcesPerCases: number;
+  minResourcesPerCases: number;
+  maxResourcesPerCases: number;
+  minTimestamp: Date;
+  maxTimestamp: Date;
+ }

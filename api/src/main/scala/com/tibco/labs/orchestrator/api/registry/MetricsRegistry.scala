@@ -3,7 +3,7 @@ package com.tibco.labs.orchestrator.api.registry
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, Behavior}
 import com.tibco.labs.orchestrator.api.methods.MetricsMgr
-import com.tibco.labs.orchestrator.models.{MetricsDS, MetricsTable}
+import com.tibco.labs.orchestrator.models.{MetricsAnalysis, MetricsDS, MetricsTable}
 import org.slf4j.LoggerFactory
 
 object MetricsRegistry {
@@ -19,7 +19,13 @@ object MetricsRegistry {
 
   final case class getDetailsMetricsRegistry(orgId: String, assetId: String, replyTo: ActorRef[ActionPerformedRenderedMetrics]) extends Command
 
-  final case class getDetailsMetricsAnalysisRegistry(orgId: String, analysisId: String, replyTo: ActorRef[ActionPerformedRenderedAnalysisMetrics]) extends Command
+  final case class storeMetricsASRegistry(data: MetricsAnalysis, replyTo: ActorRef[ActionPerformedStoreMetrics]) extends Command
+
+  final case class deleteMetricsASRegistry(orgId: String, assetId: String, replyTo: ActorRef[ActionPerformedDeleteMetrics]) extends Command
+
+  final case class getDetailsMetricsASRegistry(orgId: String, assetId: String, replyTo: ActorRef[ActionPerformedRenderedMetricsAS]) extends Command
+
+  //final case class getDetailsMetricsAnalysisRegistry(orgId: String, analysisId: String, replyTo: ActorRef[ActionPerformedRenderedAnalysisMetrics]) extends Command
 
 
   // response
@@ -29,7 +35,9 @@ object MetricsRegistry {
 
   final case class ActionPerformedRenderedMetrics(status: String, code: Int, data: MetricsDS)
 
-  final case class ActionPerformedRenderedAnalysisMetrics(status: String, code: Int, data: MetricsTable)
+  final case class ActionPerformedRenderedMetricsAS(status: String, code: Int, data: MetricsAnalysis)
+
+  //final case class ActionPerformedRenderedAnalysisMetrics(status: String, code: Int, data: MetricsTable)
 
   def apply(): Behavior[Command] = registryLogin()
 
@@ -54,11 +62,31 @@ object MetricsRegistry {
         replyTo ! metricsJob().deleteDSMetrics(orgId, assetId)
         Behaviors.same
 
+      case storeMetricsASRegistry(data, replyTo) =>
+        log.info("storeMetricsRegistry called")
+        //replyTo ! ActionPerformed(s"JOB ${configPM.reference} created.", 0)
+        replyTo ! metricsJob().storeASMetrics(data)
+        Behaviors.same
+
+      case getDetailsMetricsASRegistry(orgId, assetId, replyTo) =>
+        log.info("getDetailsMetricsRegistry called")
+        //replyTo ! ActionPerformed(s"JOB ${configPM.reference} created.", 0)
+        replyTo ! metricsJob().getASMetrics(orgId, assetId)
+        Behaviors.same
+
+      case deleteMetricsASRegistry(orgId, assetId, replyTo) =>
+        log.info("deleteMetricsRegistry called")
+        //replyTo ! ActionPerformed(s"JOB ${configPM.reference} created.", 0)
+        replyTo ! metricsJob().deleteASMetrics(orgId, assetId)
+        Behaviors.same
+
+/*
       case getDetailsMetricsAnalysisRegistry(orgId, analysisId, replyTo) =>
         log.info("getDetailsMetricsAnalysisRegistry called")
         //replyTo ! ActionPerformed(s"JOB ${configPM.reference} created.", 0)
         replyTo ! metricsJob().getAnalysisMetrics(orgId, analysisId)
         Behaviors.same
+*/
 
 
     }
@@ -80,10 +108,25 @@ object MetricsRegistry {
       ActionPerformedDeleteMetrics(job._1, job._2, job._3)
     }
 
-    def getAnalysisMetrics(orgid: String, analysisId: String) = {
+    def storeASMetrics(data: MetricsAnalysis) = {
+      val job: (String, Int, String) = new MetricsMgr().storeASMetrics(data)
+      ActionPerformedStoreMetrics(job._1, job._2, job._3)
+    }
+
+    def getASMetrics(orgid: String, analysisid: String) = {
+      val job: (String, Int, MetricsAnalysis) = new MetricsMgr().getDetailsASMetrics(analysisid, orgid)
+      ActionPerformedRenderedMetricsAS(job._1, job._2, job._3)
+    }
+
+    def deleteASMetrics(orgid: String, analysisid: String) = {
+      val job: (String, Int, String) = new MetricsMgr().deleteASMetrics(analysisid, orgid)
+      ActionPerformedDeleteMetrics(job._1, job._2, job._3)
+    }
+
+/*    def getAnalysisMetrics(orgid: String, analysisId: String) = {
       val job: (String, Int, MetricsTable) = new MetricsMgr().getDetailsAnalysisMetrics(analysisId, orgid)
       ActionPerformedRenderedAnalysisMetrics(job._1, job._2, job._3)
-    }
+    }*/
 
   }
 }

@@ -1,22 +1,28 @@
 package com.tibco.labs.orchestrator.api
 
+import akka.NotUsed
 import akka.actor.typed.scaladsl.AskPattern._
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.{ActorRef, ActorSystem, DispatcherSelector}
 import akka.http.scaladsl.model.Multipart.BodyPart
-import akka.http.scaladsl.model.{HttpEntity, Multipart, StatusCodes}
+import akka.http.scaladsl.model.headers.RawHeader
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, Multipart, StatusCodes}
 import akka.http.scaladsl.server.directives.FileInfo
 import akka.http.scaladsl.server.{Directive1, Directives, MissingFormFieldRejection, Route}
+import akka.stream.alpakka.s3.ObjectMetadata
+import akka.stream.alpakka.s3.scaladsl.S3
 import akka.stream.{IOResult, Materializer}
 import akka.stream.scaladsl.{FileIO, Sink, Source}
 import akka.util.{ByteString, Timeout}
-import com.tibco.labs.orchestrator.api.registry.FilesRegistry._
 import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
-import com.tibco.labs.orchestrator.api.registry.{FilesRegistry, RedisContent, S3Content}
+import com.tibco.labs.orchestrator.models.{RedisContent, S3Content}
+import com.tibco.labs.orchestrator.api.registry.FilesRegistry._
+import com.tibco.labs.orchestrator.api.registry.FilesRegistry
+import com.tibco.labs.orchestrator.conf.DiscoverConfig
 import org.slf4j.LoggerFactory
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
@@ -24,9 +30,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 
 import java.io.File
 import java.nio.file.Paths
+import scala.util.{Failure, Success}
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
-import scala.concurrent.Future
+
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration.DurationInt
 
 
@@ -35,37 +45,38 @@ import scala.concurrent.duration.DurationInt
 @Path("/files")
 class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val system: ActorSystem[_]) extends Directives {
 
+
   case class FileUpload(
-                        @Schema(`type` = "string", format = "string", description = "newline", defaultValue = "\r\n", required = true) newline: String,
-                        @Schema(`type` = "string", format = "string", description = "separator", defaultValue = ",", required = true) separator: String,
-                        @Schema(`type` = "string", format = "string", description = "quoteChar", defaultValue = "\"", required = true) quoteChar: String,
-                        @Schema(`type` = "string", format = "string", description = "encoding", defaultValue = "UTF-8", required = true) encoding: String,
-                        @Schema(`type` = "string", format = "string", description = "escapeChar", defaultValue = "\\", required = true) escapeChar: String,
-                        @Schema(`type` = "string", format = "binary", description = "file") csv: File
+                         @Schema(`type` = "string", format = "string", description = "newline", defaultValue = "\r\n", required = true) newline: String,
+                         @Schema(`type` = "string", format = "string", description = "separator", defaultValue = ",", required = true) separator: String,
+                         @Schema(`type` = "string", format = "string", description = "quoteChar", defaultValue = "\"", required = true) quoteChar: String,
+                         @Schema(`type` = "string", format = "string", description = "encoding", defaultValue = "UTF-8", required = true) encoding: String,
+                         @Schema(`type` = "string", format = "string", description = "escapeChar", defaultValue = "\\", required = true) escapeChar: String,
+                         @Schema(`type` = "string", format = "binary", description = "file") csv: File
                        )
 
 
-  //import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-  //import com.tibco.labs.orchestrator.models.JsonFormatsS3._
-  //#import-json-formats
-
   val log = LoggerFactory.getLogger(this.getClass.getName)
+  val bucketName: String = DiscoverConfig.config.backend.storage.filesystem.s3_bucket
+
 
   // If ask takes more time than this to complete the request is failed
   private implicit val timeout: Timeout = Timeout.create(system.settings.config.getDuration("files.routes.ask-timeout"))
 
+  // dedicated dispatcher
+
+ implicit val blockingDispatcher: ExecutionContextExecutor = system.dispatchers.lookup(DispatcherSelector.fromConfig("file-ops-blocking-dispatcher"))
+  //val GetDispatcher: ExecutionContextExecutor = system.dispatchers.lookup(DispatcherSelector.fromConfig("file2-ops-blocking-dispatcher"))
 
   def getListFiles(id: String): Future[S3Content] =
     filesRegistry.ask(getListFilesRegistry(id, _))
 
-  def getListFilesV2(id: String): Future[RedisContent] =
-    filesRegistry.ask(getListFilesV2Registry(id, _))
 
   def getPreviewFile(id: String, fileName: String): Future[ActionPerformedFilesPreview] =
     filesRegistry.ask(getPreviewFileRegistry(id, fileName, _))
 
-  def getURLFile(token: String, fileName: String): Future[ActionPerformedFilesUrl] =
-    filesRegistry.ask(getS3FileContentRegistry(token, fileName, _))
+  def getURLFile(orgid: String, fileName: String): Future[ActionPerformedFilesUrl] =
+    filesRegistry.ask(getS3FileContentRegistry(orgid, fileName, _))
 
 
   def uploadFile2S3(id: String, fileInfo: FileInfo, data: Source[ByteString, Any], forms: Map[String, String]): Future[ActionPerformedFiles] = {
@@ -80,7 +91,7 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   //#users-get-delete
 
 
-  val FilesRoutes: Route = postRouteFile ~ getRouteFile ~ deleteRouteSegment ~ getRouteFileV2 ~ getPreviewRoute ~ getRouteFileContent
+  val FilesRoutes: Route = postRouteFile ~ deleteRouteSegment  ~ getPreviewRoute ~ getRouteFileContent ~ getRouteDirectFile// ~ getRouteFile
 
   @POST
   @Path("{orgid}")
@@ -102,43 +113,86 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
     cors() {
       path("files" / Segment) { orgid =>
         concat(
-          withRequestTimeout(900.seconds) {
-            withSizeLimit(1073741824) {
-              //toStrictEntity(900.seconds, 1073741824) {
-            //  formFields(
-            //    "newline".?,
-            //    "separator".?,
-            //    "quoteChar".?,
-            //    "encoding".?,
-            //    "escapeChar".?
-             // ) { (newline, separator, quoteChar, encoding, escapeChar) =>
-                //log.info(s"Forms : ${newline.getOrElse("\r\n")} -- ${separator.getOrElse(",")} -- ${quoteChar.getOrElse("\"")} -- ${encoding.getOrElse("UTF-8")}")
-                //val forms: Map[String, String] = Map("separator" -> separator.getOrElse(","), "newline" -> newline.getOrElse("\n\r"), "quoteChar" -> quoteChar.getOrElse("\""), "encoding" -> encoding.getOrElse("UTF-8"), "escapeChar" -> escapeChar.getOrElse("\\"))
-                fileUploadWithFields("csv") {
+          post {
+           // withExecutionContext(blockingDispatcher) {
+              withRequestTimeout(900.seconds) {
+                withSizeLimit(1073741824) {
+                  //toStrictEntity(900.seconds, 1073741824) {
+                  //  formFields(
+                  //    "newline".?,
+                  //    "separator".?,
+                  //    "quoteChar".?,
+                  //    "encoding".?,
+                  //    "escapeChar".?
+                  // ) { (newline, separator, quoteChar, encoding, escapeChar) =>
+                  //log.info(s"Forms : ${newline.getOrElse("\r\n")} -- ${separator.getOrElse(",")} -- ${quoteChar.getOrElse("\"")} -- ${encoding.getOrElse("UTF-8")}")
+                  //val forms: Map[String, String] = Map("separator" -> separator.getOrElse(","), "newline" -> newline.getOrElse("\n\r"), "quoteChar" -> quoteChar.getOrElse("\""), "encoding" -> encoding.getOrElse("UTF-8"), "escapeChar" -> escapeChar.getOrElse("\\"))
+                  fileUploadWithFields("csv") {
                     case (fields, metadata, file) =>
-                        log.info(s"${metadata.fileName} at ")
-                        log.info(s"org id 2 : ${orgid}")
-                         log.info(s"Forms : ${fields("separator")} -- ${fields("newline")}")
-                        onSuccess(uploadFile2S3(orgid.toLowerCase, metadata, file, fields)) { uploadFuture =>
-                          if (uploadFuture.code == 0) {
-                            complete((StatusCodes.Created, uploadFuture))
-                          } else {
-                            complete((StatusCodes.InternalServerError, uploadFuture))
-                          }
+                      log.info(s"${metadata.fileName} at ")
+                      log.info(s"org id 2 : ${orgid}")
+                      log.info(s"Forms : ${fields("separator")} -- ${fields("newline")}")
+                      onSuccess(uploadFile2S3(orgid.toLowerCase, metadata, file, fields)) { uploadFuture =>
+                        if (uploadFuture.code == 0) {
+                          complete((StatusCodes.Created, uploadFuture))
+                        } else {
+                          complete((StatusCodes.InternalServerError, uploadFuture))
                         }
                       }
+                  }
                   //}
                 }
-              //}
-            }
-
+                //}
+              }
+            //}
+          }
         )
       }
   }
   }
 
-
   @GET
+  @Path("/download/{orgid}/{filename}")
+  @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
+  @Operation(summary = "Return stream of file from S3", description = "Return stream of file from S3", tags = Array("Files Operations"),
+    parameters = Array(
+      new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
+      new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename")
+    ),
+    responses = Array(
+      new ApiResponse(responseCode = "200", description = "filestream",content = Array(new Content(mediaType = "applicetion/octet-stream"))),
+      new ApiResponse(responseCode = "500", description = "Internal Error")
+    )
+  )
+  def getRouteDirectFile: Route = {
+    cors() {
+      concat(
+        // /files/<orgid>/
+        path("files" / "download" / Segment / Segment) { (orgid , filename) =>
+          concat(
+            get {
+              //#retrieve-sparkapp-info/status
+              val key = s"${orgid.toLowerCase()}/${filename}"
+              val src: Source[Option[(Source[ByteString, NotUsed], ObjectMetadata)], NotUsed] = S3.download(bucketName, key )
+              val rss: Future[(Source[ByteString, NotUsed], ObjectMetadata)] = src.runWith(Sink.head).map(_.getOrElse((Source.empty[ByteString], null)))
+              onComplete(rss) {
+                case Failure(exception) => complete((StatusCodes.NotFound, exception.getMessage))
+                case Success(value) => {
+                  val headers = List(RawHeader("Content-Disposition", s"""attachment; filename="${filename}""""))
+                  //complete(HttpResponse(StatusCodes.OK, headers, HttpEntity(ContentTypes.`application/octet-stream`, value._1)))
+                  complete(HttpEntity(ContentTypes.`application/octet-stream`, value._1))
+
+                }
+              }
+            }
+          )
+        }
+      )
+    }
+  }
+
+
+ /* @GET
   @Path("V1/{orgid}")
   @Deprecated
   @Produces(Array(MediaType.APPLICATION_JSON))
@@ -168,8 +222,9 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
         }
       )
     }
-  }
+  }*/
 
+/*
   @GET
   @Path("{orgid}")
   @Produces(Array(MediaType.APPLICATION_JSON))
@@ -187,6 +242,7 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
         path("files" / Segment) { orgid =>
           concat(
             get {
+              withExecutionContext(GetDispatcher) {
               //#retrieve-sparkapp-info/status
               rejectEmptyResponse {
                 onSuccess(getListFilesV2(orgid.toLowerCase)) { response =>
@@ -195,21 +251,26 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
               }
               //#retrieve-sparkapp-info/status
             }
+            }
           )
         }
       )
     }
   }
+*/
 
   @GET
-  @Path("download/{filename}")
+  @Path("download/signed/{orgId}/{filename}")
   @Produces(Array(MediaType.APPLICATION_JSON))
   @Operation(
     summary = "return signed url for 1 h to get you file from",
     description = "Return list of files stored in this org",
     tags = Array("Files Operations"),
-    security  = Array(new SecurityRequirement(name = "bearer")),
-    parameters = Array(new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename")),
+    //security  = Array(new SecurityRequirement(name = "bearer")),
+    parameters = Array(
+      new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename"),
+      new Parameter(name = "orgId", in = ParameterIn.PATH, description = "orgId")
+     ),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
         content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedFilesUrl])))),
@@ -220,22 +281,22 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
     cors() {
       concat(
         // /files/<orgid>/
-        path("files" / "download" /Segment) { filename =>
-          extractCredentials { creds =>
+        path("files" / "download" / "signed" / Segment / Segment) { (orgid, filename) =>
+          //extractCredentials { creds =>
             concat(
               get {
                 //#retrieve-sparkapp-info/status
                 rejectEmptyResponse {
-                  log.info(creds.getOrElse("None").toString)
-                  val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
-                  onSuccess(getURLFile(token, filename)) { response =>
+                 // log.info(creds.getOrElse("None").toString)
+                  //val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+                  onSuccess(getURLFile(orgid.toLowerCase(), filename)) { response =>
                     complete(response)
                   }
                 }
                 //#retrieve-sparkapp-info/status
               }
             )
-          }
+          //}
         }
       )
     }

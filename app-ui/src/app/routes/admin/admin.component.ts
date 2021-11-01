@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ConfigurationMenuEntry, TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { Location } from '@angular/common';
 import { UxplLeftNavMulti } from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav-multi/uxpl-left-nav-multi';
-import { TcAppDefinitionService } from '@tibco-tcstk/tc-liveapps-lib';
+import { ConfigurationService } from 'src/app/service/configuration.service';
 
 @Component({
   templateUrl: './admin.component.html',
@@ -14,10 +14,10 @@ export class AdminComponent implements OnInit, AfterViewInit  {
   @ViewChild('leftNav', { static: false }) nav: ElementRef<UxplLeftNavMulti>;
   leftNavTabs = [];
 
-  constructor(protected configService: TcAppDefinitionService, protected router: Router, protected location: Location) { }
+  constructor(protected configService: ConfigurationService, protected router: Router, protected location: Location) { }
 
   ngOnInit() {
-    const adminMenu = this.configService.appConfig.config.adminMenu;
+    const adminMenu = this.configService.adminMenu;
     this.leftNavTabs = adminMenu.map((element: ConfigurationMenuEntry) => {
       const newEntry = {
         id: element.entry.toLowerCase().split(' ').join('-'),

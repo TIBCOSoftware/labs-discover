@@ -296,3 +296,18 @@
   box-shadow: none !important;
   outline: 0 none;
 }
+
+.clickable {
+  color: #1774E5;
+  font-family: 'Source Sans Pro';
+  font-size: 16px;
+  letter-spacing: 0;
+  line-height: 24px;
+  margin-right: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}

@@ -17,6 +17,8 @@ import com.tibco.labs.orchestrator.api.registry.PreviewFileRegistry
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
 
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import scala.concurrent.Future

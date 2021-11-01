@@ -1,7 +1,7 @@
 <div class="create-case-container" id="my-popup-content">
-  <uxpl-select-input #selectInput id="caseTypeInput" label="Case type" hint="Which kind of an issue is this case exhibiting?" (uxplChanged)="invInfo.type = $event.detail.value;"></uxpl-select-input>
+  <uxpl-select-input label="Case type" hint="Which kind of an issue is this case exhibiting?" no-clear-on-reselect [value]="investigationApplicationId" [options]="invValues" (uxplChanged)="setInvestigationApp($event)"></uxpl-select-input>
 
-  <uxpl-radio-group class="ct-radio" [value]="invInfo?.contextType" (uxplChanged)="contextTypeRadioChange($event)">
+  <uxpl-radio-group class="ct-radio" [value]="invInfo?.type" (uxplChanged)="contextTypeRadioChange($event)">
     <uxpl-radio class='radio-item' value="Case">Case<div class="additional-info">{{caseAdditionalInfo}}</div></uxpl-radio>
     <uxpl-radio class='radio-item' value="Variants">Variant<div class="additional-info">{{variantAdditionalInfo}}</div></uxpl-radio>
   </uxpl-radio-group>
@@ -10,9 +10,9 @@
                    type="text"
                    hint="Briefly describe the Investigation"
                    valid required="true"></uxpl-form-field>
-  <uxpl-textarea (uxplChanged)="updateField($event.detail.value, 'additionalDetails');" style="margin-top: 5px;" placeholder="Tell us more about this Investigation...">Additional details (Optional)</uxpl-textarea>
+  <uxpl-textarea (uxplChanged)="updateField($event.detail.value, 'details');" style="margin-top: 5px;" placeholder="Tell us more about this Investigation...">Additional details (Optional)</uxpl-textarea>
   <div class="create-case-bottom-button-bar">
-    <uxpl-button (clicked)="createInvestigation.emit(null)" id="#cancelButton" type="no-border">Cancel</uxpl-button>
-    <uxpl-button (clicked)="createInvestiagation()">Create</uxpl-button>
+    <uxpl-button (clicked)="cancelCreateInvestigation()" id="#cancelButton" type="no-border">Cancel</uxpl-button>
+    <uxpl-button (clicked)="createInvestigation()">Create</uxpl-button>
   </div>
 </div>

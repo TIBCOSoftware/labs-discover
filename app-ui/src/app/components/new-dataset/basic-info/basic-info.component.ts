@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { concatMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { DatasetService } from 'src/app/service/dataset.service';
-import { Dataset } from '../../../models_ui/dataset';
+import { CatalogService } from 'src/app/backend/api/catalog.service';
+import { CheckExist } from 'src/app/backend/model/checkExist';
+import { Dataset } from 'src/app/backend/model/dataset';
 import { NewAnalysisStepStatus } from '../../../models_ui/discover';
 @Component({
   selector: 'dataset-basic-info',
@@ -21,7 +22,7 @@ export class NewDatasetBasicInfoComponent implements OnInit {
   public nameChanged: Subject<any> = new Subject<any>();
 
   constructor(
-    protected datasetService: DatasetService
+    protected catalogService: CatalogService
   ) { }
 
   ngOnInit(): void {
@@ -31,9 +32,11 @@ export class NewDatasetBasicInfoComponent implements OnInit {
       .pipe(debounceTime(500), distinctUntilChanged())
       .pipe(
         concatMap(model => {
-          const value = model.value;
-          const datasetId = model.datasetId;
-          return this.datasetService.isExist(value, datasetId);
+          const requestBody = {
+            Dataset_Id: model.datasetId,
+            Dataset_Name: model.value
+          } as CheckExist;
+          return this.catalogService.isSameNameDatasetExist(requestBody);
         })
       ).subscribe(re => {
         if (re && re.exist === true) {

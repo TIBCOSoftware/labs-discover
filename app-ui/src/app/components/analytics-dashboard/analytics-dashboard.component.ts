@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {UxplLeftNav} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-left-nav/uxpl-left-nav';
-import {NewInvestigation} from '../../models_ui/discover';
+// import {NewInvestigation} from '../../models_ui/discover';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ObjectHeaderConfig} from '@tibco-tcstk/tc-web-components/dist/types/models/objectHeaderConfig';
@@ -22,18 +22,21 @@ import {OauthService} from '../../service/oauth.service';
 import {debounceTime, delay, last, retryWhen, take} from 'rxjs/operators';
 import {AnalyticsMenuConfigUI, CaseConfig} from '../../models_ui/configuration';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
-import {LiveAppsService} from '@tibco-tcstk/tc-liveapps-lib';
 import _ from 'lodash';
 import {CreateCaseMenuComponent} from '../create-case-menu/create-case-menu.component';
-import {RepositoryService} from 'src/app/api/repository.service';
-import {VisualisationService} from 'src/app/api/visualisation.service';
+import {RepositoryService} from 'src/app/backend/api/repository.service';
+import {VisualisationService} from 'src/app/backend/api/visualisation.service';
 import {notifyUser} from '../../functions/message';
-import { Analysis } from 'src/app/model/analysis';
-import { InvestigationApplication } from 'src/app/model/investigationApplication';
-import {Template} from '../../model/template';
+import { Analysis } from 'src/app/backend/model/analysis';
+import { InvestigationApplication } from 'src/app/backend/model/investigationApplication';
+import {Template} from '../../backend/model/template';
 import {SfFilterPanelComponent} from '../sf-filter-panel/sf-filter-panel.component';
 import {TemplateFilterConfigUI} from '../../models_ui/analyticTemplate';
 import {Subject} from 'rxjs';
+import { InvestigationsService } from 'src/app/backend/api/investigations.service';
+import { InvestigationCreateRequest } from 'src/app/backend/model/investigationCreateRequest';
+import { InvestigationCreateResponse } from 'src/app/backend/model/investigationCreateResponse';
+import {InvestigationConfig} from '../../models_ui/investigations';
 
 @Component({
   selector: 'analytics-dashboard',
@@ -69,20 +72,16 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
 
   public investigationConfig: InvestigationApplication[];
   public document: SpotfireDocument;
-  private templateNameToUse: string;
+  private templateIdToUse: string;
   private analysisIdToUse: string;
+  private analysisNameToUse: string;
   public defaultTab: AnalyticsMenuConfigUI;
 
   templateToUse: Template;
   filterIds = [];
   filterConfig: TemplateFilterConfigUI[] = [];
   showFilterButton = false;
-  analysisReady = false;
   showFilterPanel = false;
-  containerWidth: number;
-  containerHeight: number;
-  containerLeft: number;
-  containerTop: number;
   filterPanelSize = {x: 578, y: 629};
   filterPanelLeft: number;
   filterPanelTop: number;
@@ -97,12 +96,12 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
     private configService: ConfigurationService,
     private messageService: MessageTopicService,
     private oService: OauthService,
-    private liveApps: LiveAppsService,
     private repositoryService: RepositoryService,
-    protected visualisationService: VisualisationService
+    private visualisationService: VisualisationService,
+    private investigationService: InvestigationsService
   ) {
     this.messageService.getMessage('clear-analytic.topic.message').subscribe(
-      (message) => {
+      _D => {
         this.spotfireDXP = null;
       });
   }
@@ -122,23 +121,29 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
   public async ngOnChanges(changes: SimpleChanges) {
     if (changes.analysis.previousValue !== changes.analysis.currentValue) {
       if (changes.analysis.currentValue !== '') {
-        this.templateNameToUse = null;
+        this.templateIdToUse = null;
         this.route.queryParams.pipe(take(1)).subscribe(params => {
-          this.templateNameToUse = params.forceTemplate;
+          this.templateIdToUse = params.forceTemplate;
           this.analysisIdToUse = changes.analysis.currentValue.slice(0, changes.analysis.currentValue.lastIndexOf('-'));
           if (this.analysis) {
             this.repositoryService.getAnalysisDetails(this.analysis).subscribe(
               async (analysis) => {
                 if (analysis) {
-                  if (this.templateNameToUse == null && analysis.data) {
-                    this.templateNameToUse = analysis.data.templateId;
+                  if (this.templateIdToUse == null && analysis.data) {
+                    this.templateIdToUse = analysis.data.templateId;
                   }
                   if (analysis.data) {
-                    analysis.data.templateId = this.templateNameToUse;
+                    analysis.data.templateId = this.templateIdToUse;
                   }
+                  this.analysisNameToUse = analysis.data.name;
                   this.createObjectHeader(analysis);
-                  // this.templateToUse = await this.visualisationService.getTemplate(this.templateNameToUse).toPromise();
-                  this.templateToUse = await this.visualisationService.getTemplate(this.templateNameToUse).toPromise();
+                  try {
+                    this.templateToUse = await this.visualisationService.getTemplate(this.templateIdToUse).toPromise();
+                  } catch (e) {
+                    // TODO: Specifically check for a 404 when the backend is updated
+                    console.error('TEMPLATE ERROR ', e);
+                  }
+
                   if (this.templateToUse) {
                     let oldFilter;
                     if (this.filterConfig) {
@@ -189,7 +194,9 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
                     }
                   } else {
                     this.hideSelectProcess = false;
-                    notifyUser('ERROR', 'Can\'t find template: ' + this.templateNameToUse, this.messageService);
+                    notifyUser('ERROR', 'Can\'t find template with id: ' + this.templateIdToUse, this.messageService);
+                    // We get an error getting the template, so we display the select template screen
+                    this.editTemplate()
                   }
                 }
               }
@@ -251,73 +258,36 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
     this.router.navigate(['/discover/process-analysis']);
   }
 
-  createInv(investigation: NewInvestigation) {
-    let createInvestigation = true;
-    if (investigation == null) {
+  createInv(event: InvestigationConfig) {
+    // console.log('Create inv: ', event)
+    // const createInvestigation = true;
+    if (event == null) {
       this.popup.nativeElement.show = true;
     } else {
-      if (!investigation.analysisId) {
-        investigation.analysisId = this.analysisIdToUse;
-      }
-      if (!investigation.templateName) {
-        investigation.templateName = this.templateNameToUse;
-      }
-      let appId;
-      let actionId;
-      let CASE_TEMPLATE;
-      for (const inConf of this.investigationConfig) {
-        if (inConf.customTitle === investigation.type) {
-          appId = inConf.applicationId;
-          actionId = inConf.creatorId;
-          CASE_TEMPLATE = {}; // JSON.parse(inConf.creatorData);
-        }
-      }
-      if (appId && actionId && CASE_TEMPLATE) {
-        let CASE_DATA_OBJECT = {};
-        let CASE_DATA = JSON.stringify(CASE_TEMPLATE);
-        // JSON Escape the characters
-        CASE_DATA = CASE_DATA.replace('@@SUMMARY@@', escapeCharsForJSON(investigation.summary));
-        CASE_DATA = CASE_DATA.replace('@@DETAILS@@', escapeCharsForJSON(investigation.additionalDetails));
-        CASE_DATA = CASE_DATA.replace('@@CONTEXT_TYPE@@', escapeCharsForJSON(investigation.contextType));
-        CASE_DATA = CASE_DATA.replace('@@CONTEXT_IDS@@', escapeCharsForJSON(investigation.contextIds.toString()));
-        CASE_DATA = CASE_DATA.replace('@@TEMPLATE_NAME@@', escapeCharsForJSON(investigation.templateName));
-        CASE_DATA = CASE_DATA.replace('@@ANALYSIS_ID@@', escapeCharsForJSON(investigation.analysisId));
-        try {
-          CASE_DATA_OBJECT = JSON.parse(CASE_DATA);
-        } catch (e) {
-          createInvestigation = false;
-          console.error('Error Parsing initial case data ', e);
-          this.reportError('ERROR Creating Investigation: Unsupported Characters');
-        }
-        if (createInvestigation) {
-          // Get the APP Id and the Action ID
-          this.liveApps.runProcess(this.configService.config.sandboxId, appId, actionId, null, CASE_DATA_OBJECT).pipe(
-            retryWhen(errors => {
-              return errors.pipe(
-                delay(2000),
-                take(3)
-              );
-            }),
-            take(1)
-          ).subscribe(response => {
-              if (response) {
-                if (!response.data.errorMsg) {
-                  this.messageService.sendMessage('news-banner.topic.message', investigation.type + ' investigation created successfully...');
-
-                  this.popup.nativeElement.show = false;
-                } else {
-                  console.error('Unable to run the action');
-                  console.error(response.data.errorMsg);
-                }
-              }
-            }, error => {
-              console.error('Unable to run the action');
-              console.error(error);
+      const investigation = event.data as InvestigationCreateRequest;
+      investigation.analysisId = this.analysisIdToUse;
+      investigation.analysisName = this.analysisNameToUse;
+      investigation.templateId = this.templateToUse.id;
+      investigation.templateName = this.templateToUse.name;
+      const appId = event.investigationId;
+      // console.log('this.investigationConfig: ', this.investigationConfig);
+      const appConfig = this.investigationConfig.find((el: InvestigationApplication) => el.applicationId === appId)
+      if(appConfig){
+        const creatorId = appConfig.creatorId;
+        this.investigationService.postStartCaseForInvestigation(appId, creatorId,investigation).subscribe(
+          (response: InvestigationCreateResponse) => {
+            if (response) {
+              // console.log('Response: ' , response)
+              this.messageService.sendMessage('news-banner.topic.message', event.investigationType + ' investigation created successfully ('+response.id+')...');
+              this.popup.nativeElement.show = false;
             }
-          );
-        }
+          }, error => {
+            console.error('Unable to run the action');
+            console.error(error);
+          }
+        );
       } else {
-        this.reportError('ERROR Creating Investigation: Config Not Found');
+        console.error('Could not find the Configuration to create the investigation')
       }
     }
   }

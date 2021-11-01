@@ -14,7 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.tibco.labs.orchestrator.api.registry.ProcessMiningScheduledRegistry
-
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+import io.circe.generic.auto._
+//import jakarta.ws.rs.core.MediaType
+//import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
 import javax.ws.rs.core.MediaType
 import scala.concurrent.Future
@@ -29,7 +32,6 @@ class ProcessMiningScheduledRoutes(processMiningScheduledRegistry: ActorRef[Proc
   //#user-routes-class
 
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-  import com.tibco.labs.orchestrator.models.JsonFormatsPmScheduled._
   //#import-json-formats
 
   // If ask takes more time than this to complete the request is failed

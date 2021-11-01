@@ -13,14 +13,14 @@
   </div>
   <div>
     <div class="data-wrapper" *ngIf="files == null || files.length>0">
-      <p-table #csvtable [columns]="cols" [value]="files"
+      <p-table #csvtable [columns]="cols" [value]="myFiles"
                dataKey="name" id="pTable" styleClass="csv-file-table" [rowHover]="true" [scrollable]="true"
                [scrollHeight]="scrollHeight" [autoLayout]="true"
                [showCurrentPageReport]="true" [loading]="files == null"
                [filterDelay]="0">
         <ng-template pTemplate="header" let-columns>
           <tr style="background-color: #fff;">
-            <th *ngFor="let col of columns; let i = index;" [pSortableColumn]="col.field" class="top-row"
+            <th *ngFor="let col of columns; let i = index;" [pSortableColumn]="col.sortField" class="top-row"
                 [ngClass]="{'firstCol': i==0}">
               {{col.header}}
               <p-sortIcon [field]="col.field" ariaLabel="Activate to sort" class="sort-icon"
@@ -34,20 +34,21 @@
         <ng-template pTemplate="body" let-file>
           <tr class="rowhover" id="toHightlight" matTooltip="{{getToolTip(file)}}" matTooltipClass="tTip"
               [ngClass]="{selected: selectedFile?.OriginalFilename==file.redisFileInfo.OriginalFilename || dataset.Dataset_Source?.FileName===file.redisFileInfo.OriginalFilename}">
-
             <td class="no-padding data-row hovereffect firstCol">
-              <div [innerHTML]="file.redisFileInfo.OriginalFilename | highlight: searchTerm : 'Multi-Match'"></div>
+              <div *ngIf="!isStandAlone" [innerHTML]="file.redisFileInfo.OriginalFilename | highlight: searchTerm : 'Multi-Match'"></div>
+              <div *ngIf="isStandAlone" class="clickable" [innerHTML]="file.redisFileInfo.OriginalFilename | highlight: searchTerm : 'Multi-Match'" (click)="fileClicked(file.redisFileInfo)" matTooltip="download" matTooltipClass="tTip"></div>
             </td>
             <td class="no-padding data-row hovereffect">
-              <div>{{file.fileSize | csvFilesize}}</div>
+              <div>{{file.redisFileInfo.FileSize | csvFilesize}}</div>
             </td>
             <td class="no-padding data-row hovereffect">
-              <div>{{file.redisFileInfo.LastModified | csvFiletime}}</div>
+              <div>{{file.redisFileInfo.LastModified | relativeTime
+                }}</div>
             </td>
             <td class="no-padding lastCol" style="max-width: 150px;" *ngIf="!isStandAlone">
               <!--<pre>{{dataset.csvMethod}}</pre>-->
               <div
-                *ngIf="(dataset.csvMethod==='file' || dataset.csvMethod==='upload') && (selectedFile?.OriginalFilename===file.redisFileInfo.OriginalFilename || dataset.Dataset_Source?.FileName===file.redisFileInfo.OriginalFilename); else selectButtonBlock"
+                *ngIf="((dataset.csvMethod==='file' && selectedFile?.OriginalFilename===file.redisFileInfo.OriginalFilename) || (dataset.csvMethod==='upload' && dataset.Dataset_Id && dataset.Dataset_Source?.FileName===file.redisFileInfo.OriginalFilename)); else selectButtonBlock"
                 class="selected-col">
                 <uxpl-icon class="inline-ele" icon="pl-icon-checkmark" width="14px" height="14px"></uxpl-icon>
                 <div class="selected inline-ele">selected</div>
@@ -61,7 +62,7 @@
               <div
                 *ngIf="(dataset.csvMethod!='file' || selectedFile?.OriginalFilename!=file.redisFileInfo.OriginalFilename) && file.beingUsed==false"
                 (click)="deleteFile(file, $event)" class="clickable">
-                <uxpl-icon class="inline-ele" icon="pl-icon-delete" width="24px" height="24px"></uxpl-icon>
+                <uxpl-icon class="inline-ele" icon="pl-icon-delete" width="24px" height="24px" matTooltip="delete" matTooltipClass="tTip"></uxpl-icon>
               </div>
             </td>
           </tr>
@@ -75,7 +76,7 @@
       <span class="title">Selected data: </span>{{file.name}}<span class="new-upload">(new upload)</span>
     </div>
     <div
-      *ngIf="dataset.csvMethod=='upload' && dataset.Dataset_Source && dataset.Dataset_Source?.FileName && dataset.Dataset_Source?.FilePath"
+      *ngIf="dataset.csvMethod=='upload' && dataset.Dataset_Id && dataset.Dataset_Source && dataset.Dataset_Source?.FileName && dataset.Dataset_Source?.FilePath"
       class="selected-data">
       <span class="title">Selected data: </span>{{dataset.Dataset_Source?.FileName}}<span
       class="new-upload">(uploaded)</span>

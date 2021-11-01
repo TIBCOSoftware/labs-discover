@@ -6,7 +6,7 @@ export function setupSwagger(app: any) {
     koaSwagger({
       routePrefix: '/swagger', 
       swaggerOptions: {
-        url: 'https://discover.cloud.tibco.com/docs/api.yaml', 
+        url: './docs/api.yaml', 
       },
     }),
   );

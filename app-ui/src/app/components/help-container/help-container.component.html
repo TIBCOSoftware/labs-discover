@@ -1,8 +1,6 @@
 <div class="help-side">
-  <!-- <pre>{{helpSource  | json}}</pre>
-  <!- TODO: Reverted to the old help bar, since it is sometimes not showing up
   <uxpl-help-side-bar [helpSettingsUrl]="helpSource" [auth]="oauthService.getKey().token"
-                      [show]="showHelp"></uxpl-help-side-bar>-->
+                      [show]="showHelp"></uxpl-help-side-bar>
   <div class="help-version" *ngIf="showHelp">
     VERSION: <span style="color: black">{{csDescriptor?.cloudstarter?.version}} </span> BUILD DATE: <span
     style="color: black">{{csDescriptor?.cloudstarter?.build_date}}</span>
