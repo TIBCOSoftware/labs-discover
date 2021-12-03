@@ -1,1 +1,0 @@
-{"version":3,"file":"CurrentUserChecker.js","sourceRoot":"","sources":["../../src/CurrentUserChecker.ts"],"names":[],"mappings":"","sourcesContent":["import { Action } from './Action';\n\n/**\n * Special function used to get currently authorized user.\n */\nexport type CurrentUserChecker = (action: Action) => Promise<any> | any;\n"]}
