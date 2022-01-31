@@ -92,6 +92,24 @@ and finally a resolution in the form of counter measures that will take effect a
     </item>
     
     <item>
+      <title>Docs: Export</title>
+      <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/export/</link>
+      <pubDate>Mon, 31 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/docs/knowhow/export/</guid>
+      <description>
+        
+        
+        &lt;p&gt;The Discover UI allows to export any or multiple discovered Variants as Documentation to TIBCO Cloud Nimbus. In Nimbus it can be used to share the Process with colleagues, collaborate with them, or create advanced Storyboards out of them.&lt;br&gt;&lt;/p&gt;
+&lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/pJd6yaopnwY&#34; title=&#34;YouTube video player&#34; frameborder=&#34;0&#34; allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&#34; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Note: We are working on a re-Import as well.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Docs: Online Help</title>
       <link>https://tibcosoftware.github.io/labs-discover/docs/knowhow/onlinehelp/</link>
       <pubDate>Fri, 20 Nov 2020 00:00:00 +0000</pubDate>
