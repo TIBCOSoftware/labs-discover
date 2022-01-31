@@ -26,3 +26,7 @@ export interface FolderModel {
   parentFolderId: number;
   name: string;
 }
+
+export interface ExportModel {
+  mapId: string;
+}

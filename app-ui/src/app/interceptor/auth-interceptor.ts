@@ -35,13 +35,9 @@ export class AuthInterceptor implements HttpInterceptor {
     if (url.startsWith('https://account.cloud.tibco.com')) { return true };
     if (url.startsWith('https://eu.account.cloud.tibco.com')) { return true };
     if (url.startsWith('https://au.account.cloud.tibco.com')) { return true };
-    if (url.startsWith('https://metadata.cloud.tibco.com')) { return true };
-    if (url.startsWith('https://eu.metadata.cloud.tibco.com')) { return true };
-    if (url.startsWith('https://au.metadata.cloud.tibco.com')) { return true };
     if (url.startsWith('https://spotfire-next.cloud.tibco.com')) { return true };
     if (url.startsWith('https://eu.spotfire-next.cloud.tibco.com')) { return true };
     if (url.startsWith('https://au.spotfire-next.cloud.tibco.com')) { return true };
-    if (url.startsWith('https://eu-west-1.integration.cloud.tibcoapps.com')) { return true };
     if (url.startsWith(environment.apiURL)) { return true };
   };
 

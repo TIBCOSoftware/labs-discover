@@ -37,10 +37,11 @@ class FilteredGraph {
      * @returns {cytoscape.EdgeDefinition[]}
      */
     findValidSources(edgeDef) {
+        const traversedNodes = new Set();
         let edges = this.cy.$('edge[source = "' + edgeDef.data.source + '"]' + '[target = "' + edgeDef.data.target + '"]');
         let validEdges = [];
         edges.forEach(edge => {
-            validEdges.push(...this.findValidSource(edge, edgeDef.data.target));
+            validEdges.push(...this.findValidSource(edge, traversedNodes));
         });
         return validEdges;
     }
@@ -48,22 +49,26 @@ class FilteredGraph {
     /**
      * Find valid sources for edge
      * @param {cytoscape.EdgeSingular} edge
-     * @param {string} initialNodeId
+     * @param {Set<string>} traversedNodes
      * @returns {cytoscape.EdgeDefinition[]} json representation of edges
      */
-    findValidSource(edge, initialNodeId) {
+    findValidSource(edge, traversedNodes) {
         if (this.isNodeValid(edge.source())) {
             return [JSON.parse(JSON.stringify(edge.json()))];
         }
 
-        let incomers = edge.source().incomers('edge:simple[source !="' + initialNodeId + '"]'); // Selecting outgoing edges whose target is not initial node to avoid loops
+        //let incomers = edge.source().incomers('edge:simple[source !="' + initialNodeId + '"]'); // Selecting outgoing edges whose target is not initial node to avoid loops
+        let incomers = edge.source().incomers( function(ele){
+            return ele.isEdge() && ele.isSimple() && !traversedNodes.has(ele.data("source"));
+        });
+
         if (incomers.length === 0) {
             return [];
         }
 
         let multipleOutgoers = edge.source().outgoers("edge:simple").length > 1;
         let validEdges = [];
-        // For each edge going out of target
+        // For each incoming edge
         for (let i = 0, len = incomers.length; i < len; i++) {
             if (this.isNodeValid(incomers[i].source())) {
                 // target node is valid
@@ -80,7 +85,8 @@ class FilteredGraph {
                 validEdges.push(validEdge);
             } else {
                 // continue traversing graph
-                let sources = this.findValidSource(incomers[i], initialNodeId);
+                traversedNodes.add(edge.source().id());
+                let sources = this.findValidSource(incomers[i], traversedNodes);
                 for (let j = 0, lenJ = sources.length; j < lenJ; j++) {
                     let validEdge;
                     if (multipleOutgoers) {
@@ -113,10 +119,11 @@ class FilteredGraph {
      * @returns {cytoscape.EdgeDefinition[]}
      */
     findValidTargets(edgeDef) {
+        const traversedNodes = new Set();
         let edges = this.cy.$('edge[source = "' + edgeDef.data.source + '"]' + '[target = "' + edgeDef.data.target + '"]');
         let validEdges = [];
         edges.forEach(edge => {
-            validEdges.push(...this.findValidTarget(edge, edgeDef.data.source));
+            validEdges.push(...this.findValidTarget(edge, traversedNodes));//edgeDef.data.source));
         });
         return validEdges;
     }
@@ -124,17 +131,21 @@ class FilteredGraph {
     /**
      * Find valid targets for edge
      * @param {cytoscape.EdgeSingular} edge
-     * @param {string} initialNodeId
+     * @param {Set<string>} traversedNodes
      * @returns {cytoscape.EdgeDefinition[]} json representation of edges
      */
-    findValidTarget(edge, initialNodeId) {
+    findValidTarget(edge, traversedNodes) {
         if (this.isNodeValid(edge.target())) {
             return [JSON.parse(JSON.stringify(edge.json()))];
         }
 
         // Selecting outgoing edges whose target is not initial node to avoid loops (:simple matches edges with different source as target)
         // outgoers selects edges coming out of a node
-        let outgoers = edge.target().outgoers('edge:simple[target !="' + initialNodeId + '"]');
+        //let outgoers = edge.target().outgoers('edge:simple[target !="' + initialNodeId + '"]');
+        let outgoers = edge.target().outgoers( function(ele){
+            return ele.isEdge() && ele.isSimple() && !traversedNodes.has(ele.data("target"));
+        });
+
         if (outgoers.length === 0) {
             return [];
         }
@@ -158,7 +169,8 @@ class FilteredGraph {
                 validEdges.push(validEdge);
             } else {
                 // continue traversing graph
-                let targets = this.findValidTarget(outgoers[i], initialNodeId);
+                traversedNodes.add(edge.target().id());
+                let targets = this.findValidTarget(outgoers[i], traversedNodes);
                 for (let j = 0, lenJ = targets.length; j < lenJ; j++) {
                     let validEdge;
                     if (multipleIncomers) {

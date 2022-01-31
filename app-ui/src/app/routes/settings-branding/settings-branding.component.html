@@ -39,7 +39,7 @@
               <ng-template pTemplate="body" let-highlight let-rowIndex="rowIndex">
                 <tr class="rowhover" >
                 <td class="no-padding data-row hovereffect">
-                  {{highlight.iconURL}}
+                  {{ highlight.iconURL.slice(highlight.iconURL.lastIndexOf('/') + 1) }}
                 </td>
                 <td class="no-padding data-row hovereffect">{{ highlight.title }}</td>
                 <td class="no-padding data-row hovereffect">{{ highlight.content }}</td>
@@ -55,7 +55,7 @@
           <h3>Background image</h3>
           <div class="settings-line">
             <input type="file" #file style="display:none" (change)="handleUpload($event.target.files[0])">
-            <uxpl-form-field class="setting-background-image" label="Background image" type="text" valid required="true" [value]="landingPage.backgroundURL" (uxplChanged)="handleUpdate($event, 'landingPage', 'backgroundURL')"></uxpl-form-field>
+            <uxpl-form-field class="setting-background-image" label="Background image" type="text" valid required="true" readonly="true" [value]="landingPage.backgroundURL.slice(landingPage.backgroundURL.lastIndexOf('/') + 1)"></uxpl-form-field>
             <uxpl-icon style="margin-bottom: -5px;" icon="pl-icon-upload" width="24px" height="24px" (click)="file.click()"></uxpl-icon>
           </div>
         </div>

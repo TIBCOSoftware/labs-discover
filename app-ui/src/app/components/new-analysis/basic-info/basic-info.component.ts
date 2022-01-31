@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { RepositoryService } from 'src/app/backend/api/repository.service';
 import { Analysis } from 'src/app/backend/model/analysis';
@@ -21,7 +21,7 @@ export class BasicInfoComponent implements OnInit, OnChanges {
   public nameChanged: Subject<any> = new Subject<any>();
 
   private analysisNames: string[] = [];
-  public sameName: boolean = false;
+  public sameName = false;
 
   public nameHint = '';
 
@@ -43,7 +43,7 @@ export class BasicInfoComponent implements OnInit, OnChanges {
           this.sameName = false;
         }
         this.updateStatus();
-      });  
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -72,7 +72,11 @@ export class BasicInfoComponent implements OnInit, OnChanges {
         value
       });
     } else {
-      this.updateStatus();
+      // Use a setTimeout here to fix the issue that when a description get's pasted the Next button does not get enabled
+      // (this gives the input to this class the change to be set)
+      setTimeout(() => {
+        this.updateStatus();
+      })
     }
   }
 

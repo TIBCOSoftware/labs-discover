@@ -1,34 +1,26 @@
 import { Service } from "typedi";
 import { logger } from "../common/logging";
-import { Mapdata, Iactivity, Iline, ControlPanel } from "../models/documentation.model";
+import { Mapdata, ExportModel, Iactivity, Iline, ControlPanel } from "../models/documentation.model";
 import { DiscoverCache } from "../cache/DiscoverCache";
-import { DiagramModel, DiagramModelLanguage, MapFolderCollection, MapFolderModel, MapFoldersApi, MapsApi, DiagramsApi, MapModel } from "../nimbus/api";
+import { DiagramModel, DiagramModelLanguage, MapFolderCollection, MapFolderModel, MapFoldersApi, MapsApi, DiagramsApi, MapModel } from "../api/nimbus/api";
 
 @Service()
 export class DocumentationService {
 
-  private folders: MapFoldersApi;
-  private maps: MapsApi;
-  private diagrams: DiagramsApi;
-
   constructor (
-    private cache: DiscoverCache,
-  ) {
-    // logger.info('DocumentationService constructor called with values: ');
-    // logger.info('    Nimbus: ' + nimbusURL);
-
-    this.folders = new MapFoldersApi(process.env.NIMBUS + "");
-    this.maps = new MapsApi(process.env.NIMBUS + "");
-    this.diagrams = new DiagramsApi(process.env.NIMBUS + "");
-  }
+    protected cache: DiscoverCache,
+    protected folders: MapFoldersApi,
+    protected maps: MapsApi,
+    protected diagrams: DiagramsApi
+  ) {}
 
   // *** Public Service Functions
 
   // Get All available Folders and Structure
-  public getFolders = async (token: string, folderid?: number): Promise<MapFolderCollection> => {
+  public getFolders = async (token: string, folderid: number): Promise<MapFolderCollection> => {
 
     const header = { headers: { "Authorization": token}};
-    const resultExport = (await this.folders.getMapFolders(folderid, header)).body;
+    const resultExport = (await this.folders.getMapFolder(folderid, header)).body;
 
     return resultExport;
   }
@@ -60,12 +52,17 @@ export class DocumentationService {
     if (createExport.draft) {
       const mapId = createExport.draft.mapId as string;
       const resultExport = await this.formatExport(mapname, mapId, graph);
-      // logger.info(" - MAP JSON : " + JSON.stringify(resultExport));
+      logger.info(" - MAP JSON : " + JSON.stringify(mapId));
 
       const diagram: DiagramModel = resultExport;
       const updateExport = (await this.diagrams.updateDiagram(mapId, undefined, undefined, undefined, undefined, undefined, undefined, diagram, header)).body;
 
-      return updateExport;
+      const ExportResponse: ExportModel = {
+        mapId: mapId
+      };
+
+      //return updateExport;
+      return JSON.stringify(ExportResponse);
     }
 
     return createExport;
@@ -242,7 +239,6 @@ export class DocumentationService {
 
       // tslint:disable-next-line:max-line-length
       logger.info("Discover JSON contained | " + activitycount + " Activities | " + linecount + " Lines | " + validlinecount + " valid Lines | Loops " + looplinecount);
-      // logger.info("JSON: " + JSON.stringify(map));
       return map as DiagramModel;
   }
 

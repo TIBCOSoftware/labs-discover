@@ -5,11 +5,17 @@
 }
 
 uxpl-help-side-bar::part(help-page) {
-  min-height: calc(100vh - 60px);
-  max-height: calc(100vh - 60px);
+  min-height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
   /*box-shadow: 0 -10px 10px -3px #8e8e8e;*/
   z-index: 10000;
   /*box-shadow: none;*/
+}
+
+uxpl-help-side-bar::part(details) {
+  height: calc(100% - 65px);
+  min-height: calc(100% - 105px);
+  max-height: calc(100% - 105px);
 }
 
 .help-version {

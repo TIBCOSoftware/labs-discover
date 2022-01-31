@@ -8,7 +8,6 @@ package com.tibco.labs.utils
 import com.tibco.labs.config.{DiscoverAnalysisConfig, Filter, Schema}
 import com.tibco.labs.utils.Status.sendBottleToTheSea
 import com.tibco.labs.utils.commons._
-import org.apache.log4j.Logger
 
 import scala.collection.mutable
 //import com.tibco.labs.utils.tibcoCloudMessaging.sendTCMMessage

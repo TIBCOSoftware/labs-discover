@@ -1,35 +1,29 @@
 import * as redis from "redis";
 import { promisifyAll} from 'bluebird';
-import axios from "axios";
 import { Service } from "typedi";
 import { logger } from "../common/logging";
 import { v4 as uuidv4} from 'uuid';
-import { Analysis } from "../models/analysis-redis.model";
-import { get } from 'lodash';
-import { ClaimsApi, ClaimsSandbox } from "../liveapps/authorization/api";
+import { ClaimsApi, ClaimsSandbox } from "../api/liveapps/authorization/api";
 
 @Service()
 export class DiscoverCache  {
 
   private client: redis.RedisClient;
-  private liveappsURL: string;
 
-  private claimsService: ClaimsApi;
-
-  constructor(host: string, port: number, liveappsURL: string) {
+  constructor(
+    host: string, 
+    port: number, 
+    protected claimsService: ClaimsApi
+  ) {
     logger.info('Creating redis client: ');
     logger.info('  Host: ' + host);
     logger.info('  Port: ' + port);
-    logger.info('  Liveapps URL: ' + liveappsURL);
     this.client = new redis.RedisClient({
       port,
       host
     });
     promisifyAll(this.client);
-    this.liveappsURL = liveappsURL;
-    this.claimsService = new ClaimsApi(process.env.LIVEAPPS +'/organisation/v1');
   }
-
 
   private sleep(ms: number) {
     return new Promise((resolve) => {
@@ -137,17 +131,30 @@ export class DiscoverCache  {
     return response;
   }
 
-  public get = async (token: string, database: string, key: string): Promise<string> => {
+  // private _setHash = async (database: string, key: string, value: string, ttl?: number): Promise<string> {
+  //   return "hh"
+  // }
+
+  public get = async (token: string, database: string, key: string, entry?: string): Promise<string> => {
     const realClient = await this.getClient(token);
-    logger.debug('En 0 Client: ' + token + ' database: ' + database + ' key: ' + key + ' realClient: ' + realClient.globalSubscriptionId);
-    const kk =  await this._get(database, realClient.globalSubscriptionId + '-' + key);
-    return kk;
+    logger.debug('Client: ' + token + ' database: ' + database + ' key: ' + key + ' realClient: ' + realClient.globalSubscriptionId);
+    if (!entry) {
+      return await this._get(database, realClient.globalSubscriptionId + '-' + key);
+    } else {
+      return await this._getHash(database, realClient.globalSubscriptionId + ':' + key, entry);
+    }
   }
 
   private _get = async (database: string, key: string): Promise<string> => {
     this.client.select(this.obtainDatabase(database));
     // @ts-ignore
     return await this.client.getAsync(key);
+  }
+
+  private _getHash = async (database: string, key: string, entry: string): Promise<string> => {
+    this.client.select(this.obtainDatabase(database));
+    // @ts-ignore
+    return await this.client.hgetAsync(key, entry);
   }
 
   public delete = async (token: string, database: string, key: string): Promise<number> => {
@@ -281,13 +288,13 @@ export class DiscoverCache  {
   /**
    * The orgId here means subscription id in CIC
    * @param token The bearer token. 
-   * @returns The subscription id (in discover backend, it's called orgId).
+   * @returns The subscription id in lower case(in discover backend, it's called orgId).
    */
   public getOrgId = async (token: string): Promise<string> => {
     if (token) {
       const tokenInfo = await this.getClient(token);
       if (tokenInfo && tokenInfo.globalSubscriptionId) {
-        return tokenInfo.globalSubscriptionId;
+        return tokenInfo.globalSubscriptionId.toLowerCase();
       }
     }
     logger.warn(`[DiscoverCache] Failed to get orgId from the token = ${token}`);

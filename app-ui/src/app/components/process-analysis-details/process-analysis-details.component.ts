@@ -1,12 +1,12 @@
 import {Component, Input, OnInit, OnChanges, SimpleChanges, Output, EventEmitter} from '@angular/core';
 import {VisualisationService} from 'src/app/backend/api/visualisation.service';
 import {Analysis} from 'src/app/backend/model/models';
-import {getShortMessage, copyToClipBoard} from '../../functions/details';
+import {copyToClipBoard} from '../../functions/details';
 import {MessageTopicService, TcCoreCommonFunctions} from '@tibco-tcstk/tc-core-lib';
 import {DatePipe, Location} from '@angular/common';
-import { AttributeDef } from '@tibco-tcstk/tc-web-components/dist/types/models/attributeDef';
-import { ChartService, SummaryConfig } from '../../service/chart.service';
-import { DateTime } from 'luxon';
+import {AttributeDef} from '@tibco-tcstk/tc-web-components/dist/types/models/attributeDef';
+import {ChartService, SummaryConfig} from '../../service/chart.service';
+import {DateTime} from 'luxon';
 
 @Component({
   selector: 'process-analysis-details',
@@ -33,15 +33,11 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
   templateName: string;
   showError = false;
   errorIcon: string;
-  attrDefs: AttributeDef[];
   moreInfo = false;
 
   activitiesChartConfig: any;
   durationChartConfig: any;
   summaryConfig: SummaryConfig;
-
-  getShortMessage = getShortMessage;
-  copyToClipBoard = copyToClipBoard;
 
   paId: string;
   paVersion: string;
@@ -50,27 +46,25 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.errorIcon = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/svg/error-image-2.svg');
-    /* no longer required as we have templateLabel from the analysis service */
-    /* if (this.processAnalysis.data.templateId && this.processAnalysis.data.templateId !== '') {
+    // If template label is not part of the response
+    if (this.processAnalysis.data.templateId && !this.processAnalysis.data.templateLabel ) {
       this.visualisationService.getTemplate(this.processAnalysis.data.templateId).subscribe(
         result => {
-          this.templateName = result.name;
+          this.processAnalysis.data.templateLabel = result.name;
         }
       )
-    } else {
-      this.templateName = 'Not assigned';
-    } */
-    if (!this.processAnalysis.data.templateLabel || this.processAnalysis.data.templateLabel === '') {
+    }
+    if (!this.processAnalysis.data.templateId) {
       this.processAnalysis.data.templateLabel = 'Not assigned';
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(this.processAnalysis && this.processAnalysis.id){
+    if (this.processAnalysis && this.processAnalysis.id) {
       const idT = this.processAnalysis.id;
       this.paId = idT.substring(0, idT.lastIndexOf('-'))
       this.paVersion = idT.substring(idT.lastIndexOf('-') + 1)
-      if (!this.processAnalysis.data.templateLabel || this.processAnalysis.data.templateLabel === '') {
+      if (!this.processAnalysis.data.templateId) {
         this.processAnalysis.data.templateLabel = 'Not assigned';
       }
       if (this.processAnalysis?.metrics) {
@@ -85,16 +79,17 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
   get attributeDefs(): AttributeDef[] {
     if (this.processAnalysis) {
       const defs: AttributeDef[] = [
-        { label: 'Created by', value: this.processAnalysis.metadata.createdBy },
+        {label: 'Created by', value: this.processAnalysis.metadata.createdBy},
         // { label: 'Case ID', value: this.processAnalysis.data.mappings.caseId },
         // { label: 'Start time', value: this.processAnalysis.data.mappings.startTime },
-        { label: 'Created on', value: this.datePipe.transform(this.processAnalysis.metadata.createdOn, 'short') },
+        {label: 'Created on', value: this.datePipe.transform(this.processAnalysis.metadata.createdOn, 'short')},
         // { label: 'Activity', value: this.processAnalysis.data.mappings.activity },
         // { label: 'End time', value: this.processAnalysis.data.mappings.endTime },
-        { label: 'Template', value: this.processAnalysis.data.templateLabel },
+        {label: 'Template', value: this.processAnalysis.data.templateLabel},
         // { label: 'Resource', value: this.processAnalysis.data.mappings.resource },
         // { label: 'Scheduled start time', value: this.processAnalysis.data.mappings.scheduledStart },
-        { label: 'Id', value: this.paId, copyable: true },
+        {label: 'Id', value: this.paId, copyable: true},
+        // { label: 'Description', value: this.processAnalysis.data.description },
         // { label: 'Department', value: this.processAnalysis.data.mappings.resourceGroup },
         // { label: 'Secheduled end time', value: this.processAnalysis.data.mappings.scheduledEnd },
         // { label: 'Version', value: this.paVersion, copyable: true },
@@ -102,7 +97,7 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
         // { label: 'Other attributes', value: this.processAnalysis.data.mappings.otherAttributes ? 'true' : 'false' }
       ]
       if (this.processAnalysis.metadata.message) {
-        defs.push({ label: 'Error', value: this.processAnalysis.metadata.message, copyable: true});
+        defs.push({label: 'Error', value: this.processAnalysis.metadata.message, copyable: true});
       }
       return defs;
     } else {
@@ -112,12 +107,7 @@ export class ProcessAnalysisDetailsComponent implements OnInit, OnChanges {
   }
 
   get label(): string {
-    /* if (this.processAnalysis) {
-      return this.processAnalysis?.data?.name + ' (' + this.processAnalysis?.metadata?.state + ')'
-    } else { */
-      return 'Additional Info';
-    // }
-
+    return 'Additional Info';
   }
 
   handleMoreInfoToggle() {

@@ -107,14 +107,19 @@ export class ProcessAnalysisComponent implements OnInit, AfterViewInit {
           progress.percentage = data.progression;
           progress.status = data.message;
         }
-        // stop polling status once the progression is 0 or 100
-        return progress.stop === true || (data.progression === 0 || data.progression === 100)
+        // stop polling status once the progression is 100
+        if(data.progression === 100) {
+          setTimeout(async() => {
+            await this.refresh()
+            this.paTable.calculateActions()
+          }, 2500)
+        }
+        return progress.stop === true || data.progression === 100
       }),
       take(1)
     ).pipe(
       concatMap(resp => {
         return this.repositoryService.getAnalysisDetails(analysisId).pipe(
-          repeatWhen(obs => obs.pipe(delay(1000))),
           filter(data => (progress.stop === true || data.metadata.state !== 'Process mining')),
           take(1)
         );

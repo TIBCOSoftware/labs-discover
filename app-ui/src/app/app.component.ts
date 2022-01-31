@@ -17,9 +17,9 @@ import { GeneralInformation } from './backend/model/generalInformation';
 })
 export class AppComponent implements OnInit, AfterViewInit {
 
-  @ViewChild('helpBar', {static: true}) helpBar: ElementRef<UxplHelpSideBar>;
-
   @ViewChild('TCNavbar', {static: false}) TCNavbar: TibcoCloudNavbarComponent;
+
+  @ViewChild('helpContainer', {read: ElementRef}) helpContainer: ElementRef;
 
   disableTimeout = false;
   isLogin = false;
@@ -44,6 +44,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
         // We need urlAfterRedirects, because of the initial landing (which redirects to welcome)
         this.helpSource = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, 'assets/help' + evt.urlAfterRedirects + '/config.json');
+
       }
     })
   }
@@ -74,7 +75,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         },
         help: {
           visible: true,
-          publishEvent: true
+          publishEvent: false
         },
         notifications: {
           visible: false
@@ -106,10 +107,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
       },
       customizedComponents: [
-        {
-          name: 'help',
-          template: '#help-template'
-        }
       ],
       accountChange: {
         disabled: false,                    // optional. If provided and the value eques to true, then account change popup won't show.
@@ -126,22 +123,10 @@ export class AppComponent implements OnInit, AfterViewInit {
     window.setTimeout(() => {
       this.afterInit = true;
     }, 100)
-    window.setTimeout(() => {
-      if(this.TCNavbar.navbar) {
-       this.subScribeToHelp()
-      } else {
-        window.setTimeout(() => {
-          this.subScribeToHelp()
-        }, 3000)
-      }
-    }, 300);
-  }
-
-  private subScribeToHelp() {
-    this.TCNavbar.navbar.subscribeEvent('CLICK_ICON_MENU_HELP', (event) => {
-      // toggle help component
-      this.showHelp = !this.showHelp;
-    });
+    setTimeout(() => {
+      this.TCNavbar.navbar.customizePanel('help', this.helpContainer.nativeElement);
+      this.showHelp = true;
+    }, 100)
   }
 
 }

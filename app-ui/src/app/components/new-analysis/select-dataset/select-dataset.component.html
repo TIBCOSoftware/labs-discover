@@ -6,12 +6,11 @@
                                                                          (click)="goDataSet()">go to Datasets.</span>
 
     <div class="datasource-preview-table" *ngIf="preview && !isDataPreviewError">
-      <!-- *ngIf="!isError && previewColumns?.length > 0" -->
-      <tcpmg-generic-table [columnDefs]="preview.columns" [rowData]="preview.data.slice(0,5)"
+      <data-preview-table [columnDefs]="preview.columns" [rowData]="preview?.data.slice(0,5)"
                            [autoLayout]="false" [showSortIcon]="false"
                            [showExpandButton]="false" [paginator]="false"
                            [showCurrentPageReport]="false" [showFilterRow]="false">
-      </tcpmg-generic-table>
+      </data-preview-table>
     </div>
     <div *ngIf="!preview && !isDataPreviewError" class="center">
       <!-- *ngIf=" (previewColumns === undefined || previewColumns?.length === 0)" class="center"> -->

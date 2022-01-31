@@ -1,0 +1,55 @@
+<div class="nimbusLocation">
+    <div class="root-folder">
+        <div class="icon">
+            <uxpl-icon class="chevron-icon" icon="pl-icon-chevron-left" width="24px" height="24px"></uxpl-icon>
+        </div>
+        <div class="location">
+            <span class="clickable blue-txt" (click)="naviToFolder(-1)">Processes</span><span *ngFor="let folder of breadcrumbs | slice:1; index as i; last as isLast"  [ngClass]="{'clickable': !isLast, 'blue-txt': !isLast}" (click)="naviToFolder(i)"> / {{folder.name}}</span>
+        </div>
+        <div class="create-folder">
+            <span (click)="enterCreateNewFolderMode()">New Folder</span>
+        </div>
+    </div>
+    
+
+    <div class="sub-folders">
+        <div class="folder-row" *ngIf="editNewFolderMode">
+            <div class="icon">
+                <span class="state-icon">
+                    <img src="assets/svg/ic-folder.svg"/>
+                </span>
+            </div>
+            <div class="name-col">
+                <input #newFolderInput type="text" 
+                    (keyup.enter)="onNewFolderNameEnter(newFolderInput.value)" 
+                    (blur)="onNewFolderNameBlur(newFolderInput.value)">
+            </div>
+            <div class="selected">
+            </div>
+        </div>
+        <div class="folder-row" *ngFor="let folder of folders" (click)="selectFolder(folder)">
+            <div class="icon">
+                <span class="state-icon">
+                    <img src="assets/svg/ic-folder.svg"/>
+                </span>
+            </div>
+            <div class="name-col">
+                <div class="name" [ngClass]="{'blue-txt': folder.subFolders && folder.subFolders.length}" (click)="goIntoFolder(folder, $event)">{{folder.name}}</div>
+                <div class="subfolder-num">{{folder.subFolders? folder.subFolders.length : 0}} folders</div>
+            </div>
+            <div class="selected">
+                <div class="selected-col" *ngIf="selectedFolder?.mapFolderId === folder.mapFolderId">
+                    <uxpl-icon class="inline-ele" icon="pl-icon-checkmark" width="14px" height="14px"></uxpl-icon>
+                    <div class="inline-ele">Selected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+
+

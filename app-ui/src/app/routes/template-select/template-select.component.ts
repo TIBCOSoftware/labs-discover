@@ -7,6 +7,7 @@ import { RepositoryService } from 'src/app/backend/api/repository.service';
 import { Analysis } from 'src/app/backend/model/analysis';
 import { VisualisationService } from 'src/app/backend/api/visualisation.service';
 import {compareTemplates} from '../../functions/templates';
+import {getShortMessage} from "../../functions/details";
 
 @Component({
   selector: 'template-select',
@@ -66,7 +67,7 @@ export class TemplateSelectComponent implements OnInit {
               value: 'Created on ' + formatDate,
             },
             {
-              value: this.analysis.data.description,
+              value: getShortMessage(this.analysis.data.description, 50),
             },
             {isEdit: true, editing: false, value: tempText, eventOnEdit: true, id: 'template'}
           ]

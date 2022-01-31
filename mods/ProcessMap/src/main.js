@@ -145,6 +145,13 @@ Spotfire.initialize(async mod => {
             // Set marking color 
             markingColor = (await dataView.marking()).colorHexCode;
 
+            // if no data, display message
+            // let rowCount = await dataView.rowCount();
+            // if(rowCount == 0){
+            //     onError(["No data is available for the visualization to render."]);
+            // }
+
+
             let isAxisConfigOK = checkInputs(srcAxis, tgtAxis, colorAxis, labelsAxis, sizeByAxis, colNamesAxis, subsetsAxis);
             if (isAxisConfigOK) {
                 await renderCore(dataView);
@@ -161,7 +168,6 @@ Spotfire.initialize(async mod => {
 
         context.signalRenderComplete();
     }
-
 
     /**
      * Error handler triggered when the read call fails, or configuration is invalid.
@@ -336,6 +342,9 @@ Spotfire.initialize(async mod => {
             // Empty visualization
             document.getElementById("visualization").innerHTML = "";
             previousElements = null;
+
+            resetGraphJson();
+
             return;
         }
 
@@ -366,6 +375,9 @@ Spotfire.initialize(async mod => {
 
         refCy = renderGraph(elements, dataView, selectedLayout, nodeShape, allElements["Not in Current Filtering"]);
 
+        // TODO : 
+        persistGraphJson(refCy.cy);
+
         previousCy = refCy;
         previousElements = newElements;
 
@@ -380,6 +392,30 @@ Spotfire.initialize(async mod => {
             checkCompliance(refCy.cy, refCy.layout, allElements[uncompliantVariants], selectedLayout);
         }
 
+    }
+
+    //TODO
+    /**
+     * @param {cytoscape.Core} cy
+     */
+    async function persistGraphJson(cy){
+        // @ts-ignore
+        let graphJson = JSON.stringify(cy.json(true).elements);
+        let graphJsonDocProp = await mod.document.property("GraphJson").catch(() => undefined);
+        if(graphJsonDocProp){
+            graphJsonDocProp.set(graphJson);
+        }
+    }
+
+    /**
+     * Reset GraphJson document property
+     */
+     async function resetGraphJson(){
+        // @ts-ignore
+        let graphJsonDocProp = await mod.document.property("GraphJson").catch(() => undefined);
+        if(graphJsonDocProp){
+            graphJsonDocProp.set("");
+        }
     }
 
     /**
@@ -880,6 +916,8 @@ Spotfire.initialize(async mod => {
      */
     async function applyFilter(filterOn, direction) {
         let fltrStgsDocProp = await mod.document.property("FilterSettings").catch(() => undefined);
+        let inKeepRowProp = await mod.document.property("inKeepRow").catch(() => undefined);
+        let outKeepRowProp = await mod.document.property("outKeepRow").catch(() => undefined);
 
         // TODO : put the code below in the onComplete callback of previous transaction (which clears marking)
         let eles = previousCy.cy.elements(':selected');
@@ -913,6 +951,10 @@ Spotfire.initialize(async mod => {
                         }
                     }
                 });
+
+                if(inKeepRowProp && outKeepRowProp){
+                    inKeepRowProp.set(outKeepRowProp.value());
+                }
 
                 if (fltrStgsDocProp) {
                     //{"origin": "graph|panel", "filterOn": "cases|events", "direction": "in|out"}
@@ -973,6 +1015,11 @@ Spotfire.initialize(async mod => {
                         if ((!hasStart && (ele.data.id === "START")) || (!hasStop && (ele.data.id === "STOP"))) {
                             elements.push(ele);
                             filteredElements.splice(i, 1); // Remove node from filteredElements
+                        }
+                    } else {
+                        if(!hasStart && (ele.data.source === "START")){
+                            elements.push(ele);
+                            filteredElements.splice(i, 1);
                         }
                     }
                 }
@@ -1074,7 +1121,7 @@ Spotfire.initialize(async mod => {
         const hasLabels = await dataView.continuousAxis("Labels") != null;
         const hasSizeBy = await dataView.continuousAxis("Size by") != null;
         const hasColor = isColorCategorical ? await dataView.categoricalAxis("Color") != null : await dataView.continuousAxis("Color") != null ;
-
+        const hasNimbus = await dataView.continuousAxis("Nimbus") != null;
 
 
         /** @type {Map<string, any>} */
@@ -1088,6 +1135,7 @@ Spotfire.initialize(async mod => {
             let source = row.categorical("Source").value()[0].key;
             let target = row.categorical("Target").value()[0].key;
             let parent = hasParent && row.continuous("Parent").value() ? "" + row.continuous("Parent").value() : null;
+            let nimbus = hasNimbus && row.continuous("Nimbus").value() ? "" + row.continuous("Nimbus").value() : null;
 
             if (!source) {
                 console.warn("Null values are not supported on Source axis.");
@@ -1124,9 +1172,10 @@ Spotfire.initialize(async mod => {
                             id: id,
                             // parent: parent != null && !id.startsWith("START") && !id.startsWith("STOP") ? "" + parent : null,
                             label: nodeLabel,
-                            color: row.color().hexCode,
+                            color: id.startsWith("START") || id.startsWith("STOP") ? '#727272' : row.color().hexCode, // setting color for START and STOP nodes, for the Nimbus export
                             category: category,
-                            colorByValue: !isColorCategorical && hasColor  ? row.continuous("Color").value() : 0
+                            colorByValue: !isColorCategorical && hasColor  ? row.continuous("Color").value() : 0, 
+                            tooltip : nimbus ? nimbus : ""
                         },
                         selected: row.isMarked(),
                         // TODO : replace selector in spotfire-cytoscape-style.js to "Node which id equals to START or STOP"
@@ -1161,7 +1210,8 @@ Spotfire.initialize(async mod => {
                             color: row.color().hexCode,
                             category: isColorCategorical ? row.categorical("Color").formattedValue("") : "",
                             sizeBy: hasSizeBy ? row.continuous("Size by").value() : 0,
-                            label: ""
+                            label: "",
+                            tooltip : nimbus ? nimbus : ""
                         },
                         selected: row.isMarked(),
                         scratch: { _spotfire: { row: row } }

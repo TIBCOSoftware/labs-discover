@@ -23,3 +23,7 @@
   border: solid 1px #dedede;
   overflow: hidden;
 }
+
+.tcs-admin-router-pane {
+  width: 100%;
+}

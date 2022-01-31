@@ -6,7 +6,8 @@
           [breakpoints]="{'960px': '90vw', '640px': '100vw'}" [style]="{width: '75vw'}" (onHide)="toggleDisplay()">
   <ng-template pTemplate="header">
     <div class="p-dialog-title">
-      <span>{{selectedAnalysis?.data?.name}}&nbsp;<span *ngIf="selectedAnalysis?.data?.name.toUpperCase() !== selectedAnalysis?.data?.description.toUpperCase()">-&nbsp;{{selectedAnalysis?.data?.description}}</span></span>
+      <!--<span>{{selectedAnalysis?.data?.name}}&nbsp;<span *ngIf="selectedAnalysis?.data?.name.toUpperCase() !== selectedAnalysis?.data?.description.toUpperCase()">-&nbsp;{{selectedAnalysis?.data?.description}}</span></span>-->
+      <span>{{selectedAnalysis?.data?.name}}</span>
     </div>
     <div class="close-icon">
       <uxpl-icon icon="pl-icon-close" size="20px" color="#727272" (click)="handleDialogClose()"></uxpl-icon>

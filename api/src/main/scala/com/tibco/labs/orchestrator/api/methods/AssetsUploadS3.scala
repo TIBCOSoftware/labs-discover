@@ -10,6 +10,7 @@ import akka.{Done, NotUsed}
 import com.amazonaws.services.s3.model._
 import com.tibco.labs.orchestrator.Server.system.executionContext
 import com.tibco.labs.orchestrator.conf.DiscoverConfig
+import com.tibco.labs.orchestrator.conf.DiscoverConfig.externalFqdn
 import com.tibco.labs.orchestrator.models.{ListBucket, S3Content, redisFileInfo}
 import org.slf4j.{Logger, LoggerFactory}
 import redis.clients.jedis.ScanParams
@@ -90,7 +91,7 @@ class AssetsUploadS3() {
 
     log.info(s"orgid : $id, file : ${fileInfo.fileName}")
 
-    var out: (String, Int) = ("", 10)
+    var out: (String, String, Int) = ("","", 10)
 
     val filekey = id + "/assets/" + fileInfo.fileName
 
@@ -100,18 +101,19 @@ class AssetsUploadS3() {
       body
         .runWith(s3Sink)(materializer)
     var mdata: Option[ObjectMetadata] = None
-    var loc = ""
+    var loc,href = ""
     Try(Await.ready(result, Duration.Inf)) match {
       case Success(f) => {
         f.value.get match {
           case Failure(exception) => {
             val err = exception.getMessage
-            out = (err, 100)
-            (s"Error on file ${fileInfo.fileName} during upload : ${out._1}", "", out._2)
+            out = ("", err, 100)
+            (s"Error on file ${fileInfo.fileName} during upload : ${out._1}", "", out._3)
           }
           case Success(value) => {
             loc = "s3a://" + value.bucket + "/" + value.key
-            out = (loc, 0)
+            href = s"https://$externalFqdn/uiassets/download/${id}/${fileInfo.fileName}"
+            out = (href,loc, 0)
             log.info(s"A: ${out._1}")
             val metadata: Source[Option[ObjectMetadata], NotUsed] = S3.getObjectMetadata(value.bucket, value.key)
             val fmeta: Future[Option[ObjectMetadata]] = metadata.runWith(Sink.head)
@@ -130,7 +132,7 @@ class AssetsUploadS3() {
 
               }
             }
-            ("file has been uploaded", out._1, out._2)
+            ("file has been uploaded", out._1, out._3)
           }
         }
       }

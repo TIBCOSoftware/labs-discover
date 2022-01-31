@@ -128,13 +128,15 @@ Spotfire.initialize(async mod => {
             // Return and wait for next call to render when reading data was aborted.
             // Last rendered data view is still valid from a users perspective since
             // a document modification was made during a progress indication.
+            filterControls.setFilteredRows([]);
             return;
         }
 
         // Check for empty axis expression before.
         //let hasValues = await dataView.continuousAxis("Values") != null;
-        let filteredRows = rows.filter(row => row.categorical("Datasets").formattedValue() === "FilteredRows");
-        filterControls.setFilteredRows(filteredRows);
+        //let filteredRows = rows.filter(row => row.categorical("Datasets").formattedValue() === "FilteredRows");
+        //filterControls.setFilteredRows(filteredRows);
+        filterControls.setFilteredRows(rows);
 
 
         // Inform Spotfire that the render is complete (needed for export)

@@ -3,7 +3,7 @@ info:
   title: TIBCO Nimbus Public REST API
   version: '1'
 servers: 
-  - url: https://nimbus.tenant-integration.tcie.pro/01FJBTV4SKXGQVB9ENR654CSFX/ctrlwebisapi.dll
+  - url: https://nimbus.cloud.tibco.com/api
 tags: 
   - name: Diagrams
     description: A set of APIs for creating, editing and deleting process diagrams.

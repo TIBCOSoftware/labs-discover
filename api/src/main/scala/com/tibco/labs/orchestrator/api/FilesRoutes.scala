@@ -65,7 +65,7 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
 
   // dedicated dispatcher
 
- implicit val blockingDispatcher: ExecutionContextExecutor = system.dispatchers.lookup(DispatcherSelector.fromConfig("file-ops-blocking-dispatcher"))
+  implicit val blockingDispatcher: ExecutionContextExecutor = system.dispatchers.lookup(DispatcherSelector.fromConfig("file-ops-blocking-dispatcher"))
   //val GetDispatcher: ExecutionContextExecutor = system.dispatchers.lookup(DispatcherSelector.fromConfig("file2-ops-blocking-dispatcher"))
 
   def getListFiles(id: String): Future[S3Content] =
@@ -91,12 +91,12 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   //#users-get-delete
 
 
-  val FilesRoutes: Route = postRouteFile ~ deleteRouteSegment  ~ getPreviewRoute ~ getRouteFileContent ~ getRouteDirectFile// ~ getRouteFile
+  val FilesRoutes: Route = postRouteFile ~ deleteRouteSegment ~ getPreviewRoute ~ getRouteFileContent ~ getRouteDirectFile // ~ getRouteFile
 
   @POST
   @Path("{orgid}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Upload files to backend storage", description = "Upload files to backend storage", tags = Array("Files Operations"),
+  @Operation(summary = "Upload files to backend storage", security = Array(new SecurityRequirement(name = "bearer")), description = "Upload files to backend storage", tags = Array("Files Operations"),
     requestBody = new RequestBody(content = Array(
       new Content(
         mediaType = MediaType.MULTIPART_FORM_DATA,
@@ -114,53 +114,53 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
       path("files" / Segment) { orgid =>
         concat(
           post {
-           // withExecutionContext(blockingDispatcher) {
-              withRequestTimeout(900.seconds) {
-                withSizeLimit(1073741824) {
-                  //toStrictEntity(900.seconds, 1073741824) {
-                  //  formFields(
-                  //    "newline".?,
-                  //    "separator".?,
-                  //    "quoteChar".?,
-                  //    "encoding".?,
-                  //    "escapeChar".?
-                  // ) { (newline, separator, quoteChar, encoding, escapeChar) =>
-                  //log.info(s"Forms : ${newline.getOrElse("\r\n")} -- ${separator.getOrElse(",")} -- ${quoteChar.getOrElse("\"")} -- ${encoding.getOrElse("UTF-8")}")
-                  //val forms: Map[String, String] = Map("separator" -> separator.getOrElse(","), "newline" -> newline.getOrElse("\n\r"), "quoteChar" -> quoteChar.getOrElse("\""), "encoding" -> encoding.getOrElse("UTF-8"), "escapeChar" -> escapeChar.getOrElse("\\"))
-                  fileUploadWithFields("csv") {
-                    case (fields, metadata, file) =>
-                      log.info(s"${metadata.fileName} at ")
-                      log.info(s"org id 2 : ${orgid}")
-                      log.info(s"Forms : ${fields("separator")} -- ${fields("newline")}")
-                      onSuccess(uploadFile2S3(orgid.toLowerCase, metadata, file, fields)) { uploadFuture =>
-                        if (uploadFuture.code == 0) {
-                          complete((StatusCodes.Created, uploadFuture))
-                        } else {
-                          complete((StatusCodes.InternalServerError, uploadFuture))
-                        }
+            // withExecutionContext(blockingDispatcher) {
+            withRequestTimeout(900.seconds) {
+              withSizeLimit(1073741824) {
+                //toStrictEntity(900.seconds, 1073741824) {
+                //  formFields(
+                //    "newline".?,
+                //    "separator".?,
+                //    "quoteChar".?,
+                //    "encoding".?,
+                //    "escapeChar".?
+                // ) { (newline, separator, quoteChar, encoding, escapeChar) =>
+                //log.info(s"Forms : ${newline.getOrElse("\r\n")} -- ${separator.getOrElse(",")} -- ${quoteChar.getOrElse("\"")} -- ${encoding.getOrElse("UTF-8")}")
+                //val forms: Map[String, String] = Map("separator" -> separator.getOrElse(","), "newline" -> newline.getOrElse("\n\r"), "quoteChar" -> quoteChar.getOrElse("\""), "encoding" -> encoding.getOrElse("UTF-8"), "escapeChar" -> escapeChar.getOrElse("\\"))
+                fileUploadWithFields("csv") {
+                  case (fields, metadata, file) =>
+                    log.info(s"${metadata.fileName} at ")
+                    log.info(s"org id 2 : ${orgid}")
+                    log.info(s"Forms : ${fields("separator")} -- ${fields("newline")}")
+                    onSuccess(uploadFile2S3(orgid.toLowerCase, metadata, file, fields)) { uploadFuture =>
+                      if (uploadFuture.code == 0) {
+                        complete((StatusCodes.Created, uploadFuture))
+                      } else {
+                        complete((StatusCodes.InternalServerError, uploadFuture))
                       }
-                  }
-                  //}
+                    }
                 }
                 //}
               }
+              //}
+            }
             //}
           }
         )
       }
-  }
+    }
   }
 
   @GET
   @Path("/download/{orgid}/{filename}")
   @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
-  @Operation(summary = "Return stream of file from S3", description = "Return stream of file from S3", tags = Array("Files Operations"),
+  @Operation(summary = "Return stream of file from S3", security = Array(new SecurityRequirement(name = "bearer")), description = "Return stream of file from S3", tags = Array("Files Operations"),
     parameters = Array(
       new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename")
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "filestream",content = Array(new Content(mediaType = "applicetion/octet-stream"))),
+      new ApiResponse(responseCode = "200", description = "filestream", content = Array(new Content(mediaType = "applicetion/octet-stream"))),
       new ApiResponse(responseCode = "500", description = "Internal Error")
     )
   )
@@ -168,12 +168,12 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
     cors() {
       concat(
         // /files/<orgid>/
-        path("files" / "download" / Segment / Segment) { (orgid , filename) =>
+        path("files" / "download" / Segment / Segment) { (orgid, filename) =>
           concat(
             get {
               //#retrieve-sparkapp-info/status
               val key = s"${orgid.toLowerCase()}/${filename}"
-              val src: Source[Option[(Source[ByteString, NotUsed], ObjectMetadata)], NotUsed] = S3.download(bucketName, key )
+              val src: Source[Option[(Source[ByteString, NotUsed], ObjectMetadata)], NotUsed] = S3.download(bucketName, key)
               val rss: Future[(Source[ByteString, NotUsed], ObjectMetadata)] = src.runWith(Sink.head).map(_.getOrElse((Source.empty[ByteString], null)))
               onComplete(rss) {
                 case Failure(exception) => complete((StatusCodes.NotFound, exception.getMessage))
@@ -192,85 +192,86 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   }
 
 
- /* @GET
-  @Path("V1/{orgid}")
-  @Deprecated
-  @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Files Operations"),
-    parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id")),
-    responses = Array(
-      new ApiResponse(responseCode = "200", description = "response",
-        content = Array(new Content(schema = new Schema(implementation = classOf[S3Content])))),
-      new ApiResponse(responseCode = "500", description = "Internal server error"))
-  )
-  def getRouteFile: Route = {
-    cors() {
-      concat(
-        // /files/<orgid>/
-        path("files" / "V1" / Segment) { orgid =>
-          concat(
-            get {
-              //#retrieve-sparkapp-info/status
-              rejectEmptyResponse {
-                onSuccess(getListFiles(orgid.toLowerCase)) { response =>
-                  complete(response)
-                }
-              }
-              //#retrieve-sparkapp-info/status
-            }
-          )
-        }
-      )
-    }
-  }*/
+  /* @GET
+   @Path("V1/{orgid}")
+   @Deprecated
+   @Produces(Array(MediaType.APPLICATION_JSON))
+   @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Files Operations"),
+     parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id")),
+     responses = Array(
+       new ApiResponse(responseCode = "200", description = "response",
+         content = Array(new Content(schema = new Schema(implementation = classOf[S3Content])))),
+       new ApiResponse(responseCode = "500", description = "Internal server error"))
+   )
+   def getRouteFile: Route = {
+     cors() {
+       concat(
+         // /files/<orgid>/
+         path("files" / "V1" / Segment) { orgid =>
+           concat(
+             get {
+               //#retrieve-sparkapp-info/status
+               rejectEmptyResponse {
+                 onSuccess(getListFiles(orgid.toLowerCase)) { response =>
+                   complete(response)
+                 }
+               }
+               //#retrieve-sparkapp-info/status
+             }
+           )
+         }
+       )
+     }
+   }*/
 
-/*
-  @GET
-  @Path("{orgid}")
-  @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Files Operations"),
-    parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id")),
-    responses = Array(
-      new ApiResponse(responseCode = "200", description = "response",
-        content = Array(new Content(schema = new Schema(implementation = classOf[RedisContent])))),
-      new ApiResponse(responseCode = "500", description = "Internal server error"))
-  )
-  def getRouteFileV2: Route = {
-    cors() {
-      concat(
-        // /files/<orgid>/
-        path("files" / Segment) { orgid =>
-          concat(
-            get {
-              withExecutionContext(GetDispatcher) {
-              //#retrieve-sparkapp-info/status
-              rejectEmptyResponse {
-                onSuccess(getListFilesV2(orgid.toLowerCase)) { response =>
-                  complete(response)
+  /*
+    @GET
+    @Path("{orgid}")
+    @Produces(Array(MediaType.APPLICATION_JSON))
+    @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Files Operations"),
+      parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id")),
+      responses = Array(
+        new ApiResponse(responseCode = "200", description = "response",
+          content = Array(new Content(schema = new Schema(implementation = classOf[RedisContent])))),
+        new ApiResponse(responseCode = "500", description = "Internal server error"))
+    )
+    def getRouteFileV2: Route = {
+      cors() {
+        concat(
+          // /files/<orgid>/
+          path("files" / Segment) { orgid =>
+            concat(
+              get {
+                withExecutionContext(GetDispatcher) {
+                //#retrieve-sparkapp-info/status
+                rejectEmptyResponse {
+                  onSuccess(getListFilesV2(orgid.toLowerCase)) { response =>
+                    complete(response)
+                  }
                 }
+                //#retrieve-sparkapp-info/status
               }
-              //#retrieve-sparkapp-info/status
-            }
-            }
-          )
-        }
-      )
+              }
+            )
+          }
+        )
+      }
     }
-  }
-*/
+  */
 
   @GET
   @Path("download/signed/{orgId}/{filename}")
   @Produces(Array(MediaType.APPLICATION_JSON))
   @Operation(
     summary = "return signed url for 1 h to get you file from",
+    security = Array(new SecurityRequirement(name = "bearer")),
     description = "Return list of files stored in this org",
     tags = Array("Files Operations"),
     //security  = Array(new SecurityRequirement(name = "bearer")),
     parameters = Array(
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename"),
       new Parameter(name = "orgId", in = ParameterIn.PATH, description = "orgId")
-     ),
+    ),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
         content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedFilesUrl])))),
@@ -283,25 +284,24 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
         // /files/<orgid>/
         path("files" / "download" / "signed" / Segment / Segment) { (orgid, filename) =>
           //extractCredentials { creds =>
-            concat(
-              get {
-                //#retrieve-sparkapp-info/status
-                rejectEmptyResponse {
-                 // log.info(creds.getOrElse("None").toString)
-                  //val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
-                  onSuccess(getURLFile(orgid.toLowerCase(), filename)) { response =>
-                    complete(response)
-                  }
+          concat(
+            get {
+              //#retrieve-sparkapp-info/status
+              rejectEmptyResponse {
+                // log.info(creds.getOrElse("None").toString)
+                //val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+                onSuccess(getURLFile(orgid.toLowerCase(), filename)) { response =>
+                  complete(response)
                 }
-                //#retrieve-sparkapp-info/status
               }
-            )
+              //#retrieve-sparkapp-info/status
+            }
+          )
           //}
         }
       )
     }
   }
-
 
 
   @GET
@@ -310,6 +310,7 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   @Operation(
     summary = "Return list of files stored in this org",
     description = "Return list of files stored in this org",
+    security = Array(new SecurityRequirement(name = "bearer")),
     tags = Array("Files Operations"),
     parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename to preview (original name)")),
@@ -349,7 +350,7 @@ class FilesRoutes(filesRegistry: ActorRef[FilesRegistry.Command])(implicit val s
   @DELETE
   @Path("{orgid}/{filename}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Delete the specified file on storage", description = "Delete the specified file on storage", tags = Array("Files Operations"),
+  @Operation(summary = "Delete the specified file on storage", security = Array(new SecurityRequirement(name = "bearer")), description = "Delete the specified file on storage", tags = Array("Files Operations"),
     parameters = Array(
       new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "FileName to be deleted")

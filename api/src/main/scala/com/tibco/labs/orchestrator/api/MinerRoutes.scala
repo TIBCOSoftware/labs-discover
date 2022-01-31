@@ -78,7 +78,7 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
     summary = "Get all Analysis in an org",
     description = "Get all Analysis in an org",
     tags = Array("Mining Data"),
-    security  = Array(new SecurityRequirement(name = "bearer")),
+    security = Array(new SecurityRequirement(name = "bearer")),
     //parameters = Array(new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "Spark Job Name")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -93,25 +93,25 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
     cors() {
       path("mining" / "analysis" / "all") {
 
-          extractCredentials { creds =>
+        extractCredentials { creds =>
           get {
             //#retrieve-sparkapp-info/status
             rejectEmptyResponse {
-                log.info(creds.getOrElse("None").toString)
-                val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
-                onSuccess(getAllAnalysisAPI(token)) { response =>
-                  if (response.code == 0) {
-                    complete((StatusCodes.OK, response))
-                  } else if (response.code == 401) {
-                    complete((StatusCodes.Unauthorized, response))
-                  } else {
-                    complete((StatusCodes.BadGateway, response))
-                  }
+              log.info(creds.getOrElse("None").toString)
+              val token = creds.getOrElse("None").toString.replaceAll("Bearer ", "")
+              onSuccess(getAllAnalysisAPI(token)) { response =>
+                if (response.code == 0) {
+                  complete((StatusCodes.OK, response))
+                } else if (response.code == 401) {
+                  complete((StatusCodes.Unauthorized, response))
+                } else {
+                  complete((StatusCodes.BadGateway, response))
                 }
               }
             }
-            //#retrieve-sparkapp-info/status
           }
+          //#retrieve-sparkapp-info/status
+        }
 
       }
     }
@@ -125,7 +125,7 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
     summary = "Get all reference variants in an org",
     description = "Get all reference variants in an org",
     tags = Array("Mining Data"),
-    security  = Array(new SecurityRequirement(name = "bearer")),
+    security = Array(new SecurityRequirement(name = "bearer")),
     parameters = Array(new Parameter(name = "analysis_id", in = ParameterIn.PATH, description = "Id of analysis")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -144,7 +144,7 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
             //#retrieve-sparkapp-info/status
             rejectEmptyResponse {
               log.info(creds.getOrElse("None").toString)
-              val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+              val token = creds.getOrElse("None").toString.replaceAll("Bearer ", "")
               onSuccess(getReferenceVariantsAPI(token, analysisId)) { response =>
                 if (response.code == 0) {
                   complete((StatusCodes.OK, response))
@@ -171,7 +171,7 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
     summary = "Get all activities  in an org for a given analysis",
     description = "Get all activities  in an org for a given analysis",
     tags = Array("Mining Data"),
-    security  = Array(new SecurityRequirement(name = "bearer")),
+    security = Array(new SecurityRequirement(name = "bearer")),
     parameters = Array(new Parameter(name = "analysis_id", in = ParameterIn.PATH, description = "Id of analysis")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -184,13 +184,13 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
   )
   def getActivitiesRoute: Route = {
     cors() {
-      path("mining" / "activities"  / Segment) { analysisId =>
+      path("mining" / "activities" / Segment) { analysisId =>
         extractCredentials { creds =>
           get {
             //#retrieve-sparkapp-info/status
             rejectEmptyResponse {
               log.info(creds.getOrElse("None").toString)
-              val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+              val token = creds.getOrElse("None").toString.replaceAll("Bearer ", "")
               onSuccess(getActivitiesAPI(token, analysisId)) { response =>
                 if (response.code == 0) {
                   complete((StatusCodes.OK, response))
@@ -217,7 +217,7 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
     summary = "Delete all data  in an org for a given analysis",
     description = "Delete all data  in an org for a given analysis",
     tags = Array("Mining Data"),
-    security  = Array(new SecurityRequirement(name = "bearer")),
+    security = Array(new SecurityRequirement(name = "bearer")),
     parameters = Array(new Parameter(name = "analysis_id", in = ParameterIn.PATH, description = "Id of analysis")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -230,13 +230,13 @@ class MinerRoutes(miningDataRegistry: ActorRef[MiningDataRegistry.Command])(impl
   )
   def deleteAnalysisRoute: Route = {
     cors() {
-      path("mining" / "analysis"  / Segment) { analysisId =>
+      path("mining" / "analysis" / Segment) { analysisId =>
         extractCredentials { creds =>
           delete {
             //#retrieve-sparkapp-info/status
             rejectEmptyResponse {
               log.info(creds.getOrElse("None").toString)
-              val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+              val token = creds.getOrElse("None").toString.replaceAll("Bearer ", "")
               onSuccess(deleteAnalysisAPI(token, analysisId)) { response =>
                 if (response.code == 0) {
                   complete((StatusCodes.OK, response))

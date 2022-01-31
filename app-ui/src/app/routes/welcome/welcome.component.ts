@@ -6,6 +6,8 @@ import {LandingPageConfig} from '@tibco-tcstk/tc-liveapps-lib';
 import {cloneDeep} from 'lodash-es';
 import { HttpClient } from '@angular/common/http';
 import { Location } from '@angular/common';
+import { OauthService } from 'src/app/service/oauth.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-welcome',
@@ -15,22 +17,34 @@ import { Location } from '@angular/common';
 export class WelcomeComponent implements OnInit {
 
   landingPage: LandingPageConfig;
-  readonly CLOUD_STARTER_DESCRIPTOR = 'assets/cloud_app_descriptor.json';
-  public version: string;
+  public ready: boolean = false;
 
-  constructor(private router: Router, private configService: ConfigurationService, private http: HttpClient, private location: Location) {
+  constructor(
+    private router: Router, 
+    private configService: ConfigurationService, 
+    protected oauthService: OauthService
+  ) {
   }
 
-  ngOnInit(): void {
-    this.http.get(TcCoreCommonFunctions.prepareUrlForNonStaticResource(this.location, this.CLOUD_STARTER_DESCRIPTOR)).subscribe((csDescriptor: any) => {
-      this.version = 'Version: ' + csDescriptor.cloudstarter.version + ' Build Date: ' + csDescriptor.cloudstarter.build_date;
-    });
+  private async fetchWithAuthentication(url, authToken) {
+    const headers = new Headers();
+    headers.set('Authorization', `Bearer ` + authToken);
+    const file = await fetch(url, { headers });
+    const blob = await file.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    return objectUrl;
+    // return fetch(url, { headers });
+  }
+
+  async ngOnInit(): Promise<void> {
     this.landingPage = cloneDeep(this.configService.config.discover.landingPage);
-    this.landingPage.backgroundURL = '/webresource/orgFolders/' + this.configService.config.uiAppId + '_assets/' + this.landingPage.backgroundURL;
-    this.landingPage.highlights = this.landingPage.highlights.map(highlight => {
-      highlight.iconURL = '/webresource/orgFolders/' + this.configService.config.uiAppId + '_assets/' + highlight.iconURL;
+
+    const imageUrl = environment.apiURL + '/configuration/assets/' + this.landingPage.backgroundURL;
+    this.landingPage.backgroundURL = await this.fetchWithAuthentication(imageUrl, this.oauthService.token);
+    this.landingPage.highlights = await Promise.all(this.landingPage.highlights.map(async highlight => {
+      highlight.iconURL = await this.fetchWithAuthentication(environment.apiURL + '/configuration/assets/' + highlight.iconURL, this.oauthService.token);
       return highlight;
-    });
+    }));
     this.landingPage.actionButton = [
       new ActionButtonConfig().deserialize({
           text: 'Get started',
@@ -38,6 +52,7 @@ export class WelcomeComponent implements OnInit {
         }
       )
     ];
+    this.ready = true;
   }
 
   getStarted() {

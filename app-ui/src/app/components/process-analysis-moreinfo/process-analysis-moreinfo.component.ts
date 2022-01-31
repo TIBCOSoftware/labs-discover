@@ -41,7 +41,8 @@ export class ProcessAnalysisMoreinfoComponent implements OnChanges {
         { label: 'Department', value: this.selectedAnalysis.data.mappings.resourceGroup, type: 'string' },
         { label: 'Scheduled end time', value: this.selectedAnalysis.data.mappings.scheduledEnd, type: 'string' },
         { label: 'Requestor', value: this.selectedAnalysis.data.mappings.requester, type: 'string' },
-        { label: 'Other attributes', value: this.selectedAnalysis.data.mappings.otherAttributes?.toString(), type: 'string' }
+        { label: 'Other attributes', value: this.selectedAnalysis.data.mappings.otherAttributes?.toString(), type: 'string' },
+        { label: 'Description', value: this.selectedAnalysis.data.description, type: 'string' }
       ];
     }
   }

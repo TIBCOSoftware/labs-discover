@@ -1,1 +1,0 @@
-{"version":3,"file":"analysisList.js","sourceRoot":"","sources":["../../../src/backend/model/analysisList.ts"],"names":[],"mappings":";AAAA;;;;;;;;;;GAUG;;;AAIH,MAAa,YAAY;IAYrB,MAAM,CAAC,mBAAmB;QACtB,OAAO,YAAY,CAAC,gBAAgB,CAAC;IACzC,CAAC;;AAdL,oCAeC;AAZU,0BAAa,GAAuB,SAAS,CAAC;AAE9C,6BAAgB,GAA0D;IAC7E;QACI,MAAM,EAAE,YAAY;QACpB,UAAU,EAAE,YAAY;QACxB,MAAM,EAAE,QAAQ;KACnB;CAAK,CAAC"}

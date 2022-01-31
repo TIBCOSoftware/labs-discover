@@ -31,7 +31,6 @@ export class MapComponent implements OnInit, OnChanges {
   ];
   previewValue: string = this.previewOptions[0].value;
   hasAutoMapped: boolean;
-  styleContext = this;
   mappedColumns = []
 
   ngOnInit(): void {
@@ -41,8 +40,7 @@ export class MapComponent implements OnInit, OnChanges {
   public clearMap = (): void => {
     Object.keys(this.mapping).forEach(v => delete this.mapping[v]);
     this.mapping = {} as unknown as Mapping;
-    this.previewColumns = calculateColumns(this.previewValue === 'full-data' ? this.preview?.availableColumns : this.filterMappedColumns());
-    // this.updateStatus()
+    this.previewColumns = calculateColumns(this.previewValue === 'full-data' ? this.preview?.availableColumns : this.filterMappedColumns(), this.mappedColumns);
   }
 
   public updateStatus = (event): void => {
@@ -50,7 +48,7 @@ export class MapComponent implements OnInit, OnChanges {
       this.hasAutoMapped = event.isAutoMapped;
     }
     this.setMappedColumns();
-    this.previewColumns = calculateColumns(this.previewValue === 'full-data' ? this.preview?.availableColumns : this.filterMappedColumns());
+    this.previewColumns = calculateColumns(this.previewValue === 'full-data' ? this.preview?.availableColumns : this.filterMappedColumns(), this.mappedColumns);
     // FIX for "Expression has changed after it was checked" (https://blog.angular-university.io/angular-debugging/)
     // Only send status update in the next JavaScript Cycle
     window.setTimeout(() => {
@@ -66,7 +64,7 @@ export class MapComponent implements OnInit, OnChanges {
 
   public handlePreviewColumns = (event): void => {
     this.previewValue = event.detail.value;
-    this.previewColumns = calculateColumns(this.previewValue === 'full-data' ? this.preview?.availableColumns : this.filterMappedColumns());
+    this.previewColumns = calculateColumns(this.previewValue === 'full-data' ? this.preview?.availableColumns : this.filterMappedColumns(), this.mappedColumns);
   }
 
   private setMappedColumns() {
@@ -84,17 +82,6 @@ export class MapComponent implements OnInit, OnChanges {
       return this.mappedColumns.indexOf(el) >= 0;
     });
     return columnsForTable;
-  }
-
-  public setTableStyle(rowData, col, context) {
-    // console.log('Setting style: Row Data: ' , rowData, ' Column: ', col)
-    let re = {};
-    if (context.mappedColumns && context.mappedColumns.length > 0) {
-      if (context.mappedColumns.indexOf(col.headerName) > -1) {
-        re = {'background-color': '#f3f4fb'}
-      }
-    }
-    return re;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

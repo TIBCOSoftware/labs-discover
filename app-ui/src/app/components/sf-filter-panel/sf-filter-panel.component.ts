@@ -50,8 +50,13 @@ export class SfFilterPanelComponent implements OnInit, AfterViewInit, OnChanges 
   private firstShow = false;
 
   contentExpanded = true;
+  contentMaximized = false;
   oriHeight: number;
   minFilterPanelSize = {x: 228, y: 68};
+
+  // the top when the filter panel is show at first time. The position is right underneath the filter button
+  // so when the filter panel is maximized we can know what the top should be
+  maxTop: number;
 
   ngOnInit() {
     this.processConfig();
@@ -131,9 +136,11 @@ export class SfFilterPanelComponent implements OnInit, AfterViewInit, OnChanges 
     })
   }
 
-  public toggleShow(isShown: boolean) {
+  public toggleShow(isShown: boolean, maxTop: number) {
     if (isShown && !this.firstShow) {
       this.firstShow = true;
+      // save it here, and don't loose it
+      this.maxTop = maxTop;
       this.setMenu();
     }
   }
@@ -145,6 +152,19 @@ export class SfFilterPanelComponent implements OnInit, AfterViewInit, OnChanges 
       this.sfFilterContainer.verticalExpand(this.oriHeight);
     }
     this.contentExpanded = !this.contentExpanded;
+  }
+
+  public toggleContentMaximize() {
+    if (this.contentMaximized) {
+      this.sfFilterContainer.restore();
+    } else {
+      this.sfFilterContainer.maximize(this.maxTop);
+    }
+    this.contentMaximized = !this.contentMaximized;
+  }
+
+  public resizeToSmallSize(event) {
+    this.contentMaximized = false;
   }
 
 }

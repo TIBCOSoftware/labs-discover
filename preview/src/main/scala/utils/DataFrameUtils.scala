@@ -6,6 +6,7 @@
 package com.tibco.labs
 package utils
 
+import com.tibco.labs.utils.common.logger
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame, SQLContext, SaveMode}
@@ -29,7 +30,7 @@ object DataFrameUtils {
 
 
   def parseTdv(tdvOptions: Map[String, String], spark: SQLContext): DataFrame = {
-    println(s"###########  Start read Data Source  ##########")
+    logger.info(s"###########  Start read Data Source  ##########")
     var tmpDataFrame = spark.emptyDataFrame
 
     try {
@@ -38,7 +39,7 @@ object DataFrameUtils {
         .options(tdvOptions)
         .load()
 
-      println(s"###########  End read Data Source   ##########")
+      logger.info(s"###########  End read Data Source   ##########")
 
     } catch {
       case e: Throwable => throw new Exception("Something went wrong... in parseTdv method " + e.getMessage)

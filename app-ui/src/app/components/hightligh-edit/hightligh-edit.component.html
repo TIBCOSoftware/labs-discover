@@ -4,14 +4,14 @@
     <div class="highlight-icon-section">
       <div class="highlight-column">
         <div class="highlight-line">
-            <uxpl-form-field class="field-icon" label="Icon" type="text" valid required="true" [value]="highlight.iconURL" (uxplChanged)="handleUpdate($event, 'iconURL')"></uxpl-form-field>
+            <uxpl-form-field class="field-icon" label="Icon" type="text" valid required="true" readonly="true" [value]="highlight.iconURL.slice(highlight.iconURL.lastIndexOf('/') + 1)"></uxpl-form-field>
             <input type="file" #file style="display:none" (change)="handleUpload($event.target.files[0])">
-            <uxpl-icon style="margin-bottom: -5px; cursor: pointer" icon="pl-icon-upload" width="24px" height="24px" (click)="file.click()"></uxpl-icon>    
+            <uxpl-icon style="margin-bottom: -5px; cursor: pointer" icon="pl-icon-upload" width="24px" height="24px" (click)="file.click()"></uxpl-icon>
         </div>
         <uxpl-form-field class="field-title" label="Title" type="text" valid required="true" [value]="highlight.title" (uxplChanged)="handleUpdate($event, 'title')"></uxpl-form-field>
       </div>
       <div class="splash-oval">
-        <uxpl-icon class="splash-oval-icon" [url]="iconURL" width="48px" height="48px"></uxpl-icon>
+        <uxpl-icon class="splash-oval-icon" [url]="iconURL" size="48px"></uxpl-icon>
       </div>
     </div>
     <uxpl-textarea label="Description" type="text" valid required="true" [value]="highlight.content" (uxplChanged)="handleUpdate($event, 'content')" maxLines="3">Description</uxpl-textarea>

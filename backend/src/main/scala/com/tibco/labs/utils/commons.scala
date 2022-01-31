@@ -7,7 +7,9 @@ package com.tibco.labs.utils
 
 import com.typesafe.config.{Config, ConfigFactory}
 import io.circe.Json
-import org.apache.log4j.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -17,9 +19,7 @@ import scala.tools.nsc.io.Path
 
 object commons {
 
-  val logger: Logger = org.apache.log4j.Logger.getRootLogger
-
-
+  val logger: Logger = LoggerFactory.getLogger("Processmining")
 
   def uuid = java.util.UUID.randomUUID.toString
 

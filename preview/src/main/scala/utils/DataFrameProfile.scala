@@ -5,7 +5,7 @@ import com.tibco.labs.utils.common.spark
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
-case class DataFrameProfile(df: DataFrame)  {
+class DataFrameProfile(df: DataFrame)  {
 
   df.cache
 

@@ -194,6 +194,10 @@ export class TemplateEditorComponent implements OnInit {
       default:
         break;
     }
+    // Fix so it shows correctly on the summary page (not for Copy, since then the preview needs to show the old DXP)
+    if(this.request?.template &&  this.analyticsOption === 'CUSTOM' || this.analyticsOption === 'EXISTING' || this.analyticsOption === 'CURRENT' ){
+      this.request.template.spotfireLocation = this.selectedAnalytics;
+    }
   }
 
   private setFDestinationId(sourceId) {

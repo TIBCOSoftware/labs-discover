@@ -1,4 +1,4 @@
-import { PublishedViews, RedisFileInfo } from "../backend/api";
+import { PublishedViews, RedisFileInfo } from "../api/backend/api";
 
 export interface DatasetListItem {
   datasetid: string;

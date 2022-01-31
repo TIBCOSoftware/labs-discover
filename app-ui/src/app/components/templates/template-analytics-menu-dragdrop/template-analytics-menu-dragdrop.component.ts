@@ -106,7 +106,7 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
   }
 
   // @debounce(50)
-  dragMoved(event) {
+  dragMoved(event, isChild) {
     const e = this.document.elementFromPoint(event.pointerPosition.x, event.pointerPosition.y);
     if (!e) {
       this.clearDragInfo();
@@ -117,41 +117,42 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
       this.clearDragInfo();
       return;
     }
-
-    this.dropActionTodo = {
-      targetId: container.getAttribute('data-id')
-    };
-
-    const targetRect = container.getBoundingClientRect();
-    const oneThird = targetRect.height / 3;
-
-    if (event.pointerPosition.y - targetRect.top < oneThird) {
-      // before
-      this.dropActionTodo.action = 'before';
-    } else if (event.pointerPosition.y - targetRect.top > 2 * oneThird) {
-      // after
-      this.dropActionTodo.action = 'after';
-    } else {
-      const nodeMoving = this.findById(this.menuNodesIN, event.source.data);
-      if (nodeMoving) {
-        if (this.menuNodesIN.filter(node => node.uiId === container.getAttribute('data-id')).length !== 0 && (!nodeMoving.child || nodeMoving?.child?.length === 0)) {
-          // inside
-          this.dropActionTodo.action = 'inside';
+    const targetId = container.getAttribute('data-id')
+    const currentId = event.source.data
+    // don't allow to drop on itself
+    if(targetId !== currentId) {
+      this.dropActionTodo = {
+        targetId
+      };
+      const targetRect = container.getBoundingClientRect();
+      const oneThird = targetRect.height / 3;
+      if (event.pointerPosition.y - targetRect.top < oneThird) {
+        // before
+        this.dropActionTodo.action = 'before';
+      } else if (event.pointerPosition.y - targetRect.top > 2 * oneThird) {
+        // after
+        this.dropActionTodo.action = 'after';
+      } else {
+        const nodeMoving = this.findById(this.menuNodesIN, event.source.data);
+        if (nodeMoving && !isChild) {
+          if (this.menuNodesIN.filter(node => node.uiId === container.getAttribute('data-id')).length !== 0 && (!nodeMoving.child || nodeMoving?.child?.length === 0)) {
+            // inside
+            this.dropActionTodo.action = 'inside';
+          }
         }
       }
     }
     this.showDragInfo();
   }
 
-  drop(event) {
+  drop(event, isChild) {
     if (!this.dropActionTodo?.action) return;
-
     const draggedItemId = event.item.data;
     const parentItemId = event.previousContainer.id;
     const targetListId = this.getParentNodeId(this.dropActionTodo.targetId, this.menuNodesIN, 'main');
+    if(draggedItemId === targetListId) return;
 
     const draggedItem = this.nodeLookup[draggedItemId];
-
     const oldItemContainer = parentItemId !== 'main' ? this.nodeLookup[parentItemId].child : this.menuNodesIN;
     const newContainer = targetListId !== 'main' ? this.nodeLookup[targetListId].child : this.menuNodesIN;
     if (targetListId === 'main' || !(draggedItem.child && draggedItem.child.length > 0)) {
@@ -159,21 +160,32 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
       switch (this.dropActionTodo.action) {
         case 'before':
         case 'after':
-          oldItemContainer.splice(i, 1);
-          const targetIndex = newContainer.findIndex(c => c.uiId === this.dropActionTodo.targetId);
-          if (this.dropActionTodo.action === 'before') {
-            newContainer.splice(targetIndex, 0, draggedItem);
-          } else {
-            newContainer.splice(targetIndex + 1, 0, draggedItem);
+          let targetIndex = newContainer.findIndex(c => c.uiId === this.dropActionTodo.targetId);
+          if(targetIndex > -1) {
+            oldItemContainer.splice(i, 1);
+            // Calculate targetIndex again (in case the old container is the same as new), since the splice shifted it
+            if(oldItemContainer === newContainer) {
+              targetIndex = newContainer.findIndex(c => c.uiId === this.dropActionTodo.targetId);
+            }
+            if (this.dropActionTodo.action === 'before') {
+              newContainer.splice(targetIndex, 0, draggedItem);
+            } else {
+              newContainer.splice(targetIndex + 1, 0, draggedItem);
+            }
           }
           break;
         case 'inside':
           if(this.allowNesting) {
-            oldItemContainer.splice(i, 1);
-            if (!this.nodeLookup[this.dropActionTodo.targetId].child) {
-              this.nodeLookup[this.dropActionTodo.targetId].child = [];
+            // We don't allow for submenus
+            if(!isChild) {
+              oldItemContainer.splice(i, 1);
+              if (!this.nodeLookup[this.dropActionTodo.targetId].child) {
+                this.nodeLookup[this.dropActionTodo.targetId].child = [];
+              }
+              this.nodeLookup[this.dropActionTodo.targetId].child.push(draggedItem)
+            } else {
+              notifyUser('WARNING', '[N] You can\'t create sub menus of sub menus...', this.msService);
             }
-            this.nodeLookup[this.dropActionTodo.targetId].child.push(draggedItem)
           } else {
             notifyUser('WARNING', 'You can\'t create sub menus...', this.msService);
           }
@@ -188,10 +200,7 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
     } else {
       notifyUser('WARNING', 'You can\'t create sub menus of sub menus...', this.msService);
     }
-
-    // this.emitNodes();
   }
-
 
   blink(id: number){
     for(let i = 1; i < this.NUMBER_OF_BLINKS; i++){
@@ -250,6 +259,17 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
         this.findById(data[i].child, id);
       }
     }
+  }
+
+  private getLevelForId = (data, id, depth = 0): number => {
+    for (const i in data) {
+      if (data[i].uiId === id) {
+        return depth + 1;
+      } else if (data[i].child && data[i].child.length && typeof data[i].child === 'object') {
+        return this.getLevelForId(data[i].child, id, depth + 1);
+      }
+    }
+    return 0
   }
 
   private updateById(data, id, newNode: AnalyticsMenuConfigUI) {
@@ -354,22 +374,5 @@ export class TemplateAnalyticsMenuDragdropComponent implements OnInit, OnChanges
       }
     });
   }
-
-  /*
-  private emitNodes() {
-    // this.menuNodesIN = [];
-    const toEmit: AnalyticsMenuConfigUI[] = [];
-    this.uiMenu.forEach(item => {
-      const mItem: UIMenu = {...item};
-      delete mItem.uiId;
-      const children: UIMenu[] = item.child.map(cItem => {
-        delete cItem.uiId;
-        return cItem;
-      });
-      mItem.child = children;
-      toEmit.push(mItem)
-    });
-    this.update.emit(toEmit);
-  }*/
 
 }

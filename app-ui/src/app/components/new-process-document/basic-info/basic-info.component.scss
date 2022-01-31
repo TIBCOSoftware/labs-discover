@@ -1,0 +1,22 @@
+.basic-info-container {
+    display: flex;
+    flex-direction: column;
+
+    .doc-location {
+        margin-top: 28px;
+
+        .title {
+            height: 21px;
+            color: #727272;
+            font-family: "Source Sans Pro";
+            font-size: 13px;
+            letter-spacing: 0;
+            line-height: 21px;
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.error {
+    color: #db0000;
+}

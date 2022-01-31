@@ -7,14 +7,15 @@ package utils
 */
 
 
-import utils.common.{spark, token}
-import org.apache.spark.internal.Logging
+import utils.common.{logger, spark, token}
+
+
 
 import java.time.{LocalDateTime, ZoneOffset}
 import sttp.capabilities
 import sttp.model.{MediaType, StatusCode}
 
-object Status extends Logging{
+object Status{
 
   case class Status(
                      Organisation: String,
@@ -51,11 +52,11 @@ object Status extends Logging{
 
     //Fire and Forget
     statusResponse.code match {
-      case StatusCode.Ok => logInfo("Status Updated")
+      case StatusCode.Ok => logger.info("Status Updated")
       case _ => {
         statusResponse.body match {
-          case Left(value) => logError("Status not updated, failed with" + value )
-          case Right(value) => logError("Status not updated, failed with" + value )
+          case Left(value) => logger.error("Status not updated, failed with" + value )
+          case Right(value) => logger.error("Status not updated, failed with" + value )
         }
       }
     }
@@ -64,7 +65,7 @@ object Status extends Logging{
   }
 
   def errorHandler(): Unit = {
-    logError("Exiting...")
+    logger.error("Exiting...")
     spark.stop()
     sys.exit(100)
   }

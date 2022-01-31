@@ -1,6 +1,6 @@
-<div class="help-side">
-  <uxpl-help-side-bar [helpSettingsUrl]="helpSource" [auth]="oauthService.getKey().token"
-                      [show]="showHelp"></uxpl-help-side-bar>
+<div ngclass="help-side">
+  <uxpl-help-side-bar [helpSettingsUrl]="helpSourceToUse" [auth]="oauthService.getKey().token"
+                      [show]="showHelp" ></uxpl-help-side-bar>
   <div class="help-version" *ngIf="showHelp">
     VERSION: <span style="color: black">{{csDescriptor?.cloudstarter?.version}} </span> BUILD DATE: <span
     style="color: black">{{csDescriptor?.cloudstarter?.build_date}}</span>

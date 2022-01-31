@@ -113,7 +113,7 @@ class LoginRoutes(loginRegistry: ActorRef[LoginRegistry.Command])(implicit val s
           }
         )
       }
-    //}
+      //}
     }
   }
 

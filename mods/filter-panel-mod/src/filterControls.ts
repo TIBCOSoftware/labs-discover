@@ -472,8 +472,15 @@ export class FilterControls {
         let filterCountDocProp = await this.mod.document.property<number>(FILTER_COUNT_PROPERTY).catch(() => undefined);
         let fltrStgsDocProp = await this.mod.document.property<string>(FILTER_SETTINGS_PROPERTY).catch(() => undefined);
 
+        let inKeepRowProp = await this.mod.document.property<string>("inKeepRow").catch(() => undefined);
+        let outKeepRowProp = await this.mod.document.property<string>("outKeepRow").catch(() => undefined);
+
         this.mod.transaction( () => {
 
+            if(inKeepRowProp && outKeepRowProp){
+                inKeepRowProp.set(outKeepRowProp.value());
+            }
+            
             if(fltrStgsDocProp){
                 //{"origin": "graph|panel", "filterOn": "cases|events", "direction": "in|out"}
                 fltrStgsDocProp.set('{"origin": "panel", "filterOn": "'+this.filterOn.toLowerCase()+'", "direction": "'+direction+'"}');

@@ -1,0 +1,74 @@
+openapi: "3.0.1"
+info:
+  version: "1.0.0"
+  title: "Swagger TIBCO Cloud"
+  termsOfService: "https://www.tibco.com/company/terms-of-use"
+  contact:
+    email: "apiteam@swagger.io"
+servers:
+  - url: "eu.account.cloud.tibco.com"
+tags:
+  - name: "Account"
+    description: "TIBCO Cloud Account management"
+security:
+  - bearerAuth: []
+paths:
+  /tsc-ws/v1/account/user:
+    get:
+      tags:
+      - "Account"
+      summary: "Get user account information"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "getAccountInfo"
+      responses:
+        "200":
+          description: Users in account/tenant
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/User"
+        "400":
+          description: "Forbidden"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: CIC oauth token
+  schemas:
+    User: 
+      type: object
+      properties: 
+        userEntityId: 
+          type: string
+        role: 
+          type: string
+        email: 
+          type: string
+        firstName: 
+          type: string
+        lastName: 
+          type: string
+        status: 
+          type: string
+        tenantDetails: 
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantDetails'
+        lastLoginDate: 
+          type: number
+    TenantDetails:
+      type: object
+      properties: 
+        tenantId: 
+          type: string
+        tenantRoleIds: 
+          type: array
+          items: 
+            type: string
+        teamAdmin: 
+          type: boolean
+        region: 
+          type: string

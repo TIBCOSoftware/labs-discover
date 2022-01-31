@@ -1,75 +1,53 @@
+import { IncomingMessage } from 'http';
 import { Response } from 'koa';
 import { Param, Body, Get, Post, Put, Delete, HeaderParam, QueryParam, JsonController, Res } from 'routing-controllers';
 import { Service } from 'typedi';
 import { DiscoverCache } from '../cache/DiscoverCache';
 import { logger } from '../common/logging';
-import { ClaimsApi, ClaimsSandbox, User, UsersApi } from '../liveapps/authorization/api';
-import { CasesApi, GetCaseResponseItem, GetTypeResponseItem, GetTypeResponseItemAttribute, GetTypeResponseItemCreator, GetTypeResponseItemState, TypesApi } from '../liveapps/casemanagement/api';
-import { CaseAction, CaseActionsApi } from '../liveapps/pageflow/api';
-import { ProcessDetails, ProcessesApi } from '../liveapps/processmanagement/api';
+import { ClaimsApi, ClaimsSandbox, User, UsersApi } from '../api/liveapps/authorization/api';
+import { CasesApi, GetCaseResponseItem, GetTypeResponseItem, GetTypeResponseItemAttribute, GetTypeResponseItemCreator, GetTypeResponseItemState, HttpError, TypesApi } from '../api/liveapps/casemanagement/api';
+import { CaseAction, CaseActionsApi } from '../api/liveapps/pageflow/api';
+import { ProcessDetails, ProcessesApi } from '../api/liveapps/processmanagement/api';
 import { InvestigationApplication, InvestigationField, Investigations, InvestigationState } from '../models/configuration.model';
 import { Application, InvestigationActions, InvestigationApplicationDefinition, InvestigationCreateRequest, InvestigationCreateResponse, InvestigationDetails, InvestigationMetadata, InvestigationTrigger } from '../models/investigation.model';
-import { ConfigurationService } from '../services/configuration.service';
+import { ConfigurationApi } from '../api/discover/api';
 
 @Service()
 @JsonController('/investigation')
 export class InvestigationController {
-  
-  private claimsService: ClaimsApi;
-  private casesService: CasesApi;
-  private typesService: TypesApi;
-  private usersService: UsersApi;
-  private actionsService: CaseActionsApi;
-  private processService: ProcessesApi;
-  private configurationService: ConfigurationService;
-
   private users: User[] = [];
 
-
   constructor (
-    protected cache: DiscoverCache
-  ){
-    this.claimsService = new ClaimsApi(process.env.LIVEAPPS +'/organisation/v1');
-    this.casesService = new CasesApi(process.env.LIVEAPPS + '/case/v1');
-    this.typesService = new TypesApi(process.env.LIVEAPPS + '/case/v1');
-    this.usersService = new UsersApi(process.env.LIVEAPPS + '/organisation/v1');
-    this.actionsService = new CaseActionsApi(process.env.LIVEAPPS + '/pageflow/v1');
-    this.processService = new ProcessesApi(process.env.LIVEAPPS + '/process/v1');
-    this.configurationService = new ConfigurationService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
-
-  }
+    protected cache: DiscoverCache,
+    protected claimsService: ClaimsApi,
+    protected casesService: CasesApi,
+    protected typesService: TypesApi,
+    protected usersService: UsersApi,
+    protected actionsService: CaseActionsApi,
+    protected processService: ProcessesApi,
+    protected configurationService: ConfigurationApi
+  ){}
 
   public static getName = (): string => {
     return 'InvestigationController';
   }
 
-  private preflightCheck = (token: string, response: Response): boolean | Response => {
-    if (!token) {
-      response.status = 400;
-      return response;
-    }
-    return true;
-  }
-
   @Get('/applications')
   async getAllApplications(@HeaderParam("authorization") token: string, @Res() response: Response): Promise<Application[] | Response > {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
+    logger.debug('getAllApplications started for token: ' + token);
 
     const header = { headers: { 'Authorization': token}};
     const sandboxId = (await this.cache.getClient(token.replace('Bearer ', ''))).sandboxId;
     const typesDetails = (await this.typesService.getTypes(sandboxId, 'b', undefined, '0', '100', undefined, header)).body;
-    return typesDetails.map((app: GetTypeResponseItem) => { return { label: app.applicationName, id: app.applicationId } as Application;});
+    const output = typesDetails.map((app: GetTypeResponseItem) => { return { label: app.applicationName, id: app.applicationId } as Application;});
+
+    logger.debug('getAllApplications ended for token: ' + token);
+    return output;
   }
 
   @Get('/:appId/definition')
   async getApplicationDefinition(@HeaderParam("authorization") token: string, @Param('appId') appId: string, @Param('appId') investigationId: string, @Res() response: Response): Promise<InvestigationApplicationDefinition | Response > {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
+    logger.debug('getApplicationDefinition started for token: ' + token + ' - appId: ' + appId);
 
     const header = { headers: { 'Authorization': token}};
     const sandboxId = (await this.cache.getClient(token.replace('Bearer ', ''))).sandboxId;
@@ -82,19 +60,22 @@ export class InvestigationController {
     const creators = this.createTriggers(type.creators as GetTypeResponseItemCreator[], type.applicationInternalName as string);
     const states = type.states?.map((state: GetTypeResponseItemState) => { return {name: state.label, color: '', icon: ''} as InvestigationState}) as InvestigationState[]; 
 
+    logger.debug('getApplicationDefinition ended for token: ' + token + ' - appId: ' + appId);
     return {fields, creators, states};
   }
 
   @Get('/:appId')
   async getInvestigationsDetails(@HeaderParam("authorization") token: string, @Param('appId') investigationId: string, @Res() response: Response): Promise< InvestigationDetails[] | Response > {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
-
+    logger.debug('getInvestigationsDetails started for token: ' + token + ' - investigationId: ' + investigationId);
     const header = { headers: { 'Authorization': token}};
     const sandboxId = (await this.cache.getClient(token.replace('Bearer ', ''))).sandboxId;
-    const caseDetails = (await this.casesService.getCases(sandboxId, 'applicationId eq ' + investigationId + ' and typeId eq 1 and purgeable eq FALSE', 'cr,uc,m,s', '0', '1000', undefined, undefined, undefined, header)).body;
+    const caseDetails = (await this.casesService.getCases(sandboxId, 'applicationId eq ' + investigationId + ' and typeId eq 1 and purgeable eq FALSE', 'cr,uc,m,s', '0', '1000', undefined, undefined, undefined, header).catch(
+      (error: HttpError) => {
+        logger.error('Error: ');
+        logger.error(error.body);
+        return { body: []};
+      }
+    )).body;
     
     const output = Promise.all(caseDetails.map(async (el: GetCaseResponseItem) => {
       let element: InvestigationDetails = {
@@ -122,28 +103,39 @@ export class InvestigationController {
       return element;
     }));
     
+    logger.debug('getInvestigationsDetails ended for token: ' + token + ' - investigationId: ' + investigationId);
     return output;
   }
 
   private getUsername = async (id: string | undefined, header: any): Promise<string> => {
+    logger.debug('getUsername started for id: ' + id);
     if (!id) {
       return '';
     }
-
     let user = this.users.filter((el: User) => el.id === id)[0];
     if (!user){
-      user = (await this.usersService.getUser(id, header)).body;
-      this.users.push(user);
+      const userDetails = (await this.usersService.getUser(id, header).catch(
+        (e: any) => {
+          if (e instanceof HttpError){
+            e.body
+            logger.debug('Error: ' + e.body.errorMsg );
+          }
+          return {body: {firstName: 'Unknown', lastName: 'user'} as User, response: {} as IncomingMessage} ;
+        }
+      ));      
+      user = userDetails.body;
+      
+      if (user.id){
+        this.users.push(user);
+      }
     }
+    logger.debug('getUsername ended for id: ' + id);
     return user.firstName + ' ' + user.lastName;
   }
 
   @Get('/:appId/:investigationId/:state/actions')
   async getActionsForInvestigation(@HeaderParam("authorization") token: string, @Param('appId') appId: string, @Param('investigationId') investigationId: string, @Param('state') state: string, @Res() response: Response): Promise<InvestigationActions[] | Response> {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
+    logger.debug('getActionsForInvestigation started for token: ' + token + ' - appId: ' + appId + ' - investigationId: ' + investigationId);
 
     const header = { headers: { 'Authorization': token}};
     const claims = (await this.claimsService.getClaims(header)).body;
@@ -165,15 +157,13 @@ export class InvestigationController {
           action.activityName
         ]            
         return {id: action.id, label: action.label, formData:  formData.join(':')}});
+    logger.debug('getActionsForInvestigation ended for token: ' + token + ' - appId: ' + appId + ' - investigationId: ' + investigationId);
     return investigationActions;
   }
 
   @Post('/:appId/:creatorId/start')
   async postStartCaseForInvestigation(@HeaderParam('authorization') token: string, @Param('appId') appId: string, @Param('creatorId') creatorId: string, @Body() requestBody: InvestigationCreateRequest, @Res() response: Response): Promise<InvestigationCreateResponse | Response> {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
+    logger.debug('postStartCaseForInvestigation started for token: ' + token + ' - appId: ' + appId + ' - creatorId: ' + creatorId);
 
     const header = { headers: { 'Authorization': token}};
     const sandboxId = (await this.cache.getClient(token.replace('Bearer ', ''))).sandboxId;
@@ -186,7 +176,8 @@ export class InvestigationController {
     const creatorBody= {} as any;
 
     if (properties) {
-      const triggerMapping = (JSON.parse(await this.configurationService.getConfiguration(token.replace('Bearer ',''), 'INVESTIGATIONS')) as Investigations).applications.filter(
+      const header = { headers: { 'Authorization': token}};
+      const triggerMapping = ((await this.configurationService.getInvestigations(header)).body as Investigations).applications.filter(
         (element: InvestigationApplication) => element.applicationId === appId
       )[0].creatorData;
 
@@ -212,7 +203,7 @@ export class InvestigationController {
       data: JSON.stringify(creatorBody)
     } as ProcessDetails;
     const createResponse = await this.processService.processCreate(details, header);
-
+    logger.debug('postStartCaseForInvestigation ended for token: ' + token + ' - appId: ' + appId + ' - creatorId: ' + creatorId);
     return { id: createResponse.body.caseIdentifier as string};
   }
 

@@ -1,8 +1,8 @@
 {
   "cloudstarter": {
     "name": "discover-app",
-    "version": "3.0.01635241166161",
-    "build_date": "Tue, 26 Oct 2021 09:39:26 GMT",
+    "version": "3.0.01639040061841",
+    "build_date": "Thu, 09 Dec 2021 08:54:21 GMT",
     "description": "The TIBCO Cloud UI for Process Mining"
   }
 }

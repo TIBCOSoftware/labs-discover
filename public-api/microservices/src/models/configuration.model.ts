@@ -33,6 +33,10 @@ export interface LandingPageButtons {
     route: string;
 }
 
+export interface LandingPageUploadResponse {
+    path:string;
+}
+
 export interface Message {
     id: string;
     scope: string;
@@ -109,6 +113,15 @@ export interface Analytics {
     customUserFolder: string;
 }
 
+export interface Connection {
+    id: string;
+    name: string;
+    hostname: string;
+    jdbcPort: number;
+    username: string;
+    password: string;
+}
+
 export interface WhoAmI {
     id: string;
     firstName: string;
@@ -119,4 +132,10 @@ export interface WhoAmI {
     isAdmin: boolean;
     isAnalyst: boolean;
     isResolver: boolean;
+    tenants: TenantInformation[];
+}
+
+export interface TenantInformation {
+    id: string;
+    roles?: string[];
 }

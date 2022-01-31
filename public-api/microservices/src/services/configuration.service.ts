@@ -7,14 +7,10 @@ import { DiscoverCache } from '../cache/DiscoverCache';
 export class ConfigurationService {
 
   private DATABASE = 'configuration'; 
-  private cache: DiscoverCache;
 
   constructor (
-    liveappsURL: string, 
-    redisHost: string, 
-    redisPort: number
+    protected cache: DiscoverCache
   ) {
-    this.cache = new DiscoverCache(redisHost, redisPort, liveappsURL);
   }
 
   public getConfiguration = async (token: string, element: string): Promise<string> => {

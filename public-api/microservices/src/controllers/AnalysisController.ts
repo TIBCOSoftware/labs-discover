@@ -2,35 +2,24 @@ import { Response } from 'koa';
 import { Param, Body, Get, Post, Put, Delete, HeaderParam, JsonController, Res, QueryParam } from 'routing-controllers';
 import { Service } from 'typedi';
 import { logger } from '../common/logging';
-import { MetricsApi, PmConfigLiveApps, SparkOneTimeJobApi } from '../backend/api'
+import { ActionPerformedSparkSingle, MetricsApi, MiningDataApi, PmConfigLiveApps, SparkOneTimeJobApi } from '../api/backend/api';
 import { AnalysisRedisService } from '../services/analysis-redis.service';
 import { Analysis, AnalysisData, AnalysisRequest, AnalysisStatus } from '../models/analysis-redis.model';
 import { DiscoverCache } from '../cache/DiscoverCache';
-import { TemplatesService } from '../services/templates.service';
-import { Template } from '../models/templates.model';
+import { Template, VisualisationApi } from '../api/discover/api';
 
 @Service()
 @JsonController('/repository')
 export class AnalysisController {
 
-  protected templatesService: TemplatesService
-
   constructor(
     protected analysisService: AnalysisRedisService,
     protected cache: DiscoverCache,
     protected sparkService: SparkOneTimeJobApi,
-    protected metricsService: MetricsApi   
-  ) {
-    this.templatesService = new TemplatesService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
-  }
-
-  private preflightCheck = (token: string, response: Response): boolean | Response => {
-    if (!token) {
-      response.status = 401;
-      return response;
-    }
-    return true;
-  }
+    protected miningData: MiningDataApi,
+    protected metricsService: MetricsApi,
+    protected templatesService: VisualisationApi
+  ) {}
 
   public static getName = (): string => {
     return 'AnalysisController';
@@ -38,10 +27,6 @@ export class AnalysisController {
 
   @Get('/analysis')
   async getAnalysis(@HeaderParam("authorization") token: string, @Res() response: Response): Promise<Analysis[] | Response> {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
 
     const analysisData = await this.addTemplateLabel(
       token.replace('Bearer ', ''),
@@ -53,10 +38,6 @@ export class AnalysisController {
 
   @Post('/analysis')
   async postAnalysis(@HeaderParam("authorization") token: string, @Body() analysis: AnalysisRequest, @Res() response: Response) {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
     const output = await this.analysisService.createAnalysis(token.replace('Bearer ', ''), analysis);
     const version = output.id.slice(output.id.lastIndexOf('-') + 1);
     const id = output.id.slice(0, output.id.lastIndexOf('-'));
@@ -68,10 +49,6 @@ export class AnalysisController {
 
   @Get('/analysis/:id')
   public async getAnalysisDetails(@HeaderParam("authorization") token: string, @Param('id') id: string, @Res() response: Response): Promise<Analysis | Response> {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check as Response;
-    }
 
     const analysisDetail = (await this.addTemplateLabel(
       token.replace('Bearer ', ''),
@@ -83,10 +60,6 @@ export class AnalysisController {
 
   @Put('/analysis/:id')
   putAnalysis(@HeaderParam("authorization") token: string, @Param('id') id: string, @Body({ required: true }) analysis: AnalysisRequest, @Res() response: Response) {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
     const version = id.slice(id.lastIndexOf('-') +1);
     id = id.slice(0, id.lastIndexOf('-'));
 
@@ -94,24 +67,25 @@ export class AnalysisController {
   }
 
   @Delete('/analysis/:id')
-  deleteAnalysis(@HeaderParam("authorization") token: string, @Param('id') id: string, @Res() response: Response) {
-    logger.debug('1');
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
+  public async deleteAnalysis(@HeaderParam("authorization") token: string, @Param('id') id: string, @Res() response: Response) {
     const version = id.slice(id.lastIndexOf('-') +1);
     id = id.slice(0, id.lastIndexOf('-'));
-
-    return this.analysisService.deleteAnalysis(token.replace('Bearer ', ''), id, version);
+    logger.debug('Deleting analysis id: ' + id + ' Version: ' + version);
+ 
+    let backendResponse: object;
+    try {
+      const header = { headers: { 'Authorization': token}};
+      backendResponse = await this.miningData.deleteAnalysisRoute(id, header);
+      return this.analysisService.deleteAnalysis(token.replace('Bearer ', ''), id, version);
+    } catch (e: any) {
+      response.status = e.statusCode as number;
+      response.message = e.statusMessage as string;
+      return response;
+    }
   }
 
   @Post('/analysis/:id/template/:templateId')
   setAnalysisTemplate(@HeaderParam("authorization") token: string, @Param('id') id: string, @Param('templateId') templateId: string, @Res() response: Response) {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
 
     const version = id.slice(id.lastIndexOf('-') + 1);
     id = id.slice(0, id.lastIndexOf('-'));
@@ -121,10 +95,6 @@ export class AnalysisController {
 
   @Post('/analysis/:id/action/:action')
   async runAnalysisAction(@HeaderParam("authorization") token: string, @Param('id') id: string, @Param('action') action: string, @Res() response: Response) {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
 
     let version = id.slice(id.lastIndexOf('-') + 1);
     id = id.slice(0, id.lastIndexOf('-'));
@@ -152,12 +122,17 @@ export class AnalysisController {
         case 'Rerun':
           actionResult = await this.analysisService.changeState(token.replace('Bearer ', ''), id, version, storedAnalysis.metadata.state, 'Process mining', true);
           version = String((actionResult as Analysis).metadata.modifiedOn);
-          const updateProgress = await this.reportAnalysisStatus(token, id+'-'+version, {progression: 0, level: 'INFO', message: 'Init for rerun'}, response);
-          await this.triggerSparkJob(token.replace('Bearer ', ''), id, version, storedAnalysis.data);
+          const sparkJob = await this.triggerSparkJob(token.replace('Bearer ', ''), id, version, storedAnalysis.data);
+          const payload = {
+            jobName: sparkJob.jobName,
+            progression: 0, 
+            level: 'INFO', 
+            message: 'Init for rerun'
+          }
+          await this.reportAnalysisStatus(token, id+'-'+version, payload, response);
           return actionResult;
         case 'Delete':
           return this.deleteAnalysis(token, id + '-' + version, response);
-          break;
         default:
           break;
       }
@@ -167,10 +142,6 @@ export class AnalysisController {
 
   @Get('/analysis/:id/status')
   public async getAnalysisStatus(@HeaderParam("authorization") token: string, @Param('id') id: string, @Res() response: Response) {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
 
     const version = id.slice(id.lastIndexOf('-') + 1);
     id = id.slice(0, id.lastIndexOf('-'));
@@ -186,10 +157,6 @@ export class AnalysisController {
 
   @Post('/analysis/:id/status')
   public async reportAnalysisStatus(@HeaderParam("authorization") token: string, @Param('id') id: string, @Body({ required: true }) status: AnalysisStatus, @Res() response: Response) {
-    const check = this.preflightCheck(token, response);
-    if (check !== true) {
-      return check;
-    }
 
     const version = id.slice(id.lastIndexOf('-') + 1);
     id = id.slice(0, id.lastIndexOf('-'));
@@ -197,11 +164,13 @@ export class AnalysisController {
 
     let analysis: Analysis;
     analysis = await this.analysisService.getAnalysisDetails(token.replace('Bearer ', ''), id, version);
+
+    // if the level is not INFO, then it is ERROR and the analysis is moved to 'Not Ready' state
     if (status.level === 'INFO'){
       await this.analysisService.setAnalysisStatus(token.replace('Bearer ', ''), id, status);
       if (status.jobName && status.progression == 100){
         analysis = await this.analysisService.changeState(token.replace('Bearer ', ''), id, version, 'Process mining', 'Ready', false);
-        this.purgeJob(status.jobName, token.replace('Bearer ', ''), id, true);
+        // this.purgeJob(status.jobName, token.replace('Bearer ', ''), id, true);
       }
     } else {
       analysis = await this.analysisService.changeState(token.replace('Bearer ', ''), id, version, 'Process mining', 'Not ready', false, status.message);
@@ -216,10 +185,9 @@ export class AnalysisController {
     });
   } 
 
-  private triggerSparkJob = async (token: string, id: string, version: string, analysis: AnalysisData): Promise<void> => {
+  private triggerSparkJob = async (token: string, id: string, version: string, analysis: AnalysisData): Promise<ActionPerformedSparkSingle> => {
     logger.debug('Starting triggerSparkJob for ID: ' + id);
     const datasetsDetails = await this.analysisService.getDatasetsDetails(token.replace('Bearer ', ''), analysis.datasetId);
-    logger.debug(datasetsDetails);
 
     const tokenInformation = await this.cache.getTokenInformation(token);
 
@@ -259,7 +227,7 @@ export class AnalysisController {
     };
     const sparkJobResponse = (await this.sparkService.postJobRoute(sparkJobPayload)).body;
     await this.analysisService.setAnalysisStatus(token, id, sparkJobResponse);
-    return;
+    return sparkJobResponse;    
   }
 
   private purgeJob = async (jobName: string, token: string, id: string, waitComplete: boolean): Promise<void> => {
@@ -282,8 +250,8 @@ export class AnalysisController {
   }
 
   private async addTemplateLabel(token: string, analysis: Analysis[]): Promise<Analysis[]> {
-
-    const templates = await this.templatesService.getTemplates(token);
+    const header = { headers: { 'Authorization': token}};
+    const templates = (await this.templatesService.getTemplates(header)).body;
 
     return analysis.map((analysis: Analysis) => {
       const templateName = templates.find((template: Template) => template.id === analysis.data.templateId) as Template;

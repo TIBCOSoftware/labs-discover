@@ -1,13 +1,17 @@
-<process-analysis-moreinfo *ngIf="processAnalysis !== undefined" [display]="moreInfo" (onHide)="handleMoreInfoToggle()" [selectedAnalysis]="processAnalysis"></process-analysis-moreinfo>
+<process-analysis-moreinfo *ngIf="processAnalysis !== undefined" [display]="moreInfo" (onHide)="handleMoreInfoToggle()"
+                           [selectedAnalysis]="processAnalysis"></process-analysis-moreinfo>
 <uxpl-detail-pane
-    [topSectionLabel]="label"
-    bottom-section-label='Key metrics'
-    [topSectionAttributes]="attributeDefs"
-    (uxplAttributeCopy)="handleDetailAttributeCopy($event?.detail)">
+  [topSectionLabel]="label"
+  [bottomSectionLabel]="processAnalysis.metadata.message ? undefined : 'Key metrics'"
+  [topSectionAttributes]="attributeDefs"
+  (uxplAttributeCopy)="handleDetailAttributeCopy($event?.detail)">
   <div slot="topSectionLabelContent" class="bottom-slot-content-container">
-    <div class="slot-button" (click)="handleMoreInfoToggle()" >More Info</div>
+    <div class="slot-button" (click)="handleMoreInfoToggle()">More Info</div>
   </div>
+
   <div slot="topSectionContent">
+    <!--<div class="description-label">DESCRIPTION</div>
+    <div class="description-detail">{{processAnalysis.data.description}}</div>-->
     <progress-screen *ngIf="progress" [message1]="progress?.message" [showImageLeft]="true"
                      [percentage]="progress?.percentage" [status]="progress?.status"></progress-screen>
     <div *ngIf="processAnalysis.metadata.message" class="error-container">
@@ -24,23 +28,33 @@
     </div>
   </div>
   <div slot="bottomSectionLabelContent" class="bottom-slot-content-container">
-    <div *ngIf="this.processAnalysis?.metrics" [ngClass]="{'slot-button': true, 'disabled': !this.processAnalysis?.metrics}" (click)="handleCompareClick()">Compare KPIs</div>
+    <div *ngIf="this.processAnalysis?.metrics"
+         [ngClass]="{'slot-button': true, 'disabled': !this.processAnalysis?.metrics}" (click)="handleCompareClick()">
+      Compare KPIs
+    </div>
   </div>
   <div slot="bottomSectionWidgets">
-    <div class="metrics-container" *ngIf="processAnalysis?.metadata?.state === 'Ready' && processAnalysis?.metrics; else notReady">
+    <div class="metrics-container"
+         *ngIf="processAnalysis?.metadata?.state === 'Ready' && processAnalysis?.metrics; else notReady">
       <uxpl-data-widget label="Quick look">
         <div class="data-points" *ngIf="summaryConfig">
           <div class="data-point-row" style="margin-top: 16px;">
-            <uxpl-data-point label="EVENTS" icon-name="pm-events-widget" icon-color="#FFFFFF" icon-size="32px"  [value]="summaryConfig.events | number"></uxpl-data-point>
-            <uxpl-data-point label="CASES" icon-name="pm-cases-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.cases | number"></uxpl-data-point>
+            <uxpl-data-point label="EVENTS" icon-name="pm-events-widget" icon-color="#FFFFFF" icon-size="32px"
+                             [value]="summaryConfig.events | number"></uxpl-data-point>
+            <uxpl-data-point label="CASES" icon-name="pm-cases-widget" icon-color="#FFFFFF" icon-size="32px"
+                             [value]="summaryConfig.cases | number"></uxpl-data-point>
           </div>
           <div class="data-point-row" style="margin-top: 23px;">
-            <uxpl-data-point label="VARIANTS" icon-name="pm-variants-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.variants | number"></uxpl-data-point>
-            <uxpl-data-point label="ACTIVITIES" icon-name="pm-activities-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.activities | number"></uxpl-data-point>
+            <uxpl-data-point label="VARIANTS" icon-name="pm-variants-widget" icon-color="#FFFFFF" icon-size="32px"
+                             [value]="summaryConfig.variants | number"></uxpl-data-point>
+            <uxpl-data-point label="ACTIVITIES" icon-name="pm-activities-widget" icon-color="#FFFFFF" icon-size="32px"
+                             [value]="summaryConfig.activities | number"></uxpl-data-point>
           </div>
           <div class="data-point-row" style="margin-top: 23px;">
-            <uxpl-data-point label="RESOURCES" icon-name="pm-resources-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.resources | number"></uxpl-data-point>
-            <uxpl-data-point label="TIMESPAN" icon-name="pm-timespan-widget" icon-color="#FFFFFF" icon-size="32px" [value]="summaryConfig.timespan" [hint]="summaryConfig.timespanHint"></uxpl-data-point>
+            <uxpl-data-point label="RESOURCES" icon-name="pm-resources-widget" icon-color="#FFFFFF" icon-size="32px"
+                             [value]="summaryConfig.resources | number"></uxpl-data-point>
+            <uxpl-data-point label="TIMESPAN" icon-name="pm-timespan-widget" icon-color="#FFFFFF" icon-size="32px"
+                             [value]="summaryConfig.timespan" [hint]="summaryConfig.timespanHint"></uxpl-data-point>
           </div>
         </div>
       </uxpl-data-widget>
@@ -48,12 +62,12 @@
         <div class="chart-container">
           <div class="chart-container-wrapper" *ngIf="activitiesChartConfig">
             <canvas baseChart
-              [datasets]="activitiesChartConfig.chartData"
-              [labels]="activitiesChartConfig.labels"
-              [options]="activitiesChartConfig.options"
-              [plugins]="activitiesChartConfig.plugins"
-              [legend]="activitiesChartConfig.legend"
-              [type]="activitiesChartConfig.type">
+                    [datasets]="activitiesChartConfig.chartData"
+                    [labels]="activitiesChartConfig.labels"
+                    [options]="activitiesChartConfig.options"
+                    [plugins]="activitiesChartConfig.plugins"
+                    [legend]="activitiesChartConfig.legend"
+                    [type]="activitiesChartConfig.type">
             </canvas>
           </div>
         </div>
@@ -62,12 +76,12 @@
         <div class="chart-container">
           <div class="chart-container-wrapper" *ngIf="durationChartConfig">
             <canvas baseChart
-              [datasets]="durationChartConfig.chartData"
-              [labels]="durationChartConfig.labels"
-              [options]="durationChartConfig.options"
-              [plugins]="durationChartConfig.plugins"
-              [legend]="durationChartConfig.legend"
-              [type]="durationChartConfig.type">
+                    [datasets]="durationChartConfig.chartData"
+                    [labels]="durationChartConfig.labels"
+                    [options]="durationChartConfig.options"
+                    [plugins]="durationChartConfig.plugins"
+                    [legend]="durationChartConfig.legend"
+                    [type]="durationChartConfig.type">
             </canvas>
           </div>
         </div>
@@ -75,7 +89,7 @@
 
     </div>
     <ng-template #notReady class="metrics-container">
-      <div class="metrics-not-available">
+      <div class="metrics-not-available" *ngIf="!processAnalysis.metadata.message">
         <div class="no-metrics-content">
           <uxpl-icon icon="pm-metrics-empty-state" width="171px" height="120px"></uxpl-icon>
           Metrics will be available when the process analysis is ready

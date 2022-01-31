@@ -2,7 +2,7 @@
 import koapinologger from 'koa-pino-logger';
 import { logger } from '../common/logging';
 
-const level = process.env.LOGLEVEL as string;
+const level = (process.env.LOGLEVEL ? process.env.LOGLEVEL as string : 'info');
 
 export function setupLogging(app: any) {
   // Development Logger

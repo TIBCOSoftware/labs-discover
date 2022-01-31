@@ -943,6 +943,46 @@ paths:
                 $ref: '#/components/schemas/LandingPage'
         400:
           description: Bad request. The auth token is missing
+  /configuration/assets:
+    post:
+      description: Upload resources used in landing page
+      tags: [Configuration]
+      summary: Upload resources used in landing page
+      operationId: postLandingPagesUploadConfiguration
+      requestBody:
+        description: File to use in the landing page
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LandingPageUploadRequest'
+      responses:
+        200:
+          description: Landing page configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LandingPageUploadResponse'
+        400:
+          description: Bad request. The auth token is missing
+  /configuration/assets/{resource}:
+    get:
+      description: Get a resource image.
+      tags: [Configuration]
+      summary: Get a resource image for TIBCO Labs Discover.
+      operationId: getResource
+      parameters:
+        - name: resource
+          in: path
+          description: Resource name.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Returns resource
+        400:
+          description: Bad request. The auth token is missing
+
   /configuration/messages:
     get:
       description: Get the messages configuration for the app
@@ -1141,6 +1181,47 @@ paths:
                   $ref: '#/components/schemas/Automapping'
         400:
           description: Bad request. The auth token is missing
+  /configuration/connections:
+    get:
+      description: Get the connections configuration for the app
+      tags: [Configuration]
+      summary: Get the connections configuration for TIBCO Labs Discover.
+      operationId: getConnections
+      responses:
+        200:
+          description: Connections configuration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Connection'
+        400:
+          description: Bad request. The auth token is missing
+    post:
+      description: Modify the connections configuration for the app
+      tags: [Configuration]
+      summary: Modify the connections configuration
+      operationId: postConnections
+      requestBody:
+        description: Connections configuration to update.
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/Connection'
+      responses:
+        200:
+          description: Connections configuration.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Connection'
+        400:
+          description: Bad request. The auth token is missing
   /configuration/whoami:
     get:
       description: Get the user configuration
@@ -1308,7 +1389,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MapFolderCollection' 
+                $ref: '#/components/schemas/MapFolderModel' 
         400:
           description: Bad request. The auth token is missing
   /documentation/folders:
@@ -1323,7 +1404,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MapFolderCollection' 
+                $ref: '#/components/schemas/MapFolderModel' 
         400:
           description: Bad request. The auth token is missing
   /documentation/folder:
@@ -2081,7 +2162,7 @@ components:
         spotfireLocation: 
           description: Location of the Spotfire Report to use for this template
           type: string
-          example: /Teams/01DZBGCE4XGN899ZQ7NS238VK3/Discover/main/project_discover_latest
+          example: /Teams/<your TIBCO Spotfire Team id>/Discover/main/project_discover_latest
         menuConfig: 
           description: Set of menu entries that are shown for this template
           type: array
@@ -2290,6 +2371,19 @@ components:
           type: string
         content:
           type: string
+    LandingPageUploadRequest:
+      required:
+        - file
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+    LandingPageUploadResponse:
+      type: object
+      properties:
+        path:
+          type: string      
     Message:
       type: object
       properties:
@@ -2310,6 +2404,21 @@ components:
           type: array
           items:
             type: string 
+    Connection:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        hostname:
+          type: string
+        jdbcPort:
+          type: number
+        username:
+          type: string
+        password:
+          type: string
     Automapping:
       type: object
       properties:
@@ -2514,7 +2623,21 @@ components:
           type: boolean
         isResolver:
           type: boolean
+        tenants:
+          type: array
+          items: 
+            $ref: '#/components/schemas/TenantInformation'
           
+    TenantInformation:
+      type: object
+      properties:
+        id:
+          type: string
+        roles:
+          type: array
+          items: 
+            type: string
+
     FolderModel:
       type: object
       properties:

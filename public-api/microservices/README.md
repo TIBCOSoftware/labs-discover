@@ -28,26 +28,26 @@ npm i -g @openapitools/openapi-generator-cli
 #### Mac
 
 ```
-export REDIS_PORT=6379
+export REDIS_PORT=55979      ## redis proxy post from LENS
 export REDIS_HOST=127.0.0.1
 export LIVEAPPS=https://eu.liveapps.cloud.tibco.com
 export NIMBUS=https://eu.nimbus.cloud.tibco.com
 export LOGLEVEL=debug
 
-cd microservies
+cd microservices
 npm run dev2
 ```
 
 #### Win
 
 ```
-set REDIS_PORT=58210
+set REDIS_PORT=55979        ## redis proxy post from LENS
 set REDIS_HOST=127.0.0.1
 set LIVEAPPS=https://eu.liveapps.cloud.tibco.com
 set NIMBUS=https://eu.nimbus.cloud.tibco.com
 set LOGLEVEL=debug
 
-cd microservies
+cd microservices
 npm run devwin
 ```
 

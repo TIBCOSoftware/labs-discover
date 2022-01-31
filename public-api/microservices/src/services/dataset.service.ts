@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { DatasetSourceTdv, FilesOperationsApi, PreviewConfigFile, SchemaPreview, SparkPreviewJobApi, TdvJob, TibcoDataVirtualizationApi } from '../backend/api';
+import { DatasetSourceTdv, FilesOperationsApi, PreviewConfigFile, SchemaPreview, SparkPreviewJobApi, TdvJob, TibcoDataVirtualizationApi } from '../api/backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
 import { logger } from "../common/logging";
 import { DatasetListItem, Dataset, DatasetUpdated, PreviewStatus } from "../models/datasets.model";
@@ -16,8 +16,7 @@ export class DatasetService {
     protected tdvService: TibcoDataVirtualizationApi,
     protected fileService: FilesOperationsApi,
     protected previewApi: SparkPreviewJobApi
-  ) {
-  }
+  ) {}
 
   public createDataset = async (token: string, dataset: Dataset): Promise<DatasetUpdated> => {
     const now = new Date().getTime();

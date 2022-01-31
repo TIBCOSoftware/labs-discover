@@ -1,6 +1,14 @@
 #!/bin/bash
 
-image_name=labs-discover-api-datasets
+PS3="Select the micro service: "
+
+select ms in datasets documentation; do
+  echo "Start to build image for $ms"
+  break;
+done
+
+
+image_name=labs-discover-api-$ms
 ws=$(docker ps -a|grep ${image_name}|cut -d' ' -f1|sort|uniq|tr '\012' ' ')
 if [ -z ${ws+x} ]
 then

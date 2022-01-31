@@ -26,18 +26,24 @@ export function transformMapping(mapping: Mapping) {
   return colMappObj;
 }
 
-export function calculateColumns(columns: any[]): any[] {
+
+export function calculateColumns(columns: any[], mappedColumns: string[]): any[] {
   return columns.map(column => {
     let name = column
     if (column.columnName) {
       name = column.columnName
+    }
+    let mapped = false
+    if(mappedColumns.indexOf(name) > -1) {
+      mapped = true
     }
     const newColumn = {
       headerName: name,
       field: name,
       sortable: false,
       filter: false,
-      resizable: false
+      resizable: false,
+      isMapped: mapped
     };
     return newColumn;
   })

@@ -148,6 +148,12 @@ import { DialogModule } from 'primeng/dialog';
 import { AuthGuard } from './guards/auth.guard';
 import { UploadFileDialogComponent } from './components/upload-file-dialog/upload-file-dialog.component';
 import { ProcessAnalysisMoreinfoComponent } from './components/process-analysis-moreinfo/process-analysis-moreinfo.component';
+import { DataPreviewTableComponent } from './components/data-preview-table/data-preview-table.component';
+
+import {NewProcessDocumentWizardComponent} from './components/new-process-document/wizard/wizard.component';
+import {NewProcessDocumentBasicInfoComponent} from './components/new-process-document/basic-info/basic-info.component';
+import {NewProcessDocumentLocationComponent} from './components/new-process-document/document-location/document-location.component';
+import {NewProcessDocumentConfirmationComponent} from './components/new-process-document/confirmation/confirmation.component';
 
 /** This is the tc core configuration object
  * To use oauth you must also add the OAuthInterceptor to providers
@@ -276,11 +282,15 @@ const configurationProvider = () => {
     DatasetDetailsComponent,
     CsvUploadButtonComponent,
     HelpContainerComponent,
+    NewProcessDocumentWizardComponent,
+    NewProcessDocumentBasicInfoComponent,
+    NewProcessDocumentLocationComponent,
+    NewProcessDocumentConfirmationComponent,
     ProcessAnalysisCompareComponent,
     MetricComparisonComponent,
     UploadFileDialogComponent,
     ProcessAnalysisMoreinfoComponent,
-    ProcessAnalysisMoreinfoComponent
+    DataPreviewTableComponent
   ],
   imports: [
     CommonModule,

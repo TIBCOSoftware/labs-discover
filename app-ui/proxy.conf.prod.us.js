@@ -422,19 +422,6 @@ try {
         }
       }
     }
-  },
-  "/s/ghknokhoemng/ebx-ca-tabula/": {
-    "target": {
-      "host": "eu.metadata.cloud.tibco.com",
-      "protocol": "https:",
-      "port": 443
-    },
-    "secure": true,
-    "changeOrigin": true,
-    "logLevel": "info",
-    "headers": {
-      "Origin": "https://eu.liveapps.cloud.tibco.com"
-    }
   }
 } catch (err) {
   console.warn('Warning on Injecting OAUTH, likely tibco-cloud.properties does not exits, or you need to run: npm install --save-dev properties-reader');

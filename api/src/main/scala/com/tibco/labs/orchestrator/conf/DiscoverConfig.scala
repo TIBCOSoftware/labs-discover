@@ -32,6 +32,7 @@ object DiscoverConfig {
 
   val redis_host: String = sys.env.getOrElse("REDIS_HOST", "redis-service")
   val redis_port: String = sys.env.getOrElse("REDIS_PORT", "6379")
+  val externalFqdn: String = sys.env.getOrElse("external_fqdn", "localhost:8080")
 
 
   if (redis_host.isEmpty || redis_host.isEmpty) {

@@ -1,0 +1,73 @@
+<div class="fixActionRow">
+  <h1 mat-dialog-title>Create process document</h1>
+  <div mat-dialog-content class="dialog-content" [style.visibility]="noNimbusSubscription || showResult ? 'hidden' : 'visible'">
+    <uxpl-stepper [config]="config" (stepClickedIdx)="handleStepClick($event)"  [hideNumbers]="!isNewDataSet">
+      <div *ngIf="display('nimbus-doc-basic-info')" style="display: flex; flex-direction: column" slot="nimbus-doc-basic-info">
+        <nimbus-doc-basic-info [document]="document" step="nimbus-doc-basic-info" (status)="handleStatus($event)" (enableSave)="handleSaveStatus($event)"></nimbus-doc-basic-info>
+      </div>
+      <div *ngIf="display('nimbus-doc-confirmation')" style="display: flex; flex-direction: column" slot="nimbus-doc-confirmation">
+        <nimbus-doc-confirmation [document]="document" step="nimbus-doc-confirmation" (status)="handleStatus($event)" (handlePreviewData)="handlePreviewData($event)"></nimbus-doc-confirmation>
+      </div>
+    </uxpl-stepper>
+
+  </div>
+  <div>
+    <div mat-dialog-actions *ngIf="!noNimbusSubscription && !showResult">
+      <uxpl-button type="secondary" (clicked)="onCancel()">Cancel</uxpl-button>
+      <uxpl-button [disabled]="handleDisablePrevButton()" [hidden]="hide('prev')" type="secondary" (clicked)="changeTab(-1)">Previous</uxpl-button>
+      <uxpl-button [disabled]="handleDisableNextButton()" [hidden]="hide('next')" (clicked)="changeTab(1)">Next</uxpl-button>
+      <uxpl-button [hidden]="hide('finish')" (clicked)="createProcessDocument()">Create</uxpl-button>
+    </div>
+    <div mat-dialog-actions *ngIf="!showResult && noNimbusSubscription">
+      <uxpl-button type="secondary" (clicked)="goToSubscriptions()">Go to Subscriptions</uxpl-button>
+      <uxpl-button (clicked)="closeDialog()">Close</uxpl-button>
+    </div>
+    <div mat-dialog-actions *ngIf="showResult && success">
+      <uxpl-button type="secondary" (clicked)="viewProcessDocument()">View process document</uxpl-button>
+      <uxpl-button (clicked)="closeDialog()">Close</uxpl-button>
+    </div>
+    <div mat-dialog-actions *ngIf="showResult && !success">
+      <uxpl-button (clicked)="closeDialog()">Close</uxpl-button>
+    </div>
+  </div>
+
+  <div *ngIf="progress.enabled" class="modal-backdrop">
+    <progress-screen class="overlay-container" [message1]="progress.message1" [message2]="progress.message2" [percentage]="progress.percentage" [status]="progress.status"></progress-screen>
+  </div>
+
+  <div *ngIf="noNimbusSubscription" class="modal-backdrop">
+    <div class="overlay-container">
+      <div>
+        <img width="208" height="160" [src]="missingSubscriptionImage">
+      </div>
+      <div >
+        <div class="result-text">It looks like you don’t have access to TIBCO Cloud Nimbus yet</div>
+        <div class="result-msg">Go to your <span><a (click)="goToSubscriptions()">Subscriptions</a></span> page to request access, start a free trial, or purchase a subscription and then come back to finish creating your process documentation.</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showResult && success" class="modal-backdrop">
+    <div class="overlay-container">
+      <div>
+        <img width="208" height="160" [src]="successDocumentImage">
+      </div>
+      <div >
+        <div class="result-text">Success!</div>
+        <div class="result-msg">Your process document has been successfully created.</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showResult && !success" class="modal-backdrop">
+    <div class="overlay-container">
+      <div>
+        <img width="208" height="160" [src]="errorDocumentImage">
+      </div>
+      <div >
+        <div class="result-text">Oops, something went wrong</div>
+        <div class="result-msg">Your process document couldn’t be created.</div>
+      </div>
+    </div>
+  </div>
+</div>

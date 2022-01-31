@@ -4,7 +4,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TcCoreCommonFunctions } from '@tibco-tcstk/tc-core-lib';
 import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
-import { ConfigurationService } from 'src/app/service/configuration.service';
+import { ConfigurationService } from 'src/app/backend/api/configuration.service';
+import { LandingPageUploadResponse } from 'src/app/backend/model/landingPageUploadResponse';
+import { OauthService } from 'src/app/service/oauth.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   templateUrl: './hightligh-edit.component.html',
@@ -16,17 +19,27 @@ export class HightlighEditComponent implements OnInit {
   public iconURL: string;
 
   constructor(
-    protected configService: ConfigurationService,
+    protected configurationService: ConfigurationService,
     protected documentService: TcDocumentService,
     protected location: Location,
+    protected oauthService: OauthService,
     public dialogRef: MatDialogRef<HightlighEditComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
 
   ) { }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.highlight = this.data;
-    this.iconURL = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, '/webresource/orgFolders/' + this.configService.config.uiAppId + '_assets/' +  this.highlight.iconURL);
+    this.iconURL = await this.fetchWithAuthentication(environment.apiURL + '/configuration/assets/' + this.highlight.iconURL, this.oauthService.token);
+  }
+
+  private async fetchWithAuthentication(url, authToken) {
+    const headers = new Headers();
+    headers.set('Authorization', `Bearer ` + authToken);
+    const file = await fetch(url, { headers });
+    const blob = await file.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    return objectUrl;
   }
 
   public onNoClick = (): void => {
@@ -42,19 +55,13 @@ export class HightlighEditComponent implements OnInit {
   }
 
   public handleUpload = (file: File): void => {
-    let uploadProgress = 0;
-    this.documentService.uploadDocument('orgFolders', this.configService.config.uiAppId + '_assets', this.configService.config.sandboxId, file, file.name, 'File uploaded from browser.').subscribe(
-      (response: any) => {
-        if (response.type === HttpEventType.UploadProgress) {
-          uploadProgress = Math.round(100 * response.loaded / response.total);
-          if (uploadProgress === 100) {
-            this.highlight.iconURL = file.name;
-            this.iconURL = TcCoreCommonFunctions.prepareUrlForStaticResource(this.location, '/webresource/orgFolders/' + this.configService.config.uiAppId + '_assets/' +  this.highlight.iconURL);
-          }
-        }
+    this.configurationService.postLandingPagesUploadConfiguration(file).subscribe(
+      (response: LandingPageUploadResponse) => {
+        this.highlight.iconURL = file.name;
+        this.iconURL = file.name;
       },
       error => {
-        console.log('error');
+        console.log('error', error);
       }
     );
   }

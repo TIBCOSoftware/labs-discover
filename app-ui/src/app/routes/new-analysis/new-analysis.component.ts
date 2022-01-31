@@ -66,8 +66,8 @@ export class NewAnalysisComponent implements OnInit {
 
   ngOnInit(): void {
     this.messageService.sendMessage('integratedHelp', 'discover/new-analysis');
-    this.advancedMode = false;
-    this.showDataPreview = false;
+    this.advancedMode = true;
+    this.showDataPreview = true;
     if (this.route.snapshot.paramMap.get('id') !== null) {
       this.mode = 'edit';
       this.showDataPreview = true;
@@ -130,7 +130,7 @@ export class NewAnalysisComponent implements OnInit {
     this.catalogService.getPreview(datasetId).pipe(
       map((preview: Preview) => {
         const avCol = preview.columns.map(column => column.columnName);
-        const col = calculateColumns(preview.columns);
+        const col = calculateColumns(preview.columns, []);
         this.previewD = {
           availableColumns: avCol,
           columns: col,
@@ -150,11 +150,11 @@ export class NewAnalysisComponent implements OnInit {
   private getStepperConfiguration = (advancedMode: boolean): void => {
     let isAvailable = false;
     let confirmLabel = 'Confirmation';
-    let advLabel = 'Advanced preparation';
+    const advLabel = 'Advanced';
     if (this.mode === 'edit') {
       isAvailable = true;
       confirmLabel = 'Summary';
-      advLabel = 'Advanced';
+      // advLabel = 'Advanced';
       this.advancedMode = true;
     }
     const basicSteps = [
@@ -198,6 +198,9 @@ export class NewAnalysisComponent implements OnInit {
     stepStatus.completed = newStatus.completed;
     if (newStatus.step === 'map' && stepStatus.completed) {
       this.doAutoMap = false
+      // Enable the last two tabs
+      this.config.steps.forEach(step => step.available = true)
+      this.config = {...this.config};
     }
   }
 

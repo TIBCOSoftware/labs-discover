@@ -102,6 +102,7 @@ export class DatasetComponent implements OnInit, OnDestroy {
     // )
     // this.datasetService.getDatasets().subscribe(
       datasetListItems => {
+        datasetListItems.sort((a, b) => b.lastPreviewDate - a.lastPreviewDate);
         this.datasets = datasetListItems;
         this.loading = false;
         // start progress query for those who doesn't have status yet

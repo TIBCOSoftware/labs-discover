@@ -160,6 +160,21 @@ class TdvFormatMsgPayload {
          |                        <com:value>true</com:value>
          |                     </com:attribute>
          |                     <com:attribute>
+         |                        <com:name>csvParsingMode</com:name>
+         |                        <com:type>STRING</com:type>
+         |                        <com:value>DROPMALFORMED</com:value>
+         |                     </com:attribute>
+         |                     <com:attribute>
+         |                        <com:name>csvParserLib</com:name>
+         |                        <com:type>STRING</com:type>
+         |                        <com:value>univocity</com:value>
+         |                     </com:attribute>
+         |                     <com:attribute>
+         |                        <com:name>csvNullValueStr</com:name>
+         |                        <com:type>STRING</com:type>
+         |                        <com:value></com:value>
+         |                     </com:attribute>
+         |                     <com:attribute>
          |                        <com:name>inferSchema</com:name>
          |                        <com:type>BOOLEAN</com:type>
          |                        <com:value>true</com:value>

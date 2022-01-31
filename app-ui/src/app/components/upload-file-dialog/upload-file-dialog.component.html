@@ -1,4 +1,4 @@
-<p-dialog class="tibco-pm-dialog" [ngStyle]="{'width':!filename ? '500px' : '75vw' }"
+<p-dialog class="tibco-pm-dialog" [ngStyle]="{'width':!filename ? '500px' : '75vw'}"
           [modal]=true
           [(visible)]="display"
           [closable]=true
@@ -28,7 +28,7 @@
         <div class="parse-preview-container">
           <div>Data Preview</div>
           <div *ngIf="previewColumns?.length > 0" class="dataset-preview-table">
-            <tcpmg-generic-table [columnDefs]="previewColumns" [rowData]="previewData"
+            <tcpmg-generic-table [columnDefs]="previewColumns" [rowData]="previewData" [tableScrollable]="true" [tableStyle]="{'max-width':'calc(100vw - 200px)', height:'300px'}"
                                  [autoLayout]="false" [showSortIcon]="false"
                                  [showExpandButton]="false" [paginator]="false"
                                  [showCurrentPageReport]="false" [showFilterRow]="false"

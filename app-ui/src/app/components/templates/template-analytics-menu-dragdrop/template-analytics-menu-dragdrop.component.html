@@ -23,9 +23,9 @@
     </div>
     <div class="node-children" cdkDropList [cdkDropListData]="node.child" [id]="node.uiId"
          [cdkDropListConnectedTo]="dropTargetIds"
-         (cdkDropListDropped)="drop($event)" [cdkDropListSortingDisabled]="true">
+         (cdkDropListDropped)="drop($event, true)" [cdkDropListSortingDisabled]="true">
       <!--suppress TypeScriptUnresolvedVariable -->
-      <div *ngFor="let child of node.child" cdkDrag [cdkDragData]="child.uiId" (cdkDragMoved)="dragMoved($event)">
+      <div *ngFor="let child of node.child" cdkDrag [cdkDragData]="child.uiId" (cdkDragMoved)="dragMoved($event, true)">
         <ng-container *ngTemplateOutlet="tmplNode,context:{node:child}"></ng-container>
       </div>
     </div>
@@ -33,8 +33,8 @@
 </ng-template>
 
 <div cdkDropList *ngIf="menuNodesIN" [cdkDropListData]="menuNodesIN" [id]="'main'" [cdkDropListConnectedTo]="dropTargetIds"
-     (cdkDropListDropped)="drop($event)" [cdkDropListSortingDisabled]="true">
-  <div *ngFor="let node of menuNodesIN" cdkDrag [cdkDragData]="node.uiId" (cdkDragMoved)="dragMoved($event)">
+     (cdkDropListDropped)="drop($event, false)" [cdkDropListSortingDisabled]="true">
+  <div *ngFor="let node of menuNodesIN" cdkDrag [cdkDragData]="node.uiId" (cdkDragMoved)="dragMoved($event, false)">
     <ng-container *ngTemplateOutlet="tmplNode,context:{node:node}"></ng-container>
   </div>
 </div>
@@ -48,15 +48,19 @@
 </div>
 
 <!--
-SPOTFIRE API:
-https://eu-west-1.integration.cloud.tibcoapps.com:443/nfvthzbohgelvgmrdqfthqfene7mjz5q/Items?Type=123
-
 <hr />
 <p><strong>current drag drop action:</strong></p>
 <pre>{{dropActionTodo|json}}</pre>
 <hr />
+<p><strong>currentEditNode:</strong></p>
+<pre>{{currentEditNode|json}}</pre>
+<hr />
+<p><strong>allowNesting</strong></p>
+<pre>{{allowNesting|json}}</pre>
+<hr />
 <p><strong>tree data</strong></p>
-<pre>{{menuNodesIN|json}}</pre>-->
-<!--<hr />
+<pre>{{menuNodesIN|json}}</pre>
+<hr/>
 <p><strong>UI Menu </strong></p>
-<pre>{{uiMenu|json}}</pre>-->
+<pre>{{menuNodesIN|json}}</pre>
+-->

@@ -49,8 +49,8 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
 
 
   case class FileUploadUI(
-                         @Schema(`type` = "string", format = "binary", description = "file", required = true) file: File
-                       )
+                           @Schema(`type` = "string", format = "binary", description = "file", required = true) file: File
+                         )
 
 
   val log = LoggerFactory.getLogger(this.getClass.getName)
@@ -86,7 +86,7 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
   @POST
   @Path("{orgid}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Upload files to S3 under <Bucket>/{orgId}/assets/", description = "Upload files to S3 under <Bucket>/{orgId}/assets/", tags = Array("Assets Storage Operations"),
+  @Operation(summary = "Upload files to S3 under <Bucket>/{orgId}/assets/", security = Array(new SecurityRequirement(name = "bearer")), description = "Upload files to S3 under <Bucket>/{orgId}/assets/", tags = Array("Assets Storage Operations"),
     requestBody = new RequestBody(content = Array(
       new Content(
         mediaType = MediaType.MULTIPART_FORM_DATA,
@@ -106,30 +106,30 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
           withRequestTimeout(900.seconds) {
             withSizeLimit(1073741824) {
               fileUpload("file") {
-                    case (metadata, file) =>
-                        onSuccess(uploadFile2S3(orgid.toLowerCase, metadata, file)) { uploadFuture =>
-                          if (uploadFuture.code == 0) {
-                            complete((StatusCodes.Created, uploadFuture))
-                          } else {
-                            complete((StatusCodes.InternalServerError, uploadFuture))
-                          }
-                        }
-                      }
-                  //}
-                }
+                case (metadata, file) =>
+                  onSuccess(uploadFile2S3(orgid.toLowerCase, metadata, file)) { uploadFuture =>
+                    if (uploadFuture.code == 0) {
+                      complete((StatusCodes.Created, uploadFuture))
+                    } else {
+                      complete((StatusCodes.InternalServerError, uploadFuture))
+                    }
+                  }
+              }
               //}
             }
+            //}
+          }
 
         )
       }
-  }
+    }
   }
 
 
   @GET
   @Path("{orgid}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return list of files stored in this org for web assets", description = "Return list of files stored in this org for web assets", tags = Array("Assets Storage Operations"),
+  @Operation(summary = "Return list of files stored in this org for web assets", security = Array(new SecurityRequirement(name = "bearer")), description = "Return list of files stored in this org for web assets", tags = Array("Assets Storage Operations"),
     parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -160,13 +160,13 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
   @GET
   @Path("/download/{orgid}/{filename}")
   @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
-  @Operation(summary = "Return stream of file from S3", description = "Return stream of file from S3", tags = Array("Assets Storage Operations"),
+  @Operation(summary = "Return stream of file from S3", security = Array(new SecurityRequirement(name = "bearer")), description = "Return stream of file from S3", tags = Array("Assets Storage Operations"),
     parameters = Array(
       new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename")
     ),
     responses = Array(
-      new ApiResponse(responseCode = "200", description = "filestream",content = Array(new Content(mediaType = "applicetion/octet-stream"))),
+      new ApiResponse(responseCode = "200", description = "filestream", content = Array(new Content(mediaType = "applicetion/octet-stream"))),
       new ApiResponse(responseCode = "500", description = "Internal Error")
     )
   )
@@ -174,23 +174,23 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
     cors() {
       concat(
         // /files/<orgid>/
-        path("uiassets" / "download" / Segment / Segment) { (orgid , filename) =>
+        path("uiassets" / "download" / Segment / Segment) { (orgid, filename) =>
           concat(
             get {
               //#retrieve-sparkapp-info/status
-                  val key = s"${orgid.toLowerCase()}/assets/${filename}"
-                  val src: Source[Option[(Source[ByteString, NotUsed], ObjectMetadata)], NotUsed] = S3.download(bucketName, key )
-                  val rss: Future[(Source[ByteString, NotUsed], ObjectMetadata)] = src.runWith(Sink.head).map(_.getOrElse((Source.empty[ByteString], null)))
-                   onComplete(rss) {
-                     case Failure(exception) => complete((StatusCodes.NotFound, exception.getMessage))
-                     case Success(value) => {
-                       val headers = List(RawHeader("Content-Disposition", s"""attachment; filename="${filename}""""))
-                       //complete(HttpResponse(StatusCodes.OK, headers, HttpEntity(ContentTypes.`application/octet-stream`, value._1)))
-                       complete(HttpEntity(ContentTypes.`application/octet-stream`, value._1))
+              val key = s"${orgid.toLowerCase()}/assets/${filename}"
+              val src: Source[Option[(Source[ByteString, NotUsed], ObjectMetadata)], NotUsed] = S3.download(bucketName, key)
+              val rss: Future[(Source[ByteString, NotUsed], ObjectMetadata)] = src.runWith(Sink.head).map(_.getOrElse((Source.empty[ByteString], null)))
+              onComplete(rss) {
+                case Failure(exception) => complete((StatusCodes.NotFound, exception.getMessage))
+                case Success(value) => {
+                  val headers = List(RawHeader("Content-Disposition", s"""attachment; filename="${filename}""""))
+                  //complete(HttpResponse(StatusCodes.OK, headers, HttpEntity(ContentTypes.`application/octet-stream`, value._1)))
+                  complete(HttpEntity(ContentTypes.`application/octet-stream`, value._1))
 
-                     }
-                   }
+                }
               }
+            }
           )
         }
       )
@@ -205,7 +205,7 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
     summary = "return signed url for 1 h to get you file from",
     description = "Return list of files stored in this org",
     tags = Array("Assets Storage Operations"),
-    security  = Array(new SecurityRequirement(name = "bearer")),
+    security = Array(new SecurityRequirement(name = "bearer")),
     parameters = Array(new Parameter(name = "filename", in = ParameterIn.PATH, description = "filename")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -217,14 +217,14 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
     cors() {
       concat(
         // /files/<orgid>/
-        path("uiassets" / "download" /Segment) { filename =>
+        path("uiassets" / "download" / Segment) { filename =>
           extractCredentials { creds =>
             concat(
               get {
                 //#retrieve-sparkapp-info/status
                 rejectEmptyResponse {
                   log.info(creds.getOrElse("None").toString)
-                  val token = creds.getOrElse("None").toString.replaceAll("Bearer ","")
+                  val token = creds.getOrElse("None").toString.replaceAll("Bearer ", "")
                   onSuccess(getURLFile(token, filename)) { response =>
                     complete(response)
                   }
@@ -241,7 +241,7 @@ class UIAssetsRoutes(filesRegistry: ActorRef[UIAssetsRegistry.Command])(implicit
   @DELETE
   @Path("{orgid}/{filename}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Delete the specified file on storage", description = "Delete the specified file on storage", tags = Array("Assets Storage Operations"),
+  @Operation(summary = "Delete the specified file on storage", security = Array(new SecurityRequirement(name = "bearer")), description = "Delete the specified file on storage", tags = Array("Assets Storage Operations"),
     parameters = Array(
       new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id"),
       new Parameter(name = "filename", in = ParameterIn.PATH, description = "FileName to be deleted")

@@ -9,7 +9,7 @@ import {Location} from '@angular/common';
 @Component({
   selector: 'upload-file-dialog',
   templateUrl: './upload-file-dialog.component.html',
-  styleUrls: ['./upload-file-dialog.component.css']
+  styleUrls: ['./upload-file-dialog.component.scss']
 })
 export class UploadFileDialogComponent implements OnInit {
 

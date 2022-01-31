@@ -1,6 +1,9 @@
 <div class="analytics-dashboard-top-level">
   <div class="analytics-wrapper"> <!-- [hidden]="!fullSpotfireConfig.hasAnalytics" -->
     <uxpl-object-header [config]="objHeaderConfig" (back)="goProcessAnalysis()" (editDetail)="editTemplate()">
+      <uxpl-button [disabled]="!graphJson" slot="navigation-content" id="#createProcessDocument" type="secondary" (click)="createProcessDocument()">
+        Create process document
+      </uxpl-button>
       <uxpl-button slot="navigation-content" style="width: 160px" icon="assets/images/svg/plus.svg"
                    (clicked)="showCreateCaseMenu()" [disabled]="disableInvestigation()">
         Investigation

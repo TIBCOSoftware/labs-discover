@@ -8,14 +8,13 @@ package utils
 */
 
 
-import utils.common.{spark, token}
+import utils.common.{logger, spark, token}
 
-import org.apache.spark.internal.Logging
 import sttp.model.StatusCode
 
 import java.time.{LocalDateTime, ZoneOffset}
 
-object MetricsSend extends Logging{
+object MetricsSend {
 
   case class Metrics(
                      Organisation: String,
@@ -36,7 +35,7 @@ object MetricsSend extends Logging{
 
     val payload: Metrics = Metrics(orgId,jobName, DatasetID, data, DurationDB, DurationJob, total, dup,time)
     import io.circe._, io.circe.generic.auto._, io.circe.syntax._, io.circe.generic.JsonCodec
-    logInfo(payload.asJson.spaces2)
+    logger.info(payload.asJson.spaces2)
 
     import io.circe.generic.auto._
     import sttp.client3._
@@ -53,11 +52,11 @@ object MetricsSend extends Logging{
 
     //Fire and Forget
     statusResponse.code match {
-      case StatusCode.Ok => logInfo("Metrics Updated")
+      case StatusCode.Ok => logger.info("Metrics Updated")
       case _ => {
         statusResponse.body match {
-          case Left(value) => logError("Metrics not updated, failed with" + value )
-          case Right(value) => logError("Metrics not updated, failed with" + value )
+          case Left(value) => logger.error("Metrics not updated, failed with" + value )
+          case Right(value) => logger.error("Metrics not updated, failed with" + value )
         }
       }
     }

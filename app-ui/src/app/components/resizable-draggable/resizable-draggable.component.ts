@@ -17,49 +17,56 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
   @Input('left') public left: number;
   @Input('top') public top: number;
 
-  @Input('containerTop') public containerTop: number;
-  @Input('containerLeft') public containerLeft: number;
-  @Input('containerHeight') public containerHeight: number;
-  @Input('containerWidth') public containerWidth: number;
+  // @Input('containerTop') public containerTop: number;
+  // @Input('containerLeft') public containerLeft: number;
+  // @Input('containerHeight') public containerHeight: number;
+  // @Input('containerWidth') public containerWidth: number;
 
   @Input('minHeight') public minHeight: number;
   @Input('minWidth') public minWidth: number;
   @ViewChild('box') public box: ElementRef;
 
   @Output() enableSFPointerEvents: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() resizeToSmallSize: EventEmitter<boolean> = new EventEmitter<boolean>();
   private boxPosition: { left: number, top: number };
   private containerPos: { left: number, top: number, right: number, bottom: number };
   public mouse: {x: number, y: number}
   public status: Status = Status.OFF;
-  private mouseClick: {x: number, y: number, left: number, top: number}
+  private mouseClick: {x: number, y: number, left: number, top: number};
+  private posBeforeMax: {top: number, left: number, height: number, width: number};
 
   showResizeHandler = true;
+
+  maximized = false;
+  private maxDimension: {width: number, height: number};
 
   ngOnInit() {}
 
   ngAfterViewInit(){
     this.loadBox();
-    this.loadContainer();
+    // this.loadContainer();
 
     this.initMinSize();
   }
 
   private loadBox(){
-    const {left, top} = this.box.nativeElement.getBoundingClientRect();
-    this.boxPosition = {left, top};
-    // console.log('this.boxPosition', this.boxPosition);
+    setTimeout(() => {
+      const {left, top} = this.box.nativeElement.getBoundingClientRect();
+      // console.log(`loadBox [${this.left}, ${this.top}]`);
+      this.boxPosition = {left, top};
+    }, 100);
   }
 
-  private loadContainer(){
-    // const left = this.boxPosition.left - this.left;
-    // const top = this.boxPosition.top - this.top;
-    const left = this.containerLeft;
-    const top = this.containerTop;
-    const right = this.containerWidth + this.containerLeft;
-    const bottom = this.containerHeight + this.containerTop;
-    this.containerPos = { left, top, right, bottom };
-    // console.log('[loadContainer] this.containerPos: ', this.containerPos);
-  }
+  // private loadContainer(){
+  //   // const left = this.boxPosition.left - this.left;
+  //   // const top = this.boxPosition.top - this.top;
+  //   const left = this.containerLeft;
+  //   const top = this.containerTop;
+  //   const right = this.containerWidth + this.containerLeft;
+  //   const bottom = this.containerHeight + this.containerTop;
+  //   this.containerPos = { left, top, right, bottom };
+  //   // console.log('[loadContainer] this.containerPos: ', this.containerPos);
+  // }
 
   private initMinSize() {
     if (!this.minHeight) {
@@ -132,9 +139,14 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
   private resize(){
     // console.log('resize')
     if(this.resizeCondMeet()){
-      // console.log('meet resize condition, resize');
+      // console.log(`meet resize condition, resize. mouse[${this.mouse.x}, ${this.mouse.y}] boxPosition[${this.boxPosition.left}, ${this.boxPosition.top}]`);
       this.width = Math.max(Number(this.mouse.x > this.boxPosition.left) ? this.mouse.x - this.boxPosition.left : 0, this.minWidth);
       this.height = Math.max(Number(this.mouse.y > this.boxPosition.top) ? this.mouse.y - this.boxPosition.top : 0, this.minHeight);
+
+      if (this.maxDimension && (this.width < this.maxDimension.width || this.height < this.maxDimension.height)) {
+        this.maximized = false;
+        this.resizeToSmallSize.emit(true);
+      }
     }
   }
 
@@ -146,6 +158,26 @@ export class ResizableDraggableComponent implements OnInit, AfterViewInit {
   public verticalExpand(newHeight: number) {
     this.showResizeHandler = true;
     return this.changeHeight(newHeight);
+  }
+
+  public maximize(maxTop: number) {
+    this.posBeforeMax = {top: this.top, left: this.left, height: this.height, width: this.width};
+    const margin = 24;
+    this.left = this.containerPos.left + margin;
+    this.top = maxTop;
+    this.width = this.containerPos.right - this.containerPos.left - 2 * margin;
+    this.height = this.containerPos.bottom - maxTop - margin;
+
+    this.maximized = true;
+    this.maxDimension = {width: this.width, height: this.height};
+  }
+  public restore() {
+    this.left = this.posBeforeMax.left;
+    this.top = this.posBeforeMax.top;
+    this.width = this.posBeforeMax.width;
+    this.height = this.posBeforeMax.height;
+
+    this.maximized = false;
   }
 
   private changeHeight(newHeight: number) {

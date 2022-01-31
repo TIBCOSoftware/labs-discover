@@ -37,6 +37,9 @@ import { InvestigationsService } from 'src/app/backend/api/investigations.servic
 import { InvestigationCreateRequest } from 'src/app/backend/model/investigationCreateRequest';
 import { InvestigationCreateResponse } from 'src/app/backend/model/investigationCreateResponse';
 import {InvestigationConfig} from '../../models_ui/investigations';
+import { NewProcessDocumentWizardComponent } from '../new-process-document/wizard/wizard.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {getShortMessage} from "../../functions/details";
 
 @Component({
   selector: 'analytics-dashboard',
@@ -89,8 +92,12 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
   public hoverOnFilterButton = false;
   readonly FILTER_DIV = 'FILTERDIV'
 
+  dialogRef: MatDialogRef<NewProcessDocumentWizardComponent, any>;
+  public graphJson;
+
   constructor(
     private location: Location,
+    private dialog: MatDialog,
     private route: ActivatedRoute,
     private router: Router,
     private configService: ConfigurationService,
@@ -120,6 +127,7 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
 
   public async ngOnChanges(changes: SimpleChanges) {
     if (changes.analysis.previousValue !== changes.analysis.currentValue) {
+      this.graphJson = null;
       if (changes.analysis.currentValue !== '') {
         this.templateIdToUse = null;
         this.route.queryParams.pipe(take(1)).subscribe(params => {
@@ -225,7 +233,7 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
         details: [
           {isEdit: false, editing: false, value: 'Created by ' + analysis.metadata.createdBy},
           {isEdit: false, editing: false, value: 'Created on ' + formatDate},
-          {isEdit: false, editing: false, value: analysis.data.description},
+          {isEdit: false, editing: false, value: getShortMessage(analysis.data.description, 50)},
           {isEdit: true, editing: false, value: 'Template: ' + templateDetails.name, eventOnEdit: true, id: 'template'}
         ],
         externalOptions: false,
@@ -319,12 +327,25 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
   public setDocument = (event): void => {
     if(!this.document) {
       this.document = event;
+      
+      event._doc.onDocumentPropertyChanged('GraphJson', change => {
+        try {
+          for (let key in change) {
+            if (key === 'value') {
+              this.graphJson = JSON.parse(change.value as string);
+            }
+          }
+        } catch(error) {
+          // ignore the error, the graphJson can be empty string or null
+        }
+        
+      })
       this.document.onDocumentReady$().subscribe(_val => {
         this.enableMenu = true;
         if (this.filterConfig) {
           this.showFilterButton = true;
           const {width, height, left, top} = this.setFilterPanelScope();
-          this.filterPanelSize.y = height - 76;
+          this.filterPanelSize.y = height - 76 - 24;
           // this.containerHeight = height;
           // this.containerWidth = width;
           // this.containerLeft = left;
@@ -386,7 +407,7 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
     }
     this.filterPanelLeft = rtAnchorPos.x - this.filterPanelSize.x;
     this.filterPanelTop = rtAnchorPos.y + 10;
-    this.spotfireFilterPanel.toggleShow(this.showFilterPanel);
+    this.spotfireFilterPanel.toggleShow(this.showFilterPanel, this.filterPanelTop);
 
   }
 
@@ -428,5 +449,25 @@ export class AnalyticsDashboardComponent implements OnInit, OnChanges {
     if (this.analysisRef) {
       this.analysisRef.openPage(page, this.FILTER_DIV);
     }
+  }
+
+  createProcessDocument() {
+    const config = this.configService.config;
+    let hasValidSubscription = false;
+    if (config && config.user && config.user.tenants) {
+      config.user.tenants.forEach(tenant => {
+        if (tenant.id.toLowerCase() === 'nimbus' && tenant.roles && tenant.roles.length > 0) {
+          hasValidSubscription = true;
+        }
+      });
+    }
+    this.dialogRef = this.dialog.open(NewProcessDocumentWizardComponent, {
+      width: '720px',
+      height: '566px',
+      data: {
+        graphJson: this.graphJson,
+        hasValidSubscription
+      }
+    });
   }
 }

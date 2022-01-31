@@ -16,6 +16,7 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.tibco.labs.orchestrator.api.registry.ProcessMiningScheduledRegistry
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 //import jakarta.ws.rs.core.MediaType
 //import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
 import javax.ws.rs._
@@ -57,7 +58,7 @@ class ProcessMiningScheduledRoutes(processMiningScheduledRegistry: ActorRef[Proc
   @POST
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Upload files to backend storage", description = "Upload files to backend storage", tags = Array("Spark Scheduled Job"),
+  @Operation(summary = "Upload files to backend storage", security = Array(new SecurityRequirement(name = "bearer")), description = "Upload files to backend storage", tags = Array("Spark Scheduled Job"),
     requestBody = new RequestBody(content = Array(new Content(
       schema = new Schema(implementation = classOf[pmConfigLiveApps]),
       examples = Array(new ExampleObject(value =
@@ -183,7 +184,7 @@ class ProcessMiningScheduledRoutes(processMiningScheduledRegistry: ActorRef[Proc
   @GET
   @Path("{sparkAppName}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Spark Scheduled Job"),
+  @Operation(summary = "Return list of files stored in this org", security = Array(new SecurityRequirement(name = "bearer")), description = "Return list of files stored in this org", tags = Array("Spark Scheduled Job"),
     parameters = Array(new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "Organization Id")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -221,7 +222,7 @@ class ProcessMiningScheduledRoutes(processMiningScheduledRegistry: ActorRef[Proc
   @DELETE
   @Path("{sparkAppName}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Delete the specified spark application", description = "Delete the specified spark application", tags = Array("Spark Scheduled Job"),
+  @Operation(summary = "Delete the specified spark application", security = Array(new SecurityRequirement(name = "bearer")), description = "Delete the specified spark application", tags = Array("Spark Scheduled Job"),
     parameters = Array(
       new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "sparkAppName Id")
     ),

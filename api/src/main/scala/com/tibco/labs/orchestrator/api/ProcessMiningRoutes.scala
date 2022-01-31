@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, ExampleObject, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 
 //import jakarta.ws.rs.core.MediaType
@@ -62,7 +63,7 @@ class ProcessMiningRoutes(processMiningRegistry: ActorRef[ProcessMiningRegistry.
   @POST
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Creates a spark job with a given config", description = "Creates a spark job with a given config", tags = Array("Spark One time Job"),
+  @Operation(summary = "Creates a spark job with a given config", security = Array(new SecurityRequirement(name = "bearer")), description = "Creates a spark job with a given config", tags = Array("Spark One time Job"),
     requestBody = new RequestBody(content = Array(new Content(
       schema = new Schema(implementation = classOf[pmConfigLiveApps]),
       examples = Array(new ExampleObject(value =
@@ -189,7 +190,7 @@ class ProcessMiningRoutes(processMiningRegistry: ActorRef[ProcessMiningRegistry.
   @GET
   @Path("{sparkAppName}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Get status of the spark job for PM", description = "Get status of the spark job for PM", tags = Array("Spark One time Job"),
+  @Operation(summary = "Get status of the spark job for PM", security = Array(new SecurityRequirement(name = "bearer")), description = "Get status of the spark job for PM", tags = Array("Spark One time Job"),
     parameters = Array(new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "Spark Job Name")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -227,7 +228,7 @@ class ProcessMiningRoutes(processMiningRegistry: ActorRef[ProcessMiningRegistry.
   @DELETE
   @Path("{sparkAppName}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Delete the specified spark application", description = "Delete the specified spark application", tags = Array("Spark One time Job"),
+  @Operation(summary = "Delete the specified spark application", security = Array(new SecurityRequirement(name = "bearer")), description = "Delete the specified spark application", tags = Array("Spark One time Job"),
     parameters = Array(
       new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "sparkAppName Id")
     ),

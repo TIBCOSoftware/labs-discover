@@ -12,6 +12,7 @@
     <div class="map-left-panel">
       <map-panel [mapping]="mapping" [availableColumns]="preview?.availableColumns" [datasetId]="selectedDataset"
                  (status)="updateStatus($event)" [doAutoMap]="doAutoMap"></map-panel>
+      <!--
       <div class="map-section advanced-margin" *ngIf="!hideAdvanced">
         Advanced options
       </div>
@@ -19,7 +20,7 @@
         <p>Select additional tab to customize your analysis</p>
         <uxpl-switch-input [checked]="advancedMode" (uxplChange)="toggleAdvanced($event)">Additional preparation tab
         </uxpl-switch-input>
-      </div>
+      </div> -->
     </div>
     <div class="map-preview-table" *ngIf="previewColumns">
       <div style="display: flex; flex-direction: row; align-items: baseline; justify-content: space-between;">
@@ -33,12 +34,11 @@
         </div>
       </div>
       <div style="overflow: auto; height: calc( 100% - 53px);">
-        <tcpmg-generic-table [columnDefs]="previewColumns" [rowData]="preview?.data"
-                             [autoLayout]="false" [showSortIcon]="false"
-                             [showExpandButton]="false" [paginator]="false"
-                             [showCurrentPageReport]="false" [showFilterRow]="false" [styleFunction]="setTableStyle"
-                             [styleContext]="styleContext">
-        </tcpmg-generic-table>
+        <data-preview-table [columnDefs]="previewColumns" [rowData]="preview?.data.slice(0,20)"
+                            [autoLayout]="false" [showSortIcon]="false"
+                            [showExpandButton]="false" [paginator]="false"
+                            [showCurrentPageReport]="false" [showFilterRow]="false">
+        </data-preview-table>
 
       </div>
     </div>

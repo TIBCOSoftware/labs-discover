@@ -1289,34 +1289,92 @@ paths:
                 $ref: '#/components/schemas/InvestigationCreateResponse'
         400:
           description: Bad request. The auth token is missing
-  /documentation/exportGraph/{mapname}/{folderId}:
-    post:
-      description: export graph
+  /documentation/folders/{folderId}:
+    get:
+      description: list all available folders as structured JSON
       tags: [Documentations]
-      summary: export graph
-      operationId: postExport
+      summary: get all available folders
+      operationId: getFolders
       parameters:
-        - name: mapname
-          description: map name
-          in: path
-          required: true
-          schema:
-            type: string
         - name: folderId
           description: folder Id
           in: path
           required: true
           schema:
+            type: number
+      responses:
+        200:
+          description: Feedback from Documentation System, containing Structure of all folders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapFolderCollection' 
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/folders:
+    get:
+      description: list all available root folders as structured JSON
+      tags: [Documentations]
+      summary: get all available root folders
+      operationId: getRootFolders
+      responses:
+        200:
+          description: Feedback from Documentation System, containing Structure of all folders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapFolderCollection' 
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/folder:
+    post:
+      description: create new folder in structure at given parent folder ID
+      tags: [Documentations]
+      summary: create new folder
+      operationId: postFolder
+      requestBody:
+        description: create new folder in structure, under given parent folder ID
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FolderModel'
+      responses:
+        200:
+          description: Feedback from Documentation System, as MapFolderModel.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapFolderModel'
+        400:
+          description: Bad request. The auth token is missing
+  /documentation/exportGraph/{folderId}/{graphname}:
+    post:
+      description: export Discover graph JSON into given Documenation folder ID
+      tags: [Documentations]
+      summary: export Discover Graph into Documentation folder
+      operationId: postExport
+      parameters:
+        - name: folderId
+          description: folder Id
+          in: path
+          required: true
+          schema:
+            type: number
+        - name: graphname
+          description: graph name
+          in: path
+          required: true
+          schema:
             type: string
       requestBody:
-        description: Export Data to create for export function
+        description: Graph JSON Data for export function
         content:
           application/json:
             schema:
               type: object
       responses:
         200:
-          description: Feedback from Documentation System.
+          description: Feedback from Documentation System, JSON of the created Map.
           content:
             application/json:
               schema:
@@ -1512,8 +1570,7 @@ components:
         "case Purch Doc Category name": "Purchase order",
         "case Vendor": "vendorID_0259",
         "case concept:name": "0342842834h2834",
-        "case Source": "sourceSystemID_0000"
-        }]'
+        "case Source": "sourceSystemID_0000"}]'  
     Preview:
       type: object
       properties:
@@ -2457,3 +2514,129 @@ components:
           type: boolean
         isResolver:
           type: boolean
+          
+    FolderModel:
+      type: object
+      properties:
+        parentFolderId: 
+          type: number
+        name:
+          type: string
+          
+    MapFolderCollection: 
+      type: object
+      properties: 
+        items: 
+          readOnly: true
+          type: array
+          items: 
+            $ref: '#/components/schemas/MapFolderModel'
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                readOnly: true
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                type: string
+    MapFolderModel: 
+      type: object
+      properties: 
+        mapFolderId: 
+          example: 1
+          type: integer
+          format: int32
+        parentMapFolderId: 
+          type: integer
+          format: int32
+        name: 
+          example: EMEA Maps
+          type: string
+          minLength: 1
+          maxLength: 100
+        accessRights: 
+          type: object
+          properties: 
+            default: 
+              example: allowed
+              type: string
+              enum: 
+              - allowed
+              - denied
+            specific: 
+              type: array
+              items: 
+                type: object
+                properties: 
+                  id: 
+                    example: 1
+                    type: integer
+                    format: int32
+                  type: 
+                    example: user
+                    type: string
+                    enum: 
+                    - user
+                    - group
+                  access: 
+                    example: allowed
+                    type: string
+                    enum: 
+                    - allowed
+                    - denied
+                  name: 
+                    readOnly: true
+                    example: John Doe
+                    type: string
+        maps: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              processId: 
+                readOnly: true
+                example: 83330BC7232E4465B05BF4AD8756EA13
+                type: string
+              name: 
+                readOnly: true
+                example: Sample Map
+                type: string
+        subFolders: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapFolderId: 
+                readOnly: true
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: EMEA Maps
+                type: string
+        breadcrumbs: 
+          readOnly: true
+          type: array
+          items: 
+            type: object
+            properties: 
+              mapFolderId: 
+                readOnly: true
+                example: 1
+                type: integer
+                format: int32
+              name: 
+                readOnly: true
+                example: EMEA Maps
+                type: string
+      required: 
+        - name
+        

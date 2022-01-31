@@ -7,15 +7,10 @@ import { DiscoverCache } from '../cache/DiscoverCache';
 export class TemplatesService {
 
   private DATABASE = 'templates'; 
-  private cache: DiscoverCache;
 
   constructor (
-    liveappsURL: string, 
-    redisHost: string, 
-    redisPort: number
-  ) {
-    this.cache = new DiscoverCache(redisHost, redisPort, liveappsURL);
-  }
+    protected cache: DiscoverCache
+  ) {}
 
   public getTemplates = async (token: string): Promise<Template[]> => {
     let allTemplates = await Promise.all([this.cache.search(token, this.DATABASE, '*'), this.cache.search('DEFAULT', this.DATABASE, '*')]);

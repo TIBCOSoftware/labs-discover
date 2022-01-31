@@ -1,14 +1,11 @@
 import { KoaConfig } from './Koa';
 import http from 'http';
-import https from 'https';
-// import { setupSockets } from './Socket';
 import { logger } from '../common/logging';
 import config from 'config';
 import { Probe } from './Probe';
 
 export class Application {
 
-  server: any;
   koa: KoaConfig;
   probe: Probe;
 
@@ -19,8 +16,6 @@ export class Application {
     const port = config.get('ports.http') as number;
     const debugPort = config.get('ports.debug');
     const healthCheckPort = config.get('ports.healthCheck');
-
-    // const routePrefix = this.koa.getRoutePrefix();
 
     http.createServer(this.koa.app.callback()).listen(port, () => {
       logger.info(`
@@ -44,8 +39,5 @@ export class Application {
         ------------
       `);
     });
-
-    // Start Websockets
-    // setupSockets(this.server);
   }
 }

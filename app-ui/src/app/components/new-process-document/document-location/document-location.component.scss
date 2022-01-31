@@ -1,0 +1,114 @@
+
+.nimbusLocation {
+    width: 100%;
+    border: 1px solid #B6B6B6;
+    border-radius: 3px;
+
+    // height: 24px;
+    color: #212121;
+    font-family: "Source Sans Pro";
+    font-size: 16px;
+    letter-spacing: 0;
+    line-height: 24px;
+
+    .blue-txt {
+        color: #1774E5;
+        cursor: pointer;
+    }
+
+    .root-folder {
+        display: flex;
+        height: 41px;
+        padding-top: 8px;
+        border-bottom: 1px solid #DEDEDE;
+        .icon {
+            width: 48px;
+            .chevron-icon {
+                margin-left: 24px;
+            }
+        }
+        .location {
+            flex-grow: 1;
+            span {
+                &.clickable {
+                    cursor: pointer;
+                }
+            }
+        }
+        .create-folder {
+            margin-right: 10px;
+            cursor: pointer;
+            height: 18px;
+            color: #1774E5;
+            font-family: "Source Sans Pro";
+            font-size: 14px;
+            letter-spacing: 0;
+            line-height: 18px;
+        }
+    }
+
+    .sub-folders {
+        max-height: 190px;
+        overflow: auto;
+    }
+
+    .folder-row {
+        display: flex;
+        width: 100%;
+        border-top: 1px solid #DEDEDE;
+        border-bottom: 1px solid #DEDEDE;
+
+        height: 65px;
+        padding-top: 8px;
+
+        &:hover {
+            background-color: #F3F4FB;
+        }
+
+        .icon {
+            width: 64px;
+            text-align: right;
+        }
+        .name-col {
+            flex-grow: 100;
+            margin-left: 18px;
+            display: flex;
+            flex-direction: column;
+            .name {
+                width: 460px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            .subfolder-num {
+                height: 21px;
+                color: #727272;
+                font-family: "Source Sans Pro";
+                font-size: 14px;
+                letter-spacing: 0;
+                line-height: 21px;
+            }
+        }
+        .selected {
+            width: 95px;
+            text-align: left;
+
+            color: #727272;
+            font-family: "Source Sans Pro";
+            font-size: 14px;
+            letter-spacing: 0;
+            line-height: 18px;
+
+            padding-top: 14px;
+
+            .selected-col {
+                // padding-right: 8px;
+                display: flex;
+                .inline-ele {
+                    display: inline-block;
+                }
+            }
+            
+        }
+    }
+}

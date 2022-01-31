@@ -16,6 +16,7 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.tibco.labs.orchestrator.api.registry.PreviewFileRegistry
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.generic.auto._
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 
 //import jakarta.ws.rs.core.MediaType
 //import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces}
@@ -59,10 +60,14 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
   @POST
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Spawn Spark job to preview and insert File as binary in DB", description = "Spawn Spark job to preview and insert File as binary in DB", tags = Array("Spark Preview Job"),
-    requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[previewConfigFile]),
-      examples = Array(new ExampleObject(value =
-        """{
+  @Operation(summary = "Spawn Spark job to preview and insert File as binary in DB",
+    description = "Spawn Spark job to preview and insert File as binary in DB",
+    tags = Array("Spark Preview Job"),
+    security = Array(new SecurityRequirement(name = "bearer")),
+    requestBody = new RequestBody(
+      content = Array(new Content(schema = new Schema(implementation = classOf[previewConfigFile]),
+        examples = Array(new ExampleObject(value =
+          """{
                    "Token": "CIC~IloveFoodAndWine",
                    "Organization": "01xxxxxxxxxxxxxxxxxxxxxxxx",
                    "DatasetId": "xxxxxxxx",
@@ -114,7 +119,7 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
       }
     ]
            }"""))
-    ))),
+      ))),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "Add response",
         content = Array(new Content(schema = new Schema(implementation = classOf[ActionPerformedPreview])))),
@@ -148,7 +153,9 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
   @GET
   @Path("{sparkAppName}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return Status of Spark Preview Job", description = "Return Status of Spark Preview Job", tags = Array("Spark Preview Job"),
+  @Operation(summary = "Return Status of Spark Preview Job",
+    security = Array(new SecurityRequirement(name = "bearer")),
+    description = "Return Status of Spark Preview Job", tags = Array("Spark Preview Job"),
     parameters = Array(new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "Organization Id")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",
@@ -186,7 +193,8 @@ class PreviewFileRoutes(previewFileRegistry: ActorRef[PreviewFileRegistry.Comman
   @DELETE
   @Path("{sparkAppName}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Delete the specified spark application", description = "Delete the specified spark application", tags = Array("Spark Preview Job"),
+  @Operation(summary = "Delete the specified spark application", security = Array(new SecurityRequirement(name = "bearer")),
+    description = "Delete the specified spark application", tags = Array("Spark Preview Job"),
     parameters = Array(
       new Parameter(name = "sparkAppName", in = ParameterIn.PATH, description = "sparkAppName Id")
     ),

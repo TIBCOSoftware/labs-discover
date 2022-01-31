@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import com.tibco.labs.orchestrator.api.registry.TdvMgmtRegistry
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 
 //import jakarta.ws.rs.core.MediaType
 //import jakarta.ws.rs.{Consumes, DELETE, GET, POST, Path, Produces, PUT}
@@ -78,15 +79,14 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   def getTDVPubDSDetailsUnManagedJob(orgid: String, dsName: String): Future[ActionPerformedDetailsAssetsUnManaged] =
     tdvMgmtRegistry.ask(getUnManagedDatasetsDetailsMgmtRegistry(orgid, dsName, _))
 
-  def getTDVHealthJob(): Future[ActionPerformedCheck] =
-    tdvMgmtRegistry.ask(checkTdvMgmtRegistry)
+  def getTDVHealthJob: Future[ActionPerformedCheck] = tdvMgmtRegistry.ask(checkTdvMgmtRegistry)
   //#all-routes
   //#users-get-post
   //#users-get-delete
 
   //val PreviewRoutes: Route = postJobTdvRoute ~ deleteJobTdvRoute ~ updateJobTdvRoute
   val TdvRoutes: Route =
-      postJobTdvRoute ~
+    postJobTdvRoute ~
       putJobTdvRoute ~
       postUnManagedJobTdvRoute ~
       deleteJobTdvRoute ~
@@ -96,14 +96,14 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
       getDatasetsDetailsRoute ~
       getDatasetsAllManagedRoute ~
       getDatasetsAllUnManagedRoute ~
-        getDatasetsDetailsUnManagedRoute ~ getTdvHealthCheckRoute
+      getDatasetsDetailsUnManagedRoute ~ getTdvHealthCheckRoute
 
 
   @POST
   @Path("/managed/csv")
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Create a new CSV datasource with introspection in TDV", description = "Create a new datasource with introspection in TDV", tags = Array("Tibco DataVirtualization"),
+  @Operation(summary = "Create a new CSV datasource with introspection in TDV" ,security = Array(new SecurityRequirement(name = "bearer")), description = "Create a new datasource with introspection in TDV", tags = Array("Tibco DataVirtualization"),
     requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[tdvJob]),
       examples = Array(new ExampleObject(value =
         """		{
@@ -159,7 +159,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   @Path("/managed/csv")
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Update a CSV datasource with introspection in TDV", description = "Re-introspect a given data source", tags = Array("Tibco DataVirtualization"),
+  @Operation(summary = "Update a CSV datasource with introspection in TDV", security = Array(new SecurityRequirement(name = "bearer")), description = "Re-introspect a given data source", tags = Array("Tibco DataVirtualization"),
     requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[tdvJob]),
       examples = Array(new ExampleObject(value =
         """		{
@@ -218,14 +218,14 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   @Path("/unmanaged/copy")
   @Consumes(Array(MediaType.APPLICATION_JSON))
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Copy an unmanaged views into our system", description = "Copy an unmanaged views into our system", tags = Array("Tibco DataVirtualization"),
+  @Operation(summary = "Copy an unmanaged views into our system", security = Array(new SecurityRequirement(name = "bearer")), description = "Copy an unmanaged views into our system", tags = Array("Tibco DataVirtualization"),
     requestBody = new RequestBody(content = Array(new Content(schema = new Schema(implementation = classOf[UnManageDataSetCopy]),
       examples = Array(new ExampleObject(value =
         """		{
                 "DatasetName": "CallCenter",
                 "Annotation": "Some Call center logs",
                 "DatasetPath": "/somewhere/in/dark/path",
-                "Organization": "01dxjp1rpa35bzcv1kvem9ffyk"
+                "Organization": "<your TIBCO Discover Org id>"
               }"""
       ))))),
     responses = Array(
@@ -268,7 +268,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   //@QueryParam("dataViewName") dataViewName: String
   //@QueryParam("publishedDataViewName")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Delete the specified datasource in TDV", description = "Delete the specified datasource in TDV", tags = Array("Tibco DataVirtualization"),
+  @Operation(summary = "Delete the specified datasource in TDV", security = Array(new SecurityRequirement(name = "bearer")), description = "Delete the specified datasource in TDV", tags = Array("Tibco DataVirtualization"),
     parameters = Array(
       new Parameter(name = "orgId", in = ParameterIn.PATH, description = "orgId where te datasource is stored"),
       new Parameter(name = "DatasetID", in = ParameterIn.PATH, description = "DatasetID to be deleted")
@@ -285,7 +285,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   )
   def deleteJobTdvRoute: Route = {
     cors() {
-      path("tdv" / "managed" /"csv" / Segment / Segment) { (orgid, dataSourceName) =>
+      path("tdv" / "managed" / "csv" / Segment / Segment) { (orgid, dataSourceName) =>
         withRequestTimeout(30.seconds) {
           delete {
             //parameters("dataview", "publishedview") { (dataview, publishedview) =>
@@ -315,7 +315,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   //@QueryParam("dataViewName") dataViewName: String
   //@QueryParam("publishedDataViewName")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Get Schema of a specified DataSource", description = "Get Schema of a specified DataSource", tags = Array("Tibco DataVirtualization"),
+  @Operation(summary = "Get Schema of a specified DataSource", security = Array(new SecurityRequirement(name = "bearer")), description = "Get Schema of a specified DataSource", tags = Array("Tibco DataVirtualization"),
     parameters = Array(
       new Parameter(name = "orgId", in = ParameterIn.PATH, description = "orgId where the datasource is stored"),
       new Parameter(name = "DatasetID", in = ParameterIn.PATH, description = "DatasetID to be retrieve")
@@ -410,7 +410,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   )
   def getDatasetsPublishedRoute: Route = {
     cors() {
-      path("tdv" / "unmanaged" /"views"  / Segment) { (orgid) =>
+      path("tdv" / "unmanaged" / "views" / Segment) { (orgid) =>
         get {
           //parameters("dataview", "publishedview") { (dataview, publishedview) =>
           //#delete-sparkapp
@@ -429,6 +429,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
       }
     }
   }
+
   @GET
   @Path("/unmanaged/datasets/{orgId}")
   //@QueryParam("dataViewName") dataViewName: String
@@ -447,7 +448,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   )
   def getDatasetsAllUnManagedRoute: Route = {
     cors() {
-      path("tdv" / "unmanaged" / "datasets"  / Segment) { (orgid) =>
+      path("tdv" / "unmanaged" / "datasets" / Segment) { (orgid) =>
         get {
           //parameters("dataview", "publishedview") { (dataview, publishedview) =>
           //#delete-sparkapp
@@ -485,7 +486,7 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   )
   def getDatasetsAllManagedRoute: Route = {
     cors() {
-      path("tdv" / "managed" / "datasets"  / Segment) { (orgid) =>
+      path("tdv" / "managed" / "datasets" / Segment) { (orgid) =>
         get {
           //parameters("dataview", "publishedview") { (dataview, publishedview) =>
           //#delete-sparkapp
@@ -600,11 +601,11 @@ class TdvMgmtRoutes(tdvMgmtRegistry: ActorRef[TdvMgmtRegistry.Command])(implicit
   )
   def getTdvHealthCheckRoute: Route = {
     cors() {
-      path("tdv" / "health" ) {
+      path("tdv" / "health") {
         get {
           //parameters("dataview", "publishedview") { (dataview, publishedview) =>
           //#delete-sparkapp
-          onSuccess(getTDVHealthJob()) { performed =>
+          onSuccess(getTDVHealthJob) { performed =>
             if (performed.code == 0) {
               complete((StatusCodes.OK, performed))
             } else {

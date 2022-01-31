@@ -1,10 +1,9 @@
 import { Response } from 'koa';
 import { Body, Delete, Get, HeaderParam, JsonController, Param, Post, Put, Res, UploadedFile } from 'routing-controllers';
 import { Service } from 'typedi';
-import { FilesOperationsApi, LoginApi, LoginCredentials, PublishedViews, RedisFileInfo, RequestFile, SchemaTdv, TibcoDataVirtualizationApi, UnManageDataSetCopy } from '../backend/api';
+import { FilesOperationsApi, LoginApi, LoginCredentials, PublishedViews, RedisFileInfo, RequestFile, SchemaTdv, TibcoDataVirtualizationApi, UnManageDataSetCopy } from '../api/backend/api';
 import { DiscoverCache } from '../cache/DiscoverCache';
 import { CsvFile, CsvUploadMetadata, Dataset, DatasetListItem, DatasetUpdated, Preview, PreviewColumn, PreviewStatus } from '../models/datasets.model';
-import { AnalysisService } from '../services/analysis.service';
 import { DatasetService } from '../services/dataset.service';
 
 import axios from 'axios';
@@ -15,13 +14,11 @@ export class DatasetController {
 
   constructor (
     protected datasetService: DatasetService,
-    protected analysisService: AnalysisService,
     private loginApi: LoginApi,
     private tdvApi: TibcoDataVirtualizationApi,
     private fileApi: FilesOperationsApi,
     private cache: DiscoverCache
-  ){
-  }
+  ){}
 
   public static getName = (): string => {
     return 'DatasetController';
@@ -387,6 +384,9 @@ export class DatasetController {
 
   @Post('/files')
   async uploadCsvFile(@HeaderParam("authorization")token: string, @Body() body: CsvUploadMetadata, @UploadedFile("csv") file: any, @Res() response: Response): Promise<Response | any> {
+    // set the timeout for testing
+    response.ctx.request.socket.setTimeout(10 * 60 *1000);
+
     const check = await this.preflightCheck(token, response);
     if (check !== true) {
       return check;

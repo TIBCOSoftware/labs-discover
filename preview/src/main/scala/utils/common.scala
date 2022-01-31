@@ -5,12 +5,13 @@ package utils
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 import scala.tools.nsc.io.Path
 
 object common {
-
+  val logger: Logger = LoggerFactory.getLogger("Preview")
   /**
    * @return Unique identifier as a string
    */

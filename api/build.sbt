@@ -2,6 +2,7 @@
 ThisBuild / organization  := "com.tibco.labs.orchestrator"
 
 name := "labs-processmining-api"
+version := "0.9.0"
 
 scalaVersion := "2.12.14"
 lazy val akkaHttpVersion = "10.2.6"
@@ -48,6 +49,7 @@ dockerUpdateLatest := true
 dockerUsername := Some("tibcosoftware")
 //dockerRepository := sys.props.get("docker.registry")
 dockerBaseImage := "fcenedes/javaeks:latest"
+
 
 bashScriptExtraDefines ++= IO.readLines(baseDirectory.value / "kubernetes" / "ExtractTempKeys.sh")
 

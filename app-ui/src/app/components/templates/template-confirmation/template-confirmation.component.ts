@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {getSFLink} from '../../../functions/templates';
 import {ConfigurationService} from '../../../service/configuration.service';
 import {VisualisationService} from 'src/app/backend/api/visualisation.service';
-import { Template } from 'src/app/backend/model/models';
+import {Template} from 'src/app/backend/model/models';
 import {stripOrgFolder} from '../../../functions/analysis';
 
 @Component({
@@ -20,7 +20,7 @@ export class TemplateConfirmationComponent {
   stripOrgF = stripOrgFolder;
 
   constructor(
-    protected visualisationService: VisualisationService,
+    private visualisationService: VisualisationService,
     private configService: ConfigurationService
   ) {
   }
@@ -29,11 +29,4 @@ export class TemplateConfirmationComponent {
     window.open(getSFLink(this.configService.config?.discover?.analytics) + '/spotfire/wp/analysis?file=' + this.template.spotfireLocation);
   }
 
-  public getName = (): string => {
-    return this.template.spotfireLocation.substring(this.template.spotfireLocation.lastIndexOf('/')+1);
-  }
-
-  public isCopy = (): boolean => {
-    return this.analyticsChoice === 'COPY';
-  }
 }

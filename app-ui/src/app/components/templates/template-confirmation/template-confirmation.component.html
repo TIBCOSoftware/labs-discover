@@ -83,11 +83,11 @@
           <div class="item-header">File name</div>
         </td>
         <td>
-          <div class="item-detail">{{getName()}}</div>
+          <div class="item-detail">{{template.spotfireLocation.substring(this.template.spotfireLocation.lastIndexOf('/')+1)}}</div>
         </td>
       </tr>
     </table>
-    <div *ngIf="isCopy()" class="copy-dxp">
+    <div *ngIf="analyticsChoice === 'COPY'" class="copy-dxp">
       <div class="copy-dxp-switch">
         <div class="copy-dxp-label">A copy of the DXP will be made:</div>
       </div>

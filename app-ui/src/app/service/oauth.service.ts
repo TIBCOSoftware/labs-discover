@@ -21,7 +21,7 @@ export class OauthService {
   private APP_URL = '';
   private DOMAIN = '';
   private CLIENTID = '';
-  private SCOPE = 'securitycontext+internal.refresh-session+offline+openid+profile+email+openid+BPM+nimbus+spotfire+offline_access';
+  private SCOPE = 'securitycontext+internal.refresh-session+offline+openid+profile+email+openid+BPM+tsc+nimbus+spotfire+offline_access';
   // private SCOPE = 'securitycontext+internal.refresh-session+offline+openid+profile+email+openid+BPM+spotfire+offline_access';
   private VERIFIER;
   private MAX_TOKEN_EXPIRY_SECONDS = 1080;
@@ -41,6 +41,7 @@ export class OauthService {
       } else {
         this.APP_URL = window.location.protocol + '//' + host[0] + ':' + window.location.port + baseHref + 'index.html';
       }
+      this._REGION = 'eu';
     } else {
       this._MODE = 'cloud';
       this.ACCOUNT_DOMAIN = 'account.cloud.tibco.com';
@@ -176,7 +177,7 @@ export class OauthService {
       .replace(/\+/g, '-')
       .replace(/\//g, '_');
     this.setKey({verifier: codeVerifier});
-    // const codeChallenge = 'vVx8gU7hfb18z4v_fischYYz8aaeJP6GAio2a_WzE14';
+    // const codeChallenge = '<TIBCO Discover codeChallenge sample string: vvx...>';
     window.location.href = this.ACCOUNT_DOMAIN + '/idm/v1/oauth2/auth?response_type=code&scope='
       + this.SCOPE + '&redirect_uri='
       + this.APP_URL + '&client_id='
@@ -196,6 +197,12 @@ export class OauthService {
         return res.hid + '-' + res.hacct + '-' + res.regn;
       })
     )
+  }
+
+  getTscWhoami(): Observable<any> {
+    const url = `/tsc-ws/v2/whoami`;
+    // const url = `https://${this._REGION === 'us' ? '' : (this._REGION + '.')}account.cloud.tibco.com/tsc-ws/v2/whoami`;
+    return this.http.get(url);
   }
 
   public getToken(code: string): Observable<TokenResponse> {

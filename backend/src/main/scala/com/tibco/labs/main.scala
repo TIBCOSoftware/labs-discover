@@ -15,8 +15,7 @@ import java.io.File
 import com.tibco.labs.utils.Status._
 import io.circe.optics.JsonPath.root
 import org.apache.commons.io.FileUtils
-import org.apache.log4j.Logger
-import org.apache.spark.SparkConf
+
 import org.apache.spark.sql._
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 

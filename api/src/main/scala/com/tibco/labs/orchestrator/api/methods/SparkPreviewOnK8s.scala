@@ -93,6 +93,8 @@ class SparkPreviewOnK8s() {
     //val modArg0: Json => Json = Jsonroot.spec.arguments(0).string.modify(_ => s"${previewConfig.DatasetId}")
     val modArg1: Json => Json = Jsonroot.spec.arguments(1).string.modify(_ => s"${previewConfig.DatasetId}")
     //val modArg2: Json => Json = Jsonroot.spec.arguments(2).string.modify(_ => s"${previewConfig.Token}")
+    val modOpts1: Json => Json = Jsonroot.spec.sparkConf.`spark.driver.extraJavaOptions`.string.modify(_ => s"-Dlog4j.configuration=file:///log4j.properties -Dlogfile.name=spark-preview-${meta_name}")
+    val modOpts2: Json => Json = Jsonroot.spec.sparkConf.`spark.executor.extraJavaOptions`.string.modify(_ => s"-Dlog4j.configuration=file:///log4j.properties -Dlogfile.name=spark-preview-${meta_name}")
 
     jsonk8s = modName(jsonk8s)
     jsonk8s = modImg(jsonk8s)
@@ -102,6 +104,8 @@ class SparkPreviewOnK8s() {
     jsonk8s = modArg1(jsonk8s)
     //jsonk8s = modArg2(jsonk8s)
 
+    jsonk8s = modOpts1(jsonk8s)
+    jsonk8s = modOpts2(jsonk8s)
 
     //write the file to fs
 

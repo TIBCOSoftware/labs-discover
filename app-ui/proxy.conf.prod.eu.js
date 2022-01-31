@@ -1,3 +1,5 @@
+const path = require("path");
+const os = require("os");
 const PROXY_CONFIG = {
   "/idm/v3/login-oauth": {
     "target": {
@@ -436,7 +438,7 @@ const PROXY_CONFIG = {
     },
     "onProxyReq": addOauthHeader
   },
-  
+
   "/catalog": {
     "target": {
       "host": "discover.labs.tibcocloud.com",
@@ -467,6 +469,51 @@ const PROXY_CONFIG = {
     "onProxyReq": addOauthHeader
   },
 
+  "/repository": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
+  "/assets": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
+  "/visualisation": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
   "/login": {
     "target": {
       "host": "discover.labs.tibcocloud.com",
@@ -483,6 +530,21 @@ const PROXY_CONFIG = {
   },
 
   "/tdv": {
+    "target": {
+      "host": "discover.labs.tibcocloud.com",
+      "protocol": "https:",
+      "port": 443
+    },
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "info",
+    "headers": {
+      "Origin": "https://discover.labs.tibcocloud.com"
+    },
+    "onProxyReq": addOauthHeader
+  },
+
+  "/documentation": {
     "target": {
       "host": "discover.labs.tibcocloud.com",
       "protocol": "https:",
@@ -582,9 +644,11 @@ try {
         // Do not replace the token on the fly.
         replaceTCSTKSESSION = false;
         if (token == 'USE-GLOBAL') {
-          const {resolve} = require('path')
-          const globalPath = resolve(process.execPath, '../../lib/node_modules');
-          const globalProp = propReader(globalPath + '/@tibco-tcstk/common/global-tibco-cloud.properties').path();
+          const path = require('path')
+          const os = require('os')
+          const GLOBALTCPropFolder = path.join(os.homedir(), '.tcli')
+          const GLOBALPropertyFileName = path.join(GLOBALTCPropFolder, 'global-tibco-cloud.properties')
+          const globalProp = propReader(GLOBALPropertyFileName).path();
           if (globalProp.CloudLogin && globalProp.CloudLogin.OAUTH_Token && globalProp.CloudLogin.OAUTH_Token.trim() != '') {
             token = globalProp.CloudLogin.OAUTH_Token;
 

@@ -184,3 +184,15 @@ uxpl-data-point::part(data-point-icon) {
   letter-spacing: 0;
   line-height: 18px;
 }
+
+.description-label {
+  color: #727272;
+  font-size: 10px;
+  line-height: 13px;
+}
+
+.description-detail {
+  color: #212121;
+  font-size: 14px;
+  line-height: 21px;
+}

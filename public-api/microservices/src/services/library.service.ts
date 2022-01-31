@@ -7,26 +7,19 @@ import { Session, Visualisation } from "../models/library.model";
 @Service()
 export class LibraryService {
 
-  private cache: DiscoverCache;
-
   constructor (
-    liveappsURL: string, 
-    redisHost: string, 
-    redisPort: number
-  ) {
-    this.cache = new DiscoverCache(redisHost, redisPort, liveappsURL);
-  }
+    protected cache: DiscoverCache,
+    protected spotfireURL: string
+  ) {}
 
   public getItems = async (token: string, type: string): Promise<Visualisation[]> => {
-    const settings = await this.callSpotfire(token, 'https://eu.spotfire-next.cloud.tibco.com/spotfire/wp/settings', 'GET');
+    const settings = await this.callSpotfire(token, this.spotfireURL + '/spotfire/wp/settings', 'GET');
     const rootFolderId = settings.data.rootFolderId;
 
-    const folderInfo = await this.getFolderInfo(token, rootFolderId);
+    const rootFolderInfo = await this.getFolderInfo(token, rootFolderId);
+    const folderInfo = await this.getFolderInfo(token, rootFolderInfo.data.Children.filter((folder: any) => folder.IsFolder && folder.Path === '/Teams')[0].Id);
 
-    const folderInfo2 = await this.getFolderInfo(token, folderInfo.data.Children.filter((folder: any) => folder.IsFolder && folder.Path === '/Teams')[0].Id);
-    // logger.debug(folderInfo2.data);
-
-    const teamsInfo = folderInfo2.data;
+    const teamsInfo = folderInfo.data;
     if (teamsInfo != null){
       const org = (await this.cache.getTokenInformation(token)).globalSubscriptionId;
       const orgFolderId = teamsInfo.Children.filter((el: any) => el.IsFolder && el.Path === ('/Teams/' + org))[0].Id;
@@ -41,11 +34,10 @@ export class LibraryService {
   public copyItem = async (token: string, itemId: string, newName: string, newFolder: string): Promise<any> => {
     const copyItem = {
       itemsToCopy: [itemId],
-      // destinationItemName: newName.slice(newName.lastIndexOf('/') + 1),
       destinationFolderId: newFolder,
       conflictResolution: 'KeepBoth'
     }
-    const copyResponse = await this.callSpotfire(token, 'https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/copy', 'POST', copyItem);
+    const copyResponse = await this.callSpotfire(token, this.spotfireURL + '/spotfire/rest/library/copy', 'POST', copyItem);
     if (newName) {
       return await this.renameItem(token, copyResponse.data[0].Id, newName.slice(newName.lastIndexOf('/') + 1));
     }
@@ -61,33 +53,29 @@ export class LibraryService {
           headers: { 
             cookie: "JSESSIONID=" + session.JSESSIONID,
             "X-XSRF-TOKEN": session["X-XSRF-TOKEN"],
-            referer:  'eu.' + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage'
+            referer:  this.spotfireURL.replace('https://', '') + '/spotfire/wp/startPage'
           }
         });
     }
 
     if (method === 'POST'){
-      // try{
-              return await axios.post(url, data,
+      return await axios.post(url, data,
         {
           headers: { 
             cookie: "JSESSIONID=" + session.JSESSIONID,
             "X-XSRF-TOKEN": session["X-XSRF-TOKEN"],
-            referer:  'eu.' + 'spotfire-next.cloud.tibco.com/spotfire/wp/startPage'
+            referer:  this.spotfireURL.replace('https://', '') + '/spotfire/wp/startPage'
           }
-        });
-      // } catch (e) {
-      //   logger.error(e);
-      // }
+        }
+      );
     }
   }
 
   private iterateItems = async (token: string, baseFolderId: string, type: string): Promise<any> => {
     let re = [];
     const iterateFolder = await this.getFolderInfo(token, baseFolderId);
-    // logger.debug(iterateFolder.data);
 
-    for (let itItem of iterateFolder.data.Children) { // Could be changed into a Map
+    for (let itItem of iterateFolder.data.Children){
       if(itItem.ItemType === type){
         re.push(itItem);
       }
@@ -100,14 +88,8 @@ export class LibraryService {
 
   private getSession = async (token: string): Promise<Session> => {
     logger.debug('Token is: ' + token);
-    // const s  = await this.cache.get('spotfire', 'token', token);
-
-    // if (s) {
-    //   return JSON.parse(s) as Session;
-    // }
-
     logger.debug('GET NEW Session from spotfire');
-    const response = await axios.get('https://eu.spotfire-next.cloud.tibco.com', 
+    const response = await axios.get(this.spotfireURL, 
       {
         headers: { 'Authorization': 'Bearer ' + token }
       });
@@ -118,7 +100,6 @@ export class LibraryService {
       // @ts-expect-error
       'X-XSRF-TOKEN': /XSRF-TOKEN=(.*?);/g.exec(response.headers['set-cookie'])[1],
     }
-    // this.cache.set('spotfire', 'token', token, JSON.stringify(session), 600);
     return session;
   }
 
@@ -127,7 +108,7 @@ export class LibraryService {
       "folderId": folderId,
       "types": ["spotfire.folder", "spotfire.dxp", "spotfire.sbdf", "spotfire.mod"]
     };
-    return await this.callSpotfire(token, 'https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/folderInfo', 'POST', request);    
+    return await this.callSpotfire(token, this.spotfireURL + '/spotfire/rest/library/folderInfo', 'POST', request);    
   }
 
   private renameItem = async (token: string, id: string, title: string): Promise<any> => {
@@ -135,6 +116,6 @@ export class LibraryService {
       itemId: id,
       title: title
     }
-    return await this.callSpotfire(token, 'https://eu.spotfire-next.cloud.tibco.com/spotfire/rest/library/modifyTitle', 'POST', renameItem);
+    return await this.callSpotfire(token, this.spotfireURL + '/spotfire/rest/library/modifyTitle', 'POST', renameItem);
   }
 }

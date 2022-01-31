@@ -1,6 +1,7 @@
 <div class="basic-info-container">
   <uxpl-form-field style="margin-top: 5px; margin-bottom: 5px;" id="analysis-name" label="Analysis name" type="text" [valid]="isValidName()" required="true" [value]="name" (uxplChanged)="handleUpdate($event, 'name')" [hint]="nameHint"></uxpl-form-field>
-  <uxpl-form-field style="margin-top: 5px; margin-bottom: 5px;" id="analysis-description" label="Analysis description" type="text" valid required="true" [value]="description" (uxplChanged)="handleUpdate($event, 'description')"></uxpl-form-field>
+  <!--<uxpl-form-field style="margin-top: 5px; margin-bottom: 5px;" id="analysis-description" label="Analysis description" type="text" valid required="true" [value]="description" (uxplChanged)="handleUpdate($event, 'description')"></uxpl-form-field>-->
+  <uxpl-textarea style="margin-top: 5px;" placeholder="Describe your process analysis..." [value]="description" (uxplChanged)="handleUpdate($event, 'description')">Analysis description</uxpl-textarea>
 </div>
 
 

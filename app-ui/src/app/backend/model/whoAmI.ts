@@ -9,6 +9,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { TenantInformation } from './tenantInformation';
 
 
 export interface WhoAmI { 
@@ -21,5 +22,6 @@ export interface WhoAmI {
     isAdmin?: boolean;
     isAnalyst?: boolean;
     isResolver?: boolean;
+    tenants?: Array<TenantInformation>;
 }
 

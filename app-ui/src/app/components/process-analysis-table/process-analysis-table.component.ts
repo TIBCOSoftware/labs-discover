@@ -13,6 +13,7 @@ import {get} from 'lodash-es';
 import {Analysis} from 'src/app/backend/model/models';
 import {UxplPopup} from '@tibco-tcstk/tc-web-components/dist/types/components/uxpl-popup/uxpl-popup';
 import { DateTime } from 'luxon';
+import {getShortMessage} from '../../functions/details';
 
 @Component({
   selector: 'process-analysis-table',
@@ -60,14 +61,15 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
 
   public actions = {}
 
+  // callCounter = 0
+
   ngOnInit() {
-
-
     this.cols = [
       {field: 'data.name', header: 'Name'},
       {field: 'data.description', header: 'Description'},
       {field: 'metadata.modifiedBy', header: 'Last updated by'},
       {field: 'metadata.modifiedOn', header: 'Last updated'},
+      /*{field: 'data.templateLabel', header: 'Template'},*/
       {field: 'metadata.state', header: 'Status'},
     ];
   }
@@ -94,10 +96,12 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
     }
   }
 
+  // TODO: put the data in a data matrix
+  // callCounter = 0
   public obtainData(rowData: any, col: any): string {
-    // console.log('Get data.... ')
+    // console.log('Get data('+col+') .... ', this.callCounter)
     // this.callCounter++;
-    return get(rowData, col);
+    return getShortMessage(get(rowData, col), 50);
   }
 
   public getToolTip(field: any, data: any) {
@@ -140,7 +144,7 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
     return re;
   }
 
-  private calculateActions() {
+  public calculateActions() {
     if (this.processAnalyses && this.processAnalyses.length > 0) {
       for (const rowData of this.processAnalyses) {
         const actionButtons = rowData.actions.map(element => {
@@ -169,35 +173,6 @@ export class ProcessAnalysisTableComponent implements OnInit, OnChanges {
       }
     }
   }
-
-  // This function was creating very high CPU load
-  /*
- public getAction(rowData) {
-   const actionButtons = rowData.actions.map(element => {
-     return {
-       id: element,
-       label: element,
-       data: {
-         analysisId: rowData.id,
-         name: element,
-         action: element
-       }
-     }
-   });
-
-   if(rowData.data.templateId && rowData.data.templateId !== '' && rowData.metadata.state === 'Ready'){
-     actionButtons.splice(0, 0, {
-       id: 'Change template',
-       label: 'Change template',
-       data: {
-         analysisId: rowData.id,
-         name: 'change-template',
-       }
-     })
-   }
-     return {options: actionButtons}
-
-  }*/
 
 
   public async handleCaseActionSelect(event: any, rowNumber: number) {

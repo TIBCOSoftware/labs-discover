@@ -1,9 +1,8 @@
 import { Response } from 'koa';
-import { Param, Body, Get, Post, Put, Delete, HeaderParam, QueryParam, JsonController, Res } from 'routing-controllers';
+import { Body, Get, Post, Put, Delete, HeaderParam, QueryParam, JsonController, Res } from 'routing-controllers';
 import { Service } from 'typedi';
 import { logger } from '../common/logging';
 import { GeneralInformation } from '../models/configuration.model';
-import { Template, TemplateRequest } from '../models/templates.model';
 import { ConfigurationService } from '../services/configuration.service';
 import { LibraryService } from '../services/library.service';
 import { TemplatesService } from '../services/templates.service';
@@ -12,16 +11,11 @@ import { TemplatesService } from '../services/templates.service';
 @JsonController('/admin')
 export class AdministrationController {
   
-  private templatesService: TemplatesService;
-  private libraryService: LibraryService;
-  private configurationService: ConfigurationService;
-  
-  constructor (){
-    this.templatesService = new TemplatesService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
-    this.libraryService = new LibraryService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
-    this.configurationService = new ConfigurationService(process.env.LIVEAPPS as string, process.env.REDIS_HOST as string, Number(process.env.REDIS_PORT as string));
-    // this.templatesService.initActions();
-  }
+  constructor (
+    protected configurationService: ConfigurationService,
+    protected libraryService: LibraryService,
+    protected templateService: TemplatesService
+    ){}
 
   public static getName = (): string => {
     return 'AdminController';

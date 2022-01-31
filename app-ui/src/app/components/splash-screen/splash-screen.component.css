@@ -73,10 +73,17 @@
   width: 588px;
 }
 
+.highlight uxpl-icon {
+  flex: 1;
+}
+
 .highlight .track-icon {
   height: 48px;
   width: 48px;
   background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .highlight .collaborate-icon {

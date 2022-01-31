@@ -47,7 +47,8 @@ export class CsvService {
     let localConfig = {
       preview: lines + 1,
       download: true,
-      step: null
+      step: null,
+      complete: null
     }
 
     if (config) {
@@ -65,6 +66,10 @@ export class CsvService {
             parser.abort();
             observable.complete();
           }
+        }
+        // if the rows of csv file is less than the preview count, need to complete once no more lines.
+        localConfig.complete = () => {
+          observable.complete();
         }
         parse(file, localConfig);
       }

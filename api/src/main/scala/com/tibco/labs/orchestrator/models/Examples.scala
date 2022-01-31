@@ -87,7 +87,7 @@ object Examples {
       |    "Start_time": "Start Date"
       |  },
       |  "Name": "CallCenter",
-      |  "Organization": "01dxjp1rpa35bzcv1kvem9ffyk",
+      |  "Organization": "<your TIBCO Organization ID>",
       |  "Schedule": {
       |    "Schedule": "every5min",
       |    "isSchedule": "false"

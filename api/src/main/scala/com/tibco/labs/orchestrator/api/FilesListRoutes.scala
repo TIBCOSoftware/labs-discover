@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.{Content, Schema}
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.{Operation, Parameter}
 import org.slf4j.LoggerFactory
 
@@ -60,7 +61,7 @@ class FilesListRoutes(filesRegistry: ActorRef[FilesListRegistry.Command])(implic
   @GET
   @Path("{orgid}")
   @Produces(Array(MediaType.APPLICATION_JSON))
-  @Operation(summary = "Return list of files stored in this org", description = "Return list of files stored in this org", tags = Array("Files Operations"),
+  @Operation(summary = "Return list of files stored in this org", security = Array(new SecurityRequirement(name = "bearer")), description = "Return list of files stored in this org", tags = Array("Files Operations"),
     parameters = Array(new Parameter(name = "orgid", in = ParameterIn.PATH, description = "Organization Id")),
     responses = Array(
       new ApiResponse(responseCode = "200", description = "response",

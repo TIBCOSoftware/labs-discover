@@ -110,12 +110,24 @@ export class CustomCaseTableComponent implements OnInit, OnChanges {
   }
 
   public getStateColor(state) {
-    const color =  this.cConfig.states.filter(el => el.name === state)[0].color;
+    const investigationState =  this.cConfig.states.filter(el => el.name === state)[0];
+    let color =  ''
+    if(investigationState) {
+      color  = investigationState.color
+    } else {
+      console.error('No color found for state: ', state)
+    }
     return color ? color : '#f4f4f4';
   }
 
   public getStateIcon(state){
-    const icon = this.cConfig.states.filter(el => el.name === state)[0].icon;
+    const investigationState = this.cConfig.states.filter(el => el.name === state)[0];
+    let icon = ''
+    if(investigationState) {
+      icon = investigationState.icon
+    } else {
+      console.error('No Icon found for state: ', state)
+    }
     return icon ? icon : 'assets/images/states' + state + '.svg';
   }
 

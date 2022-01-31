@@ -1,16 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfigurationService } from 'src/app/backend/api/configuration.service';
 import { MessageTopicService } from '@tibco-tcstk/tc-core-lib';
-import { TcDocumentService } from '@tibco-tcstk/tc-liveapps-lib';
 import { set } from 'lodash-es';
 import { MatDialog } from '@angular/material/dialog';
 import { WelcomePreviewComponent } from 'src/app/components/welcome-preview/welcome-preview.component';
 import { HightlighEditComponent } from 'src/app/components/hightligh-edit/hightligh-edit.component';
-import { HttpEventType } from '@angular/common/http';
 import { GeneralInformation } from 'src/app/backend/model/generalInformation';
 import { LandingPage } from 'src/app/backend/model/landingPage';
 import { map } from 'rxjs/operators';
 import { Analytics } from 'src/app/backend/model/analytics';
+import { LandingPageUploadResponse } from 'src/app/backend/model/landingPageUploadResponse';
 
 @Component({
   selector: 'settings-branding',
@@ -34,8 +33,7 @@ export class SettingsBrandingComponent implements OnInit {
   constructor(
     protected configurationService: ConfigurationService,
     protected dialog: MatDialog,
-    protected messageService: MessageTopicService,
-    protected documentService: TcDocumentService) {
+    protected messageService: MessageTopicService) {
   }
 
   ngOnInit(): void {
@@ -116,8 +114,8 @@ export class SettingsBrandingComponent implements OnInit {
 
   public handleHighlighEdit = (index) => {
     const dialogRef = this.dialog.open(HightlighEditComponent, {
-      width: '40%',
-      height: '40%',
+      width: '60%',
+      height: '50%',
       data: {...this.landingPage.highlights[index]}
     });
 
@@ -129,19 +127,13 @@ export class SettingsBrandingComponent implements OnInit {
   }
 
   public handleUpload = (file: File): void => {
-    // let uploadProgress = 0;
-    // this.documentService.uploadDocument('orgFolders', this.configService.config.uiAppId + '_assets', this.configService.config.sandboxId, file, file.name, 'File uploaded from browser.').subscribe(
-    //   (response: any) => {
-    //     if (response.type === HttpEventType.UploadProgress) {
-    //       uploadProgress = Math.round(100 * response.loaded / response.total);
-    //       if (uploadProgress === 100) {
-    //         this.landingPage.backgroundURL = file.name;
-    //       }
-    //     }
-    //   },
-    //   error => {
-    //     console.log('error', error);
-    //   }
-    // );
+    this.configurationService.postLandingPagesUploadConfiguration(file).subscribe(
+      (response: LandingPageUploadResponse) => {
+        this.landingPage.backgroundURL = response.path;
+      },
+      error => {
+        console.log('error', error);
+      }
+    );
   }
 }

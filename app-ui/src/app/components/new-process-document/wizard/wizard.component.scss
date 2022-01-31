@@ -1,0 +1,72 @@
+.fixActionRow {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.dialog-content {
+    height:100%;
+}
+
+.mat-dialog-content {
+  max-height: initial;
+}
+
+.mat-dialog-actions {
+    justify-content: flex-end;
+}
+
+::ng-deep table {
+    font-size: 14px;
+    span {
+        font-size: 14px;
+        font-family: "Source Sans Pro";
+    }
+    span.p-inputtext {
+        font-size: 14px;
+        font-family: "Source Sans Pro";
+    }
+}
+
+.modal-backdrop {
+    position: absolute;
+    width: calc(100% + 48px);
+    height: calc(100% - 150px);
+    background: #FFFFFF;
+    z-index: 1001;
+    top: 100px;
+    left: -24px;
+    .overlay-container {
+        z-index: 1002;
+        position: relative;
+        top: calc(50% - 213px);
+        width: 80%;
+        text-align: center;
+        margin: auto;
+
+        .result-text {
+            height: 23px;
+            color: #212121;
+            font-family: "Source Sans Pro";
+            font-size: 18px;
+            letter-spacing: 0;
+            line-height: 23px;
+            text-align: center;
+        }
+        .result-msg {
+            margin-top: 16px;
+            height: 48px;
+            color: #212121;
+            font-family: "Source Sans Pro";
+            font-size: 16px;
+            letter-spacing: 0;
+            line-height: 24px;
+            text-align: center;
+        }
+    }
+}

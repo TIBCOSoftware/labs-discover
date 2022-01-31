@@ -14,6 +14,31 @@
     
     
     <item>
+      <title>Blog: Januar 2022 release</title>
+      <link>https://tibcosoftware.github.io/labs-discover/blog/2022/01/31/januar-2022-release/</link>
+      <pubDate>Mon, 31 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://tibcosoftware.github.io/labs-discover/blog/2022/01/31/januar-2022-release/</guid>
+      <description>
+        
+        
+        &lt;p&gt;What’s new in the January 2022 release of Project Discover™ ?
+This release contains the following new features&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Process documentation: available to TIBCO Cloud Nimbus customers, you can now generate a Nimbus map to document the discovered variants.&lt;/li&gt;
+&lt;li&gt;Filter panel overlay enhancement: you now have the ability to Filter In/Out on both Events/Cases. Also, the filter dialog can now be maximized for better usability.&lt;/li&gt;
+&lt;li&gt;A new visualization is added to several pages of the Spotfire templates: the &amp;lsquo;icicle&amp;rsquo; mod allows to dynamically navigate the data associated with events. You can use it both for filtering and navigation purpose. Think about it as a sort of combination of a tree map and a cross table.&lt;/li&gt;
+&lt;li&gt;We added documentation to the preview Spotfire DXP, allowing to define filters as pre-processing.&lt;/li&gt;
+&lt;li&gt;Bug fixes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;keep your feedbacks coming!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+      </description>
+    </item>
+    
+    <item>
       <title>Blog: October 2021 release</title>
       <link>https://tibcosoftware.github.io/labs-discover/blog/2021/11/01/october-2021-release/</link>
       <pubDate>Mon, 01 Nov 2021 00:00:00 +0000</pubDate>

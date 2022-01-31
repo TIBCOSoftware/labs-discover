@@ -281,7 +281,8 @@ object events {
       val columnNamesToKeepAttr = Seq("row_id", "analysis_id") ++ newColNamesToKeep
       logger.info("Attributes cols table for binary support : " + columnNamesToKeepAttr)
       df_attributes_binary = df_events.select(columnNamesToKeepAttr.head, columnNamesToKeepAttr.tail: _*)
-      //df_attributes_binary.printSchema()
+      logger.info("Print attributes schema")
+      logger.info(df_attributes_binary.schema.treeString)
       logger.info("To lowercase...")
       df_attributes_binary = df_attributes_binary.select(df_attributes_binary.columns.map(x => col(x).as(x.toLowerCase)): _*)
       //df_attributes_binary.printSchema()
