@@ -43,7 +43,7 @@
     "chartjs-plugin-datalabels": "^2.0.0",
     "crypto-es": "^1.2.7",
     "lodash-es": "^4.17.20",
-    "luxon": "^2.1.1",
+    "luxon": "^2.5.2",
     "ng2-charts": "^3.0.0-rc.7",
     "ngx-color-picker": "^10.1.0",
     "papaparse": "^5.3.1",
